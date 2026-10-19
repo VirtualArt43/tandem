@@ -1,0 +1,1196 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Queues inside a fixed buffer · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="fixed-buffer-queues" data-title="Queues inside a fixed buffer" data-track="core" data-module="core-17" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details open><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues" class=here><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m17">Module 17: System coding rounds</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 17.8</span><span>34 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Queues inside a fixed buffer</h1><p class="lsum">Build bounded rings, prove single-producer single-consumer ordering, and share fixed storage between two FIFO queues with a free list.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Google</span><span class="co">Microsoft</span></div><div class="prereq"><span>Before this:</span><a href="producer-consumer.html">Producer and consumer with a bounded buffer</a><a href="condition-variables.html">Condition variables and monitors</a></div></header><article class="prose" id="article">
+<p class="lead">Rubrik's senior screens have asked for a FIFO queue inside a fixed-size buffer with no dynamic allocation, then for multiple threads, then for two queues sharing one buffer of hundreds of megabytes with minimal waste. Google and Microsoft ask the circular buffer and its locking too. This lesson builds each step.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of a conveyor belt sushi bar with eight plate spots going round. The chef puts a plate on the next free spot; diners take the oldest plate; both just keep walking round the same eight spots. Nothing new is built while the restaurant runs, and when all eight spots hold a plate, the chef waits. That is a ring buffer.</p>
+<p>Now two restaurants share one parking area of numbered bays. Each restaurant keeps its own waiting line of cars, and every car holds a slip saying "the next car in my line is in bay 17". A board at the gate lists the empty bays. A car takes any empty bay from the board and joins its line; a car that leaves puts its bay back on the board. Neither restaurant owns half the lot: <strong>space flows to whichever line needs it</strong>. That is two queues in one buffer with a free list.</p>
+</div>
+
+<h2 id="the-ring-buffer">The ring buffer</h2>
+<p>A <a class="term" data-term="ring-buffer" href="glossary.html#ring-buffer">ring buffer</a> is an array of <code>capacity</code> slots plus two indices: <code>head</code> (the next slot to read) and <code>tail</code> (the next slot to write). Writing puts the value at <code>tail</code> and moves <code>tail</code> forward; reading takes it from <code>head</code> and moves <code>head</code> forward; both wrap to 0 at the end of the array. The index updates take O(1) work and <strong>payload storage never grows after construction</strong>. Blocking operations can still wait indefinitely. Java lock contention and condition waits can allocate internal waiter nodes, so a fixed array alone is not a promise of zero runtime allocation.</p>
+<p>The one subtle question is how to tell full from empty, because in both cases <code>head == tail</code>. Three standard answers:</p>
+<table>
+<thead><tr><th>Convention</th><th>Empty when</th><th>Full when</th><th>Trade-off</th></tr></thead>
+<tbody>
+<tr><td>Keep a <code>count</code></td><td><code>count == 0</code></td><td><code>count == capacity</code></td><td>Simplest; one more field to update</td></tr>
+<tr><td>Leave one slot unused</td><td><code>head == tail</code></td><td><code>(tail + 1) % capacity == head</code></td><td>No count, but one slot is always wasted</td></tr>
+<tr><td>Logical counters; index is <code>counter &amp; (capacity - 1)</code> for a power-of-two capacity</td><td><code>tail == head</code></td><td><code>tail - head == capacity</code></td><td>No wasted slot and no count; the SPSC version below uses modular counter arithmetic</td></tr>
+</tbody>
+</table>
+<p>At a billion increments per second, a signed 64-bit counter reaches its sign boundary in about 292 years, but correctness should still cover wraparound. The SPSC example uses defined modular arithmetic: Java <code>long</code> arithmetic wraps, and C++ uses unsigned <code>uint64_t</code>. A positive power-of-two capacity, far below half the counter range, keeps the bounded distance and low-bit index meaningful across wraparound; signed C++ overflow would be undefined behaviour.</p>
+
+<h2 id="making-it-thread-safe">Making it thread-safe</h2>
+<p>The multi-threaded version is the <a class="term" data-term="bounded-buffer" href="glossary.html#bounded-buffer">bounded buffer</a> you already know, with the deque replaced by the array: one lock guards <code>slots</code>, <code>head</code>, <code>tail</code> and <code>count</code> as a single invariant, producers wait for "not full", consumers wait for "not empty", and every wait is a loop. The demo below pushes 30,000 items through 8 slots, so the indices wrap thousands of times.</p>
+
+<figure class="code pair" data-sample="fixed-buffer-queues.1" data-expect="ok"><figcaption><span class="ctitle">A blocking ring buffer of ints: fixed array, one lock, two conditions</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// A blocking FIFO of ints: payload storage is allocated once.</span>
+<span class="k">class</span> IntRing {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">IntRing</span>(<span class="t">size_t</span> capacity) : <span class="f">slots_</span>(capacity) {
+        <span class="k">if</span> (capacity == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"positive capacity required"</span>);
+    }
+
+    <span class="t">void</span> <span class="f">put</span>(<span class="t">int</span> value) {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        notFull_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> count_ &lt; slots_.<span class="f">size</span>(); });
+        slots_[tail_] = value;
+        tail_ += <span class="n">1</span>;
+        <span class="k">if</span> (tail_ == slots_.<span class="f">size</span>()) {          <span class="c">// wrap around</span>
+            tail_ = <span class="n">0</span>;
+            laps_ += <span class="n">1</span>;
+        }
+        count_ += <span class="n">1</span>;
+        notEmpty_.<span class="f">notify_one</span>();
+    }
+
+    <span class="t">int</span> <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        notEmpty_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> count_ &gt; <span class="n">0</span>; });
+        <span class="t">int</span> value = slots_[head_];
+        head_ += <span class="n">1</span>;
+        <span class="k">if</span> (head_ == slots_.<span class="f">size</span>()) head_ = <span class="n">0</span>;
+        count_ -= <span class="n">1</span>;
+        notFull_.<span class="f">notify_one</span>();
+        <span class="k">return</span> value;
+    }
+
+    <span class="t">uint64_t</span> <span class="f">laps</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        <span class="k">return</span> laps_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; slots_;     <span class="c">// sized once, never resized</span>
+    <span class="t">size_t</span> head_ = <span class="n">0</span>;            <span class="c">// next slot to read</span>
+    <span class="t">size_t</span> tail_ = <span class="n">0</span>;            <span class="c">// next slot to write</span>
+    <span class="t">size_t</span> count_ = <span class="n">0</span>;           <span class="c">// tells full from empty when head_ == tail_</span>
+    <span class="t">uint64_t</span> laps_ = <span class="n">0</span>;          <span class="c">// how often tail_ wrapped around, for the demo</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notFull_, notEmpty_;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    IntRing <span class="f">ring</span>(<span class="n">8</span>);
+    <span class="k">const</span> <span class="t">int</span> producers = <span class="n">3</span>, consumers = <span class="n">3</span>, perProducer = <span class="n">10000</span>;
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int64_t</span>&gt; sum{<span class="n">0</span>}, taken{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; producers; p += <span class="n">1</span>)
+        threads.<span class="f">emplace_back</span>([&amp;] { <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= perProducer; i += <span class="n">1</span>) ring.<span class="f">put</span>(i); });
+    <span class="k">for</span> (<span class="t">int</span> c = <span class="n">0</span>; c &lt; consumers; c += <span class="n">1</span>)
+        threads.<span class="f">emplace_back</span>([&amp;] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; producers * perProducer / consumers; i += <span class="n">1</span>) {
+                sum += ring.<span class="f">take</span>();
+                taken += <span class="n">1</span>;
+            }
+        });
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    <span class="t">int64_t</span> expected = <span class="k">static_cast</span>&lt;<span class="t">int64_t</span>&gt;(producers) * perProducer * (perProducer + <span class="n">1</span>) / <span class="n">2</span>;
+    <span class="k">if</span> (taken.<span class="f">load</span>() != producers * perProducer || sum.<span class="f">load</span>() != expected) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"bad ring"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%lld items through 8 slots; sum correct: %s; the write index wrapped %llu times\n"</span>,
+                <span class="k">static_cast</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt;(taken.<span class="f">load</span>()), sum.<span class="f">load</span>() == expected ? <span class="s">"true"</span> : <span class="s">"false"</span>,
+                <span class="k">static_cast</span>&lt;<span class="t">unsigned</span> <span class="t">long</span> <span class="t">long</span>&gt;(ring.<span class="f">laps</span>()));
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="c">// A blocking FIFO of ints: payload storage is allocated once.</span>
+<span class="k">final</span> <span class="k">class</span> <span class="t">IntRing</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span>[] slots;
+    <span class="k">private</span> <span class="t">int</span> head = <span class="n">0</span>;        <span class="c">// next slot to read</span>
+    <span class="k">private</span> <span class="t">int</span> tail = <span class="n">0</span>;        <span class="c">// next slot to write</span>
+    <span class="k">private</span> <span class="t">int</span> count = <span class="n">0</span>;       <span class="c">// tells full from empty when head == tail</span>
+    <span class="k">private</span> <span class="t">long</span> laps = <span class="n">0</span>;       <span class="c">// how often tail wrapped around, for the demo</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notEmpty = lock.<span class="f">newCondition</span>();
+
+    <span class="t">IntRing</span>(<span class="t">int</span> capacity) {
+        <span class="k">if</span> (capacity &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"positive capacity required"</span>);
+        slots = <span class="k">new</span> <span class="t">int</span>[capacity];
+    }
+
+    <span class="k">void</span> <span class="f">put</span>(<span class="t">int</span> value) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (count == slots.length) notFull.<span class="f">await</span>();
+            slots[tail] = value;
+            tail += <span class="n">1</span>;
+            <span class="k">if</span> (tail == slots.length) {          <span class="c">// wrap around</span>
+                tail = <span class="n">0</span>;
+                laps += <span class="n">1</span>;
+            }
+            count += <span class="n">1</span>;
+            notEmpty.<span class="f">signal</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="t">int</span> <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (count == <span class="n">0</span>) notEmpty.<span class="f">await</span>();
+            <span class="t">int</span> value = slots[head];
+            head += <span class="n">1</span>;
+            <span class="k">if</span> (head == slots.length) head = <span class="n">0</span>;
+            count -= <span class="n">1</span>;
+            notFull.<span class="f">signal</span>();
+            <span class="k">return</span> value;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="t">long</span> <span class="f">laps</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">return</span> laps;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">IntRing</span> ring = <span class="k">new</span> <span class="t">IntRing</span>(<span class="n">8</span>);
+        <span class="k">final</span> <span class="t">int</span> producers = <span class="n">3</span>, consumers = <span class="n">3</span>, perProducer = <span class="n">10_000</span>;
+        <span class="t">AtomicLong</span> sum = <span class="k">new</span> <span class="t">AtomicLong</span>(), taken = <span class="k">new</span> <span class="t">AtomicLong</span>();
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; threads = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; producers; p += <span class="n">1</span>) {
+            threads.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= perProducer; i += <span class="n">1</span>) ring.<span class="f">put</span>(i);
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"producer-"</span> + p));
+        }
+        <span class="k">for</span> (<span class="t">int</span> c = <span class="n">0</span>; c &lt; consumers; c += <span class="n">1</span>) {
+            threads.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; producers * perProducer / consumers; i += <span class="n">1</span>) {
+                        sum.<span class="f">addAndGet</span>(ring.<span class="f">take</span>());
+                        taken.<span class="f">incrementAndGet</span>();
+                    }
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"consumer-"</span> + c));
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">join</span>();
+        <span class="t">long</span> expected = (<span class="t">long</span>) producers * perProducer * (perProducer + <span class="n">1</span>) / <span class="n">2</span>;
+        <span class="k">if</span> (taken.<span class="f">get</span>() != producers * perProducer || sum.<span class="f">get</span>() != expected) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"bad ring"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(taken.<span class="f">get</span>() + <span class="s">" items through 8 slots; sum correct: "</span> + (sum.<span class="f">get</span>() == expected)
+                           + <span class="s">"; the write index wrapped "</span> + ring.<span class="f">laps</span>() + <span class="s">" times"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>30000 items through 8 slots; sum correct: true; the write index wrapped 3750 times</pre></div><div class="runout" hidden></div></figure>
+
+<p>Microsoft has asked candidates to find the mistake in a circular buffer's locking. When reviewing such code, look for: <code>size()</code> or <code>isEmpty()</code> reads <code>count</code> without the lock and a caller acts on the stale answer; separate head and tail locks with a shared <code>count</code> that neither protects; a single condition with <code>notify</code> (one) where producers and consumers both wait, so a producer's signal wakes another producer; and an <code>if</code> instead of a loop around the wait. Even a locked <code>isEmpty()</code> is only a snapshot; another consumer can remove the item before <code>take()</code>. Use one atomic <code>poll</code> when you need a nonblocking check and removal.</p>
+
+<h2 id="one-producer-one-consumer-no-lock-at-all">One producer, one consumer: no lock at all</h2>
+<p>If exactly one thread produces and exactly one consumes, the ring needs no lock. Look at who writes what: only the producer ever moves <code>tail</code>, only the consumer ever moves <code>head</code>. Each index has a <strong>single writer</strong>, so there is no read-modify-write race to prevent. What remains is visibility and ordering: the consumer must not see the new <code>tail</code> before it can see the value written into the slot. That is exactly what a release store and an acquire load provide: the producer writes the slot, then stores <code>tail</code> with release; the consumer loads <code>tail</code> with acquire, then reads the slot. This is a <a class="term" data-term="spsc-queue" href="glossary.html#spsc-queue">single-producer single-consumer queue</a>, useful when a logging or audio pipeline has exactly one producer and one consumer. Safely publish the constructed ring before either thread starts, and keep it alive until both have stopped.</p>
+
+<figure class="code pair" data-sample="fixed-buffer-queues.2" data-expect="ok"><figcaption><span class="ctitle">A single-producer single-consumer ring with no lock</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// One producer thread and one consumer thread, no lock. Each index has a single writer: only the producer</span>
+<span class="c">// moves tail_, only the consumer moves head_. Release stores publish, acquire loads observe.</span>
+<span class="k">class</span> SpscRing {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">SpscRing</span>(<span class="t">size_t</span> capacityPowerOfTwo) : <span class="f">slots_</span>(capacityPowerOfTwo), <span class="f">mask_</span>(capacityPowerOfTwo - <span class="n">1</span>) {
+        <span class="k">if</span> (capacityPowerOfTwo == <span class="n">0</span> || (capacityPowerOfTwo &amp; (capacityPowerOfTwo - <span class="n">1</span>)) != <span class="n">0</span>)
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"positive power of two required"</span>);
+    }
+
+    <span class="t">bool</span> <span class="f">offer</span>(<span class="t">int</span> value) {                                        <span class="c">// producer thread only</span>
+        <span class="t">uint64_t</span> t = tail_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed);        <span class="c">// our own index: no ordering needed</span>
+        <span class="k">if</span> (t - head_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire) == slots_.<span class="f">size</span>()) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// full</span>
+        slots_[t &amp; mask_] = value;                                 <span class="c">// write the slot first,</span>
+        tail_.<span class="f">store</span>(t + <span class="n">1</span>, <span class="t">std</span>::memory_order_release);             <span class="c">// then publish it</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">bool</span> <span class="f">poll</span>(<span class="t">int</span>&amp; out) {                                          <span class="c">// consumer thread only</span>
+        <span class="t">uint64_t</span> h = head_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed);
+        <span class="k">if</span> (h == tail_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire)) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// empty; pairs with the producer's release</span>
+        out = slots_[h &amp; mask_];                                   <span class="c">// safe to read: published before tail_ moved</span>
+        head_.<span class="f">store</span>(h + <span class="n">1</span>, <span class="t">std</span>::memory_order_release);             <span class="c">// hand the slot back to the producer</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; slots_;
+    <span class="k">const</span> <span class="t">uint64_t</span> mask_;                                          <span class="c">// capacity is a power of two: index = counter &amp; mask_</span>
+    <span class="k">alignas</span>(<span class="n">64</span>) <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">uint64_t</span>&gt; head_{<span class="n">0</span>};                    <span class="c">// next to read: written only by the consumer</span>
+    <span class="k">alignas</span>(<span class="n">64</span>) <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">uint64_t</span>&gt; tail_{<span class="n">0</span>};                    <span class="c">// next to write: written only by the producer</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    SpscRing <span class="f">ring</span>(<span class="n">8</span>);
+    <span class="k">const</span> <span class="t">int</span> n = <span class="n">20000</span>;
+    <span class="t">bool</span> inOrder = <span class="k">true</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">producer</span>([&amp;] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= n; i += <span class="n">1</span>)
+            <span class="k">while</span> (!ring.<span class="f">offer</span>(i)) <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>();      <span class="c">// full: let the consumer run</span>
+    });
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">consumer</span>([&amp;] {
+        <span class="t">int</span> value = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="t">int</span> expect = <span class="n">1</span>; expect &lt;= n; expect += <span class="n">1</span>) {
+            <span class="k">while</span> (!ring.<span class="f">poll</span>(value)) <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>();   <span class="c">// empty: let the producer run</span>
+            <span class="k">if</span> (value != expect) inOrder = <span class="k">false</span>;
+        }
+    });
+    producer.<span class="f">join</span>();
+    consumer.<span class="f">join</span>();
+    <span class="k">if</span> (!inOrder) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"bad SPSC order"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%d items through an 8-slot ring with no lock; arrived in order: %s\n"</span>, n, inOrder ? <span class="s">"true"</span> : <span class="s">"false"</span>);
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="c">// One producer thread and one consumer thread, no lock. Each index has a single writer: only the producer</span>
+<span class="c">// moves tail, only the consumer moves head. Release stores publish, acquire loads observe.</span>
+<span class="k">final</span> <span class="k">class</span> <span class="t">SpscRing</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span>[] slots;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> mask;                              <span class="c">// capacity is a power of two, so index = counter &amp; mask</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> head = <span class="k">new</span> <span class="t">AtomicLong</span>();     <span class="c">// next to read: written only by the consumer</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> tail = <span class="k">new</span> <span class="t">AtomicLong</span>();     <span class="c">// next to write: written only by the producer</span>
+
+    <span class="t">SpscRing</span>(<span class="t">int</span> capacityPowerOfTwo) {
+        <span class="k">if</span> (capacityPowerOfTwo &lt;= <span class="n">0</span> || (capacityPowerOfTwo &amp; (capacityPowerOfTwo - <span class="n">1</span>)) != <span class="n">0</span>)
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"positive power of two required"</span>);
+        slots = <span class="k">new</span> <span class="t">int</span>[capacityPowerOfTwo];
+        mask = capacityPowerOfTwo - <span class="n">1</span>;
+    }
+
+    <span class="t">boolean</span> <span class="f">offer</span>(<span class="t">int</span> value) {                          <span class="c">// producer thread only</span>
+        <span class="t">long</span> t = tail.<span class="f">getPlain</span>();                        <span class="c">// our own index: no ordering needed</span>
+        <span class="k">if</span> (t - head.<span class="f">getAcquire</span>() == slots.length) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// full</span>
+        slots[(<span class="t">int</span>) (t &amp; mask)] = value;                 <span class="c">// write the slot first,</span>
+        tail.<span class="f">setRelease</span>(t + <span class="n">1</span>);                          <span class="c">// then publish it</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">boolean</span> <span class="f">poll</span>(<span class="t">int</span>[] out) {                           <span class="c">// consumer owns a non-null one-element array</span>
+        <span class="t">long</span> h = head.<span class="f">getPlain</span>();
+        <span class="k">if</span> (h == tail.<span class="f">getAcquire</span>()) <span class="k">return</span> <span class="k">false</span>;        <span class="c">// empty; the acquire pairs with the producer's release</span>
+        out[<span class="n">0</span>] = slots[(<span class="t">int</span>) (h &amp; mask)];                <span class="c">// safe to read: published before tail moved</span>
+        head.<span class="f">setRelease</span>(h + <span class="n">1</span>);                          <span class="c">// hand the slot back to the producer</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">SpscRing</span> ring = <span class="k">new</span> <span class="t">SpscRing</span>(<span class="n">8</span>);
+        <span class="k">final</span> <span class="t">int</span> n = <span class="n">20_000</span>;
+        <span class="t">Thread</span> producer = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= n; i += <span class="n">1</span>) {
+                <span class="k">while</span> (!ring.<span class="f">offer</span>(i)) <span class="t">Thread</span>.<span class="f">onSpinWait</span>();   <span class="c">// full: spin politely</span>
+            }
+        }, <span class="s">"producer"</span>);
+        <span class="t">int</span>[] box = <span class="k">new</span> <span class="t">int</span>[<span class="n">1</span>];
+        <span class="t">boolean</span>[] inOrder = {<span class="k">true</span>};
+        <span class="t">Thread</span> consumer = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">for</span> (<span class="t">int</span> expect = <span class="n">1</span>; expect &lt;= n; expect += <span class="n">1</span>) {
+                <span class="k">while</span> (!ring.<span class="f">poll</span>(box)) <span class="t">Thread</span>.<span class="f">onSpinWait</span>();  <span class="c">// empty: spin politely</span>
+                <span class="k">if</span> (box[<span class="n">0</span>] != expect) inOrder[<span class="n">0</span>] = <span class="k">false</span>;
+            }
+        }, <span class="s">"consumer"</span>);
+        producer.<span class="f">start</span>();
+        consumer.<span class="f">start</span>();
+        producer.<span class="f">join</span>();
+        consumer.<span class="f">join</span>();
+        <span class="k">if</span> (!inOrder[<span class="n">0</span>]) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"bad SPSC order"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(n + <span class="s">" items through an 8-slot ring with no lock; arrived in order: "</span> + inOrder[<span class="n">0</span>]);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>20000 items through an 8-slot ring with no lock; arrived in order: true</pre></div><div class="runout" hidden></div></figure>
+
+<p>Three details carry the correctness argument. The slot is written <em>before</em> the release store of <code>tail</code>, so anyone who sees the new <code>tail</code> through an acquire load also sees the slot (the <a class="term" data-term="acquire-release" href="glossary.html#acquire-release">acquire and release</a> pairing). The consumer releases <code>head</code> after reading the slot, so the producer, which loads <code>head</code> with acquire, never overwrites a slot that is still being read. And the producer reads its own <code>tail</code> with a plain or relaxed load, because no other thread writes it. The C++ <code>alignas(64)</code> separates the indices on machines with 64-byte cache lines, reducing <a class="term" data-term="false-sharing" href="glossary.html#false-sharing">false sharing</a>. It is a tuning assumption, not a portable cache-line size: larger lines may require more padding. Java has no portable object alignment guarantee; dummy fields alone are not a portable proof of separation.</p>
+<p>Each <code>offer</code> or <code>poll</code> attempts bounded work and returns false on observed full or empty; the retry loops in the demo may spin indefinitely if the peer stops. <code>Thread.onSpinWait()</code> is a processor hint, not a yield or a synchronization operation. C++ atomics are not universally lock-free: check <code>is_lock_free()</code> on the target before claiming that progress property.</p>
+
+<figure class="timeline"><figcaption>Publishing a slot and returning it safely</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Producer</span><span>Consumer</span></div><div class="tl-row"><span class="t">1</span><span class="cell">writes value 42 into slot 0</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell">release-stores tail = 1</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">acquire-loads tail = 1, then reads slot 0</span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">release-stores head = 1 after finishing the read</span></div><div class="tl-row"><span class="t">5</span><span class="cell">acquire-loads head = 1 before reusing slot 0</span><span class="cell empty"></span></div><div class="tl-note">Publication and reuse require ordering in both directions.</div></div></figure>
+
+<p>The moment there are two producers, this breaks: both can read the same <code>tail</code>, write the same slot, and publish the same index. Multiple producers need a lock, or a compare-and-swap on <code>tail</code> plus a per-slot flag saying when the slot's data is ready, which is a much harder design. In an interview, say exactly where single-writer stops holding.</p>
+
+<h2 id="two-queues-in-one-buffer">Two queues in one buffer</h2>
+<p>Rubrik's follow up: two FIFO queues share one buffer (one report says 100 MB to over 1 GB), each must stay FIFO, space should shift with usage, and waste should be minimal. The tempting answers fail:</p>
+<ul>
+<li><strong>Split the buffer in half.</strong> Simple, but if one queue holds 90 percent of the traffic, half the buffer sits idle while the busy queue blocks.</li>
+<li><strong>Grow one queue from each end.</strong> That works for two stacks, not two queues: a FIFO queue moves through memory as it is used, so the two would collide in the middle.</li>
+</ul>
+<p>The answer that works is a <strong><a class="term" data-term="free-list" href="glossary.html#free-list">free list</a> of slots</strong>. Every slot has a value and a <code>next</code> index. Unused slots are chained into the free list. Each queue is a linked list of slots with its own <code>head</code> and <code>tail</code>. Enqueue pops any free slot, fills it and links it after the queue's tail. Dequeue unlinks the head slot, reads it and pushes the slot back on the free list. Each operation makes O(1) index updates without allocating an element node, and a slot freed by one queue can be used by the other a moment later. The examples use two arrays for clarity; if the contract literally supplies one byte buffer, carve value and link regions out of that buffer and count both against the capacity. In C++, respect alignment and object lifetimes; Java can use absolute <code>ByteBuffer</code> access with a specified byte order.</p>
+<p>For threads, one lock guards everything (the free list is shared by both queues, so one lock is the honest granularity), with one "not empty" condition per queue and one "not full" condition for the whole buffer. After acquiring the lock, a producer waits for space only when every slot is used; a consumer waits for data while its own queue is empty. Lock contention can block either operation too. Each slot belongs to exactly one of three disjoint lists: queue 0, queue 1, or free. Their lengths sum to the capacity, empty queues have both ends equal to -1, and every nonempty tail has next equal to -1.</p>
+
+<figure class="code pair" data-sample="fixed-buffer-queues.3" data-expect="ok"><figcaption><span class="ctitle">Two FIFO queues sharing one fixed buffer through a free list</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// Two FIFO queues share one fixed buffer of slots. Free slots form a linked free list inside the arrays,</span>
+<span class="c">// and each queue is a linked list of slots, so space moves to whichever queue needs it.</span>
+<span class="k">class</span> TwoQueues {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">TwoQueues</span>(<span class="t">int</span> slots) {
+        <span class="k">if</span> (slots &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"positive capacity required"</span>);
+        value_.<span class="f">resize</span>(<span class="k">static_cast</span>&lt;<span class="t">size_t</span>&gt;(slots));
+        next_.<span class="f">resize</span>(<span class="k">static_cast</span>&lt;<span class="t">size_t</span>&gt;(slots));
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; slots; i += <span class="n">1</span>) next_[i] = i + <span class="n">1</span> &lt; slots ? i + <span class="n">1</span> : -<span class="n">1</span>;
+    }
+
+    <span class="c">// Blocks only when every slot in the whole buffer is in use.</span>
+    <span class="t">void</span> <span class="f">enqueue</span>(<span class="t">int</span> q, <span class="t">int</span> v) {
+        <span class="k">if</span> (q &lt; <span class="n">0</span> || q &gt;= <span class="n">2</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"bad queue id"</span>);
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        notFull_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> freeHead_ != -<span class="n">1</span>; });
+        <span class="t">int</span> s = freeHead_;                         <span class="c">// pop a free slot: O(1)</span>
+        freeHead_ = next_[s];
+        value_[s] = v;
+        next_[s] = -<span class="n">1</span>;
+        <span class="k">if</span> (tail_[q] == -<span class="n">1</span>) head_[q] = s;          <span class="c">// queue was empty</span>
+        <span class="k">else</span> next_[tail_[q]] = s;                  <span class="c">// link after the old tail</span>
+        tail_[q] = s;
+        used_ += <span class="n">1</span>;
+        mostUsed_ = <span class="t">std</span>::<span class="f">max</span>(mostUsed_, used_);
+        notEmpty_[q].<span class="f">notify_one</span>();
+    }
+
+    <span class="c">// Blocks while queue q is empty, however full the other queue is.</span>
+    <span class="t">int</span> <span class="f">dequeue</span>(<span class="t">int</span> q) {
+        <span class="k">if</span> (q &lt; <span class="n">0</span> || q &gt;= <span class="n">2</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"bad queue id"</span>);
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        notEmpty_[q].<span class="f">wait</span>(lock, [<span class="k">this</span>, q] { <span class="k">return</span> head_[q] != -<span class="n">1</span>; });
+        <span class="t">int</span> s = head_[q];
+        <span class="t">int</span> v = value_[s];
+        head_[q] = next_[s];
+        <span class="k">if</span> (head_[q] == -<span class="n">1</span>) tail_[q] = -<span class="n">1</span>;         <span class="c">// queue is now empty</span>
+        next_[s] = freeHead_;                      <span class="c">// push the slot back on the free list: O(1)</span>
+        freeHead_ = s;
+        used_ -= <span class="n">1</span>;
+        notFull_.<span class="f">notify_one</span>();
+        <span class="k">return</span> v;
+    }
+
+    <span class="t">int</span> <span class="f">mostUsed</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        <span class="k">return</span> mostUsed_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; value_, next_;                <span class="c">// next_[i]: the slot after i in its list, or -1</span>
+    <span class="t">int</span> freeHead_ = <span class="n">0</span>;                             <span class="c">// top of the free list</span>
+    <span class="t">int</span> head_[<span class="n">2</span>] = {-<span class="n">1</span>, -<span class="n">1</span>}, tail_[<span class="n">2</span>] = {-<span class="n">1</span>, -<span class="n">1</span>};
+    <span class="t">int</span> used_ = <span class="n">0</span>, mostUsed_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notFull_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notEmpty_[<span class="n">2</span>];
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    TwoQueues <span class="f">qs</span>(<span class="n">8</span>);
+    <span class="k">const</span> <span class="t">int</span> n = <span class="n">20000</span>;
+    <span class="t">bool</span> fifo[<span class="n">2</span>] = {<span class="k">true</span>, <span class="k">true</span>};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> q = <span class="n">0</span>; q &lt; <span class="n">2</span>; q += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;qs, q] { <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) qs.<span class="f">enqueue</span>(q, i); });
+        threads.<span class="f">emplace_back</span>([&amp;qs, &amp;fifo, q] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>)
+                <span class="k">if</span> (qs.<span class="f">dequeue</span>(q) != i) fifo[q] = <span class="k">false</span>;
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    <span class="k">if</span> (!fifo[<span class="n">0</span>] || !fifo[<span class="n">1</span>] || qs.<span class="f">mostUsed</span>() &gt; <span class="n">8</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"bad shared queues"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"queue 0 FIFO: %s, queue 1 FIFO: %s; most slots in use at once: %d of 8\n"</span>,
+                fifo[<span class="n">0</span>] ? <span class="s">"true"</span> : <span class="s">"false"</span>, fifo[<span class="n">1</span>] ? <span class="s">"true"</span> : <span class="s">"false"</span>, qs.<span class="f">mostUsed</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="c">// Two FIFO queues share one fixed buffer of slots. Free slots form a linked free list inside the arrays,</span>
+<span class="c">// and each queue is a linked list of slots, so space moves to whichever queue needs it.</span>
+<span class="k">final</span> <span class="k">class</span> <span class="t">TwoQueues</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span>[] value, next;              <span class="c">// next[i]: the slot after i in its list, or -1</span>
+    <span class="k">private</span> <span class="t">int</span> freeHead;                         <span class="c">// top of the free list</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span>[] head = {-<span class="n">1</span>, -<span class="n">1</span>}, tail = {-<span class="n">1</span>, -<span class="n">1</span>};
+    <span class="k">private</span> <span class="t">int</span> used = <span class="n">0</span>, mostUsed = <span class="n">0</span>;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span>[] notEmpty = {lock.<span class="f">newCondition</span>(), lock.<span class="f">newCondition</span>()};
+
+    <span class="t">TwoQueues</span>(<span class="t">int</span> slots) {
+        <span class="k">if</span> (slots &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"positive capacity required"</span>);
+        value = <span class="k">new</span> <span class="t">int</span>[slots];
+        next = <span class="k">new</span> <span class="t">int</span>[slots];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; slots; i += <span class="n">1</span>) next[i] = i + <span class="n">1</span> &lt; slots ? i + <span class="n">1</span> : -<span class="n">1</span>;
+        freeHead = <span class="n">0</span>;
+    }
+
+    <span class="c">// Blocks only when every slot in the whole buffer is in use.</span>
+    <span class="k">void</span> <span class="f">enqueue</span>(<span class="t">int</span> q, <span class="t">int</span> v) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (q &lt; <span class="n">0</span> || q &gt;= <span class="n">2</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"bad queue id"</span>);
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (freeHead == -<span class="n">1</span>) notFull.<span class="f">await</span>();
+            <span class="t">int</span> s = freeHead;                     <span class="c">// pop a free slot: O(1)</span>
+            freeHead = next[s];
+            value[s] = v;
+            next[s] = -<span class="n">1</span>;
+            <span class="k">if</span> (tail[q] == -<span class="n">1</span>) head[q] = s;       <span class="c">// queue was empty</span>
+            <span class="k">else</span> next[tail[q]] = s;               <span class="c">// link after the old tail</span>
+            tail[q] = s;
+            used += <span class="n">1</span>;
+            mostUsed = <span class="t">Math</span>.<span class="f">max</span>(mostUsed, used);
+            notEmpty[q].<span class="f">signal</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="c">// Blocks while queue q is empty, however full the other queue is.</span>
+    <span class="t">int</span> <span class="f">dequeue</span>(<span class="t">int</span> q) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (q &lt; <span class="n">0</span> || q &gt;= <span class="n">2</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"bad queue id"</span>);
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (head[q] == -<span class="n">1</span>) notEmpty[q].<span class="f">await</span>();
+            <span class="t">int</span> s = head[q];
+            <span class="t">int</span> v = value[s];
+            head[q] = next[s];
+            <span class="k">if</span> (head[q] == -<span class="n">1</span>) tail[q] = -<span class="n">1</span>;      <span class="c">// queue is now empty</span>
+            next[s] = freeHead;                   <span class="c">// push the slot back on the free list: O(1)</span>
+            freeHead = s;
+            used -= <span class="n">1</span>;
+            notFull.<span class="f">signal</span>();
+            <span class="k">return</span> v;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="t">int</span> <span class="f">mostUsed</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">return</span> mostUsed;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">TwoQueues</span> qs = <span class="k">new</span> <span class="t">TwoQueues</span>(<span class="n">8</span>);
+        <span class="k">final</span> <span class="t">int</span> n = <span class="n">20_000</span>;
+        <span class="t">boolean</span>[] fifo = {<span class="k">true</span>, <span class="k">true</span>};
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; threads = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> q = <span class="n">0</span>; q &lt; <span class="n">2</span>; q += <span class="n">1</span>) {
+            <span class="t">int</span> id = q;
+            threads.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) qs.<span class="f">enqueue</span>(id, i);
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"producer-"</span> + q));
+            threads.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) <span class="k">if</span> (qs.<span class="f">dequeue</span>(id) != i) fifo[id] = <span class="k">false</span>;
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"consumer-"</span> + q));
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">join</span>();
+        <span class="k">if</span> (!fifo[<span class="n">0</span>] || !fifo[<span class="n">1</span>] || qs.<span class="f">mostUsed</span>() &gt; <span class="n">8</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"bad shared queues"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"queue 0 FIFO: "</span> + fifo[<span class="n">0</span>] + <span class="s">", queue 1 FIFO: "</span> + fifo[<span class="n">1</span>]
+                           + <span class="s">"; most slots in use at once: "</span> + qs.<span class="f">mostUsed</span>() + <span class="s">" of 8"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>queue 0 FIFO: true, queue 1 FIFO: true; most slots in use at once: 8 of 8</pre></div><div class="runout" hidden></div></figure>
+
+<div class="box example">
+<h3>Worked example: the arrays after five operations</h3>
+<p>Six slots, queues A and B, every slot free at the start (free list 0, 1, 2, 3, 4, 5).</p>
+<table>
+<thead><tr><th>Operation</th><th>Slot used</th><th>Queue A</th><th>Queue B</th><th>Free list</th></tr></thead>
+<tbody>
+<tr><td>enqueue(A, 10)</td><td>0</td><td>0 (10)</td><td>empty</td><td>1, 2, 3, 4, 5</td></tr>
+<tr><td>enqueue(B, 20)</td><td>1</td><td>0 (10)</td><td>1 (20)</td><td>2, 3, 4, 5</td></tr>
+<tr><td>enqueue(A, 11)</td><td>2; <code>next[0] = 2</code></td><td>0 (10), 2 (11)</td><td>1 (20)</td><td>3, 4, 5</td></tr>
+<tr><td>dequeue(A) returns 10</td><td>0 goes back</td><td>2 (11)</td><td>1 (20)</td><td>0, 3, 4, 5</td></tr>
+<tr><td>enqueue(B, 21)</td><td>0 again; <code>next[1] = 0</code></td><td>2 (11)</td><td>1 (20), 0 (21)</td><td>3, 4, 5</td></tr>
+</tbody>
+</table>
+<p>Slot 0 served queue A and then queue B. Within each queue the <code>next</code> links keep FIFO order even though the slots are scattered through the array: queue B reads 20 from slot 1 and then follows <code>next[1]</code> to slot 0 for 21.</p>
+</div>
+
+<h2 id="minimal-waste-for-a-very-large-buffer">Minimal waste for a very large buffer</h2>
+<p>For 1 GiB of payload containing 4-byte ints, a 4-byte <code>next</code> index per slot doubles the storage: 268,435,456 values and another 1 GiB of links. If the total budget is 1 GiB including links, only half that budget remains for values, before other metadata. That is the "minimal waste" follow up, and the fix is to link <strong>chunks</strong> instead of slots, which is also what the Rubrik SSE candidate did with lists of fixed-size chunks:</p>
+<ul>
+<li>Carve the buffer into chunks of, say, 1,024 values (4 KiB). Each chunk has one <code>next</code> index. The free list and each queue are lists of chunks.</li>
+<li>Each queue keeps a head chunk with a read offset and a tail chunk with a write offset. Enqueue writes into the tail chunk and takes a new chunk from the free list only when it is full; dequeue frees the head chunk once it is drained. When the last value leaves a queue, return even a partly filled last chunk and reset both ends; otherwise small queues can retain empty chunks forever.</li>
+<li>Overhead: one 4-byte link per 4 KiB chunk is about 0.1 percent, 1 MiB for 1 GiB of payload. Waste: at most a partly filled head chunk and tail chunk per queue, a few KiB each.</li>
+</ul>
+<p>The locking is unchanged: one lock over the free list and both queues' ends. If the two queues are very hot, each queue can get its own lock for its own chunks, with the free list behind a third lock that is touched when a chunk changes ownership, roughly once per 1,024 operations during steady streaming. Always acquire the queue lock before the free-list lock, and never take a queue lock while holding the free-list lock.</p>
+
+<h2 id="shutdown-deadlines-and-tests">Shutdown, deadlines and tests</h2>
+<p>The blocking demos use fixed item counts and assume every worker runs to completion. For a reusable service add a <code>closed</code> flag under the same lock: puts reject after close, takes drain queued items and then report end of stream, and close wakes every producer and consumer. A failure that abandons the pipeline must wake peers too; merely interrupting one Java producer can leave consumers waiting for items that will never arrive.</p>
+<p>For timed operations, use one monotonic deadline and recompute the remaining wait after every wakeup. Test capacity one, many wraps, empty-to-nonempty and full-to-nonfull transitions, invalid capacities and queue ids, close with waiters, and each producer's FIFO sequence. A correct sum alone does not prove no duplicates or losses: track unique item ids. For SPSC, also start counters near wraparound and verify both publication and slot reuse under ThreadSanitizer.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Full and empty confused.</strong> With only <code>head</code> and <code>tail</code> modulo the capacity, <code>head == tail</code> means both. Keep a count, leave a slot empty, or use counters that only grow.</li>
+<li><strong>Allocating per element.</strong> A <code>LinkedList</code>, a <code>std::list</code> or <code>new Node</code> per enqueue breaks "no dynamic allocation". Links must be indices into arrays allocated once.</li>
+<li><strong>Reading the count without the lock.</strong> <code>if (!ring.isEmpty()) ring.take()</code> from two consumers is a check-then-act, and the unlocked read is a data race in C++.</li>
+<li><strong>Calling the SPSC ring from two producers.</strong> The SPSC design is correct only with one thread on each side; a second producer invalidates it and creates undefined behaviour in C++.</li>
+<li><strong>A fixed split between two queues.</strong> It meets the letter of the question and fails "space shifts with usage".</li>
+<li><strong>Forgetting the other queue's waiters.</strong> When a slot is freed, a producer for either queue may be waiting for it. Signal the shared "not full" condition, not a per-queue one.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The Rubrik sequence, as reported: a FIFO of ints in a fixed buffer with no dynamic allocation (a commenter adds O(1) put and get), then "support multiple threads", then "two queues share one buffer of 100 MB to 1 GB, each FIFO, space shifting with usage, minimal waste". The cited Google and Microsoft reports cover a circular buffer and its locking; they do not establish a ceiling on possible follow ups.</p>
+<blockquote>The buffer is an array of slots, each with a value and a next index. Free slots form a free list, and each queue is a linked list of slots with its own head and tail, so enqueue pops any free slot and links it after the tail, and dequeue unlinks the head and returns the slot to the free list. Both make O(1) index updates with no per-element allocation, and space moves to whichever queue needs it. One lock guards the free list and both queues, with a not-full condition for the buffer and a not-empty condition per queue. For a gigabyte buffer I would link fixed-size chunks rather than single slots, so the links cost about 0.1 percent instead of doubling the memory.</blockquote>
+<p>Follow ups: "one queue's producer is flooding; the other queue starves for space" (reserve a minimum number of slots per queue, or cap each queue's share), "make the single-queue version lock-free" (SPSC with acquire and release if there is one producer and one consumer; otherwise say how much harder MPMC is), and "why a power-of-two capacity?" (the index becomes a mask, and the low-bit index still works when the counters wrap).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>Multi-producer, multi-consumer without locks.</strong> A bounded design can give each slot a sequence number that identifies its reuse generation. A producer checks availability, claims a position with compare-and-swap, writes, and release-publishes the slot; a consumer acquire-observes readiness before reading and releasing the slot for reuse. Reserving a position is not publishing a value. A stalled owner can block progress behind its reservation, so using CAS does not by itself prove lock-freedom; explain the particular algorithm's progress guarantee.</li>
+<li><strong>Payload lifetime and exceptions.</strong> These examples store ints. A Java queue of references should clear removed slots to avoid retaining objects. For generic C++ payloads, define construction, destruction and move-failure handling before unlinking a slot; an exception must not lose that slot from both the queue and the free list.</li>
+<li><strong>Batching through rings.</strong> The LMAX Disruptor and similar designs let consumers read many slots per acquire load and producers claim many slots at once, which cuts the synchronization per item.</li>
+<li><strong>Fairness between two queues.</strong> A shared buffer trades isolation for utilization. If one tenant must not be able to starve the other, give each queue a guaranteed reserve: a producer may take a free slot only if doing so leaves enough free slots to cover the other queue's unused reserve.</li>
+<li><strong>Memory layout.</strong> Chunked lists keep values contiguous, which matters for cache behaviour on a multi-gigabyte buffer, and allocating the whole buffer at startup (and touching its pages) reduces initial page faults on the hot path. It cannot prevent later paging or guarantee real-time latency.</li>
+</ul>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A ring buffer is an array with a read index and a write index that wrap; decide up front how you tell full from empty.</li>
+<li>For many threads, one lock guards the array and the indices, with not-full and not-empty conditions.</li>
+<li>With one producer and one consumer, each index has a single writer, and release and acquire on the indices replace the lock.</li>
+<li>Two queues share one buffer through a free list of slots, each queue a linked list of slot indices: O(1) index updates, fixed element storage, space follows demand.</li>
+<li>For huge buffers, link chunks rather than slots so the links cost a fraction of a percent.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="fixed-buffer-queues"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="fixed-buffer-queues.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A ring of capacity 8 keeps <code>head</code>, <code>tail</code> and <code>count</code>. Right now <code>head = 6</code>, <code>tail = 2</code> and <code>count = 4</code>. Which slots hold the queued items, oldest first?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">2, 3, 4, 5</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">6, 7, 0, 1</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">6, 5, 4, 3</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The ring is corrupt: tail cannot be smaller than head</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Items run from <code>head</code> forward for <code>count</code> slots, wrapping at the end of the array: 6, 7, then 0 and 1. <code>tail = 2</code> is the next slot to write, consistent with 6 + 4 wrapping to 2. A tail below the head is normal after the write index wraps.</div></div><div class="mcq" data-id="fixed-buffer-queues.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A ring allows all capacity slots to be occupied but stores only <code>head</code> and <code>tail</code> modulo capacity, with no count or full flag. What goes wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: <code>head == tail</code> always means empty</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>head == tail</code> is true both when the ring is empty and when it is full, so the code cannot tell them apart</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The ring can only hold one item</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It needs a lock even with one thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> After capacity writes with no reads, <code>tail</code> wraps right back onto <code>head</code>. Without more information, full and empty look identical. The fixes are a count, leaving one slot always empty, or counters that only grow and are reduced modulo the capacity when indexing.</div></div><div class="mcq" data-id="fixed-buffer-queues.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the single-producer single-consumer ring, why can the producer read <code>tail</code> with a plain or relaxed load but must read <code>head</code> with acquire?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because <code>tail</code> is always smaller than <code>head</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Only the producer writes <code>tail</code>, so it always knows its own value; <code>head</code> is written by the consumer, and the acquire load ensures the consumer has finished reading a slot before the producer reuses it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because acquire loads are only allowed on <code>head</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because relaxed loads are faster and correctness does not depend on the order</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A thread always sees its own writes, so the producer needs no ordering to read <code>tail</code>. The consumer releases <code>head</code> after reading a slot; the producer's acquire load of <code>head</code> pairs with it, so a slot is never overwritten while it is still being read. The same pairing in the other direction publishes the slot's value to the consumer.</div></div><div class="mcq" data-id="fixed-buffer-queues.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two producer threads start calling <code>offer</code> on the SPSC ring at the same time. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: each <code>offer</code> is atomic</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both can claim the same slot; Java can lose a value, while C++ has a data race and undefined behaviour</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The second producer blocks until the first finishes</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The ring automatically switches to a lock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The design is correct only because <code>tail</code> has a single writer. Two producers can load the same tail before either publishes, then both write the ordinary slot. Java can lose a value; the C++ data race permits undefined behaviour, not merely a predictable lost write. Multiple producers need a lock or a compare-and-swap protocol with per-slot readiness flags.</div></div><div class="mcq" data-id="fixed-buffer-queues.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two FIFO queues share one buffer of N slots through a free list. Ignoring lock contention and waiting time, what is the update cost, and when does <code>enqueue</code> wait for space?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">O(N) each, and enqueue waits for space when its own queue holds N/2 items</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">O(1) each, and enqueue waits for space only when all N slots are in use</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">O(log N) each, and enqueue never blocks</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">O(1) each, and enqueue waits for space when the other queue is non-empty</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Popping and pushing the free list, and linking at a queue's tail or unlinking at its head, are constant-time pointer updates on index arrays. No slot is reserved for either queue, so a producer blocks only when the free list is empty, which is what lets space shift with usage.</div></div><div class="mcq" data-id="fixed-buffer-queues.q6" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which designs satisfy "a FIFO queue whose payload and link storage never allocate after construction"? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">An <code>int[]</code> or <code>std::vector&lt;int&gt;</code> sized once, with head and tail indices that wrap</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Value and next-index arrays sized once, with a free list of slot indices</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A <code>LinkedList</code> or <code>std::list</code> with a size check before each insert</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">An <code>ArrayDeque</code> or <code>std::deque</code> that grows when it is full</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Both correct options allocate everything up front and then only move indices. Ordinary linked lists allocate nodes. The growable deques in the option allocate additional storage when expanding; a size check alone does not preallocate nodes or blocks. This question concerns data storage, not internal lock waiter allocations.</div></div><div class="mcq" data-id="fixed-buffer-queues.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>The Java SPSC ring uses <code>setRelease</code> and <code>getAcquire</code> on <code>AtomicLong</code>. What would happen if both indices used ordinary <code>get()</code> and <code>set()</code> instead?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It would break: plain atomics give no ordering</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It would still be correct: <code>get()</code> and <code>set()</code> on <code>AtomicLong</code> have volatile semantics, which are stronger than acquire and release, with performance depending on the JVM and hardware</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It would deadlock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It would not compile, because <code>AtomicLong</code> has no <code>get()</code> or <code>set()</code> methods</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>get</code> and <code>set</code> are volatile reads and writes, which include acquire and release ordering and more (a total order). Release and acquire are the minimum the algorithm needs, which is why tuned queues use them (or <code>lazySet</code>), but the volatile versions are a safe default in an interview.</div></div><div class="mcq" data-id="fixed-buffer-queues.q8" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>On a target with 64-byte cache lines, why are the C++ SPSC indices declared <code>alignas(64)</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The atomics would not compile without alignment</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">So the two indices live on different cache lines: the producer writes one and the consumer the other, and sharing a line can cause unrelated writes to invalidate the same line (false sharing)</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">So that <code>memory_order_acquire</code> works</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">To make the ring hold 64 elements</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Correctness does not need this extra alignment; performance may benefit. Two threads writing different variables on one 64-byte line force the cache line to ping-pong between cores. Separating them is the standard fix; C++17 also offers <code>std::hardware_destructive_interference_size</code> as an implementation-provided estimate where the library supports it; it is not available in every libc++ build. A machine with larger cache lines needs a different layout.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="fixed-buffer-queues.c1" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">Two queues have 1 GiB of payload storage for 4-byte ints; link metadata is additional. (a) How much extra memory does a slot-level free list with a 4-byte next index per slot need? (b) With chunks of 1,024 values and one 4-byte link per chunk? (c) In the chunked design, roughly how much space can be wasted at any moment?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>(a) 1 GiB holds 2 to the power 30 bytes, so 2 to the power 28 ints, about 268 million slots. One 4-byte index each is another 1 GiB, so the links double the memory.</p>
+<p>(b) Chunks of 1,024 ints are 4 KiB, so there are 2 to the power 18 chunks, 262,144 of them. One 4-byte link each is 1 MiB, about 0.1 percent of the buffer.</p>
+<p>(c) Each queue can have a partly read head chunk and a partly written tail chunk, so at most about 2 chunks per queue, 4 chunks in total, about 16 KiB, small at this scale. The trade is that a queue holding a single value still occupies a whole 4 KiB chunk.</p></div></div><div class="cq" data-q="fixed-buffer-queues.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Single-threaded first, as the interviewer asks: write a fixed-capacity int queue with O(1) <code>offer</code> (returns false when full) and <code>poll</code> (reports empty when empty) and no allocation after construction.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="fixed-buffer-queues.4"><figcaption><span class="ctitle">A fixed-capacity int queue, single-threaded</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> IntQueue {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">IntQueue</span>(<span class="t">size_t</span> capacity) : <span class="f">slots_</span>(capacity) {
+        <span class="k">if</span> (capacity == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"positive capacity required"</span>);
+    }
+
+    <span class="t">bool</span> <span class="f">offer</span>(<span class="t">int</span> v) {
+        <span class="k">if</span> (count_ == slots_.<span class="f">size</span>()) <span class="k">return</span> <span class="k">false</span>;     <span class="c">// full</span>
+        slots_[tail_] = v;
+        tail_ = (tail_ + <span class="n">1</span>) % slots_.<span class="f">size</span>();           <span class="c">// wrap around</span>
+        count_ += <span class="n">1</span>;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; <span class="f">poll</span>() {
+        <span class="k">if</span> (count_ == <span class="n">0</span>) <span class="k">return</span> <span class="t">std</span>::nullopt;          <span class="c">// empty</span>
+        <span class="t">int</span> v = slots_[head_];
+        head_ = (head_ + <span class="n">1</span>) % slots_.<span class="f">size</span>();
+        count_ -= <span class="n">1</span>;
+        <span class="k">return</span> v;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; slots_;                           <span class="c">// sized once</span>
+    <span class="t">size_t</span> head_ = <span class="n">0</span>, tail_ = <span class="n">0</span>, count_ = <span class="n">0</span>;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">IntQueue</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span>[] slots;
+    <span class="k">private</span> <span class="t">int</span> head = <span class="n">0</span>, tail = <span class="n">0</span>, count = <span class="n">0</span>;
+
+    <span class="t">IntQueue</span>(<span class="t">int</span> capacity) {
+        <span class="k">if</span> (capacity &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"positive capacity required"</span>);
+        slots = <span class="k">new</span> <span class="t">int</span>[capacity];
+    }
+
+    <span class="t">boolean</span> <span class="f">offer</span>(<span class="t">int</span> v) {
+        <span class="k">if</span> (count == slots.length) <span class="k">return</span> <span class="k">false</span>;       <span class="c">// full</span>
+        slots[tail] = v;
+        tail = (tail + <span class="n">1</span>) % slots.length;              <span class="c">// wrap around</span>
+        count += <span class="n">1</span>;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">boolean</span> <span class="f">poll</span>(<span class="t">int</span>[] out) {                         <span class="c">// caller reuses a one-element array</span>
+        <span class="k">if</span> (count == <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;                 <span class="c">// empty</span>
+        <span class="t">int</span> v = slots[head];
+        head = (head + <span class="n">1</span>) % slots.length;
+        count -= <span class="n">1</span>;
+        out[<span class="n">0</span>] = v;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Java reuses a caller-owned one-element array and returns a boolean; <code>OptionalInt.of</code> would create a wrapper unless the JIT eliminates it, so it cannot promise no allocation. C++ <code>std::optional&lt;int&gt;</code> contains the int inline and needs no separate allocation. The Java output array must be non-null and have at least one element. For many threads, wrap both methods in one lock and turn the full and empty returns into waits on two conditions.</p></div></div><div class="cq" data-q="fixed-buffer-queues.c3" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">In the two-queue buffer, queue A's producer is very fast and its consumer is slow. A's queue grows until it holds every slot, and queue B's producer blocks even though B's queue is empty. The interviewer asks you to prevent B from starving. Propose a fix and its cost.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Give each queue a guaranteed reserve, say R slots. Track how many slots each queue holds. A producer for queue q may take a free slot only if, after taking it, the free slots still cover the other queue's unused reserve: free minus 1 must be at least max(0, R minus used by the other queue). Otherwise it waits on the not-full condition. So A can grow into everything except B's unused reserve, with <code>2 * R &lt;= capacity</code> and <code>R &gt; 0</code>, so A cannot consume B's unused reserve. This protects capacity, not scheduling fairness or progress when B's own consumer stops.</p>
+<p>The cost is utilization: up to R slots may sit idle while A is blocked, and the choice of R is a policy decision (equal reserves, or proportional to expected traffic). Signalling also changes: use <code>signalAll</code> or <code>notify_all</code> on the shared not-full condition when capacity is released. A single signal can choose a producer whose reserve predicate is still false and leave an eligible producer asleep. Every woken producer re-checks its own predicate; alternatively, maintain separate conditions and explicitly wake eligible queues.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="fixed-buffer-queues.s1" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Design a bounded queue in a fixed array. How do you make it safe for several producers and consumers?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Define head, tail and count with a positive fixed capacity</li><li>One lock protects slots and all queue metadata</li><li>Producers wait while full and consumers while empty, using separate conditions</li><li>Update the invariant before signalling and recheck after every wakeup</li><li>Close wakes all waiters and allows consumers to drain</li><li>Distinguish fixed payload storage from runtime waiter allocations and test unique ids</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I use a fixed array with a head index, a tail index, and a count, all protected by one lock. Head identifies the next value to remove, tail the next slot to fill, and count distinguishes empty from full when the indices are equal. Producers wait while count equals capacity; consumers wait while count is zero. I use separate not-full and not-empty conditions, always in loops, because a wakeup does not reserve a slot or an item. Each operation updates the slot and metadata before signalling the opposite side. For shutdown I set a closed flag under the lock, reject new puts, let takes drain, and wake everyone. The data array never grows, but Java's lock machinery may allocate waiter nodes. I would test capacity one, repeated wrapping, unique item identities, per-producer order, and closing while both kinds of caller are waiting.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Would a locked <code>isEmpty()</code> followed by <code>take()</code> make a nonblocking removal safe?</span></p></div></div><div class="sq" data-sq="fixed-buffer-queues.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"There is exactly one producer and one consumer. Explain both memory-ordering directions in your ring."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Producer alone writes tail; consumer alone writes head</li><li>Slot write precedes release publication of tail</li><li>Consumer acquires tail before reading the slot</li><li>Consumer releases head after reading; producer acquires head before reuse</li><li>Own-index accesses need no cross-thread ordering</li><li>Power-of-two modular counters survive wrap; extra producers invalidate ownership</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The lock can go because each index has one writer, but ordering must work in both directions. The producer writes the value into a slot, then release-stores the new tail. The consumer acquire-loads tail before reading that slot, so observing publication also makes the value visible. After reading, the consumer release-stores head. The producer acquire-loads head before reusing the slot, ensuring it cannot overwrite data while the consumer still reads it. Each thread can read its own index with a plain Java or relaxed C++ atomic access. I validate a positive power-of-two capacity and use defined modular counter arithmetic so wraparound preserves both the distance and masked index. Two producers break the ownership proof: both can claim one slot, and C++ then has undefined behaviour. Failed offers and polls return immediately; a surrounding retry loop can still wait forever if its peer stops.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why is atomically incrementing tail before writing the slot insufficient for multiple producers?</span></p></div></div><div class="sq" data-sq="fixed-buffer-queues.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Two FIFO queues must share one large buffer with little wasted space. What would you build?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Use queue head and tail indices plus one shared free list</li><li>Enqueue takes a free slot; dequeue returns it while preserving FIFO links</li><li>One lock protects the disjoint-list ownership invariant</li><li>Shared space condition and per-queue data conditions govern waits</li><li>Link chunks to reduce metadata, accepting bounded partial-chunk waste</li><li>Reserve capacity for isolation and wake all producers when admission predicates differ</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would let both queues draw storage from one free list instead of reserving half the buffer for each. Each queue has its own head and tail. Enqueue removes a free slot and links it after that queue's tail; dequeue removes the head and returns its slot to the free list. One lock protects the invariant that every slot belongs to exactly one queue or the free list. Consumers wait on their own queue's data condition, while producers share a space condition. For a large buffer, I link chunks of values rather than individual values. One four-byte link per four-kibibyte payload chunk costs about a tenth of a percent, at the cost of partially used end chunks. If one queue needs guaranteed capacity, I add a reserve. Producers then have different admission predicates, so a shared single signal is insufficient; I wake all and recheck.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How does your capacity calculation change when the supplied buffer must contain both payload and link metadata?</span></p></div></div></section>
+
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-ring-buffer-queue.html" data-problem="ring-buffer-queue"><span class="pk">Thread-safe structures · medium</span><b>Ring buffer blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-two-queues-one-buffer.html" data-problem="two-queues-one-buffer"><span class="pk">Thread-safe structures · hard</span><b>Two queues, one buffer</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="parallel-file-processing.html"><span>Previous</span><b>Parallel copies, chunked reads and caches over slow storage</b></a><a class="next" href="memory-allocators.html"><span>Next</span><b>Memory allocators: free lists, buddy allocation and thread safety</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-ring-buffer">The ring buffer</a><a href="#making-it-thread-safe">Making it thread-safe</a><a href="#one-producer-one-consumer-no-lock-at-all">One producer, one consumer: no lock at all</a><a href="#two-queues-in-one-buffer">Two queues in one buffer</a><a href="#minimal-waste-for-a-very-large-buffer">Minimal waste for a very large buffer</a><a href="#shutdown-deadlines-and-tests">Shutdown, deadlines and tests</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

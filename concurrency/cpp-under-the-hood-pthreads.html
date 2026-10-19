@@ -1,0 +1,774 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Under the hood: how std::thread maps to the OS · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-under-the-hood-pthreads" data-title="Under the hood: how std::thread maps to the OS" data-track="cpp" data-module="cpp-3" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details open><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads" class=here><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m3">Module 03: Tools and under the hood</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 03.2</span><span>30 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Under the hood: how std::thread maps to the OS</h1><p class="lsum">How C++ threads map to pthreads, where Linux and macOS differ, and how to implement safe waits and shutdown in C.</p><div class="asked"><span>Asked at</span><span class="co">Nvidia</span></div><div class="prereq"><span>Before this:</span><a href="cpp-classes-raii.html">Classes, constructors, destructors and RAII</a><a href="cpp-build-debug-sanitizers.html">Building, debugging and sanitizers</a></div></header><article class="prose" id="article">
+<p class="lead"><code>std::thread</code> is a thin C++ coat over the operating system's threads. Knowing the layer underneath explains the frames in every stack trace and the costs of every primitive, and it lets you write a correct producer and consumer in plain C when an interviewer takes the C++ library away.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of a car with an automatic gearbox and the same car with a manual one. The engine is identical. The automatic picks gears for you and never lets you forget the clutch; the manual makes you do every step yourself, in the right order, every time.</p>
+<p>C++'s thread library offers automatic help: named guards release their locks, predicate waits re-check their condition, and <code>std::jthread</code> joins on destruction. You still have to choose those tools correctly; <code>std::thread</code> does not automatically join. <a class="term" data-term="pthreads" href="glossary.html#pthreads">POSIX threads</a> is the manual: you initialize, lock, check in a loop, unlock, destroy and handle errors yourself. <strong>Same engine, more ways to stall.</strong></p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><strong>Some rounds are C only.</strong> Reports from Nvidia system software interviews in India describe rounds that allowed only C, and an Nvidia SDE-2 report asked for a C program in which one thread prints even numbers and another prints odd numbers, in order, with mutexes and condition variables. You must be able to write that with <code>pthread_create</code>, <code>pthread_mutex_t</code> and <code>pthread_cond_t</code> from memory.</li>
+<li><strong>Stack traces speak pthreads.</strong> ThreadSanitizer says a thread was "created by main thread at pthread_create"; a hung process shows <code>__psynch_mutexwait</code> or a futex wait. Reading those frames needs this map.</li>
+<li><strong>Costs come from the OS.</strong> Each pthread corresponds to a kernel thread and has its own stack. Ordinary mutexes usually acquire in user space when free; contention may require spinning or kernel-assisted blocking.</li>
+<li><strong>Platforms differ.</strong> macOS has no unnamed POSIX semaphores, no <code>pthread_barrier_t</code> and no <code>pthread_mutex_timedlock</code>. Code that compiles on your Mac can fail at run time, and code from a Linux interview may not compile on your Mac at all.</li>
+</ul>
+</div>
+
+<h2 id="the-map-c-types-to-os-objects">The map: C++ types to OS objects</h2>
+<p>The usual libstdc++ and libc++ builds on Linux, and Apple's libc++ on macOS, use POSIX threads. <strong>This is an implementation map, not a C++ standard requirement.</strong> Details below describe those backends, including the libc++ shipped with this Mac's Apple clang 17:</p>
+<table>
+<thead><tr><th>C++</th><th>POSIX underneath</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><code>std::thread t(f)</code></td><td><code>pthread_create</code></td><td><code>join()</code> is <code>pthread_join</code>, <code>detach()</code> is <code>pthread_detach</code>; <code>t.native_handle()</code> returns the <code>pthread_t</code></td></tr>
+<tr><td><code>std::mutex</code></td><td><code>pthread_mutex_t</code>, default type</td><td><code>lock</code>, <code>try_lock</code>, <code>unlock</code> call <code>pthread_mutex_lock</code>, <code>pthread_mutex_trylock</code>, <code>pthread_mutex_unlock</code></td></tr>
+<tr><td><code>std::recursive_mutex</code></td><td><code>pthread_mutex_t</code> with <code>PTHREAD_MUTEX_RECURSIVE</code></td><td>the same thread may lock it again</td></tr>
+<tr><td><code>std::condition_variable</code></td><td><code>pthread_cond_t</code></td><td><code>wait</code> is <code>pthread_cond_wait</code>, <code>notify_one</code> is <code>pthread_cond_signal</code>, <code>notify_all</code> is <code>pthread_cond_broadcast</code>; timed waits use <code>pthread_cond_timedwait</code> or a platform variant</td></tr>
+<tr><td><code>std::timed_mutex</code>, <code>std::shared_mutex</code></td><td>library specific</td><td>in libc++ (this Mac) a timed mutex is a mutex, a condition variable and a flag, and a shared mutex is a mutex and two condition variables; libstdc++ uses <code>pthread_mutex_timedlock</code> and <code>pthread_rwlock_t</code> where available</td></tr>
+<tr><td><code>std::counting_semaphore</code></td><td>library specific</td><td>libc++ builds it on an atomic counter with atomic wait, not on <code>sem_t</code></td></tr>
+<tr><td><code>std::this_thread::sleep_for</code>, <code>yield</code>, <code>get_id</code></td><td><code>nanosleep</code>, <code>sched_yield</code>, <code>pthread_self</code></td><td></td></tr>
+<tr><td><code>thread_local</code></td><td>compiler/runtime-managed thread-local storage</td><td>C11 has <code>_Thread_local</code>; pthreads also provides dynamic per-thread keys through <code>pthread_key_create</code>, <code>pthread_setspecific</code> and <code>pthread_getspecific</code></td></tr>
+</tbody>
+</table>
+<p>On Windows, Microsoft's library sits on Windows threads and the Win32 synchronization primitives instead; the C++ code you write is the same.</p>
+<p>The stacks in <a href="cpp-build-debug-sanitizers.html">the debugging lesson</a> make this map useful. On macOS you may see <code>__psynch_mutexwait</code> below <code>_pthread_mutex_firstfit_lock_slow</code>, <code>__psynch_cvwait</code> below <code>_pthread_cond_wait</code>, or <code>_pthread_join</code>. Exact frames vary with the OS, library and mutex policy. A representative ThreadSanitizer thread-creation stack has this shape:</p>
+
+<figure class="code single" data-sample="cpp-under-the-hood-pthreads.1"><figcaption><span class="ctitle">ThreadSanitizer: where a std::thread really comes from</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code>Thread created by main thread at:
+    #0 pthread_create
+    #1 std::thread constructor
+    #2 main</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h3>What a thread is, on Linux and macOS</h3>
+<p>On Linux, glibc's <code>pthread_create</code> obtains a stack, sets up thread-local storage and creates a kernel task through <code>clone</code> or <code>clone3</code>, depending on the runtime and kernel. Flags such as <code>CLONE_VM</code>, <code>CLONE_FILES</code>, <code>CLONE_SIGHAND</code> and <code>CLONE_THREAD</code> arrange the sharing. Each task is independently scheduled: this is the 1:1 <a class="term" data-term="kernel-thread" href="glossary.html#kernel-thread">kernel thread</a> model. macOS uses different kernel interfaces with the same 1:1 result.</p>
+<p>Stack sizes are defaults, not language guarantees. On macOS inspect the actual size with <code>pthread_get_stacksize_np(pthread_self())</code> instead of assuming a fixed value. On Linux with glibc, the finite stack resource limit at program startup sets the usual default, commonly 8 MiB; an unlimited limit instead selects an architecture-specific default. Stack address space is reserved, with physical backing generally acquired as pages are touched. <code>pthread_attr_setstacksize</code> changes the requested size for a thread you create with those attributes.</p>
+
+<h3>Locks: user space first, the kernel only when needed</h3>
+<p>An ordinary mutex usually has a user-space fast path using atomic operations; it is not guaranteed to be exactly one compare-and-swap. Contention may first cause spinning and then kernel-assisted parking: a <a class="term" data-term="futex" href="glossary.html#futex">futex</a> on Linux, or macOS mechanisms such as <code>psynch</code> and <code>ulock</code>. Unlock may need a kernel wakeup when waiters exist. Special mutex protocols can take different paths.</p>
+<p>As rough orders of magnitude, an uncontended lock/unlock pair can cost tens of nanoseconds, while blocking and rescheduling can cost microseconds or more. These are not measured results or bounds for your machine. Scheduling, cache traffic and the critical section determine the actual cost; <a href="how-locks-work.html">how locks are built</a> explains the <a class="term" data-term="context-switch" href="glossary.html#context-switch">context switch</a> and contention trade-offs.</p>
+
+<h3>Reaching the pthread from C++</h3>
+<p>On these pthread backends, <code>std::thread::native_handle()</code> exposes a <code>pthread_t</code>. Its type and operations are implementation-defined. Linux offers <code>pthread_setname_np(handle, &quot;worker&quot;)</code>, with at most 15 name bytes plus the terminator, and affinity APIs; macOS's <code>pthread_setname_np(&quot;worker&quot;)</code> names only the calling thread and does not need a handle. Linux-style core pinning is not a portable pthread facility.</p>
+<p><strong>Keep lifecycle ownership in C++.</strong> Do not call <code>pthread_join</code> or <code>pthread_detach</code> on a <code>std::thread</code> handle: the C++ object would still believe it is joinable. Do not retain a handle beyond its valid thread lifetime. For native scheduling changes, check return codes and permissions; for identity, treat <code>pthread_t</code> as opaque and compare with <code>pthread_equal</code>, not a numeric OS thread id.</p>
+
+<h2 id="threads-in-c-create-pass-data-join">Threads in C: create, pass data, join</h2>
+<p><code>pthread_create</code> takes a function that receives and returns <code>void*</code>. You pass data in through that pointer, usually a pointer to a struct that you keep alive until the thread is joined, and you get results out through the same struct.</p>
+<p>The C examples below use a small <code>check</code> helper: an unexpected pthread error prints the returned error number and terminates the process. This is an explicit demonstration policy, not recoverable library error handling. A reusable component must unwind partial startup: stop and wake already-created workers, join only successful creations, then destroy initialized resources. No example uses <code>pthread_cancel</code>.</p>
+
+<figure class="code single" data-sample="cpp-under-the-hood-pthreads.2" data-expect="ok"><figcaption><span class="ctitle">Four threads, four chunks, in C style</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53</span><code><span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check</span>(<span class="t">int</span> rc, <span class="k">const</span> <span class="t">char</span> *operation) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"%s: %s\n"</span>, operation, <span class="f">strerror</span>(rc));
+        <span class="f">exit</span>(EXIT_FAILURE);       <span class="c">/* demonstration policy: terminate on unexpected errors */</span>
+    }
+}
+
+<span class="p">#define THREADS 4</span>
+<span class="p">#define N 1000</span>
+
+<span class="k">static</span> <span class="t">int</span> data[N];
+
+<span class="k">struct</span> chunk {          <span class="c">/* one per thread: its input range and its own result */</span>
+    <span class="t">int</span> begin;
+    <span class="t">int</span> end;
+    <span class="t">long</span> sum;
+};
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">sumChunk</span>(<span class="t">void</span> *arg) {
+    <span class="k">struct</span> chunk *c = (<span class="k">struct</span> chunk *)arg;   <span class="c">/* the cast is needed in C++, harmless in C */</span>
+    <span class="t">long</span> s = <span class="n">0</span>;
+    <span class="k">for</span> (<span class="t">int</span> i = c-&gt;begin; i &lt; c-&gt;end; i += <span class="n">1</span>) {
+        s += data[i];
+    }
+    c-&gt;sum = s;          <span class="c">/* only this thread writes this struct until it is joined */</span>
+    <span class="k">return</span> NULL;
+}
+
+<span class="t">int</span> <span class="f">main</span>(<span class="t">void</span>) {
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; N; i += <span class="n">1</span>) {
+        data[i] = i + <span class="n">1</span>;
+    }
+    pthread_t threads[THREADS];
+    <span class="k">struct</span> chunk chunks[THREADS];             <span class="c">/* outlives every thread: they are joined below */</span>
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; THREADS; t += <span class="n">1</span>) {
+        chunks[t].begin = t * (N / THREADS);
+        chunks[t].end = (t + <span class="n">1</span>) * (N / THREADS);
+        chunks[t].sum = <span class="n">0</span>;
+        <span class="f">check</span>(<span class="f">pthread_create</span>(&amp;threads[t], NULL, sumChunk, &amp;chunks[t]), <span class="s">"pthread_create"</span>);
+    }
+    <span class="t">long</span> total = <span class="n">0</span>;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; THREADS; t += <span class="n">1</span>) {
+        <span class="f">check</span>(<span class="f">pthread_join</span>(threads[t], NULL), <span class="s">"pthread_join"</span>);       <span class="c">/* after this, chunks[t].sum is safe to read */</span>
+        total += chunks[t].sum;
+    }
+    <span class="f">printf</span>(<span class="s">"total = %ld (expected %d)\n"</span>, total, N * (N + <span class="n">1</span>) / <span class="n">2</span>);
+    <span class="k">return</span> total == (<span class="t">long</span>)N * (N + <span class="n">1</span>) / <span class="n">2</span> ? <span class="n">0</span> : <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The samples in this lesson are written in C, in a style that is also valid C++, because Tandem's Run button compiles C++; saved as a <code>.c</code> file they build with <code>cc -std=c11 -Wall -pthread</code>. Three C habits matter here:</p>
+<ul>
+<li><strong>Return codes, not <code>errno</code>.</strong> The pthread operations used here, such as create, join, lock and wait, return 0 or an error number such as <code>EAGAIN</code>. Diagnose that return value with <code>strerror(rc)</code>, not <code>errno</code>. Some other pthread APIs return values instead, such as <code>pthread_self</code> and <code>pthread_equal</code>.</li>
+<li><strong>Give each thread its own argument.</strong> Passing <code>&amp;i</code>, the loop variable, hands every thread a pointer to the same changing integer: they read whatever value it holds when they get around to it, and the read races with the loop's writes. Use an array with one element per thread, as above.</li>
+<li><strong>Join or detach every thread.</strong> A thread that finishes but is never joined keeps its resources until someone does, much like a zombie process. There is no destructor to remind you.</li>
+</ul>
+
+<h2 id="mutexes-and-condition-variables-in-c">Mutexes and condition variables in C</h2>
+<p>A <code>pthread_mutex_t</code> can be initialized statically with <code>PTHREAD_MUTEX_INITIALIZER</code>, or with <code>pthread_mutex_init(&amp;m, NULL)</code> and later <code>pthread_mutex_destroy(&amp;m)</code>. With no RAII, every path out of a critical section must call <code>pthread_mutex_unlock</code>, including every early return and error path; C code usually funnels them through one exit at the end of the function. For debugging, a mutex of type <code>PTHREAD_MUTEX_ERRORCHECK</code> (set with <code>pthread_mutexattr_settype</code>) returns <code>EDEADLK</code> if a thread locks it twice and <code>EPERM</code> if a thread unlocks a mutex it does not own, where a default mutex would hang or misbehave.</p>
+<p>A <code>pthread_cond_t</code> is the <a class="term" data-term="condition-variable" href="glossary.html#condition-variable">condition variable</a> itself. Its contract is the same as in C++:</p>
+<ul>
+<li><code>pthread_cond_wait(&amp;cond, &amp;mutex)</code> requires ownership of the mutex. It atomically releases it and begins waiting relative to another thread acquiring that mutex and signalling. A successful return holds the mutex again. Use the same mutex for concurrent waits on a given condition variable.</li>
+<li>It may return without a signal (a <a class="term" data-term="spurious-wakeup" href="glossary.html#spurious-wakeup">spurious wakeup</a>), and another thread may have changed the state before you got the mutex back. So the wait is always written <code>while (!condition) pthread_cond_wait(&amp;cond, &amp;mutex);</code>. With no predicate overload in C, the <code>while</code> is entirely your job.</li>
+<li>When waiters exist, <code>pthread_cond_signal</code> unblocks at least one, and <code>pthread_cond_broadcast</code> unblocks all. Neither immediately hands over the mutex. A signal with no thread waiting does nothing and is not remembered, which is why the waiter must check the state, not wait for the signal.</li>
+<li>Change the state and signal while holding the mutex. Signaling just after unlocking is also legal, but holding it is the version that is easy to prove correct.</li>
+</ul>
+<figure class="timeline"><figcaption>The mutex closes the check-to-wait gap</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Consumer</span><span>Producer</span></div><div class="tl-row"><span class="t">1</span><span class="cell">Locks the mutex and finds count is zero</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">Tries to lock the mutex and must wait</span></div><div class="tl-row"><span class="t">3</span><span class="cell">Atomically releases the mutex and begins waiting on notEmpty</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">Acquires the mutex, inserts an item and signals notEmpty</span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">Unlocks the mutex</span></div><div class="tl-row"><span class="t">6</span><span class="cell">Reacquires the mutex and rechecks count before removing an item</span><span class="cell empty"></span></div><div class="tl-note">The predicate remembers the item. The signal merely prompts another check.</div></div></figure>
+
+<h2 id="producer-and-consumer-in-raw-pthreads">Producer and consumer in raw pthreads</h2>
+<p>Here is the bounded buffer from <a href="producer-consumer.html">producer and consumer</a>, written the way a C-only round expects: a ring buffer of capacity 4, two producers, two consumers, one mutex, and two condition variables. The consumers stop when the buffer is empty and every producer has finished.</p>
+
+<figure class="code single" data-sample="cpp-under-the-hood-pthreads.3" data-expect="ok"><figcaption><span class="ctitle">Bounded buffer: 2 producers, 2 consumers, pthreads only</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106</span><code><span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check</span>(<span class="t">int</span> rc, <span class="k">const</span> <span class="t">char</span> *operation) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"%s: %s\n"</span>, operation, <span class="f">strerror</span>(rc));
+        <span class="f">exit</span>(EXIT_FAILURE);       <span class="c">/* demonstration policy: terminate on unexpected errors */</span>
+    }
+}
+
+<span class="p">#define CAPACITY 4</span>
+<span class="p">#define PRODUCERS 2</span>
+<span class="p">#define CONSUMERS 2</span>
+<span class="p">#define ITEMS_PER_PRODUCER 1000</span>
+
+<span class="c">/* Buffer state and producersLeft are guarded by lock. */</span>
+<span class="k">static</span> <span class="t">int</span> buffer[CAPACITY];
+<span class="k">static</span> <span class="t">int</span> head = <span class="n">0</span>;                       <span class="c">/* next slot to read */</span>
+<span class="k">static</span> <span class="t">int</span> tail = <span class="n">0</span>;                       <span class="c">/* next slot to write */</span>
+<span class="k">static</span> <span class="t">int</span> count = <span class="n">0</span>;                      <span class="c">/* items in the buffer */</span>
+<span class="k">static</span> <span class="t">int</span> producersLeft = PRODUCERS;
+<span class="k">static</span> pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+<span class="k">static</span> pthread_cond_t notFull = PTHREAD_COND_INITIALIZER;
+<span class="k">static</span> pthread_cond_t notEmpty = PTHREAD_COND_INITIALIZER;
+
+<span class="k">struct</span> consumerResult {                    <span class="c">/* written only by its own consumer */</span>
+    <span class="t">long</span> sum;
+    <span class="t">int</span> taken;
+};
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">producer</span>(<span class="t">void</span> *arg) {
+    <span class="t">int</span> id = *(<span class="t">int</span> *)arg;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; ITEMS_PER_PRODUCER; i += <span class="n">1</span>) {
+        <span class="f">check</span>(<span class="f">pthread_mutex_lock</span>(&amp;lock), <span class="s">"pthread_mutex_lock"</span>);
+        <span class="k">while</span> (count == CAPACITY) {        <span class="c">/* while, never if */</span>
+            <span class="f">check</span>(<span class="f">pthread_cond_wait</span>(&amp;notFull, &amp;lock), <span class="s">"pthread_cond_wait"</span>);
+        }
+        buffer[tail] = id * ITEMS_PER_PRODUCER + i;
+        tail = (tail + <span class="n">1</span>) % CAPACITY;
+        count += <span class="n">1</span>;
+        <span class="f">check</span>(<span class="f">pthread_cond_signal</span>(&amp;notEmpty), <span class="s">"pthread_cond_signal"</span>);    <span class="c">/* one waiting consumer can now proceed */</span>
+        <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;lock), <span class="s">"pthread_mutex_unlock"</span>);
+    }
+    <span class="f">check</span>(<span class="f">pthread_mutex_lock</span>(&amp;lock), <span class="s">"pthread_mutex_lock"</span>);
+    producersLeft -= <span class="n">1</span>;
+    <span class="k">if</span> (producersLeft == <span class="n">0</span>) {
+        <span class="f">check</span>(<span class="f">pthread_cond_broadcast</span>(&amp;notEmpty), <span class="s">"pthread_cond_broadcast"</span>); <span class="c">/* wake every consumer so each can see the end */</span>
+    }
+    <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;lock), <span class="s">"pthread_mutex_unlock"</span>);
+    <span class="k">return</span> NULL;
+}
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">consumer</span>(<span class="t">void</span> *arg) {
+    <span class="k">struct</span> consumerResult *out = (<span class="k">struct</span> consumerResult *)arg;
+    <span class="k">for</span> (;;) {
+        <span class="f">check</span>(<span class="f">pthread_mutex_lock</span>(&amp;lock), <span class="s">"pthread_mutex_lock"</span>);
+        <span class="k">while</span> (count == <span class="n">0</span> &amp;&amp; producersLeft &gt; <span class="n">0</span>) {
+            <span class="f">check</span>(<span class="f">pthread_cond_wait</span>(&amp;notEmpty, &amp;lock), <span class="s">"pthread_cond_wait"</span>);
+        }
+        <span class="k">if</span> (count == <span class="n">0</span>) {                  <span class="c">/* empty and no producer left: finished */</span>
+            <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;lock), <span class="s">"pthread_mutex_unlock"</span>);
+            <span class="k">return</span> NULL;
+        }
+        <span class="t">int</span> item = buffer[head];
+        head = (head + <span class="n">1</span>) % CAPACITY;
+        count -= <span class="n">1</span>;
+        <span class="f">check</span>(<span class="f">pthread_cond_signal</span>(&amp;notFull), <span class="s">"pthread_cond_signal"</span>);     <span class="c">/* one waiting producer can now proceed */</span>
+        <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;lock), <span class="s">"pthread_mutex_unlock"</span>);
+        out-&gt;sum += item;                  <span class="c">/* work on the item outside the lock */</span>
+        out-&gt;taken += <span class="n">1</span>;
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>(<span class="t">void</span>) {
+    pthread_t producers[PRODUCERS];
+    pthread_t consumers[CONSUMERS];
+    <span class="t">int</span> ids[PRODUCERS];
+    <span class="k">struct</span> consumerResult results[CONSUMERS];
+    <span class="f">memset</span>(results, <span class="n">0</span>, <span class="k">sizeof</span> results);
+
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; CONSUMERS; i += <span class="n">1</span>) {
+        <span class="f">check</span>(<span class="f">pthread_create</span>(&amp;consumers[i], NULL, consumer, &amp;results[i]), <span class="s">"pthread_create"</span>);
+    }
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; PRODUCERS; i += <span class="n">1</span>) {
+        ids[i] = i;
+        <span class="f">check</span>(<span class="f">pthread_create</span>(&amp;producers[i], NULL, producer, &amp;ids[i]), <span class="s">"pthread_create"</span>);
+    }
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; PRODUCERS; i += <span class="n">1</span>) {
+        <span class="f">check</span>(<span class="f">pthread_join</span>(producers[i], NULL), <span class="s">"pthread_join"</span>);
+    }
+    <span class="t">long</span> total = <span class="n">0</span>;
+    <span class="t">int</span> taken = <span class="n">0</span>;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; CONSUMERS; i += <span class="n">1</span>) {
+        <span class="f">check</span>(<span class="f">pthread_join</span>(consumers[i], NULL), <span class="s">"pthread_join"</span>);
+        total += results[i].sum;
+        taken += results[i].taken;
+    }
+    <span class="t">long</span> n = (<span class="t">long</span>)PRODUCERS * ITEMS_PER_PRODUCER;
+    <span class="f">printf</span>(<span class="s">"consumed %d items, sum %ld (expected %ld)\n"</span>, taken, total, n * (n - <span class="n">1</span>) / <span class="n">2</span>);
+    <span class="f">check</span>(<span class="f">pthread_cond_destroy</span>(&amp;notFull), <span class="s">"pthread_cond_destroy"</span>);
+    <span class="f">check</span>(<span class="f">pthread_cond_destroy</span>(&amp;notEmpty), <span class="s">"pthread_cond_destroy"</span>);
+    <span class="f">check</span>(<span class="f">pthread_mutex_destroy</span>(&amp;lock), <span class="s">"pthread_mutex_destroy"</span>);
+    <span class="k">return</span> taken == n &amp;&amp; total == n * (n - <span class="n">1</span>) / <span class="n">2</span> ? <span class="n">0</span> : <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Walk through it the way you would in the interview:</p>
+<ul>
+<li><strong>The invariant.</strong> <code>0 &lt;= count &lt;= CAPACITY</code>, and <code>head</code>, <code>tail</code> and <code>count</code> describe exactly the occupied slots. One mutex guards all of them, because they change together.</li>
+<li><strong>Two conditions.</strong> Producers wait on <code>notFull</code>, consumers on <code>notEmpty</code>, so each <code>pthread_cond_signal</code> reaches a thread of the kind that can use it. With one shared condition you would need <code>broadcast</code> to avoid waking the wrong kind of thread and losing the signal.</li>
+<li><strong>The end condition is part of the wait.</strong> Consumers wait while "empty and producers remain". The last producer broadcasts, because every consumer must wake and see that it is over; a single signal would leave the others asleep forever.</li>
+<li><strong>Per-thread results need no lock.</strong> Each consumer writes only its own <code>results[i]</code>, and <code>main</code> reads it only after <code>pthread_join</code>, which guarantees the writes are visible.</li>
+</ul>
+<p>Compare it with the C++ version: <code>std::unique_lock</code> replaces every <code>pthread_mutex_unlock</code>, the predicate overload of <code>wait</code> replaces each <code>while</code>, and <code>std::thread</code> checks its argument types at compile time instead of passing <code>void*</code>. The design is identical. <strong>The C version only removes the guard rails.</strong></p>
+
+<h2 id="timed-waits-in-c">Timed waits in C</h2>
+<p><code>pthread_cond_timedwait(&amp;cond, &amp;mutex, &amp;deadline)</code> takes an absolute <code>struct timespec</code> deadline, not a duration. The default clock is <code>CLOCK_REALTIME</code>; wall-clock changes can distort a timeout. On Linux, initialize condition attributes, set <code>CLOCK_MONOTONIC</code> with <code>pthread_condattr_setclock</code>, initialize the condition variable using those attributes, then destroy the attributes. Compute the deadline from that same clock and keep <code>tv_nsec</code> in the range 0 to 999999999.</p>
+<p><strong>Keep one total time budget.</strong> Reuse the absolute deadline after wakeups. On <code>ETIMEDOUT</code> the mutex has been reacquired: check the predicate once more under the lock, since state change can race the timeout. Other unexpected errors need handling, not a retry loop. macOS lacks <code>pthread_condattr_setclock</code> and offers <code>pthread_cond_timedwait_relative_np</code> instead; compute one monotonic deadline and pass only the remaining duration on each retry. Passing the original relative duration repeatedly can extend the wait forever. See <a href="cpp-chrono.html">clocks and deadlines</a>.</p>
+
+<h2 id="semaphores-and-the-macos-gap">Semaphores, and the macOS gap</h2>
+<p>POSIX has two kinds of <a class="term" data-term="semaphore" href="glossary.html#semaphore">semaphore</a>. Unnamed ones live in your memory: <code>sem_init</code>, <code>sem_wait</code>, <code>sem_post</code>, <code>sem_destroy</code>. Named ones are system-wide objects: <code>sem_open</code>, <code>sem_close</code>, <code>sem_unlink</code>. Linux supports both. <strong>macOS does not implement unnamed semaphores</strong>: <code>sem_init</code> is marked deprecated, and on this Mac it returns -1 with <code>errno</code> set to <code>ENOSYS</code> ("Function not implemented").</p>
+<p>The code compiles with a deprecation warning, but <strong>failed initialization leaves no valid semaphore</strong>. Do not call <code>sem_wait</code> or <code>sem_post</code> on it: using an uninitialized semaphore has undefined behaviour, not a guaranteed harmless failure. Nvidia's reported "print 1 to N with N threads using semaphores" is one reason to know the platform distinction. Your options on a Mac:</p>
+<ul>
+<li>Build a counting semaphore from a mutex and a condition variable (the checkpoint below). It is portable, and writing it is itself a common question.</li>
+<li>Use a named semaphore with <code>sem_open</code> and <code>sem_unlink</code>. It works, but it is a system-wide object that can outlive a crashed process.</li>
+<li>Use Grand Central Dispatch's <code>dispatch_semaphore_t</code> (Apple only), or C++20's <code>std::counting_semaphore</code> when C++ is allowed.</li>
+</ul>
+<p>POSIX semaphore operations use a different error convention from pthread operations: for example, <code>sem_wait</code> returns -1 and sets <code>errno</code> on failure. Retry <code>EINTR</code> only if your cancellation policy says to continue; handle other errors. A successful <code>sem_open</code> result is closed with <code>sem_close</code>, not <code>sem_destroy</code>. Arrange <code>sem_unlink</code> for the name's lifetime as well.</p>
+<p>Two more POSIX pieces are missing on macOS: <code>pthread_barrier_t</code> and <code>pthread_mutex_timedlock</code>. If an interviewer's Linux code uses them, know that they exist and what they do, even if you practice without them.</p>
+
+<div class="box example">
+<h3>Worked example: the even and odd printer in C</h3>
+<p>The task, as reported from an Nvidia interview: one thread prints the odd numbers and another the even numbers, and together they print 1 to N in order. In C, with pthreads only.</p>
+<p>The design in one sentence: a shared <code>next</code> number guarded by a mutex, and each thread waits on a condition variable while it is not its turn, where "my turn" means <code>next % 2 == myParity</code>.</p>
+<figure class="code single" data-sample="cpp-under-the-hood-pthreads.4" data-expect="ok"><figcaption><span class="ctitle">Odd and even threads take turns</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</span><code><span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check</span>(<span class="t">int</span> rc, <span class="k">const</span> <span class="t">char</span> *operation) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"%s: %s\n"</span>, operation, <span class="f">strerror</span>(rc));
+        <span class="f">exit</span>(EXIT_FAILURE);       <span class="c">/* demonstration policy: terminate on unexpected errors */</span>
+    }
+}
+
+<span class="p">#define LIMIT 10</span>
+
+<span class="k">static</span> <span class="t">int</span> next = <span class="n">1</span>;                                  <span class="c">/* the next number to print; guarded by lock */</span>
+<span class="k">static</span> pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+<span class="k">static</span> pthread_cond_t turnChanged = PTHREAD_COND_INITIALIZER;
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">printer</span>(<span class="t">void</span> *arg) {
+    <span class="t">int</span> parity = *(<span class="t">int</span> *)arg;                         <span class="c">/* 1 prints odd numbers, 0 prints even */</span>
+    <span class="f">check</span>(<span class="f">pthread_mutex_lock</span>(&amp;lock), <span class="s">"pthread_mutex_lock"</span>);
+    <span class="k">for</span> (;;) {
+        <span class="k">while</span> (next &lt;= LIMIT &amp;&amp; next % <span class="n">2</span> != parity) {
+            <span class="f">check</span>(<span class="f">pthread_cond_wait</span>(&amp;turnChanged, &amp;lock), <span class="s">"pthread_cond_wait"</span>);   <span class="c">/* not my turn: sleep */</span>
+        }
+        <span class="k">if</span> (next &gt; LIMIT) {
+            <span class="k">break</span>;
+        }
+        <span class="f">printf</span>(<span class="s">"%s thread: %d\n"</span>, parity ? <span class="s">"odd "</span> : <span class="s">"even"</span>, next);
+        next += <span class="n">1</span>;
+        <span class="f">check</span>(<span class="f">pthread_cond_signal</span>(&amp;turnChanged), <span class="s">"pthread_cond_signal"</span>);            <span class="c">/* exactly one other thread waits here */</span>
+    }
+    <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;lock), <span class="s">"pthread_mutex_unlock"</span>);
+    <span class="k">return</span> NULL;
+}
+
+<span class="t">int</span> <span class="f">main</span>(<span class="t">void</span>) {
+    pthread_t odd, even;
+    <span class="t">int</span> oddParity = <span class="n">1</span>;
+    <span class="t">int</span> evenParity = <span class="n">0</span>;
+    <span class="f">check</span>(<span class="f">pthread_create</span>(&amp;even, NULL, printer, &amp;evenParity), <span class="s">"pthread_create"</span>);   <span class="c">/* start order does not matter */</span>
+    <span class="f">check</span>(<span class="f">pthread_create</span>(&amp;odd, NULL, printer, &amp;oddParity), <span class="s">"pthread_create"</span>);
+    <span class="f">check</span>(<span class="f">pthread_join</span>(odd, NULL), <span class="s">"pthread_join"</span>);
+    <span class="f">check</span>(<span class="f">pthread_join</span>(even, NULL), <span class="s">"pthread_join"</span>);
+    <span class="f">check</span>(<span class="f">pthread_cond_destroy</span>(&amp;turnChanged), <span class="s">"pthread_cond_destroy"</span>);
+    <span class="f">check</span>(<span class="f">pthread_mutex_destroy</span>(&amp;lock), <span class="s">"pthread_mutex_destroy"</span>);
+    <span class="k">return</span> next == LIMIT + <span class="n">1</span> ? <span class="n">0</span> : <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Points the interviewer will probe. The wait condition includes <code>next &lt;= LIMIT</code>, so the thread that is not printing the last number also wakes and exits; without it, one thread would sleep forever and <code>pthread_join</code> would hang. <code>signal</code> is enough because exactly one other thread can be waiting. With N threads taking turns (the round-robin version), several threads wait on one condition, each for a different turn, so you must <code>broadcast</code> or give each thread its own condition variable; a single <code>signal</code> could wake a thread whose turn it is not, and the right thread would never be woken. The <code>printf</code> runs under the lock, which is what keeps the output in order.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong><code>if</code> instead of <code>while</code> around <code>pthread_cond_wait</code>.</strong> Spurious and stolen wakeups make the thread proceed when its condition is false.</li>
+<li><strong>Reading <code>errno</code> after a pthread call.</strong> pthread functions return the error number. Check the return value.</li>
+<li><strong>Passing <code>&amp;i</code> from a loop to <code>pthread_create</code>.</strong> Every thread sees the same, changing variable. Give each thread its own argument.</li>
+<li><strong>A missing unlock on an early return.</strong> There are no guards in C: one forgotten path leaves the mutex locked forever.</li>
+<li><strong>Signaling without changing the state under the mutex.</strong> The waiter can check the old state, then sleep through your signal: a <a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a>.</li>
+<li><strong>A relative time in <code>pthread_cond_timedwait</code>.</strong> It wants an absolute deadline; passing "100 ms" means a time in 1970, which has already passed, so it returns at once.</li>
+<li><strong><code>sem_init</code> on macOS without checking the result.</strong> It returns -1 with <code>ENOSYS</code>. Stop there: subsequent operations on the uninitialized object are invalid.</li>
+<li><strong>Destroying a mutex or condition variable while a thread still uses it.</strong> Join first, then destroy.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>In a C-only round, say the design before typing, then write it in the order the invariant needs: state and its mutex, the conditions, then each function as lock, wait in a loop, change state, signal, unlock. State your error policy, check return codes, and join every successfully created joinable worker.</p>
+<blockquote>I'll keep the shared state in one struct guarded by one <code>pthread_mutex_t</code>, with two condition variables, not full and not empty. Each function locks, waits in a while loop on its condition because wakeups can be spurious, changes the state, signals the other side while still holding the mutex, and unlocks. The last producer broadcasts so every consumer can see that the stream has ended.</blockquote>
+<p>Follow ups to expect:</p>
+<ul>
+<li>"Why does <code>pthread_cond_wait</code> take the mutex?" Because releasing the mutex and going to sleep must be one atomic step; otherwise a signal sent between your check and your sleep is lost.</li>
+<li>"<code>signal</code> or <code>broadcast</code>?" Signal when every waiter is interchangeable and one change helps one waiter; broadcast when waiters wait for different things, or when a change (like "finished") concerns all of them.</li>
+<li>"What is the difference between a mutex and a binary semaphore?" A mutex has an owner: the thread that locked it must unlock it. A <a class="term" data-term="binary-semaphore" href="glossary.html#binary-semaphore">binary semaphore</a> has no owner: a different thread may post it, allowing a signal between threads. You can also use a semaphore for exclusion, but callers must enforce the one-permit protocol themselves.</li>
+<li>"How is <code>std::thread</code> implemented on Linux?" Usually through <code>pthread_create</code>; glibc obtains a stack and uses <code>clone</code> or <code>clone3</code> with sharing flags. The kernel schedules each thread independently.</li>
+<li>"What happens if <code>main</code> returns while other threads are still running?" In a C program it terminates the process, including the workers. <code>pthread_exit(NULL)</code> ends only the calling thread, but its stack locals must no longer be used by others. Joining is the clearer lifetime contract. In C++, destruction of an unjoined, joinable <code>std::thread</code> first calls <code>std::terminate</code>; <code>std::jthread</code> instead requests stop and joins.</li>
+</ul>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Creation and join are synchronization boundaries.</strong> Initialize arguments before creating the worker: it may run before <code>pthread_create</code> returns. Read its result only after a successful join, and never return a pointer to the worker's own stack. Detaching releases thread resources when it ends; it neither extends argument lifetimes nor waits for completion.</p>
+<p><strong>Cancellation needs cleanup.</strong> A POSIX condition wait is a cancellation point. Deferred cancellation reacquires its mutex before running cleanup handlers, so a raw C implementation using <code>pthread_cancel</code> needs <code>pthread_cleanup_push</code> and <code>pthread_cleanup_pop</code> to release it. Prefer a guarded stop flag plus broadcast for these examples. A C++ stop token is cooperative and does not invoke POSIX cancellation.</p>
+<p><strong>Mutual exclusion does not promise fairness.</strong> Neither the default mutex nor signalling this condition variable guarantees FIFO waiter selection. The bounded buffer preserves item order, but cannot promise a particular waiting producer runs next.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>The usual Linux and macOS C++ libraries wrap pthread threads, mutexes and condition variables; that backend is not mandated by C++.</li>
+<li>Ordinary mutexes usually acquire in user space; contention can add spinning, kernel calls and scheduling delay.</li>
+<li>In C, every guarantee is manual: unlock on every path, wait in a <code>while</code>, check return codes, join every thread.</li>
+<li><code>pthread_cond_wait</code> releases the mutex and sleeps atomically; signals are not remembered, so waiters check state.</li>
+<li>macOS lacks unnamed POSIX semaphores (<code>sem_init</code> returns -1 with <code>errno == ENOSYS</code>), <code>pthread_barrier_t</code>, <code>pthread_mutex_timedlock</code> and <code>pthread_condattr_setclock</code>.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-under-the-hood-pthreads"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-under-the-hood-pthreads.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>int rc = pthread_create(&amp;t, NULL, work, NULL);</code> fails. Where is the reason?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">In <code>errno</code>, as with most C library calls</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">In <code>rc</code>: pthread functions return the error number and do not set <code>errno</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nowhere: <code>pthread_create</code> cannot fail</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">In the thread's return value, read with <code>pthread_join</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>pthread_create</code> reports an error number directly, such as <code>EAGAIN</code> when resources are insufficient. Print it with <code>strerror(rc)</code>; <code>errno</code> does not report this failure. No worker was created, and the output thread identifier is not valid for a join, so there is no worker return value to inspect.</div></div><div class="mcq" data-id="cpp-under-the-hood-pthreads.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What is wrong with this consumer?<figure class="code single" data-sample="cpp-under-the-hood-pthreads.5"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="f">pthread_mutex_lock</span>(&amp;lock);
+<span class="k">if</span> (count == <span class="n">0</span>) {
+    <span class="f">pthread_cond_wait</span>(&amp;notEmpty, &amp;lock);
+}
+<span class="t">int</span> item = buffer[head];</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>pthread_cond_wait</code> must be called without the mutex held</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It must be <code>while</code>: after a spurious wakeup, or when another consumer took the item first, <code>count</code> can still be 0</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The mutex must be unlocked before reading <code>buffer</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing, as long as producers use <code>pthread_cond_signal</code> rather than <code>broadcast</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Waking up means "check again", never "go ahead". POSIX allows spurious wakeups, and another consumer can take the item before this one regains the mutex. <code>signal</code> does not prevent either case. The wait requires ownership of the mutex, and the subsequent shared-buffer access must stay protected by it.</div></div><div class="mcq" data-id="cpp-under-the-hood-pthreads.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What can this print?<figure class="code single" data-sample="cpp-under-the-hood-pthreads.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="k">static</span> <span class="t">void</span> *<span class="f">show</span>(<span class="t">void</span> *arg) {
+    <span class="f">printf</span>(<span class="s">"%d "</span>, *(<span class="t">int</span> *)arg);
+    <span class="k">return</span> NULL;
+}
+<span class="c">/* in main: */</span>
+pthread_t t[<span class="n">4</span>];
+<span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">4</span>; i += <span class="n">1</span>) {
+    <span class="f">pthread_create</span>(&amp;t[i], NULL, show, &amp;i);
+}
+<span class="k">for</span> (<span class="t">int</span> j = <span class="n">0</span>; j &lt; <span class="n">4</span>; j += <span class="n">1</span>) {
+    <span class="f">pthread_join</span>(t[j], NULL);
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always <code>0 1 2 3</code>, in some order</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">There is no defined set of outputs: unsynchronized accesses race, and workers can also dereference <code>i</code> after its lifetime ends</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Always <code>4 4 4 4</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile: <code>&amp;i</code> is an <code>int*</code>, not a <code>void*</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> All workers receive the same address while the loop writes through it without synchronization. That is a data race and undefined behaviour in C11 and C++20, so even a range of 0 to 4 is not guaranteed. The loop-local <code>i</code> is also dead before the joins, allowing a dangling access. Keep separate arguments alive through successful joins. The pointer conversion is legal; it provides no synchronization.</div></div><div class="mcq" data-id="cpp-under-the-hood-pthreads.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">On macOS, <code>sem_t s; sem_init(&amp;s, 0, 1);</code> compiles with a deprecation warning. What happens at run time?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It works like on Linux</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>sem_init</code> returns -1 with <code>errno</code> set to <code>ENOSYS</code>; <code>s</code> remains uninitialized and must not be used</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The program crashes inside <code>sem_init</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It creates a named semaphore instead</span></button></li></ol><div class="why" hidden><strong>Why.</strong> macOS's <code>sem_init</code> reports "Function not implemented"; it neither crashes as its specified failure path nor creates a named object. Using <code>s</code> after that failure has undefined behaviour. Use a mutex and condition variable semaphore, <code>sem_open</code>, <code>dispatch_semaphore_t</code>, or <code>std::counting_semaphore</code> instead.</div></div><div class="mcq" data-id="cpp-under-the-hood-pthreads.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A thread signals an initialized condition variable <code>c</code> when it has no waiters. Later another thread calls <code>pthread_cond_wait(&amp;c, &amp;m)</code> while owning the valid mutex <code>m</code>. What does the earlier signal guarantee?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It returns at once, because a signal is pending</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing for the later wait: the signal is not remembered, and the wait can block or wake spuriously</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It returns <code>EINVAL</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks the signaling thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A signal stores no permit. The later wait can block indefinitely without another notification, but spurious wakeups are also allowed. With valid arguments, an earlier signal is not an <code>EINVAL</code> error or a cause for the signalling thread to deadlock. Check shared state under the mutex before waiting; if the predicate already holds, skip the wait.</div></div><div class="mcq" data-id="cpp-under-the-hood-pthreads.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which <code>std::condition_variable</code> call corresponds to <code>pthread_cond_broadcast</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>notify_one</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>notify_all</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>wait</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>wait_for</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> On the pthread backend, <code>notify_all</code> maps to <code>pthread_cond_broadcast</code> and <code>notify_one</code> to <code>pthread_cond_signal</code>. <code>wait</code> blocks rather than notifying, while <code>wait_for</code> is a timed wait. All woken threads still reacquire their mutex and recheck the predicate.</div></div><div class="mcq" data-id="cpp-under-the-hood-pthreads.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What is the essential difference between a mutex and a binary semaphore?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A binary semaphore is faster</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A mutex has an owner that must unlock it; a semaphore has no owner, so any thread may post it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A mutex can be shared between processes and a semaphore cannot</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">There is no difference: a binary semaphore is a mutex</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A mutex must be unlocked by its owner. A semaphore can transfer a permit between threads, or implement exclusion if callers obey a protocol; ownership is not enforced. There is no universal speed ranking. POSIX supports process-shared forms of both where the implementation supplies them; this is not a promise that every such form exists on macOS. A POSIX semaphore initialized to 1 also does not prevent erroneous extra posts from increasing its count above 1.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-under-the-hood-pthreads.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext"><code>sem_init</code> is unavailable on macOS. Write a process-local counting semaphore in C with <code>semInit</code>, <code>semWait</code>, <code>semPost</code> and <code>semDestroy</code>. Reject a negative initial count and report overflow from <code>semPost</code>. Assume cooperative shutdown, with no POSIX cancellation.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-under-the-hood-pthreads.7" data-expect="ok"><figcaption><span class="ctitle">A counting semaphore from a mutex and a condition variable</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82</span><code><span class="p">#include &lt;errno.h&gt;</span>
+<span class="p">#include &lt;limits.h&gt;</span>
+<span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check</span>(<span class="t">int</span> rc, <span class="k">const</span> <span class="t">char</span> *operation) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"%s: %s\n"</span>, operation, <span class="f">strerror</span>(rc));
+        <span class="f">exit</span>(EXIT_FAILURE);
+    }
+}
+
+<span class="k">typedef</span> <span class="k">struct</span> {
+    pthread_mutex_t lock;
+    pthread_cond_t available;
+    <span class="t">int</span> permits;                          <span class="c">/* guarded by lock */</span>
+} semaphore;
+
+<span class="t">int</span> <span class="f">semInit</span>(semaphore *s, <span class="t">int</span> permits) {
+    <span class="k">if</span> (permits &lt; <span class="n">0</span>) {
+        <span class="k">return</span> EINVAL;
+    }
+    s-&gt;permits = permits;
+    <span class="t">int</span> rc = <span class="f">pthread_mutex_init</span>(&amp;s-&gt;lock, NULL);
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="k">return</span> rc;
+    }
+    rc = <span class="f">pthread_cond_init</span>(&amp;s-&gt;available, NULL);
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">check</span>(<span class="f">pthread_mutex_destroy</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_destroy"</span>);
+    }
+    <span class="k">return</span> rc;
+}
+
+<span class="t">void</span> <span class="f">semWait</span>(semaphore *s) {
+    <span class="f">check</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_lock"</span>);
+    <span class="k">while</span> (s-&gt;permits == <span class="n">0</span>) {             <span class="c">/* while: wakeups can be spurious or stolen */</span>
+        <span class="f">check</span>(<span class="f">pthread_cond_wait</span>(&amp;s-&gt;available, &amp;s-&gt;lock), <span class="s">"pthread_cond_wait"</span>);
+    }
+    s-&gt;permits -= <span class="n">1</span>;
+    <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_unlock"</span>);
+}
+
+<span class="t">int</span> <span class="f">semPost</span>(semaphore *s) {
+    <span class="f">check</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_lock"</span>);
+    <span class="k">if</span> (s-&gt;permits == INT_MAX) {
+        <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_unlock"</span>);
+        <span class="k">return</span> EOVERFLOW;
+    }
+    s-&gt;permits += <span class="n">1</span>;
+    <span class="f">check</span>(<span class="f">pthread_cond_signal</span>(&amp;s-&gt;available), <span class="s">"pthread_cond_signal"</span>);
+    <span class="f">check</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_unlock"</span>);
+    <span class="k">return</span> <span class="n">0</span>;
+}
+
+<span class="t">void</span> <span class="f">semDestroy</span>(semaphore *s) {
+    <span class="f">check</span>(<span class="f">pthread_cond_destroy</span>(&amp;s-&gt;available), <span class="s">"pthread_cond_destroy"</span>);
+    <span class="f">check</span>(<span class="f">pthread_mutex_destroy</span>(&amp;s-&gt;lock), <span class="s">"pthread_mutex_destroy"</span>);
+}
+
+<span class="k">static</span> semaphore ready;
+<span class="k">static</span> <span class="t">int</span> result = <span class="n">0</span>;                   <span class="c">/* worker writes; main reads after join */</span>
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">worker</span>(<span class="t">void</span> *arg) {
+    (<span class="t">void</span>)arg;
+    <span class="f">semWait</span>(&amp;ready);
+    result = <span class="n">42</span>;
+    <span class="k">return</span> NULL;
+}
+
+<span class="t">int</span> <span class="f">main</span>(<span class="t">void</span>) {
+    <span class="f">check</span>(<span class="f">semInit</span>(&amp;ready, <span class="n">0</span>), <span class="s">"semInit"</span>);
+    pthread_t <span class="t">thread</span>;
+    <span class="f">check</span>(<span class="f">pthread_create</span>(&amp;<span class="t">thread</span>, NULL, worker, NULL), <span class="s">"pthread_create"</span>);
+    <span class="f">check</span>(<span class="f">semPost</span>(&amp;ready), <span class="s">"semPost"</span>);     <span class="c">/* also works if the worker has not waited yet */</span>
+    <span class="f">check</span>(<span class="f">pthread_join</span>(<span class="t">thread</span>, NULL), <span class="s">"pthread_join"</span>);
+    <span class="f">semDestroy</span>(&amp;ready);
+    <span class="f">printf</span>(<span class="s">"worker result = %d (expected 42)\n"</span>, result);
+    <span class="k">return</span> result == <span class="n">42</span> ? <span class="n">0</span> : <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The count remembers permits, including posts before a wait. Each successful post adds one permit, so signalling one interchangeable waiter is enough; every waiter still loops. Initialization rolls back its mutex if condition initialization fails. Destroy only after every user has finished, and never copy the initialized struct. Unlike POSIX <code>sem_post</code>, this mutex-based <code>semPost</code> is not async-signal-safe, and it provides neither process sharing nor FIFO admission.</p></div></div><div class="cq" data-q="cpp-under-the-hood-pthreads.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain what happens inside <code>pthread_cond_wait(&amp;c, &amp;m)</code>, and why it needs the mutex as an argument.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The caller must hold <code>m</code>. The call atomically releases <code>m</code> and puts the thread to sleep on <code>c</code>; when the thread is woken, by a signal, a broadcast or spuriously, it locks <code>m</code> again before returning, so it always returns holding the mutex. The atomic release is the whole point. The waiter checked the shared state under <code>m</code> and found it not ready. If it released <code>m</code> and only then started sleeping, a producer could change the state and signal in that gap, the signal would find no waiter and vanish, and the waiter would then sleep forever: a lost wakeup. Because unlocking and sleeping are one step relative to anyone who signals under <code>m</code>, that gap does not exist. Since the thread may wake without its condition being true, and another thread may get the mutex first, the call always sits in a <code>while</code> loop that re-checks the condition.</p></div></div><div class="cq" data-q="cpp-under-the-hood-pthreads.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "What does <code>std::thread</code> actually do on Linux, and what does a thread cost?" Answer in under a minute.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>In the usual Linux builds, <code>std::thread</code> uses <code>pthread_create</code>. Glibc obtains a stack, prepares thread-local storage and creates a kernel task through <code>clone</code> or <code>clone3</code>. Threads share the process address space but are scheduled independently. Creation costs allocation, kernel bookkeeping and scheduling work; the actual time depends on the system. The default stack often follows the finite resource limit at program startup, commonly 8 MiB of virtual space, with physical backing acquired as pages are touched. Each thread also adds scheduling and cache costs. Pools amortize creation across many tasks. The C++ standard specifies synchronization and lifecycle behaviour, not this OS implementation or its timing.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-under-the-hood-pthreads.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Walk me through what happens underneath <code>std::thread</code> on Linux. Which parts would you rely on in portable C++?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Usual Linux C++ libraries use pthread_create; this is an implementation choice</li><li>The runtime obtains a stack, prepares thread-local storage and creates a kernel task</li><li>Linux uses clone or clone3 with sharing flags; each thread is independently scheduled</li><li>Creation, stacks and scheduling have costs; defaults and timings are platform-dependent</li><li>Portable reasoning uses lifecycle and synchronization guarantees, including successful join</li><li>Native handles are platform-specific and must not bypass the C++ object's lifecycle ownership</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">On a typical Linux system, a C++ thread is backed by a pthread and an independently scheduled kernel task. That is an implementation choice, not a requirement that portable C++ exposes. The library stores the callable and its arguments, then uses pthread creation. Glibc obtains a stack, prepares thread-local storage and creates the task through clone or clone3, with flags that share the process's address space and other resources. Each thread still has its own execution state and stack. Those resources, creation work and scheduling costs explain why a pool can be useful for many small tasks. Stack defaults and timings depend on the system, so I would measure rather than promise a fixed cost. In portable code, I rely on the documented lifetime and synchronization contracts: keep captured objects alive and join before consuming a worker's result. A native handle is only for platform-specific operations. I would not join it through pthreads, because the C++ object would still think it owns a joinable thread. On Windows the implementation changes, while those C++ guarantees remain.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you change a worker's stack size, and can <code>std::thread</code> do that portably?</span></p></div></div><div class="sq" data-sq="cpp-under-the-hood-pthreads.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"My pthread consumer occasionally hangs during shutdown. Walk me through the predicate and wakeups you would check."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Check queue contents and producer-completion state under the same mutex</li><li>Wait while empty and producers remain, using a while loop</li><li>Condition wait atomically releases the mutex and starts waiting, then reacquires it</li><li>The last producer broadcasts so all consumers can observe completion</li><li>Drain existing items, exit only when empty and finished, then join before destruction</li><li>Signals are not stored permits and wakeups do not imply the predicate is true</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first check whether shutdown is part of the state that the consumer waits on. For this buffer, queue contents and the number of remaining producers belong under the same mutex. A consumer waits only while the buffer is empty and at least one producer remains. The wait goes in a while loop because a wakeup does not reserve an item, and it can be spurious. The condition wait atomically releases the mutex and starts waiting, then reacquires the mutex before the successful return. That closes the gap in which a producer could otherwise change the state and send a missed signal. When the final producer finishes, it decrements the producer count under the mutex and broadcasts to all consumers. Signalling only one can leave the others asleep forever. Each consumer drains any remaining item and exits only when the buffer is both empty and finished. Then the owner joins every thread before destroying the synchronization objects. I would test both an empty shutdown and a shutdown with queued items. The shared state remembers completion; notifications alone do not.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What would change if you also wanted to cancel producers blocked on a full buffer?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-round-robin-printer.html" data-problem="round-robin-printer"><span class="pk">Ordering puzzles · medium</span><b>Round robin printer</b><span class="pst"></span></a><a class="pcard" href="p-zero-even-odd.html" data-problem="zero-even-odd"><span class="pk">Ordering puzzles · medium</span><b>Print zero even odd</b><span class="pst"></span></a><a class="pcard" href="p-semaphore-from-scratch.html" data-problem="semaphore-from-scratch"><span class="pk">Build a primitive · warm-up</span><b>Semaphore from scratch</b><span class="pst"></span></a><a class="pcard" href="p-print-in-order.html" data-problem="print-in-order"><span class="pk">Ordering puzzles · warm-up</span><b>Print in order</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-build-debug-sanitizers.html"><span>Previous</span><b>Building, debugging and sanitizers</b></a><a class="next" href="cpp-inheritance-and-virtual-functions.html"><span>Next</span><b>Inheritance and virtual functions</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-map-c-types-to-os-objects">The map: C++ types to OS objects</a><a href="#threads-in-c-create-pass-data-join">Threads in C: create, pass data, join</a><a href="#mutexes-and-condition-variables-in-c">Mutexes and condition variables in C</a><a href="#producer-and-consumer-in-raw-pthreads">Producer and consumer in raw pthreads</a><a href="#timed-waits-in-c">Timed waits in C</a><a href="#semaphores-and-the-macos-gap">Semaphores, and the macOS gap</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

@@ -1,0 +1,851 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Classic synchronization problems · Theory · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-theory" data-topic="classic-problems" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><section class="pagehead"><p class="eyebrow"><a href="practice.html#theory">Theory bank</a> · Topic 12</p><h1>Classic synchronization problems</h1><p class="hhsub">Producer-consumer, readers-writers, the bathroom, H2O, the barber, ordering puzzles and hand-built semaphores and barriers: the shapes and the follow ups.</p><div class="filters"><div class="fgroup"><span>Level</span><button type="button" class="chip" data-flevel="core">Core</button><button type="button" class="chip" data-flevel="senior">Senior</button><button type="button" class="chip" data-flevel="stretch">Stretch</button></div><div class="fgroup"><span>Show</span><button type="button" class="chip" data-fopen="1">Unanswered only</button></div></div></section><section class="theory" data-topic="classic-problems"><div class="tq cq" data-q="classic-problems.t1" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">1</span><span class="lvl lvl-core">Core</span><span class="tag">producer-consumer</span><span class="tag">condition-variable</span><span class="co">LinkedIn</span><span class="co">Bloomberg</span><span class="co">Rubrik</span></div><div class="qtext">Implement a bounded blocking buffer without library queues, and explain every choice.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The state is a fixed <a class="term" data-term="ring-buffer" href="glossary.html#ring-buffer">ring buffer</a> plus <code>head</code>, <code>tail</code> and <code>count</code>, all guarded by one lock. There are <strong>two conditions</strong>, one per predicate: producers wait on "not full", consumers on "not empty", so a signal always reaches a thread that can use it. Every wait sits in a <code>while</code> loop, because a wakeup is only a hint: it can be <a class="term" data-term="spurious-wakeup" href="glossary.html#spurious-wakeup">spurious</a>, or another thread can take the slot first.</p>
+<figure class="code pair" data-sample="classic-problems.t1.1"><figcaption><span class="ctitle">Bounded buffer: one lock, two conditions</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> BoundedBuffer {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BoundedBuffer</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">slots_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        not_full_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> count_ &lt; slots_.<span class="f">size</span>(); });
+        slots_[tail_] = <span class="t">std</span>::<span class="f">move</span>(item);
+        tail_ = (tail_ + <span class="n">1</span>) % slots_.<span class="f">size</span>();
+        count_ += <span class="n">1</span>;
+        lock.<span class="f">unlock</span>();                  <span class="c">// state changed under the lock; notify after</span>
+        not_empty_.<span class="f">notify_one</span>();
+    }
+
+    T <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        not_empty_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> count_ &gt; <span class="n">0</span>; });
+        T item = <span class="t">std</span>::<span class="f">move</span>(*slots_[head_]);
+        slots_[head_].<span class="f">reset</span>();
+        head_ = (head_ + <span class="n">1</span>) % slots_.<span class="f">size</span>();
+        count_ -= <span class="n">1</span>;
+        lock.<span class="f">unlock</span>();
+        not_full_.<span class="f">notify_one</span>();
+        <span class="k">return</span> item;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> not_full_, not_empty_;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">optional</span>&lt;T&gt;&gt; slots_;
+    <span class="t">std</span>::<span class="t">size_t</span> head_ = <span class="n">0</span>, tail_ = <span class="n">0</span>, count_ = <span class="n">0</span>;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">BoundedBuffer</span>&lt;T&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span>[] slots;
+    <span class="k">private</span> <span class="t">int</span> head = <span class="n">0</span>, tail = <span class="n">0</span>, count = <span class="n">0</span>;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notEmpty = lock.<span class="f">newCondition</span>();
+
+    <span class="t">BoundedBuffer</span>(<span class="t">int</span> capacity) { slots = <span class="k">new</span> <span class="t">Object</span>[capacity]; }
+
+    <span class="k">void</span> <span class="f">put</span>(T item) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (count == slots.length) notFull.<span class="f">await</span>();
+            slots[tail] = item;
+            tail = (tail + <span class="n">1</span>) % slots.length;
+            count += <span class="n">1</span>;
+            notEmpty.<span class="f">signal</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="a">@SuppressWarnings</span>(<span class="s">"unchecked"</span>)
+    T <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (count == <span class="n">0</span>) notEmpty.<span class="f">await</span>();
+            T item = (T) slots[head];
+            slots[head] = <span class="k">null</span>;              <span class="c">// do not keep garbage reachable</span>
+            head = (head + <span class="n">1</span>) % slots.length;
+            count -= <span class="n">1</span>;
+            notFull.<span class="f">signal</span>();
+            <span class="k">return</span> item;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>signal</code> (not <code>signalAll</code>) is safe here because each condition has only one kind of waiter and each operation frees exactly one slot or item. The Java version propagates <code>InterruptedException</code> so callers can cancel a blocked <code>put</code> or <code>take</code>.</p>
+<p><b>Likely follow up:</b> "Add <code>offer</code> with a timeout." Replace the loop with <code>while (count == slots.length) { if (nanos &lt;= 0) return false; nanos = notFull.awaitNanos(nanos); }</code>; in C++ use <code>wait_until</code> with a <code>steady_clock</code> deadline and the same predicate.</p></div></div><div class="tq cq" data-q="classic-problems.t2" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">2</span><span class="lvl lvl-core">Core</span><span class="tag">producer-consumer</span><span class="tag">notify</span><span class="co">LinkedIn</span></div><div class="qtext">With <code>synchronized</code>, <code>wait</code> and <code>notify</code>, why does a bounded buffer need <code>notifyAll</code>? Show the interleaving that hangs.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>An intrinsic lock has <strong>one wait set</strong>, so producers and consumers sleep together and <code>notify</code> may wake the wrong kind of thread. Take capacity 1, two producers and two consumers:</p>
+<figure class="timeline"><figcaption>notify wakes the wrong thread</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Producers</span><span>Consumers</span><span>Buffer</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell">C1 and C2 call take on the empty buffer and wait</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell">P1 puts an item and notify wakes C1</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">full</span></div><div class="tl-row"><span class="t">4</span><span class="cell">P2 and then P1 call put, find it full, and wait</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">C1 takes the item, and notify wakes C2, a consumer</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">empty</span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell">C1 calls take again and waits; C2 rechecks, finds it empty, waits</span><span class="cell empty"></span></div><div class="tl-note">! Everyone is in the wait set. The two producers that could make progress were never woken.</div></div></figure>
+<p>The one signal that mattered went to a consumer who could not use it, and was effectively lost. <code>notifyAll</code> wakes everyone, so whoever can proceed will, at the cost of a small thundering herd.</p>
+<p>The better fix is a <code>ReentrantLock</code> with two <code>Condition</code> objects, <code>notFull</code> and <code>notEmpty</code>, so each signal goes to a thread that can use it and <code>signal</code> becomes safe. In C++ every <code>std::condition_variable</code> is already separate, so you naturally write two.</p>
+<p><b>Likely follow up:</b> "When is plain <code>notify</code> safe?" When all waiters wait for the same predicate, and each notify enables exactly one of them to proceed: a semaphore's <code>release</code> is the classic case.</p></div></div><div class="tq cq" data-q="classic-problems.t3" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">3</span><span class="lvl lvl-senior">Senior</span><span class="tag">producer-consumer</span><span class="tag">shutdown</span><span class="co">LinkedIn</span></div><div class="qtext">How do you shut down a producer-consumer system cleanly, without losing items or leaving threads blocked?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Decide the contract first: <strong>graceful</strong> (stop accepting, deliver everything already queued) or immediate (stop now, return what was not processed).</p>
+<p>The flag approach puts a <code>closed</code> boolean inside the buffer, guarded by its lock:</p>
+<figure class="code single" data-sample="classic-problems.t3.1"><figcaption><span class="ctitle">Close inside the buffer</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="k">void</span> <span class="f">close</span>() {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        closed = <span class="k">true</span>;
+        notEmpty.<span class="f">signalAll</span>();   <span class="c">// consumers wake, drain what is left, then see closed</span>
+        notFull.<span class="f">signalAll</span>();    <span class="c">// blocked producers wake and fail fast</span>
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}
+<span class="c">// put:  while (count == slots.length &amp;&amp; !closed) notFull.await();</span>
+<span class="c">//       if (closed) throw new IllegalStateException("closed");</span>
+<span class="c">// take: while (count == 0 &amp;&amp; !closed) notEmpty.await();</span>
+<span class="c">//       if (count == 0) return null;   // closed and fully drained: the consumer exits</span></code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Every wait predicate must include <code>closed</code>, or a thread sleeps through the shutdown. <code>signalAll</code> is right here, because every waiter must react.</p>
+<p>The <a class="term" data-term="poison-pill" href="glossary.html#poison-pill">poison pill</a> approach puts one special item per consumer after the producers stop. It works with any queue, but you must know the consumer count, the producers must be finished first, and it breaks with priority queues, where the pill does not come out last.</p>
+<p>Then the owner joins every consumer with a timeout. In C++ the same design uses a <code>bool closed_</code> checked in both <code>wait</code> predicates and <code>notify_all</code> in <code>close</code>, or <code>std::jthread</code> with a <code>std::stop_token</code> and <code>std::condition_variable_any</code>.</p>
+<p><b>Likely follow up:</b> "And immediate shutdown?" Set the flag, drain the buffer into a list you return, and interrupt or stop the consumers. That is exactly what <code>shutdownNow</code> does in an executor.</p></div></div><div class="tq cq" data-q="classic-problems.t4" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">4</span><span class="lvl lvl-core">Core</span><span class="tag">read-write-lock</span><span class="tag">readers-writers</span><span class="co">Rubrik</span><span class="co">Microsoft</span></div><div class="qtext">Implement a read-write lock yourself. Which policy did you pick, and why?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The state is the number of active readers, whether a writer is active, and the number of waiting writers. I pick <strong><a class="term" data-term="writer-preference" href="glossary.html#writer-preference">writer preference</a></strong>, because with reader preference a steady stream of readers starves writers forever. Here new readers wait whenever a writer is active or waiting. The price is the mirror image: a steady stream of writers can now starve readers.</p>
+<figure class="code pair" data-sample="classic-problems.t4.1"><figcaption><span class="ctitle">A writer-preferring read-write lock</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> RwLock {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">lock_shared</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lk</span>(m_);
+        cv_.<span class="f">wait</span>(lk, [&amp;] { <span class="k">return</span> !writing_ &amp;&amp; waiting_writers_ == <span class="n">0</span>; });
+        readers_ += <span class="n">1</span>;
+    }
+    <span class="t">void</span> <span class="f">unlock_shared</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lk</span>(m_);
+        readers_ -= <span class="n">1</span>;
+        <span class="k">if</span> (readers_ == <span class="n">0</span>) cv_.<span class="f">notify_all</span>();
+    }
+    <span class="t">void</span> <span class="f">lock</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lk</span>(m_);
+        waiting_writers_ += <span class="n">1</span>;
+        cv_.<span class="f">wait</span>(lk, [&amp;] { <span class="k">return</span> !writing_ &amp;&amp; readers_ == <span class="n">0</span>; });
+        waiting_writers_ -= <span class="n">1</span>;
+        writing_ = <span class="k">true</span>;
+    }
+    <span class="t">void</span> <span class="f">unlock</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lk</span>(m_);
+        writing_ = <span class="k">false</span>;
+        cv_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">int</span> readers_ = <span class="n">0</span>, waiting_writers_ = <span class="n">0</span>;
+    <span class="t">bool</span> writing_ = <span class="k">false</span>;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">RwLock</span> {
+    <span class="k">private</span> <span class="t">int</span> readers = <span class="n">0</span>;
+    <span class="k">private</span> <span class="t">int</span> waitingWriters = <span class="n">0</span>;
+    <span class="k">private</span> <span class="t">boolean</span> writing = <span class="k">false</span>;
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">lockRead</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">while</span> (writing || waitingWriters &gt; <span class="n">0</span>) <span class="f">wait</span>();
+        readers += <span class="n">1</span>;
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">unlockRead</span>() {
+        readers -= <span class="n">1</span>;
+        <span class="k">if</span> (readers == <span class="n">0</span>) <span class="f">notifyAll</span>();
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">lockWrite</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        waitingWriters += <span class="n">1</span>;
+        <span class="k">try</span> {
+            <span class="k">while</span> (writing || readers &gt; <span class="n">0</span>) <span class="f">wait</span>();
+            writing = <span class="k">true</span>;
+        } <span class="k">finally</span> {
+            waitingWriters -= <span class="n">1</span>;
+            <span class="k">if</span> (!writing) <span class="f">notifyAll</span>();  <span class="c">// we gave up (interrupted): blocked readers may go</span>
+        }
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">unlockWrite</span>() {
+        writing = <span class="k">false</span>;
+        <span class="f">notifyAll</span>();                    <span class="c">// readers and writers wait in one set</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The C++ method names match <code>std::shared_mutex</code>, so <code>std::shared_lock</code> and <code>std::unique_lock</code> work with it. The Java <code>finally</code> matters: an interrupted writer must stop blocking readers.</p>
+<p><b>Likely follow up:</b> "Is it reentrant? Can a reader upgrade?" Neither. A reader that calls <code>lockWrite</code> waits for <code>readers == 0</code>, which includes itself, so it hangs forever. Even a nested read deadlocks: a reader that calls <code>lockRead</code> again while a writer waits blocks behind that writer, and the writer waits for this reader. Supporting reentrancy needs a per-thread hold count, which is where <code>ReentrantReadWriteLock</code> spends most of its complexity.</p></div></div><div class="tq cq" data-q="classic-problems.t5" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">5</span><span class="lvl lvl-senior">Senior</span><span class="tag">readers-writers</span><span class="tag">linked-list</span><span class="co">Rubrik</span></div><div class="qtext">Searchers, inserters and deleters share a singly linked list. Searchers run with anything except deleters, inserters exclude each other, and a deleter excludes everyone. Design it.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>This is the searcher-inserter-deleter problem from The Little Book of Semaphores. Map the roles onto a read-write lock plus one extra mutex:</p>
+<ul>
+<li>A searcher takes the read lock.</li>
+<li>An inserter takes the insert mutex, then the read lock. It shares the read side with searchers but is serialized against other inserters.</li>
+<li>A deleter takes the write lock, which waits for every searcher and the inserter to leave.</li>
+</ul>
+<p>There is no cycle: deleters never touch the insert mutex, and inserters always take it before the read lock. Use a fair or writer-preferring read-write lock, or deleters starve under a steady search load.</p>
+<p>The trap seniors are expected to catch: <strong>a searcher and the inserter run at the same time under shared locks, so the shared lock gives no ordering between them.</strong> The inserter must build the new node completely and then link it with a publishing write. In Java the <code>next</code> field is <code>volatile</code>; in C++ it is <code>std::atomic&lt;Node*&gt;</code>, stored with <code>memory_order_release</code> and loaded with <code>memory_order_acquire</code>. Otherwise a searcher can see the link before the node's value. Appending at the tail is a single pointer write, so searchers see either the old list or the new one.</p>
+<p>Downey's original uses semaphores and "lightswitches" (the first searcher in locks out deleters, the last one out lets them in): equivalent, but harder to get right live.</p>
+<p><b>Likely follow up:</b> "What races do hand-rolled semaphore versions have?" Typically a deleter that can start while a search is still in progress, or an inserter whose new node is not safely published to concurrent searchers.</p></div></div><div class="tq cq" data-q="classic-problems.t6" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">6</span><span class="lvl lvl-senior">Senior</span><span class="tag">monitor</span><span class="tag">fairness</span><span class="tag">bathroom</span><span class="co">Rubrik</span></div><div class="qtext">One bathroom holds at most three people, and two parties may never be inside together. People queue, each stays for a known time, and the most eligible waiting person enters whenever there is room. Design the synchronization.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>This is a monitor: one lock, one condition, and state that every decision reads.</p>
+<ul>
+<li>State: <code>inside</code> (0 to 3), <code>currentParty</code> (null when empty), and a FIFO list of waiting people with their arrival order.</li>
+<li>Invariant: <code>inside &lt;= 3</code>, and everyone inside belongs to <code>currentParty</code>.</li>
+<li>Enter: add yourself to the waiting list, then <code>while (!canEnter(me)) changed.await();</code>, then remove yourself, increment <code>inside</code>, set the party and <code>signalAll</code>, because the next compatible person may also fit now.</li>
+<li>Use the bathroom for <code>f(name)</code> <strong>outside the lock</strong>.</li>
+<li>Leave: lock, decrement <code>inside</code>, clear the party at zero, <code>signalAll</code>.</li>
+</ul>
+<p>The whole question is the admission rule inside <code>canEnter</code>. Strict FIFO: only the head of the queue may enter, and only if compatible. Nobody starves, but a party switch empties the bathroom while compatible people wait. "First compatible in the queue" uses the space better but can starve the other party forever. A middle ground worth proposing: admit the first compatible waiter, but once the head of the queue belongs to the other party, stop admitting the current party so the room drains and the turn passes.</p>
+<p>Handle interruption: a waiter that is interrupted must remove itself from the queue and <code>signalAll</code>, or it blocks everyone behind it.</p>
+<p><b>Likely follow up:</b> "Why <code>signalAll</code> rather than <code>signal</code>?" Waiters have different predicates (different parties, different queue positions). A single signal can go to someone who still cannot enter while a person who could enter sleeps.</p></div></div><div class="tq cq" data-q="classic-problems.t7" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">7</span><span class="lvl lvl-core">Core</span><span class="tag">scheduling</span><span class="tag">fairness</span><span class="co">Rubrik</span></div><div class="qtext">Before coding an admission problem, the interviewer asks you to compare resource allocation policies. What do you say?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><ul>
+<li><strong>FIFO</strong>: serve in arrival order. Simple and starvation free. It suffers head of line blocking: an incompatible head makes compatible requests behind it wait, which lowers utilization.</li>
+<li>Priority: serve the most important first. Good for latency classes, but low priority requests can starve, so add aging, where waiting raises priority.</li>
+<li>Shortest job first: serve the shortest expected duration first. It minimizes average waiting time when durations are known, as with <code>f(name)</code> in the bathroom problem, but long jobs can starve.</li>
+<li>Round robin or turn taking: groups alternate, possibly with a batch quota per turn. Fair across groups, and each turn still batches compatible work.</li>
+<li>First fit, or most eligible first: admit the first request that fits now. Highest utilization, and it can starve requests that never fit.</li>
+</ul>
+<p>Then tie it to the problem: "I will admit compatible people in arrival order, but cap each party's turn at K entries while the other party waits. That gives bounded waiting, which is the property I can prove, and I lose a little throughput at party switches." Naming the trade-off of throughput against fairness is what the question is really checking.</p>
+<p>The same vocabulary covers CPU scheduling (FCFS, SJF, round robin, multilevel feedback queues), so the answer doubles for an OS question.</p>
+<p><b>Likely follow up:</b> "Implement your policy." Keep the waiting list in arrival order and put the policy in one <code>canEnter</code> method, so switching policies is a one function change. That is also good design for the grader.</p></div></div><div class="tq cq" data-q="classic-problems.t8" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">8</span><span class="lvl lvl-core">Core</span><span class="tag">semaphore</span><span class="tag">barrier</span><span class="tag">h2o</span><span class="co">LinkedIn</span></div><div class="qtext">Solve Building H2O: hydrogen and oxygen threads must leave in groups of two H and one O.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Use two <a class="term" data-term="semaphore" href="glossary.html#semaphore">semaphores</a> to admit exactly two hydrogens and one oxygen into the current molecule, and a barrier of three so that group bonds together before anyone leaves. <strong>A thread returns its permit only after it has released</strong>, so the next molecule cannot form until the current one is complete.</p>
+<figure class="code pair" data-sample="classic-problems.t8.1"><figcaption><span class="ctitle">H2O with semaphores and a barrier</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="p">#include &lt;barrier&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+
+<span class="k">class</span> H2O {
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">2</span>&gt; hydrogen_{<span class="n">2</span>};
+    <span class="t">std</span>::<span class="t">binary_semaphore</span> oxygen_{<span class="n">1</span>};
+    <span class="t">std</span>::<span class="t">barrier</span>&lt;&gt; bond_{<span class="n">3</span>};
+
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">hydrogen</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; releaseHydrogen) {
+        hydrogen_.<span class="f">acquire</span>();
+        bond_.<span class="f">arrive_and_wait</span>();          <span class="c">// C++20</span>
+        <span class="f">releaseHydrogen</span>();
+        hydrogen_.<span class="f">release</span>();
+    }
+    <span class="t">void</span> <span class="f">oxygen</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; releaseOxygen) {
+        oxygen_.<span class="f">acquire</span>();
+        bond_.<span class="f">arrive_and_wait</span>();
+        <span class="f">releaseOxygen</span>();
+        oxygen_.<span class="f">release</span>();
+    }
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">class</span> H2O {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> hydrogen = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">2</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> oxygen = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">1</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">CyclicBarrier</span> bond = <span class="k">new</span> <span class="t">CyclicBarrier</span>(<span class="n">3</span>);
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">hydrogen</span>(<span class="t">Runnable</span> releaseHydrogen) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        hydrogen.<span class="f">acquire</span>();
+        <span class="k">try</span> {
+            bond.<span class="f">await</span>();                 <span class="c">// wait for the other two atoms</span>
+            releaseHydrogen.<span class="f">run</span>();
+        } <span class="k">catch</span> (<span class="t">BrokenBarrierException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(e);
+        } <span class="k">finally</span> {
+            hydrogen.<span class="f">release</span>();
+        }
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">oxygen</span>(<span class="t">Runnable</span> releaseOxygen) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        oxygen.<span class="f">acquire</span>();
+        <span class="k">try</span> {
+            bond.<span class="f">await</span>();
+            releaseOxygen.<span class="f">run</span>();
+        } <span class="k">catch</span> (<span class="t">BrokenBarrierException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(e);
+        } <span class="k">finally</span> {
+            oxygen.<span class="f">release</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Why it is correct: between acquire and release there are at most two H and one O, and the barrier needs three parties, so it trips only on exactly 2H plus 1O. The next group needs both H permits and the O permit back, and each is returned only after that atom has printed.</p>
+<p><b>Likely follow up:</b> "No C++20?" Replace the semaphores with a mutex, counters and a condition variable, and build the barrier with a generation count.</p></div></div><div class="tq cq" data-q="classic-problems.t9" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">9</span><span class="lvl lvl-core">Core</span><span class="tag">ordering</span><span class="tag">semaphore</span><span class="co">Microsoft</span><span class="co">Nvidia</span></div><div class="qtext">Two threads print odd and even numbers alternately up to N. How do you make them take turns, and what goes wrong at the end?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Pass a turn back and forth. Each thread waits for its own turn, prints, and hands the turn to the other. Two semaphores make the handoff explicit: odd starts with one permit, even with zero.</p>
+<figure class="code pair" data-sample="classic-problems.t9.1"><figcaption><span class="ctitle">Taking turns with two semaphores</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+
+<span class="k">class</span> OddEven {
+    <span class="t">std</span>::<span class="t">binary_semaphore</span> odd_turn_{<span class="n">1</span>}, even_turn_{<span class="n">0</span>};
+    <span class="t">int</span> n_;
+
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">OddEven</span>(<span class="t">int</span> n) : <span class="f">n_</span>(n) {}
+    <span class="t">void</span> <span class="f">odd</span>() {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= n_; i += <span class="n">2</span>) {
+            odd_turn_.<span class="f">acquire</span>();
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; i &lt;&lt; <span class="s">'\n'</span>;
+            even_turn_.<span class="f">release</span>();
+        }
+    }
+    <span class="t">void</span> <span class="f">even</span>() {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">2</span>; i &lt;= n_; i += <span class="n">2</span>) {
+            even_turn_.<span class="f">acquire</span>();
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; i &lt;&lt; <span class="s">'\n'</span>;
+            odd_turn_.<span class="f">release</span>();
+        }
+    }
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">OddEven</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> oddTurn = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">1</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> evenTurn = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">0</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> n;
+
+    <span class="t">OddEven</span>(<span class="t">int</span> n) { <span class="k">this</span>.n = n; }
+
+    <span class="k">void</span> <span class="f">odd</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= n; i += <span class="n">2</span>) {
+            oddTurn.<span class="f">acquire</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(i);
+            evenTurn.<span class="f">release</span>();          <span class="c">// hand the turn over</span>
+        }
+    }
+
+    <span class="k">void</span> <span class="f">even</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">2</span>; i &lt;= n; i += <span class="n">2</span>) {
+            evenTurn.<span class="f">acquire</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(i);
+            oddTurn.<span class="f">release</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The end is where these puzzles break. Each loop must know its own last number, or a thread waits for a turn that never comes. With the general version (K threads and a shared <code>turn</code> variable on one condition), the wait predicate must include "finished", and the last printer must <code>notifyAll</code>, or the other threads sleep forever. <strong>Always ask yourself who wakes the threads after the last item.</strong></p>
+<p><b>Likely follow up:</b> "Now K threads print 1 to N round robin." One lock, one condition and a shared <code>next = 1</code>. Thread <code>id</code> (0 to K minus 1) loops: wait <code>while (next &lt;= n &amp;&amp; next % k != id)</code>; if <code>next &gt; n</code>, exit; otherwise print, increment <code>next</code> and <code>notifyAll</code>. The <code>next &lt;= n</code> in the wait is what lets every thread out at the end. A condition per thread, or K semaphores, lets you wake only the next one.</p></div></div><div class="tq cq" data-q="classic-problems.t10" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">10</span><span class="lvl lvl-senior">Senior</span><span class="tag">semaphore</span><span class="tag">barber</span><span class="co">Rubrik</span></div><div class="qtext">Explain the sleeping barber problem, the race in the naive version, and how a debugging round could break it at shutdown.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A barber sleeps when nobody is waiting. A customer wakes the barber if the barber is asleep, sits in a free chair if the barber is busy, and leaves if every chair is taken. The naive version races: a customer sees the barber busy and walks to the waiting room, while the barber finishes, sees an empty waiting room and goes to sleep. The customer then sits and waits forever. <strong>The check and the sleep are not atomic</strong>, which is a lost wakeup.</p>
+<figure class="code single" data-sample="classic-problems.t10.1"><figcaption><span class="ctitle">Semaphore solution</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code>customer:
+    lock(mutex)
+    if waiting == CHAIRS: unlock(mutex); leave
+    waiting += 1
+    signal(customers)       # counts waiting customers, wakes the barber
+    unlock(mutex)
+    wait(barberReady)       # wait for the chair
+    get the haircut; wait(done)
+
+barber loop:
+    wait(customers)         # sleep while nobody is waiting
+    lock(mutex); waiting -= 1; unlock(mutex)
+    signal(barberReady)
+    cut hair; signal(done)</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The counting semaphore <code>customers</code> remembers wakeups that arrive while the barber is busy, so none are lost.</p>
+<p>At shutdown the usual bugs are: the barber blocked forever in <code>wait(customers)</code> after closing time (no flag and no wakeup), customers still in chairs who are neither served nor told to leave, and threads joined while they still wait on a semaphore. Fix it with a <code>closing</code> flag checked under the mutex, an extra <code>signal(customers)</code> so the barber wakes and sees it, an explicit decision for queued customers, and joins with timeouts.</p>
+<p><b>Likely follow up:</b> "Several barbers?" The same code works with N barber threads. The <code>done</code> signal must reach the right customer, so give each customer its own semaphore or future.</p></div></div><div class="tq cq" data-q="classic-problems.t11" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">11</span><span class="lvl lvl-core">Core</span><span class="tag">semaphore</span><span class="tag">condition-variable</span><span class="co">Microsoft</span></div><div class="qtext">Implement a counting semaphore using only a mutex and a condition variable.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A semaphore is a counter of permits with "wait while zero". The monitor version is short, and it is the shape behind every "build a primitive" question.</p>
+<figure class="code pair" data-sample="classic-problems.t11.1"><figcaption><span class="ctitle">A semaphore from a lock and a condition</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> CountingSemaphore {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">CountingSemaphore</span>(<span class="t">int</span> permits) : <span class="f">permits_</span>(permits) {}
+
+    <span class="t">void</span> <span class="f">acquire</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lk</span>(m_);
+        cv_.<span class="f">wait</span>(lk, [&amp;] { <span class="k">return</span> permits_ &gt; <span class="n">0</span>; });
+        permits_ -= <span class="n">1</span>;
+    }
+
+    <span class="t">void</span> <span class="f">release</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lk</span>(m_);
+            permits_ += <span class="n">1</span>;
+        }
+        cv_.<span class="f">notify_one</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">int</span> permits_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">CountingSemaphore</span> {
+    <span class="k">private</span> <span class="t">int</span> <span class="k">permits</span>;
+
+    <span class="t">CountingSemaphore</span>(<span class="t">int</span> <span class="k">permits</span>) { <span class="k">this</span>.<span class="k">permits</span> = <span class="k">permits</span>; }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">acquire</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">while</span> (<span class="k">permits</span> == <span class="n">0</span>) <span class="f">wait</span>();
+        <span class="k">permits</span> -= <span class="n">1</span>;
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">release</span>() {
+        <span class="k">permits</span> += <span class="n">1</span>;
+        <span class="f">notify</span>();   <span class="c">// one permit, one waiter; every waiter wants the same thing</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>notify</code> is safe here because all waiters share one predicate and each release enables exactly one acquire. Java also guarantees that a notify is not lost to an interrupt: if the chosen waiter throws <code>InterruptedException</code> instead of returning, another waiter is woken.</p>
+<p>Points to state out loud: there is no owner, so any thread may release, which is what makes it a signaling tool and not a lock. It is not fair, because a barging thread can take a permit ahead of a waiter. And <code>release</code> beyond the initial count is allowed here, as in Java's <code>Semaphore</code>. <code>std::counting_semaphore</code> allows it too, but its count must never exceed <code>max()</code>; for <code>std::binary_semaphore</code> that is 1, so a double release is undefined behavior.</p>
+<p><b>Likely follow up:</b> "Add <code>tryAcquire(timeout)</code>." Java: compute a deadline from <code>System.nanoTime()</code>, loop on <code>wait(remainingMillis)</code> while recomputing what remains, and return <code>false</code> once nothing remains, never calling <code>wait(0)</code>, which means wait forever. C++: <code>cv_.wait_until(lk, deadline, pred)</code> returns <code>false</code> on timeout.</p></div></div><div class="tq cq" data-q="classic-problems.t12" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">12</span><span class="lvl lvl-senior">Senior</span><span class="tag">barrier</span><span class="tag">generation</span><span class="co">Rubrik</span></div><div class="qtext">Build a reusable barrier. Why is a simple counter not enough?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A one-shot barrier is a counter and a condition: the last thread to arrive wakes everyone. To reuse it, the counter must reset, and that creates a race. A fast thread leaves round 1, arrives for round 2 and increments the count, while a slow thread from round 1 has not yet woken. If the slow thread's predicate was <code>count == parties</code> or <code>count == 0</code>, it may see round 2's value and sleep forever. The fix is a <strong><a class="term" data-term="generation-counter" href="glossary.html#generation-counter">generation number</a></strong>: each waiter waits for the generation to change, not for a count value.</p>
+<figure class="code pair" data-sample="classic-problems.t12.1"><figcaption><span class="ctitle">A cyclic barrier with a generation</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> ReusableBarrier {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">ReusableBarrier</span>(<span class="t">int</span> parties) : <span class="f">parties_</span>(parties) {}
+
+    <span class="t">void</span> <span class="f">arrive_and_wait</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lk</span>(m_);
+        <span class="k">const</span> <span class="t">std</span>::<span class="t">uint64_t</span> my_generation = generation_;
+        waiting_ += <span class="n">1</span>;
+        <span class="k">if</span> (waiting_ == parties_) {
+            waiting_ = <span class="n">0</span>;
+            generation_ += <span class="n">1</span>;
+            cv_.<span class="f">notify_all</span>();
+            <span class="k">return</span>;
+        }
+        cv_.<span class="f">wait</span>(lk, [&amp;] { <span class="k">return</span> generation_ != my_generation; });
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="k">const</span> <span class="t">int</span> parties_;
+    <span class="t">int</span> waiting_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">uint64_t</span> generation_ = <span class="n">0</span>;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">ReusableBarrier</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> parties;
+    <span class="k">private</span> <span class="t">int</span> waiting = <span class="n">0</span>;
+    <span class="k">private</span> <span class="t">long</span> generation = <span class="n">0</span>;
+
+    <span class="t">ReusableBarrier</span>(<span class="t">int</span> parties) { <span class="k">this</span>.parties = parties; }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">await</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">long</span> myGeneration = generation;
+        waiting += <span class="n">1</span>;
+        <span class="k">if</span> (waiting == parties) {   <span class="c">// the last to arrive opens the barrier</span>
+            waiting = <span class="n">0</span>;
+            generation += <span class="n">1</span>;
+            <span class="f">notifyAll</span>();
+            <span class="k">return</span>;
+        }
+        <span class="k">while</span> (myGeneration == generation) <span class="f">wait</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>This is what level-synchronous parallel BFS needs: every worker finishes level k before anyone starts level k plus 1.</p>
+<p><b>Likely follow up:</b> "What if a waiter is interrupted?" Its arrival was counted, so the round can never complete. <code>CyclicBarrier</code> handles this by breaking the barrier: the interrupted thread gets <code>InterruptedException</code>, every other waiter (and any later arrival) gets <code>BrokenBarrierException</code>, and someone must <code>reset</code> it. In your own barrier, either do the same with a <code>broken</code> flag in the predicate, or make the wait uninterruptible.</p></div></div><div class="tq cq" data-q="classic-problems.t13" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">13</span><span class="lvl lvl-core">Core</span><span class="tag">latch</span><span class="tag">barrier</span><span class="tag">semaphore</span><span class="co">Rubrik</span></div><div class="qtext"><code>CountDownLatch</code>, <code>CyclicBarrier</code>, <code>Semaphore</code>: when do you choose each? (<code>std::latch</code>, <code>std::barrier</code> and <code>std::counting_semaphore</code> in C++20.)</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><ul>
+<li><strong><a class="term" data-term="latch" href="glossary.html#latch">Latch</a></strong>: one-shot "wait until N events have happened". Usually the threads that count down are not the ones that wait, and <code>countDown</code> never blocks. Use it for "start when all workers are ready", "main waits until N tasks finish", or a start gate in tests. It cannot be reset.</li>
+<li>Barrier: N peer threads wait for each other, repeatedly. Everyone both arrives and waits. Use it for phases, such as simulation steps or level-by-level BFS. <code>CyclicBarrier</code> can run an action when each phase completes, and so can <code>std::barrier</code> with a completion function.</li>
+<li>Semaphore: a count of permits, a resource limit. Use it for "at most K at once" (connection slots, concurrent downloads, the "only 3 threads at once" question) or as a signal with no owner. It is not a mutual exclusion lock, and nobody owns a permit.</li>
+<li><code>Phaser</code> (Java): a reusable barrier whose parties can register and leave dynamically.</li>
+</ul>
+<p>The mistakes interviewers probe: using a barrier where workers should not wait for each other (they then stall on the slowest), using a latch for a repeating phase (it cannot be reset), and using a <code>Semaphore(1)</code> as a lock. That last one has no owner check and no reentrancy, so a bug that releases twice silently admits two threads.</p>
+<p><b>Likely follow up:</b> "Seat booking: would you use a barrier?" No. Concurrent bookings do not wait for each other; you need per-seat atomicity (a lock per seat or a compare-and-set), plus a semaphore only if total concurrency must be capped.</p></div></div><div class="tq cq" data-q="classic-problems.t14" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">14</span><span class="lvl lvl-senior">Senior</span><span class="tag">read-write-lock</span><span class="tag">upgrade</span><span class="tag">java</span><span class="tag">cpp</span></div><div class="qtext">Can a thread upgrade a read lock to a write lock? What do <code>ReentrantReadWriteLock</code>, <code>StampedLock</code> and <code>std::shared_mutex</code> allow?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Not in general, because two readers that both try to upgrade deadlock: each waits for the other to drop its read lock. So most locks refuse to upgrade.</p>
+<ul>
+<li><code>ReentrantReadWriteLock</code>: <strong>no upgrade</strong>. A thread holding the read lock that calls <code>writeLock().lock()</code> waits for the reader count to reach zero, which includes itself, so it hangs. Downgrade is allowed: take the write lock, take the read lock, release the write lock.</li>
+<li><code>StampedLock</code>: <code>tryConvertToWriteLock(stamp)</code> succeeds only if the conversion is possible right now, for example when you are the only reader. On failure it returns zero and you fall back to releasing and taking the write lock.</li>
+<li><code>std::shared_mutex</code>: no upgrade operation. Boost's <code>upgrade_mutex</code> offers an upgradeable shared mode that only one thread can hold at a time, which is what makes its upgrade deadlock free.</li>
+</ul>
+<p>The portable pattern is to release the read lock, take the write lock, and <strong>re-check the condition</strong>, because another writer may have changed the state in the gap:</p>
+<figure class="code single" data-sample="classic-problems.t14.1"><figcaption><span class="ctitle">Upgrade by release and re-check</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code>rw.<span class="f">readLock</span>().<span class="f">lock</span>();
+<span class="k">try</span> {
+    <span class="k">if</span> (cache.<span class="f">containsKey</span>(k)) <span class="k">return</span> cache.<span class="f">get</span>(k);
+} <span class="k">finally</span> { rw.<span class="f">readLock</span>().<span class="f">unlock</span>(); }
+rw.<span class="f">writeLock</span>().<span class="f">lock</span>();
+<span class="k">try</span> {
+    <span class="k">return</span> cache.<span class="f">computeIfAbsent</span>(k, <span class="k">this</span>::load);  <span class="c">// re-checks under the write lock</span>
+} <span class="k">finally</span> { rw.<span class="f">writeLock</span>().<span class="f">unlock</span>(); }</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><b>Likely follow up:</b> "Why not use a read lock for an LRU cache's <code>get</code>?" Because an LRU <code>get</code> moves the entry to the front, which is a write, so it needs exclusive access.</p></div></div><div class="tq cq" data-q="classic-problems.t15" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">15</span><span class="lvl lvl-senior">Senior</span><span class="tag">read-write-lock</span><span class="tag">lifecycle</span><span class="co">Rubrik</span></div><div class="qtext">Wrap a client whose <code>init</code> must run alone, whose requests may run concurrently once <code>init</code> succeeded, and whose <code>close</code> must wait for in-flight requests and run only once.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>This is readers-writers in disguise. Requests are readers; <code>init</code> and <code>close</code> are writers. Add an explicit state machine so every call knows what is legal.</p>
+<figure class="code single" data-sample="classic-problems.t15.1"><figcaption><span class="ctitle">Lifecycle on a read-write lock</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">ClientWrapper</span> {
+    <span class="k">private</span> <span class="k">enum</span> <span class="t">State</span> { NEW, READY, FAILED, CLOSED }
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantReadWriteLock</span> rw = <span class="k">new</span> <span class="t">ReentrantReadWriteLock</span>(<span class="k">true</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Client</span> client;
+    <span class="k">private</span> <span class="t">State</span> state = <span class="t">State</span>.NEW;              <span class="c">// guarded by rw</span>
+
+    <span class="t">ClientWrapper</span>(<span class="t">Client</span> client) { <span class="k">this</span>.client = client; }
+
+    <span class="k">void</span> <span class="f">init</span>() {
+        rw.<span class="f">writeLock</span>().<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">if</span> (state != <span class="t">State</span>.NEW) <span class="k">return</span>;
+            <span class="k">try</span> { client.<span class="f">init</span>(); state = <span class="t">State</span>.READY; }
+            <span class="k">catch</span> (<span class="t">RuntimeException</span> e) { state = <span class="t">State</span>.FAILED; <span class="k">throw</span> e; }
+        } <span class="k">finally</span> { rw.<span class="f">writeLock</span>().<span class="f">unlock</span>(); }
+    }
+
+    <span class="t">Response</span> <span class="f">request</span>(<span class="t">Request</span> r) {
+        rw.<span class="f">readLock</span>().<span class="f">lock</span>();                     <span class="c">// many at once; excluded by init and close</span>
+        <span class="k">try</span> {
+            <span class="k">if</span> (state != <span class="t">State</span>.READY) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"state "</span> + state);
+            <span class="k">return</span> client.<span class="f">request</span>(r);
+        } <span class="k">finally</span> { rw.<span class="f">readLock</span>().<span class="f">unlock</span>(); }
+    }
+
+    <span class="k">void</span> <span class="f">close</span>() {
+        rw.<span class="f">writeLock</span>().<span class="f">lock</span>();                    <span class="c">// waits for in-flight requests to drain</span>
+        <span class="k">try</span> {
+            <span class="k">if</span> (state == <span class="t">State</span>.CLOSED) <span class="k">return</span>;    <span class="c">// at most once</span>
+            <span class="t">boolean</span> wasReady = state == <span class="t">State</span>.READY;
+            state = <span class="t">State</span>.CLOSED;
+            <span class="k">if</span> (wasReady) client.<span class="f">close</span>();
+        } <span class="k">finally</span> { rw.<span class="f">writeLock</span>().<span class="f">unlock</span>(); }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The state check happens <strong>while holding the read lock</strong>, so <code>close</code> cannot slip in between the check and the call. The fair mode stops a steady request stream from starving <code>close</code>. In C++ the same shape uses <code>std::shared_mutex</code>, with <code>std::shared_lock</code> in <code>request</code> and <code>std::unique_lock</code> in <code>init</code> and <code>close</code>.</p>
+<p><b>Likely follow up:</b> "Requests should wait for <code>init</code> instead of failing." Add a one-shot gate that <code>init</code> opens when it finishes, success or failure (a <code>CountDownLatch(1)</code> or a <code>CompletableFuture</code>), and have <code>request</code> wait on it before taking the read lock. Waiting must happen outside the read lock, or <code>init</code> can never take the write lock; the read lock cannot hold a condition anyway (<code>readLock().newCondition()</code> throws <code>UnsupportedOperationException</code>).</p></div></div></section></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

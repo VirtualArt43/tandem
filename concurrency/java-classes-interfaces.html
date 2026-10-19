@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Classes, interfaces and inheritance · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-classes-interfaces" data-title="Classes, interfaces and inheritance" data-track="java" data-module="java-1" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details open><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces" class=here><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m1">Module 01: The JVM and the language core</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 01.3</span><span>19 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Classes, interfaces and inheritance</h1><p class="lsum">Classes, constructors, interfaces with default methods, abstract classes, composition over inheritance, access modifiers and nested classes, as concurrent code uses them.</p><div class="prereq"><span>Before this:</span><a href="java-objects-references.html">Objects, references and the heap</a></div></header><article class="prose" id="article">
+<p class="lead">A thread-safe class is a class first. Its fields are private, its constructor finishes before anyone sees it, its lock is something nobody outside can touch, and no subclass or default method can sneak around that lock. This lesson covers exactly the class machinery that concurrent code leans on.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of a bank branch. The vault (the fields) sits behind the counter, and customers can only use the windows (the public methods). The branch's rules, such as "the ledger always matches the cash in the vault", hold because every change goes through a teller who follows the procedure and locks the vault door while working (the lock).</p>
+<p>An interface is the sign above a window, "Deposits here": any branch can put up that sign and serve deposits its own way. Inheritance is opening a new branch by copying an old branch's floor plan and changing a few rooms; if the old plan quietly relied on "always lock the vault door first" and the new room skips it, the rule breaks. Composition is hiring the old branch as a back office behind your own counter, with your own lock on the door. <strong>A class can only keep its promises if every path to its state goes through its own counter.</strong></p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><strong>Encapsulation is what makes locking enforceable.</strong> If a field is private and every access goes through methods that take the lock, you can prove the class is safe. A public or protected mutable field makes that proof impossible.</li>
+<li><strong>An object is not ready until its constructor returns.</strong> Starting a thread or registering a listener inside a constructor lets other threads see it half built.</li>
+<li><strong>Concurrency APIs are interfaces:</strong> <code>Runnable</code>, <code>Callable</code>, <code>Executor</code>, <code>Lock</code>, <code>BlockingQueue</code>, <code>Future</code>. You implement them and program against them.</li>
+<li><strong>Default methods and subclasses do not automatically use your lock.</strong> Check the default method's atomicity contract, and remember that an overriding method does not inherit the <code>synchronized</code> modifier.</li>
+<li><strong><code>synchronized</code> methods lock <code>this</code>, which outsiders can lock too.</strong> A private lock object cannot be reached from outside.</li>
+<li><strong>Inner classes and anonymous classes change what <code>this</code> means,</strong> which changes which object a <code>synchronized (this)</code> block locks.</li>
+</ul>
+</div>
+
+<h2 id="a-class-is-state-plus-the-methods-that-guard-it">A class is state plus the methods that guard it</h2>
+<p>A class bundles fields (state) with methods (behavior). For thread safety, the important idea is the invariant: a fact about the fields that must hold whenever no method is in the middle of running. For a bank account it might be "the balance is never negative". <a class="term" data-term="encapsulation" href="glossary.html#encapsulation">Encapsulation</a> means only the class's own methods touch its fields, so only they can break the invariant, so only they need to take the lock.</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.1"><figcaption><span class="ctitle">State, invariant and the lock that guards them</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">BankAccount</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">String</span> id;
+    <span class="k">private</span> <span class="t">long</span> balance;               <span class="c">// guarded by this; invariant: balance &gt;= 0</span>
+
+    <span class="t">BankAccount</span>(<span class="t">String</span> id, <span class="t">long</span> opening) {
+        <span class="k">if</span> (opening &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"opening balance must not be negative"</span>);
+        <span class="k">this</span>.id = id;
+        <span class="k">this</span>.balance = opening;
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"amount must be positive"</span>);
+        balance = <span class="t">Math</span>.<span class="f">addExact</span>(balance, amount);   <span class="c">// reject overflow without changing the balance</span>
+    }
+
+    <span class="k">synchronized</span> <span class="t">boolean</span> <span class="f">withdraw</span>(<span class="t">long</span> amount) {
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span> || amount &gt; balance) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// check and act under one lock</span>
+        balance -= amount;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="k">synchronized</span> <span class="t">long</span> <span class="f">balance</span>() {
+        <span class="k">return</span> balance;                 <span class="c">// reads take the lock too, so they see the latest write</span>
+    }
+
+    <span class="t">String</span> <span class="f">id</span>() {
+        <span class="k">return</span> id;                      <span class="c">// final and immutable: safe to read without the lock</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Read it the way a reviewer would. Every mutable field is private and has a "guarded by" comment. Every method that touches <code>balance</code> takes the same lock, including the read. The <a class="term" data-term="check-then-act" href="glossary.html#check-then-act">check then act</a> in <code>withdraw</code> happens inside one critical section. The class is <code>final</code>, so no subclass can add an unsynchronized method later. That is what a thread-safe class looks like in an interview.</p>
+
+<h2 id="constructors-when-does-an-object-exist">Constructors: when does an object exist?</h2>
+<p>When you write <code>new BankAccount(&quot;a1&quot;, 100)</code>, the JVM allocates the object with every field at its default value (<code>0</code>, <code>false</code>, <code>null</code>), then runs the constructor chain: the superclass constructor first (<code>super(...)</code>, implicit if you do not write it), then this class's field initializers and initializer blocks in source order, then the rest of the constructor body. <code>this(...)</code> calls another constructor of the same class. Only when <code>new</code> returns is the object complete.</p>
+<p>Until then, nobody else should be able to see it. Leaking <code>this</code> from a constructor, called <a class="term" data-term="this-escape" href="glossary.html#this-escape">this escape</a>, hands other threads a half-built object:</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.2"><figcaption><span class="ctitle">Two ways to leak this from a constructor</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">import</span> java.util.function.<span class="t">DoubleConsumer</span>;
+
+<span class="k">interface</span> <span class="t">SensorHub</span> {
+    <span class="k">void</span> <span class="f">subscribe</span>(<span class="t">DoubleConsumer</span> listener);   <span class="c">// the hub may call listeners from its own threads at once</span>
+}
+
+<span class="k">class</span> <span class="t">Thermostat</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">double</span> limit;
+    <span class="k">private</span> <span class="t">int</span> alarms;
+
+    <span class="t">Thermostat</span>(<span class="t">SensorHub</span> hub, <span class="t">double</span> limit) {
+        hub.<span class="f">subscribe</span>(<span class="k">this</span>::onReading);         <span class="c">// BUG: this escapes; readings can arrive before limit is set</span>
+        <span class="k">new</span> <span class="t">Thread</span>(<span class="k">this</span>::monitor).<span class="f">start</span>();      <span class="c">// BUG: a thread that sees this before construction ends</span>
+        <span class="k">this</span>.limit = limit;
+    }
+
+    <span class="k">private</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">onReading</span>(<span class="t">double</span> celsius) {
+        <span class="k">if</span> (celsius &gt; limit) alarms += <span class="n">1</span>;       <span class="c">// may compare against 0.0, the default value of limit</span>
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">monitor</span>() { }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>A method reference like <code>this::onReading</code> captures <code>this</code>, so it leaks the object just as surely as <code>hub.subscribe(this)</code> would. Even moving the leak to the last line of the constructor is not enough in principle: the guarantee that other threads see <code>final</code> fields correctly (the <a class="term" data-term="final-field" href="glossary.html#final-field">final field semantics</a>, next lesson) only applies once the constructor has finished, and only if <code>this</code> did not escape. javac 21 can flag some of these with <code>-Xlint:this-escape</code>.</p>
+<p>The fix is a static factory: construct first, publish second.</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.3"><figcaption><span class="ctitle">Construct, then publish</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">final</span> <span class="k">class</span> <span class="t">SafeThermostat</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">double</span> limit;
+    <span class="k">private</span> <span class="t">int</span> alarms;                         <span class="c">// guarded by this</span>
+
+    <span class="k">private</span> <span class="t">SafeThermostat</span>(<span class="t">double</span> limit) {      <span class="c">// private: nobody can skip the factory</span>
+        <span class="k">this</span>.limit = limit;
+    }
+
+    <span class="k">static</span> <span class="t">SafeThermostat</span> <span class="f">attach</span>(<span class="t">SensorHub</span> hub, <span class="t">double</span> limit) {
+        <span class="t">SafeThermostat</span> t = <span class="k">new</span> <span class="t">SafeThermostat</span>(limit);   <span class="c">// fully built here</span>
+        hub.<span class="f">subscribe</span>(t::onReading);                    <span class="c">// only now does anyone else get a reference</span>
+        <span class="k">return</span> t;
+    }
+
+    <span class="k">private</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">onReading</span>(<span class="t">double</span> celsius) {
+        <span class="k">if</span> (celsius &gt; limit) alarms += <span class="n">1</span>;
+    }
+
+    <span class="k">synchronized</span> <span class="t">int</span> <span class="f">alarms</span>() {
+        <span class="k">return</span> alarms;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The same goes for threads: give the class a <code>start()</code> method, or have the factory start the thread after construction. Also avoid calling overridable methods from a constructor: the subclass version runs before the subclass's own fields are initialized.</p>
+
+<h2 id="interfaces-the-shape-of-every-concurrency-api">Interfaces: the shape of every concurrency API</h2>
+<p>An interface is a contract: a set of methods any class can promise to provide. Almost all of <code>java.util.concurrent</code> is defined this way, which is why you write <code>BlockingQueue&lt;Job&gt; q = new ArrayBlockingQueue&lt;&gt;(100);</code> and can later swap in <code>LinkedBlockingQueue</code> without touching the code that uses <code>q</code>.</p>
+
+<table>
+<thead><tr><th>Interface</th><th>Its key method</th><th>What it represents</th></tr></thead>
+<tbody>
+<tr><td><code>Runnable</code></td><td><code>void run()</code></td><td>A task with no result</td></tr>
+<tr><td><code>Callable&lt;V&gt;</code></td><td><code>V call() throws Exception</code></td><td>A task that returns a value or throws</td></tr>
+<tr><td><code>Executor</code>, <code>ExecutorService</code></td><td><code>execute(Runnable)</code>, <code>submit(Callable)</code></td><td>Something that runs tasks, usually on a pool of threads</td></tr>
+<tr><td><code>Future&lt;V&gt;</code></td><td><code>V get()</code></td><td>A result that will exist later</td></tr>
+<tr><td><code>Lock</code>, <code>Condition</code></td><td><code>lock()</code>, <code>unlock()</code>, <code>await()</code>, <code>signal()</code></td><td>Explicit locks and the conditions threads wait on</td></tr>
+<tr><td><code>BlockingQueue&lt;E&gt;</code></td><td><code>put(E)</code>, <code>take()</code></td><td>A queue that makes producers and consumers wait</td></tr>
+<tr><td><code>ConcurrentMap&lt;K, V&gt;</code></td><td><code>putIfAbsent</code>, <code>compute</code>, <code>merge</code></td><td>A map with atomic compound operations</td></tr>
+</tbody>
+</table>
+
+<h3>Default methods do not automatically acquire your lock</h3>
+<p>Since Java 8 an interface can carry method bodies: a <a class="term" data-term="default-method" href="glossary.html#default-method">default method</a> (and static methods, and since Java 9 private helper methods). A default method cannot directly access the implementing class's private fields or lock. Without an additional synchronization protocol, <strong>a default method built from several atomic calls is not atomic as a whole</strong>.</p>
+<p>The JDK itself is careful about this. <code>Map.computeIfAbsent</code> is a default method that does a <code>get</code>, then a <code>put</code>, and its documentation says it makes no atomicity guarantees and that any implementation offering atomicity must override it. <code>ConcurrentHashMap</code> does override it, and documents that the whole call is atomic. Here is the same trap in code you might write:</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.4"><figcaption><span class="ctitle">A default method that breaks atomicity, and the override that fixes it</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">interface</span> <span class="t">RateLimiter</span> {
+    <span class="t">boolean</span> <span class="f">tryAcquire</span>();                         <span class="c">// take one permit if one is available</span>
+
+    <span class="k">default</span> <span class="t">boolean</span> <span class="f">tryAcquire</span>(<span class="t">int</span> <span class="k">permits</span>) {     <span class="c">// NOT atomic: built only from tryAcquire()</span>
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="k">permits</span>; i += <span class="n">1</span>) {
+            <span class="k">if</span> (!<span class="f">tryAcquire</span>()) <span class="k">return</span> <span class="k">false</span>;      <span class="c">// may fail after taking some permits, which are then lost</span>
+        }
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+}
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">FixedPermits</span> <span class="k">implements</span> <span class="t">RateLimiter</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">int</span> available;                        <span class="c">// guarded by lock</span>
+
+    <span class="t">FixedPermits</span>(<span class="t">int</span> <span class="k">permits</span>) {
+        <span class="k">if</span> (<span class="k">permits</span> &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"permits must not be negative"</span>);
+        <span class="k">this</span>.available = <span class="k">permits</span>;
+    }
+
+    <span class="a">@Override</span>
+    <span class="k">public</span> <span class="t">boolean</span> <span class="f">tryAcquire</span>() {
+        <span class="k">return</span> <span class="f">tryAcquire</span>(<span class="n">1</span>);
+    }
+
+    <span class="a">@Override</span>
+    <span class="k">public</span> <span class="t">boolean</span> <span class="f">tryAcquire</span>(<span class="t">int</span> <span class="k">permits</span>) {      <span class="c">// all or nothing, under one lock</span>
+        <span class="k">if</span> (<span class="k">permits</span> &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"permits must be positive"</span>);
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">if</span> (available &lt; <span class="k">permits</span>) <span class="k">return</span> <span class="k">false</span>;
+            available -= <span class="k">permits</span>;
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>With only the default, two threads each asking for 3 of 4 permits can each take 2, both fail, and leave 4 permits consumed and nobody served. The override checks and takes all the permits in one critical section. When you implement a JDK interface in a thread-safe class, check its default methods too: <code>forEach</code>, <code>removeIf</code>, <code>replaceAll</code> and <code>computeIfAbsent</code> have no automatic guarantee of holding your lock across the whole operation. A default method can explicitly synchronize or use atomic primitives, so inspect its implementation and contract.</p>
+
+<h2 id="abstract-classes">Abstract classes</h2>
+<p>An abstract class is a partly written class: it can have fields, constructors and finished methods, plus abstract methods that subclasses must fill in. A class can extend only one class but implement many interfaces.</p>
+
+<table>
+<thead><tr><th></th><th>Interface</th><th>Abstract class</th></tr></thead>
+<tbody>
+<tr><td>Instance fields</td><td>No (constants only)</td><td>Yes</td></tr>
+<tr><td>Constructors</td><td>No</td><td>Yes</td></tr>
+<tr><td>How many per class</td><td>Implement as many as you like</td><td>Extend exactly one</td></tr>
+<tr><td>Method bodies</td><td>Default, static and private methods</td><td>Any</td></tr>
+<tr><td>Concurrency examples</td><td><code>Runnable</code>, <code>Lock</code>, <code>Executor</code>, <code>BlockingQueue</code></td><td><code>AbstractQueuedSynchronizer</code>, <code>AbstractExecutorService</code>, <code>RecursiveTask</code></td></tr>
+</tbody>
+</table>
+
+<p>The best-known abstract class in concurrency is <code>AbstractQueuedSynchronizer</code>, the <a class="term" data-term="aqs" href="glossary.html#aqs">AbstractQueuedSynchronizer</a>. It implements the hard part of a lock, a queue of waiting threads with parking and waking, once. <code>ReentrantLock</code>, <code>Semaphore</code> and <code>CountDownLatch</code> each contain a small internal subclass of it (named <code>Sync</code>) that only says what "acquire" and "release" mean. That is the template method pattern: the abstract class owns the algorithm, subclasses fill in the steps.</p>
+
+<h2 id="inheritance-can-break-thread-safety">Inheritance can break thread safety</h2>
+<p>Inheritance shares implementation, and with it the obligations a parent class never wrote down. Three ways it goes wrong:</p>
+<p><strong>1. <code>synchronized</code> is not inherited.</strong> It is not part of a method's signature, so an override is unsynchronized unless it says so:</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.5" data-expect="ok"><figcaption><span class="ctitle">An override silently drops the lock</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">Counter</span> {
+        <span class="k">protected</span> <span class="t">int</span> count;                        <span class="c">// guarded by this</span>
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">increment</span>() {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"Counter.increment holds the lock: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(<span class="k">this</span>));
+            count += <span class="n">1</span>;
+        }
+    }
+
+    <span class="k">static</span> <span class="k">class</span> <span class="t">LoggingCounter</span> <span class="k">extends</span> <span class="t">Counter</span> {
+        <span class="a">@Override</span>
+        <span class="k">void</span> <span class="f">increment</span>() {                          <span class="c">// no synchronized: this override is unlocked</span>
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"LoggingCounter.increment holds the lock: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(<span class="k">this</span>));
+            count += <span class="n">1</span>;                             <span class="c">// a data race once several threads call it</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="k">new</span> <span class="t">Counter</span>().<span class="f">increment</span>();
+        <span class="k">new</span> <span class="t">LoggingCounter</span>().<span class="f">increment</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="java-classes-interfaces.6"><figcaption><span class="ctitle">Output</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><code>Counter.increment holds the lock: true
+LoggingCounter.increment holds the lock: false</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Declare the override <code>synchronized</code> too, or call <code>super.increment()</code>, which takes the lock. Note also the <code>protected</code> field: any subclass can touch <code>count</code> without the lock.</p>
+<p><strong>2. Locking the wrong object from outside.</strong> Suppose you want "add if absent" on a list made thread-safe with <code>Collections.synchronizedList</code>. Each method of that wrapper locks the wrapper itself, so to make two calls atomic you must hold that same lock, which is <a class="term" data-term="client-side-locking" href="glossary.html#client-side-locking">client-side locking</a>. Locking anything else protects nothing:</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.7"><figcaption><span class="ctitle">The right lock and the wrong lock</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">class</span> <span class="t">ListHelper</span>&lt;E&gt; {
+    <span class="k">final</span> <span class="t">List</span>&lt;E&gt; list = <span class="t">Collections</span>.<span class="f">synchronizedList</span>(<span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;());
+
+    <span class="c">// BUG: locks the helper, but list.contains and list.add lock the list</span>
+    <span class="k">synchronized</span> <span class="t">boolean</span> <span class="f">putIfAbsentBroken</span>(E x) {
+        <span class="t">boolean</span> absent = !list.<span class="f">contains</span>(x);
+        <span class="k">if</span> (absent) list.<span class="f">add</span>(x);
+        <span class="k">return</span> absent;
+    }
+
+    <span class="c">// Correct: hold the list's own lock across both calls</span>
+    <span class="t">boolean</span> <span class="f">putIfAbsent</span>(E x) {
+        <span class="k">synchronized</span> (list) {
+            <span class="t">boolean</span> absent = !list.<span class="f">contains</span>(x);
+            <span class="k">if</span> (absent) list.<span class="f">add</span>(x);
+            <span class="k">return</span> absent;
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p><strong>3. Extending a class you do not own.</strong> Subclassing a thread-safe class to add a method depends on the parent's private locking policy, which can change in the next version. Composition is sturdier: keep the object private, add your own lock, and expose only what you choose.</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.8"><figcaption><span class="ctitle">Composition: your object, your lock, your API</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">UniqueList</span>&lt;E&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;E&gt; items = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();   <span class="c">// guarded by lock, never handed out</span>
+
+    <span class="t">boolean</span> <span class="f">addIfAbsent</span>(E x) {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">if</span> (items.<span class="f">contains</span>(x)) <span class="k">return</span> <span class="k">false</span>;
+            items.<span class="f">add</span>(x);
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+    }
+
+    <span class="t">List</span>&lt;E&gt; <span class="f">snapshot</span>() {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">return</span> <span class="t">List</span>.<span class="f">copyOf</span>(items);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The same reasoning answers an old interview favorite, "extend <code>Thread</code> or implement <code>Runnable</code>?". Implement <code>Runnable</code> (or <code>Callable</code>): the task stays separate from the thread that runs it, you keep your one superclass, and the same task can run on a thread, an executor or a virtual thread.</p>
+
+<h2 id="access-modifiers-who-can-touch-your-state">Access modifiers: who can touch your state</h2>
+<table>
+<thead><tr><th>Modifier</th><th>Visible to</th><th>Use it for</th></tr></thead>
+<tbody>
+<tr><td><code>private</code></td><td>The class itself and its nested classes</td><td>All mutable state, and every lock object</td></tr>
+<tr><td>none (package-private)</td><td>Classes in the same package</td><td>Helpers and implementation classes. Tandem's problem classes are package-private.</td></tr>
+<tr><td><code>protected</code></td><td>The same package and all subclasses</td><td>Rarely state: subclasses can touch it without your lock</td></tr>
+<tr><td><code>public</code></td><td>Everyone</td><td>The API, and only immutable or thread-safe things</td></tr>
+</tbody>
+</table>
+<p>Locks deserve the same care as state. A <code>synchronized</code> method locks <code>this</code>, and <code>this</code> is public: any code holding a reference to your object can write <code>synchronized (yourObject)</code> and hold your lock for as long as it likes, stalling every method you have. A <a class="term" data-term="private-lock" href="glossary.html#private-lock">private lock object</a> cannot be reached from outside.</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.9" data-expect="ok"><figcaption><span class="ctitle">Outside code holding your monitor</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</span><code><span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">MethodLockedAccount</span> {
+        <span class="k">private</span> <span class="t">long</span> balance;
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) { balance += amount; }   <span class="c">// locks this</span>
+    }
+
+    <span class="k">static</span> <span class="k">class</span> <span class="t">PrivateLockAccount</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();   <span class="c">// no code outside this class can reach it</span>
+        <span class="k">private</span> <span class="t">long</span> balance;
+        <span class="k">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+            <span class="k">synchronized</span> (lock) { balance += amount; }
+        }
+    }
+
+    <span class="c">// Some unrelated code locks the account object itself and holds it for 300 ms.</span>
+    <span class="k">static</span> <span class="t">long</span> <span class="f">msToDeposit</span>(<span class="t">Object</span> account, <span class="t">Runnable</span> deposit) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">CountDownLatch</span> holdingMonitor = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">Thread</span> hog = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">synchronized</span> (account) {
+                holdingMonitor.<span class="f">countDown</span>();
+                <span class="k">try</span> {
+                    <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">300</span>);
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }
+        }, <span class="s">"hog"</span>);
+        hog.<span class="f">start</span>();
+        holdingMonitor.<span class="f">await</span>();   <span class="c">// the hog has acquired the monitor; sleep only makes its hold visible</span>
+        <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+        deposit.<span class="f">run</span>();
+        <span class="t">long</span> ms = (<span class="t">System</span>.<span class="f">nanoTime</span>() - start) / <span class="n">1_000_000</span>;
+        hog.<span class="f">join</span>();
+        <span class="k">return</span> ms;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">MethodLockedAccount</span> a = <span class="k">new</span> <span class="t">MethodLockedAccount</span>();
+        <span class="t">PrivateLockAccount</span> b = <span class="k">new</span> <span class="t">PrivateLockAccount</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"synchronized methods: deposit waited "</span> + <span class="f">msToDeposit</span>(a, () -&gt; a.<span class="f">deposit</span>(<span class="n">10</span>)) + <span class="s">" ms"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"private lock object:  deposit waited "</span> + <span class="f">msToDeposit</span>(b, () -&gt; b.<span class="f">deposit</span>(<span class="n">10</span>)) + <span class="s">" ms"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="java-classes-interfaces.10"><figcaption><span class="ctitle">Typical output</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><code>synchronized methods: deposit waited 300 ms
+private lock object:  deposit waited 0 ms</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>In a real system the "hog" is a library that synchronizes on objects it is handed, or a caller doing client-side locking for its own reasons. A private lock prevents that direct interference. It does not rule out deadlock: your own methods can still create a lock cycle by calling external code while holding it. The measured delay is illustrative and depends on scheduling.</p>
+
+<h2 id="nested-inner-local-and-anonymous-classes">Nested, inner, local and anonymous classes</h2>
+<table>
+<thead><tr><th>Kind</th><th>Looks like</th><th>Tied to an outer object?</th><th>Typical use</th></tr></thead>
+<tbody>
+<tr><td>Static nested</td><td><code>static class Node</code> inside a class</td><td>No</td><td>Queue nodes, map entries, builders, a private <code>Sync</code></td></tr>
+<tr><td>Inner</td><td><code>class Cursor</code> inside a class, no <code>static</code></td><td>Yes, reachable as <code>Outer.this</code></td><td>An iterator over its outer object</td></tr>
+<tr><td>Local</td><td>A class declared inside a method</td><td>Yes, inside an instance method; captures effectively final locals</td><td>Rare</td></tr>
+<tr><td>Anonymous</td><td><code>new Runnable() { ... }</code></td><td>Yes, in an instance context; captures effectively final locals</td><td>Callbacks written before lambdas existed</td></tr>
+</tbody>
+</table>
+<p>An <a class="term" data-term="inner-class" href="glossary.html#inner-class">inner class</a> instance can read and change its enclosing object's fields, private ones included. That makes a task written as an inner class a second path into the outer object's state, so the outer object's lock rules apply inside it. When the inner class uses the outer object, it holds a hidden reference to it and keeps it alive as long as the task lives: a long-scheduled inner-class task can pin a large object in memory. (Since Java 18, javac drops that hidden field when it is unused.) Prefer static nested classes unless you really need the outer object.</p>
+<p>The most surprising difference is what <code>this</code> means. Inside an anonymous class, <code>this</code> is the anonymous object. Inside a lambda, <code>this</code> is the enclosing object:</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.11" data-expect="ok"><figcaption><span class="ctitle">this in an anonymous class and in a lambda</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">void</span> <span class="f">demo</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Runnable</span> anonymous = <span class="k">new</span> <span class="t">Runnable</span>() {
+            <span class="a">@Override</span>
+            <span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"anonymous class: this is a "</span> + <span class="k">this</span>.<span class="f">getClass</span>().<span class="f">getName</span>());
+            }
+        };
+        <span class="t">Runnable</span> lambda = () -&gt; <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"lambda:          this is a "</span> + <span class="k">this</span>.<span class="f">getClass</span>().<span class="f">getName</span>());
+
+        <span class="t">Thread</span> t1 = <span class="k">new</span> <span class="t">Thread</span>(anonymous, <span class="s">"anon-task"</span>);
+        t1.<span class="f">start</span>();
+        t1.<span class="f">join</span>();
+        <span class="t">Thread</span> t2 = <span class="k">new</span> <span class="t">Thread</span>(lambda, <span class="s">"lambda-task"</span>);
+        t2.<span class="f">start</span>();
+        t2.<span class="f">join</span>();
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">new</span> <span class="t">Main</span>().<span class="f">demo</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="java-classes-interfaces.12"><figcaption><span class="ctitle">Output</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><code>anonymous class: this is a Main$1
+lambda:          this is a Main</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>So <code>synchronized (this)</code> inside an anonymous <code>Runnable</code> locks that <code>Runnable</code>, not the enclosing object. Separately created tasks lock different objects, and none excludes methods that lock the enclosing instance. If you need the outer object's lock there, write <code>synchronized (Main.this)</code>, or better, use the same private lock object by name in every access path.</p>
+
+<div class="box example">
+<h3>Worked example: make this class safe, then hard to break</h3>
+<p>A teammate wrote a temperature log that a sensor hub calls from its own threads:</p>
+
+<figure class="code single" data-sample="java-classes-interfaces.13"><figcaption><span class="ctitle">TemperatureLog, as written</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">TemperatureLog</span> {
+    <span class="k">public</span> <span class="t">List</span>&lt;<span class="t">Double</span>&gt; readings = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="k">protected</span> <span class="t">double</span> max = <span class="t">Double</span>.NEGATIVE_INFINITY;
+
+    <span class="k">public</span> <span class="t">TemperatureLog</span>(<span class="t">SensorHub</span> hub) {
+        hub.<span class="f">subscribe</span>(<span class="k">this</span>::<span class="k">record</span>);
+    }
+
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="k">record</span>(<span class="t">double</span> celsius) {
+        readings.<span class="f">add</span>(celsius);
+        <span class="k">if</span> (celsius &gt; max) max = celsius;
+    }
+
+    <span class="k">public</span> <span class="t">double</span> <span class="f">max</span>() {
+        <span class="k">return</span> max;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Go through it field by field and method by method:</p>
+<ol>
+<li><code>readings</code> is public: any thread can add to or iterate it without the lock. Make it private.</li>
+<li><code>max</code> is protected: subclasses can read or write it without the lock. Make it private.</li>
+<li>The constructor leaks <code>this</code> through <code>this::record</code>, so <code>record</code> can run before construction ends. Use a private constructor and a factory.</li>
+<li><code>max()</code> reads without the lock, so it may return a stale value (and because <code>max</code> is a non-volatile <code>double</code>, the language even allows a torn read), and nothing ties it to <code>readings</code>. Lock it.</li>
+<li>The class is not final, so a subclass can override <code>record</code> without <code>synchronized</code>. Make it final.</li>
+<li>The methods lock <code>this</code>, which the sensor hub or anyone else can also lock. Use a private lock.</li>
+</ol>
+<figure class="code single" data-sample="java-classes-interfaces.14"><figcaption><span class="ctitle">TemperatureLog, fixed</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">TemperatureLog</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Double</span>&gt; readings = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();   <span class="c">// guarded by lock</span>
+    <span class="k">private</span> <span class="t">double</span> max = <span class="t">Double</span>.NEGATIVE_INFINITY;              <span class="c">// guarded by lock</span>
+
+    <span class="k">private</span> <span class="t">TemperatureLog</span>() { }
+
+    <span class="k">static</span> <span class="t">TemperatureLog</span> <span class="f">subscribeTo</span>(<span class="t">SensorHub</span> hub) {
+        <span class="t">TemperatureLog</span> log = <span class="k">new</span> <span class="t">TemperatureLog</span>();
+        hub.<span class="f">subscribe</span>(log::<span class="k">record</span>);                             <span class="c">// publish after construction</span>
+        <span class="k">return</span> log;
+    }
+
+    <span class="k">void</span> <span class="k">record</span>(<span class="t">double</span> celsius) {
+        <span class="k">synchronized</span> (lock) {
+            readings.<span class="f">add</span>(celsius);
+            <span class="k">if</span> (celsius &gt; max) max = celsius;
+        }
+    }
+
+    <span class="t">double</span> <span class="f">max</span>() {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">return</span> max;
+        }
+    }
+
+    <span class="t">List</span>&lt;<span class="t">Double</span>&gt; <span class="f">readings</span>() {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">return</span> <span class="t">List</span>.<span class="f">copyOf</span>(readings);                       <span class="c">// a snapshot, never the internal list</span>
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>None of the fixes needed clever concurrency. They needed ordinary class design applied strictly: <strong>private state, one private lock, no leaks, no extension points you did not intend.</strong></p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Public or protected mutable fields</strong> on a class that claims to be thread-safe. Nobody can enforce a lock on a field anyone can touch.</li>
+<li><strong>Starting a thread or registering a listener in a constructor.</strong> Construct first, then publish, with a factory method or a separate <code>start()</code>.</li>
+<li><strong>Calling an overridable method from a constructor.</strong> The subclass's version runs before the subclass's fields are set.</li>
+<li><strong>Assuming a default method runs under your lock.</strong> It calls your methods one at a time; override it if it must be atomic.</li>
+<li><strong>Overriding a <code>synchronized</code> method without <code>synchronized</code>.</strong> The keyword is not inherited.</li>
+<li><strong>Client-side locking on the wrong object.</strong> To combine calls on a synchronized wrapper, lock the wrapper itself, or better, use composition with your own lock.</li>
+<li><strong><code>synchronized (this)</code> inside an anonymous class</strong>, believing it locks the outer object. It locks the anonymous object.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>These ideas come up as quick theory ("interface versus abstract class?", "<code>Runnable</code> versus extending <code>Thread</code>?") and, more importantly, in how you write every thread-safe class during a coding round. Interviewers read your class top to bottom and notice a public field, a missing lock on a getter or a thread started in a constructor long before they notice clever code.</p>
+<blockquote>I keep all mutable state private and guarded by one private final lock, so no outside code can take my lock or touch my fields. The class is final, the constructor does not let <code>this</code> escape, and anything I hand out is a copy or immutable.</blockquote>
+<blockquote>I implement <code>Runnable</code> or <code>Callable</code> rather than extending <code>Thread</code>: the task stays separate from how it is run, so it can go to a thread, a pool or a virtual thread unchanged.</blockquote>
+<p>Follow ups to expect: "Is <code>synchronized</code> inherited?" (no), "Why not just use <code>synchronized</code> methods?" (they lock <code>this</code>, which is public), "Is <code>Map.computeIfAbsent</code> atomic?" (only where the implementation overrides it and says so, as <code>ConcurrentHashMap</code> does), "What does <code>this</code> refer to inside a lambda?" (the enclosing object), and "Can one thread run a <code>static synchronized</code> method while another runs an instance <code>synchronized</code> method of the same class?" (yes: the static one locks the <code>Class</code> object, the instance one locks <code>this</code>, so they do not exclude each other, and static state touched by both is unprotected).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>Document the synchronization policy.</strong> Write which lock guards which field, and whether the class is thread-safe, immutable or not thread-safe. Annotation libraries provide <code>@GuardedBy</code>, and Error Prone can check it at compile time.</li>
+<li><strong>Design for inheritance or forbid it.</strong> A thread-safe class that allows subclassing must document which lock subclasses have to use, which ties you to that lock forever. Making it <code>final</code> keeps the policy private and changeable. A <code>sealed</code> class or interface (Java 17) is the middle ground: only the subclasses named in its <code>permits</code> clause may extend it, so you can review every one of them.</li>
+<li><strong>Template methods hold locks around unknown code.</strong> If an abstract class calls an abstract method while holding its lock, a subclass can do I/O or take other locks inside your critical section. Call such hooks outside the lock (an open call) where you can.</li>
+<li><strong>Every Java object has a monitor.</strong> That is why any object can be locked, why <code>wait</code>, <code>notify</code> and <code>notifyAll</code> are final methods on <code>Object</code> (you call them on the object whose monitor you hold), and why a private lock object is just <code>new Object()</code>.</li>
+</ul>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Thread safety rests on encapsulation: private state, touched only by methods that take the lock.</li>
+<li>An object is ready only when its constructor returns; never let <code>this</code> escape before that.</li>
+<li>Default methods and overriding methods do not inherit your locking; override or forbid them.</li>
+<li>Prefer composition with your own private lock over extending a class you do not control.</li>
+<li>Use a private final lock object instead of locking <code>this</code>.</li>
+<li>Inside a lambda <code>this</code> is the enclosing object; inside an anonymous class it is the anonymous object.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-classes-interfaces"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-classes-interfaces.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What is wrong with this subclass when several threads call <code>increment()</code>?<figure class="code single" data-sample="java-classes-interfaces.15"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</span><code><span class="k">class</span> <span class="t">Counter</span> {
+    <span class="k">protected</span> <span class="t">int</span> count;
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">increment</span>() { count += <span class="n">1</span>; }
+}
+<span class="k">class</span> <span class="t">AuditedCounter</span> <span class="k">extends</span> <span class="t">Counter</span> {
+    <span class="a">@Override</span>
+    <span class="k">void</span> <span class="f">increment</span>() { <span class="f">audit</span>(); count += <span class="n">1</span>; }
+    <span class="k">void</span> <span class="f">audit</span>() { }
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The override is not synchronized, because <code>synchronized</code> is not inherited, so <code>count += 1</code> races</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: the override inherits the parent's lock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: an override must repeat <code>synchronized</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks, because both versions lock the same object</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>synchronized</code> is not part of the method signature, so the override runs without the monitor. Make the override <code>synchronized</code>, call <code>super.increment()</code> for the update, make the parent method <code>final</code>, or keep <code>count</code> private so subclasses cannot touch it at all.</div></div><div class="mcq" data-id="java-classes-interfaces.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?<figure class="code single" data-sample="java-classes-interfaces.16"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">void</span> <span class="f">go</span>() {
+        <span class="t">Runnable</span> a = <span class="k">new</span> <span class="t">Runnable</span>() {
+            <span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() { <span class="t">System</span>.out.<span class="f">println</span>(<span class="k">this</span>.<span class="f">getClass</span>().<span class="f">getName</span>()); }
+        };
+        <span class="t">Runnable</span> b = () -&gt; <span class="t">System</span>.out.<span class="f">println</span>(<span class="k">this</span>.<span class="f">getClass</span>().<span class="f">getName</span>());
+        a.<span class="f">run</span>();
+        b.<span class="f">run</span>();
+    }
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) { <span class="k">new</span> <span class="t">Main</span>().<span class="f">go</span>(); }
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>Main$1</code> then <code>Main</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>Main</code> then <code>Main$1</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>Main$1</code> twice</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>Main</code> twice</span></button></li></ol><div class="why" hidden><strong>Why.</strong> In an anonymous class, <code>this</code> is the anonymous object, whose class javac names <code>Main$1</code>. A lambda does not create a new scope for <code>this</code>, so it means the enclosing <code>Main</code> object. That is why <code>synchronized (this)</code> means different things in the two forms.</div></div><div class="mcq" data-id="java-classes-interfaces.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>interface Counter { void increment(); default void add(int n) { for (int i = 0; i &lt; n; i += 1) increment(); } }</code> is implemented by a class whose <code>increment()</code> is <code>synchronized</code>. Is <code>add(1000)</code> atomic?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No: each increment is atomic, but other threads can run between them and see or change a half-done <code>add</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: default methods run under the implementing class's lock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Yes, because <code>increment</code> is <code>synchronized</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile: a default method cannot call an abstract method</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A default method only knows the interface's methods; it takes no lock of its own. A thousand atomic steps are not one atomic step. If <code>add</code> must be atomic, override it in the class and do the whole addition under the lock.</div></div><div class="mcq" data-id="java-classes-interfaces.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why do many thread-safe classes use <code>private final Object lock = new Object();</code> instead of <code>synchronized</code> methods?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Any code holding a reference can lock <code>this</code> and stall or deadlock the class; a private lock cannot be reached from outside</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>synchronized</code> methods are much slower than <code>synchronized</code> blocks</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>synchronized</code> methods do not make writes visible to other threads</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only <code>Object</code> instances support reentrant locking</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Both forms use the same monitor machinery with the same visibility guarantees and similar cost. The difference is who else can take the lock: <code>this</code> is shared with every holder of a reference, a private field is not.</div></div><div class="mcq" data-id="java-classes-interfaces.q5" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A constructor calls <code>registry.register(this)</code> and then assigns <code>this.threshold = 10</code>. Another thread is iterating the registry at that moment. What can it see?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The new object, possibly with <code>threshold</code> still 0, its default value</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: the JVM delays the registration until the constructor ends</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A compile error, because <code>this</code> cannot be passed out of a constructor</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A <code>ClassCastException</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Fields hold default values from allocation until the constructor assigns them, and <code>this</code> escaped before the assignment. The other thread can call methods on a half-built object. Register from a factory method after <code>new</code> returns.</div></div><div class="mcq" data-id="java-classes-interfaces.q6" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A <code>Cache</code> class schedules a cleanup task, written as a non-static inner class that reads the cache's fields, on a scheduler that lives for the whole program. What is one consequence?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The task holds a hidden reference to its <code>Cache</code>, so that cache can never be garbage collected while the task is scheduled</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The inner class cannot read the cache's private fields</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The task works on a copy of the cache's fields, so it never sees new entries</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The task always runs on the thread that created the cache</span></button></li></ol><div class="why" hidden><strong>Why.</strong> An inner class that uses its enclosing object reaches it through a hidden <code>Outer.this</code> reference, which keeps the outer object alive and gives the task access to all its fields, private ones included. That access is shared state, so the cache's locking rules apply inside the task too.</div></div><div class="mcq" data-id="java-classes-interfaces.q7" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>ListHelper</code> has <code>final List&lt;E&gt; list = Collections.synchronizedList(new ArrayList&lt;&gt;());</code> and a method <code>synchronized boolean putIfAbsent(E x) { if (!list.contains(x)) { list.add(x); return true; } return false; }</code>. Other threads also call <code>list.add</code> directly. Is <code>putIfAbsent</code> atomic?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No: the method locks the helper, while the list's methods lock the list, so another thread can add between <code>contains</code> and <code>add</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: a <code>synchronized</code> method around a synchronized list is doubly safe</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No, and it also deadlocks, because two locks are taken in different orders</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Yes, but only if the list is also declared <code>volatile</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Mutual exclusion only works between threads that take the same lock. Direct <code>list.add</code> calls take the list's lock, not the helper's. Lock the list itself across both calls, or hide the list behind your own class and lock.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-classes-interfaces.c1" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">When would you use an interface and when an abstract class? Give an example of each from <code>java.util.concurrent</code>, and say why the choice matters for thread safety.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>An interface defines a contract with no state: a class can implement several, and it is the right choice for a capability many unrelated classes provide. <code>Runnable</code>, <code>Callable</code>, <code>Executor</code>, <code>Lock</code> and <code>BlockingQueue</code> are interfaces, so callers program against them and can swap implementations, for example an <code>ArrayBlockingQueue</code> for a <code>LinkedBlockingQueue</code>. An abstract class can hold state and constructors and implement part of an algorithm, and a class can extend only one. <code>AbstractQueuedSynchronizer</code> is the classic case: it implements the wait queue, parking and waking once, and <code>ReentrantLock</code>, <code>Semaphore</code> and <code>CountDownLatch</code> each contain a small subclass that defines what acquire and release mean.</p>
+<p>For thread safety, the point is that neither inherits your locking. Default methods in an interface call your methods one at a time, so they are not atomic unless you override them, as <code>ConcurrentHashMap</code> does with <code>computeIfAbsent</code>. And a subclass of an abstract or concrete class can override a <code>synchronized</code> method without the keyword. So I keep thread-safe classes final where I can, or document exactly which lock subclasses must use.</p></div></div><div class="cq" data-q="java-classes-interfaces.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Rewrite this class so it is thread-safe and hard to break: <code>public class Stats { public long count; public double total; public Stats(Ticker t) { t.onTick(this::add); } public synchronized void add(double v) { count += 1; total += v; } public double mean() { return total / count; } }</code>. Assume <code>Ticker.onTick(DoubleConsumer listener)</code> calls listeners from its own threads.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="java-classes-interfaces.17"><figcaption><span class="ctitle">Stats, made safe</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="k">import</span> java.util.function.<span class="t">DoubleConsumer</span>;
+
+<span class="k">interface</span> <span class="t">Ticker</span> {
+    <span class="k">void</span> <span class="f">onTick</span>(<span class="t">DoubleConsumer</span> listener);
+}
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">Stats</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">long</span> count;      <span class="c">// guarded by lock</span>
+    <span class="k">private</span> <span class="t">double</span> total;    <span class="c">// guarded by lock</span>
+
+    <span class="k">private</span> <span class="t">Stats</span>() { }
+
+    <span class="k">static</span> <span class="t">Stats</span> <span class="f">listenTo</span>(<span class="t">Ticker</span> ticker) {
+        <span class="t">Stats</span> s = <span class="k">new</span> <span class="t">Stats</span>();
+        ticker.<span class="f">onTick</span>(s::add);      <span class="c">// publish only after construction</span>
+        <span class="k">return</span> s;
+    }
+
+    <span class="k">void</span> <span class="f">add</span>(<span class="t">double</span> v) {
+        <span class="k">synchronized</span> (lock) {
+            count += <span class="n">1</span>;
+            total += v;
+        }
+    }
+
+    <span class="t">double</span> <span class="f">mean</span>() {
+        <span class="k">synchronized</span> (lock) {        <span class="c">// count and total must be read together</span>
+            <span class="k">return</span> count == <span class="n">0</span> ? <span class="n">0.0</span> : total / count;
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Changes: the fields are private, so nobody can update one without the other; one private lock guards both, because the invariant (<code>total</code> is the sum of the <code>count</code> values added so far) spans both fields; <code>mean()</code> reads both under the same lock, so it never divides a new total by an old count; the constructor no longer leaks <code>this</code>; the class is final, so no subclass can add an unlocked method; and the empty case no longer divides by zero.</p></div></div><div class="cq" data-q="java-classes-interfaces.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A teammate writes <code>executor.submit(new Runnable() { public void run() { synchronized (this) { sharedList.add(item); } } });</code> inside an instance method, expecting it to be protected by the same lock as the outer class's <code>synchronized</code> methods. Explain what actually happens and give two fixes.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Inside an anonymous class, <code>this</code> refers to the anonymous <code>Runnable</code> instance, not to the outer object. Each submitted task is a different <code>Runnable</code>, so each locks its own private object, and none of them excludes each other or the outer class's <code>synchronized</code> methods, which lock the outer object. Concurrent <code>add</code> calls on <code>sharedList</code> then race, which can lose items or corrupt the list.</p>
+<p>Fix 1: lock the outer object explicitly with <code>synchronized (Outer.this) { ... }</code>, matching the <code>synchronized</code> methods. Fix 2, better: give the outer class a <code>private final Object lock</code>, use it in the outer methods and in the task (<code>synchronized (lock)</code>), and write the task as a lambda, where <code>this</code> means the outer object anyway. Or replace <code>sharedList</code> with a thread-safe structure and drop the lock if no invariant spans several fields.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="java-classes-interfaces.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A subclass overrides a synchronized counter method to add auditing. Is it still thread-safe? How would you design this so the next subclass cannot break it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>An override does not automatically acquire the overridden method's monitor</li><li>Calling <code>super.increment()</code> locks only the parent call, not the surrounding audit code</li><li>Keep mutable fields private and protect every access with the same lock</li><li>Use a final class or final invariant-preserving methods, and prefer composition for added behaviour</li><li>Keep external auditing outside the critical section where the required ordering permits it</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Not automatically. An overriding method does not inherit the synchronized modifier. If it directly increments a protected counter, concurrent calls race even though the parent method was safe. Calling <code>super.increment()</code> protects the parent's update, but it does not put the surrounding audit code under that lock. I would first decide whether the audit and increment must be one observable operation. If they must, the class needs an explicit design that preserves that relationship. For a counter I own, I would keep the field private and take one private lock for both updates and reads. I would make the class final, or make the methods that preserve its invariant final if extension is required. To add logging, I would usually wrap the counter through composition instead of exposing its state to subclasses. External auditing can block or acquire another lock, so I would keep it outside the critical section when the ordering requirement allows that. The proof is about every path to the state, not just the modifier on the original method.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if the audit record and the counter must always be observed together?</span></p></div></div><div class="sq" data-sq="java-classes-interfaces.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"An interface's default method acquires three permits by calling a thread-safe one-permit method three times. Walk me through what can go wrong and how you would fix it."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Atomic calls do not make the complete default method atomic or all-or-nothing</li><li>With four available permits, two callers can each acquire two and then both fail</li><li>Earlier successful acquisitions remain consumed unless the implementation explicitly restores them</li><li>Override the batch method to validate, check availability and subtract under one lock</li><li>Document the batch contract; default methods have no automatic synchronization guarantee</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The batch is not atomic, even if every one-permit call is thread-safe. Suppose four permits are available and two threads each request three. The first thread takes one, the second takes one, and they alternate again. Each now holds two permits. Both next attempts fail, so both batch calls return false even though all four permits have been consumed. No individual call was broken. The missing guarantee was across the whole request. I would override the batch method in the implementation that owns the permit count. It validates the request, takes the same lock as every other access, checks that enough permits exist, and subtracts the entire request only on success. On failure it changes nothing. I would make the single-permit method delegate to that implementation so there is one policy to maintain. Trying to roll back a partial batch adds more concurrency reasoning and still needs a clear contract. The interface should promise all-or-nothing behaviour explicitly; a default method gets no such guarantee merely because it calls safe methods.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Could a default method itself use a synchronized block, and what lock agreement would that require?</span></p></div></div><div class="sq" data-sq="java-classes-interfaces.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"A refactor replaces a lambda with an anonymous Runnable, and list updates start getting lost. Both versions say synchronized on this. What would you inspect?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A lambda uses the enclosing instance as <code>this</code>; an anonymous class uses its own instance</li><li>Separately created tasks therefore acquire different monitors</li><li>Those monitors also differ from the outer object's synchronized-method monitor</li><li>Use <code>Outer.this</code> consistently or one private final lock shared by all access paths</li><li>Avoid constructor escape when registering or starting these callbacks</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would check which object each synchronized block actually locks. A lambda uses the enclosing instance as <code>this</code>. An anonymous Runnable has its own <code>this</code>, so the refactor changes the monitor. If each submission creates a new task, every task locks a different object. Those locks also fail to exclude the outer class's synchronized methods. Two tasks can then update the same list concurrently despite both containing synchronized blocks. One fix is to name <code>Outer.this</code> explicitly, matching the outer methods. My preferred design is one private final lock object, used by every task and every outer method that accesses the list, including readers. I would also check how callbacks are registered: registration belongs after construction, so a worker cannot observe a partly initialized owner. Changing the callback syntax is safe only after we check its lock identity and what it captures.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What would a long-lived scheduler retaining this task imply for garbage collection of its enclosing object?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-safe-stack.html" data-problem="thread-safe-stack"><span class="pk">Thread-safe structures · warm-up</span><b>Thread-safe stack</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-objects-references.html"><span>Previous</span><b>Objects, references and the heap</b></a><a class="next" href="java-final-immutability.html"><span>Next</span><b>final, immutability and records</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#a-class-is-state-plus-the-methods-that-guard-it">A class is state plus the methods that guard it</a><a href="#constructors-when-does-an-object-exist">Constructors: when does an object exist?</a><a href="#interfaces-the-shape-of-every-concurrency-api">Interfaces: the shape of every concurrency API</a><a href="#abstract-classes">Abstract classes</a><a href="#inheritance-can-break-thread-safety">Inheritance can break thread safety</a><a href="#access-modifiers-who-can-touch-your-state">Access modifiers: who can touch your state</a><a href="#nested-inner-local-and-anonymous-classes">Nested, inner, local and anonymous classes</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

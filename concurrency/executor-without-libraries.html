@@ -1,0 +1,1723 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>An executor without libraries: submit, wait for all, shutdown and shutdownNow · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="executor-without-libraries" data-title="An executor without libraries: submit, wait for all, shutdown and shutdownNow" data-track="core" data-module="core-17" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details open><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries" class=here><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m17">Module 17: System coding rounds</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 17.2</span><span>40 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>An executor without libraries: submit, wait for all, shutdown and shutdownNow</h1><p class="lsum">Build an executor from primitives, then add shutdown, cancellation, exception handling, bounded admission, idle worker retirement and precise completion semantics.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">LinkedIn</span><span class="co">Microsoft</span></div><div class="prereq"><span>Before this:</span><a href="build-thread-pool.html">Build it yourself: a thread pool with futures and shutdown</a><a href="producer-consumer.html">Producer and consumer with a bounded buffer</a><a href="interruption-and-cancellation.html">Stopping a thread: interruption and cooperative cancellation</a></div></header><article class="prose" id="article">
+<p class="lead">"Implement an executor, no library allowed" recurs in Rubrik reports from 2020 onwards. Reports in 2026 add shutdown versus shutdownNow, exceptions inside tasks, interrupts, per-task timeouts and reclaiming idle threads. Build the runnable executor and lifecycle first, then work through timeout and snapshot-wait extensions.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of a tiffin kitchen with three cooks. Orders go up on a board; a free cook takes the oldest order, cooks it, packs it, and comes back to the board. The manager can ask "tell me when no orders remain unfinished". If one cook burns a dish, that dish is reported as failed, but the cook does not walk out of the kitchen.</p>
+<p>At closing time there are two ways to stop. "No new orders, finish the board" is <strong>shutdown</strong>. "Fire alarm: drop what you are doing if you safely can, and hand me the orders nobody started" is <strong>shutdownNow</strong>. And when the lunch rush is over, the extra cooks hired for the rush go home after standing idle for a while: that is reclaiming idle threads.</p>
+</div>
+
+<h2 id="the-question-as-it-is-asked">The question, as it is asked</h2>
+<p>The Rubrik reports show one family with several faces:</p>
+<ul>
+<li><strong>2020 to 2022:</strong> <code>schedule(task)</code> never blocks; <code>waitUntilComplete()</code> blocks until all scheduled work is done; no thread-safe deque or blocking queue allowed.</li>
+<li><strong>2022 and 2025:</strong> a single-threaded client calls <code>submitWork(task)</code>, which returns at once, and <code>blockUntilComplete()</code>; spread the load over workers.</li>
+<li><strong>2026:</strong> build a bounded queue (a ring buffer, in one report), then a thread pool on it with <code>submit</code>, <code>execute</code>, <code>shutdown</code> and <code>shutdownNow</code>. Follow ups: an exception thrown inside a task, a per-task timeout, reclaiming idle threads. The interviewer judged shutdown semantics, interrupts and which exceptions are caught, and changed the requirements three times.</li>
+</ul>
+<p>The research also records a LinkedIn pool implementation with the API banned and a Microsoft <code>ThreadPoolExecutor</code> implementation question. The answer is the same machine, so build it once, properly.</p>
+
+<h2 id="the-state-the-invariant-the-two-conditions">The state, the invariant, the two conditions</h2>
+<p>Before any code, say what is shared and what must stay true:</p>
+<ul>
+<li>a FIFO <strong>queue</strong> of tasks not yet claimed by a worker;</li>
+<li>a <strong>pending</strong> count: tasks accepted and not yet finished or removed, so queued plus claimed/running;</li>
+<li>a <strong>state</strong>: running, shutting down, or stopped (the <a class="term" data-term="executor-lifecycle" href="glossary.html#executor-lifecycle">executor lifecycle</a>);</li>
+<li>the set of <strong>workers</strong>, and how many of them are idle.</li>
+</ul>
+<p>One lock guards all of it, because the invariant ties the pieces together: <strong>pending equals queued plus claimed/running, and waiters sleep only while the thing they need is false</strong>. Two kinds of thread wait for two different things, so there are two condition variables. Idle workers wait for "there is work, or the pool is ending". Callers of <code>waitUntilComplete</code> wait for "pending is zero".</p>
+<p>Three rules follow, and each one is a graded point:</p>
+<ol>
+<li>Take the task under the lock, <strong>run it outside the lock</strong>. Running under the lock serializes the pool and can deadlock callbacks, especially with C++'s nonrecursive mutex.</li>
+<li>Do the bookkeeping (<code>pending -= 1</code>, signal at zero) in a <code>finally</code> block or after a catch-all, so a failing task cannot leave the count high and a waiter asleep forever.</li>
+<li>Every wait is a loop on the real condition, re-checked after every wakeup.</li>
+</ol>
+
+<h2 id="version-1-schedule-and-waituntilcomplete">Version 1: schedule and waitUntilComplete</h2>
+<p>This is the phone screen answer: a fixed number of workers started up front, an unbounded queue (so <code>schedule</code> never waits for capacity or task completion), and a <code>close</code> that finishes queued work and joins the workers. It is reusable: you can schedule a batch, wait, and schedule another.</p>
+
+<figure class="code pair" data-sample="executor-without-libraries.1" data-expect="ok"><figcaption><span class="ctitle">schedule and waitUntilComplete, with no library executor or queue</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// schedule() does not wait for task completion; waitUntilComplete() waits for global idleness.</span>
+<span class="k">class</span> SimpleExecutor {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">SimpleExecutor</span>(<span class="t">int</span> threads) {
+        <span class="k">if</span> (threads &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"threads must be positive"</span>);
+        workers_.<span class="f">reserve</span>(<span class="k">static_cast</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt;(threads));
+        <span class="c">// Every member is constructed before the constructor body starts workers.</span>
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; threads; i += <span class="n">1</span>) workers_.<span class="f">emplace_back</span>([<span class="k">this</span>] { <span class="f">workerLoop</span>(); });
+        } <span class="k">catch</span> (...) {
+            <span class="f">close</span>();                         <span class="c">// join any workers already started before rethrowing</span>
+            <span class="k">throw</span>;
+        }
+    }
+    ~<span class="f">SimpleExecutor</span>() { <span class="f">close</span>(); }
+
+    <span class="t">void</span> <span class="f">schedule</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task) {
+        <span class="k">if</span> (!task) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"empty task"</span>);
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        <span class="k">if</span> (closed_) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"executor is closed"</span>);
+        queue_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(task));
+        pending_ += <span class="n">1</span>;
+        workReady_.<span class="f">notify_one</span>();      <span class="c">// one idle worker can take it</span>
+    }
+
+    <span class="t">void</span> <span class="f">waitUntilComplete</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        allDone_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> pending_ == <span class="n">0</span>; });
+    }
+
+    <span class="c">// Runs everything already scheduled, then stops the workers. Call it from one thread.</span>
+    <span class="t">void</span> <span class="f">close</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+            <span class="k">if</span> (closed_) <span class="k">return</span>;
+            closed_ = <span class="k">true</span>;
+        }
+        workReady_.<span class="f">notify_all</span>();
+        <span class="k">for</span> (<span class="k">auto</span>&amp; t : workers_) t.<span class="f">join</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">workerLoop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task;
+            {
+                <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+                workReady_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !queue_.<span class="f">empty</span>() || closed_; });
+                <span class="k">if</span> (queue_.<span class="f">empty</span>()) <span class="k">return</span>;                 <span class="c">// closed and drained</span>
+                task = <span class="t">std</span>::<span class="f">move</span>(queue_.<span class="f">front</span>());
+                queue_.<span class="f">pop_front</span>();
+            }
+            <span class="k">try</span> {
+                <span class="f">task</span>();                                     <span class="c">// never while holding the lock</span>
+            } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {             <span class="c">// an escaping exception would end the process</span>
+                <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"a worker survived: %s\n"</span>, e.<span class="f">what</span>());
+            } <span class="k">catch</span> (...) {
+                <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"a worker survived an unknown exception\n"</span>);
+            }
+            <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+            pending_ -= <span class="n">1</span>;
+            <span class="k">if</span> (pending_ == <span class="n">0</span>) allDone_.<span class="f">notify_all</span>();
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> workReady_;   <span class="c">// idle workers wait here</span>
+    <span class="t">std</span>::<span class="t">condition_variable</span> allDone_;     <span class="c">// waitUntilComplete waits here</span>
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; queue_;
+    <span class="t">std</span>::<span class="t">size_t</span> pending_ = <span class="n">0</span>;             <span class="c">// accepted, unfinished: queued plus claimed/running</span>
+    <span class="t">bool</span> closed_ = <span class="k">false</span>;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; workers_;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    SimpleExecutor <span class="f">ex</span>(<span class="n">3</span>);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; running{<span class="n">0</span>}, most{<span class="n">0</span>}, done{<span class="n">0</span>};
+    <span class="k">for</span> (<span class="t">int</span> batch = <span class="n">1</span>; batch &lt;= <span class="n">2</span>; batch += <span class="n">1</span>) {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">10</span>; i += <span class="n">1</span>) {
+            ex.<span class="f">schedule</span>([i, &amp;running, &amp;most, &amp;done] {
+                <span class="t">int</span> now = running.<span class="f">fetch_add</span>(<span class="n">1</span>) + <span class="n">1</span>;
+                <span class="t">int</span> seen = most.<span class="f">load</span>();
+                <span class="k">while</span> (now &gt; seen &amp;&amp; !most.<span class="f">compare_exchange_weak</span>(seen, now)) {}
+                <span class="k">if</span> (i == <span class="n">4</span>) {
+                    running.<span class="f">fetch_sub</span>(<span class="n">1</span>);
+                    <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"task 4 failed"</span>);
+                }
+                <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(10ms);         <span class="c">// stands in for real work</span>
+                done.<span class="f">fetch_add</span>(<span class="n">1</span>);
+                running.<span class="f">fetch_sub</span>(<span class="n">1</span>);
+            });
+        }
+        ex.<span class="f">waitUntilComplete</span>();
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"batch %d: %d done in total, at most %d at once\n"</span>, batch, done.<span class="f">load</span>(), most.<span class="f">load</span>());
+    }
+    ex.<span class="f">close</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="c">// schedule() does not wait for task completion; waitUntilComplete() waits for global idleness.</span>
+<span class="k">final</span> <span class="k">class</span> <span class="t">SimpleExecutor</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> workReady = lock.<span class="f">newCondition</span>();   <span class="c">// idle workers wait here</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> allDone = lock.<span class="f">newCondition</span>();     <span class="c">// waitUntilComplete waits here</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;<span class="t">Runnable</span>&gt; queue = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; workers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="k">private</span> <span class="t">long</span> pending = <span class="n">0</span>;         <span class="c">// accepted, unfinished: queued plus claimed/running</span>
+    <span class="k">private</span> <span class="t">boolean</span> closed = <span class="k">false</span>;
+
+    <span class="t">SimpleExecutor</span>(<span class="t">int</span> threads) {
+        <span class="k">if</span> (threads &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"threads must be positive"</span>);
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; threads; i += <span class="n">1</span>) workers.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(<span class="k">this</span>::workerLoop, <span class="s">"worker-"</span> + i));
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">Thread</span> t : workers) t.<span class="f">start</span>();   <span class="c">// all fields are set before start publishes them</span>
+        } <span class="k">catch</span> (<span class="t">RuntimeException</span> | <span class="t">Error</span> failure) {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> { closed = <span class="k">true</span>; workReady.<span class="f">signalAll</span>(); }
+            <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+            <span class="t">boolean</span> interrupted = <span class="k">false</span>;
+            <span class="k">for</span> (<span class="t">Thread</span> t : workers) {
+                <span class="k">while</span> (t.<span class="f">isAlive</span>()) {
+                    <span class="k">try</span> { t.<span class="f">join</span>(); }
+                    <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { interrupted = <span class="k">true</span>; }
+                }
+            }
+            <span class="k">if</span> (interrupted) <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            <span class="k">throw</span> failure;
+        }
+    }
+
+    <span class="k">void</span> <span class="f">schedule</span>(<span class="t">Runnable</span> task) {
+        java.util.<span class="t">Objects</span>.<span class="f">requireNonNull</span>(task);
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">if</span> (closed) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"executor is closed"</span>);
+            queue.<span class="f">addLast</span>(task);
+            pending += <span class="n">1</span>;
+            workReady.<span class="f">signal</span>();       <span class="c">// one idle worker can take it</span>
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">void</span> <span class="f">waitUntilComplete</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (pending &gt; <span class="n">0</span>) allDone.<span class="f">await</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="c">// Runs everything already scheduled, then stops the workers.</span>
+    <span class="k">void</span> <span class="f">close</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            closed = <span class="k">true</span>;
+            workReady.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : workers) t.<span class="f">join</span>();
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">workerLoop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">Runnable</span> task;
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (queue.<span class="f">isEmpty</span>() &amp;&amp; !closed) workReady.<span class="f">awaitUninterruptibly</span>();
+                <span class="c">// No interrupt-based cancellation here; clear even an interrupt received while idle.</span>
+                <span class="t">Thread</span>.<span class="f">interrupted</span>();
+                <span class="k">if</span> (queue.<span class="f">isEmpty</span>()) <span class="k">return</span>;               <span class="c">// closed and drained</span>
+                task = queue.<span class="f">removeFirst</span>();
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+            <span class="k">try</span> {
+                task.<span class="f">run</span>();                                 <span class="c">// never while holding the lock</span>
+            } <span class="k">catch</span> (<span class="t">Throwable</span> t) {                         <span class="c">// a failing task must not kill the worker</span>
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>() + <span class="s">" survived a task failure"</span>);
+            } <span class="k">finally</span> {
+                lock.<span class="f">lock</span>();
+                <span class="k">try</span> {
+                    pending -= <span class="n">1</span>;
+                    <span class="k">if</span> (pending == <span class="n">0</span>) allDone.<span class="f">signalAll</span>();
+                } <span class="k">finally</span> {
+                    lock.<span class="f">unlock</span>();
+                }
+            }
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">SimpleExecutor</span> ex = <span class="k">new</span> <span class="t">SimpleExecutor</span>(<span class="n">3</span>);
+        <span class="t">AtomicInteger</span> running = <span class="k">new</span> <span class="t">AtomicInteger</span>(), most = <span class="k">new</span> <span class="t">AtomicInteger</span>(), done = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="k">for</span> (<span class="t">int</span> batch = <span class="n">1</span>; batch &lt;= <span class="n">2</span>; batch += <span class="n">1</span>) {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">10</span>; i += <span class="n">1</span>) {
+                <span class="t">int</span> id = i;
+                ex.<span class="f">schedule</span>(() -&gt; {
+                    most.<span class="f">accumulateAndGet</span>(running.<span class="f">incrementAndGet</span>(), <span class="t">Math</span>::max);
+                    <span class="k">try</span> {
+                        <span class="k">if</span> (id == <span class="n">4</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"task 4 failed"</span>);
+                        <span class="f">pause</span>(<span class="n">10</span>);                          <span class="c">// stands in for real work</span>
+                        done.<span class="f">incrementAndGet</span>();
+                    } <span class="k">finally</span> {
+                        running.<span class="f">addAndGet</span>(-<span class="n">1</span>);
+                    }
+                });
+            }
+            ex.<span class="f">waitUntilComplete</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"batch "</span> + batch + <span class="s">": "</span> + done.<span class="f">get</span>() + <span class="s">" done in total, at most "</span> + most.<span class="f">get</span>() + <span class="s">" at once"</span>);
+        }
+        ex.<span class="f">close</span>();
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">pause</span>(<span class="t">long</span> ms) {
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(ms);
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>worker-0 survived a task failure
+batch 1: 9 done in total, at most 3 at once
+worker-1 survived a task failure
+batch 2: 18 done in total, at most 3 at once</pre></div><div class="runout" hidden></div></figure>
+
+<p><strong>This is a blocking synchronization design.</strong> Submission may wait for the mutex and allocation; "returns at once" means it does not wait for the task to finish. This version creates threads in the constructor; Version 2 may create one during submission. An unbounded queue trades admission waits for potentially unbounded memory use. <code>waitUntilComplete</code> observes global idleness under the lock, so later submissions may extend the wait or arrive just after it returns.</p>
+<p>Only an external owner may call <code>close</code> or wait for the entire pool; a task waiting for its own pending count to disappear deadlocks even when tasks run outside the lock. Serialize <code>close</code> calls in this simple version, and keep the executor and captured task data alive until all workers finish.</p>
+<p>Version 1 stops workers through <code>close</code>, not through interrupts. Java's <code>awaitUninterruptibly</code> preserves interrupt status when it returns, so the worker clears that status <strong>after the idle wait and before claiming the next task</strong>. Otherwise an interrupt received while idle could immediately abort an unrelated task's first interruptible operation.</p>
+<p>The mutex also publishes data. Writes before <code>schedule</code> become visible when a worker acquires the same lock to claim the task. A task's result writes precede its completion update under that lock, so a successful completion wait observes those writes. This does not protect concurrent writes by different tasks to the same result: use separate result slots or synchronize those writes too.</p>
+
+<p>Read it against the three rules. The task runs between two locked regions, never inside one. The decrement sits in <code>finally</code> in Java and after a catch-all in C++, which matters more in C++: <strong>an exception that escapes a <code>std::thread</code> function calls <code>std::terminate</code> and ends the whole process</strong>, while in Java it only kills that worker, silently shrinking the pool. And <code>waitUntilComplete</code> re-checks <code>pending</code> in a loop, so it is immune to <a class="term" data-term="spurious-wakeup" href="glossary.html#spurious-wakeup">spurious wakeups</a>.</p>
+
+<p>The predicate update must use the lock the waiter checks under. In C++, notification may occur after unlocking, provided the condition variable is still alive. Making the counter atomic does not save you, because the danger is not a torn counter, it is a signal that arrives between the waiter's check and its sleep:</p>
+
+<figure class="timeline"><figcaption>An atomic counter does not make the wait safe (C++)</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>waitUntilComplete</span><span>worker</span><span>pending</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">pending is 1</span></div><div class="tl-row"><span class="t">2</span><span class="cell">holds m_, the predicate reads pending as 1, so it is about to sleep</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">finishes the last task: pending.fetch_sub(1) without taking m_</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">pending is 0</span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">notify_all(): nobody is asleep yet, so the signal is lost</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">6</span><span class="cell bad">blocks on the condition variable</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">! Without a spurious wakeup the waiter can sleep indefinitely at zero. ThreadSanitizer cannot diagnose this lost wakeup: the counter accesses are atomic.</div></div></figure>
+
+<p>That is a <a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a>. A condition obtained from Java's <code>ReentrantLock</code> requires holding that lock to signal, which closes this exact window, but the same bug comes back if a Java waiter checks the count <em>before</em> taking the lock and then waits unconditionally. The shared rule is to check and update the predicate under one mutex and wait through that mutex. Other <code>Condition</code> implementations may document different signalling rules; C++ notification itself does not publish the predicate.</p>
+
+<h2 id="version-2-the-full-lifecycle">Version 2: the full lifecycle</h2>
+<p>The 2026 version of the question wants the lifecycle a real pool has. The shutdown methods below follow Java's <code>ThreadPoolExecutor</code> lifecycle. <code>waitUntilComplete</code> is our additional API, and our growth and rejection policies differ from the library:</p>
+
+<table>
+<thead><tr><th>Call</th><th>New submissions</th><th>Queued tasks</th><th>Running tasks</th><th>Returns</th></tr></thead>
+<tbody>
+<tr><td><code>shutdown()</code></td><td>Rejected</td><td>Still run</td><td>Finish normally</td><td>Without waiting for tasks to finish</td></tr>
+<tr><td><code>shutdownNow()</code></td><td>Rejected</td><td>Removed and handed back</td><td>Interrupted (Java) or asked to stop (C++); they stop only if they cooperate</td><td>Without joining workers, with the tasks still queued</td></tr>
+<tr><td><code>awaitTermination(t)</code></td><td>No change</td><td>No change</td><td>No change</td><td><code>true</code> once shut down and all workers have retired from pool work; C++ also joins collected handles. <code>false</code> on timeout</td></tr>
+<tr><td><code>waitUntilComplete()</code></td><td>No change</td><td>No change</td><td>No change</td><td>Once pending reaches zero</td></tr>
+</tbody>
+</table>
+
+<p>Workers start lazily, up to <code>max</code>; <code>core</code> is a retention floor, not a promise to prestart that many threads. Workers above <code>core</code> retire after an idle wait budget. The queue holds at most <code>capacity</code> waiting tasks, with at most <code>max</code> additional claimed/running tasks. A full queue rejects even if more workers could theoretically be created. This retirement of surplus workers is <a class="term" data-term="idle-thread-reclaim" href="glossary.html#idle-thread-reclaim">idle thread reclaim</a>, a reported 2026 follow up.</p>
+
+<figure class="code pair" data-sample="executor-without-libraries.2" data-expect="ok"><figcaption><span class="ctitle">A pool with shutdown, shutdownNow, awaitTermination and idle reclaim</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// A pool from one mutex and two condition variables: execute, waitUntilComplete, shutdown, shutdownNow,</span>
+<span class="c">// awaitTermination, and threads above `core` that retire after keepAlive without work.</span>
+<span class="k">class</span> MiniPool {
+<span class="k">public</span>:
+    <span class="f">MiniPool</span>(<span class="t">int</span> core, <span class="t">int</span> max, <span class="t">std</span>::<span class="t">size_t</span> capacity, <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> keepAlive)
+        : <span class="f">core_</span>(core), <span class="f">max_</span>(max), <span class="f">capacity_</span>(capacity), <span class="f">keepAlive_</span>(keepAlive) {
+        <span class="k">if</span> (core &lt; <span class="n">0</span> || max &lt;= <span class="n">0</span> || core &gt; max || capacity == <span class="n">0</span> || keepAlive.<span class="f">count</span>() &lt;= <span class="n">0</span>)
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid pool limits"</span>);
+    }
+
+    ~<span class="f">MiniPool</span>() {
+        <span class="f">shutdown</span>();
+        <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>, <span class="t">std</span>::<span class="t">thread</span>&gt; finished;
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+            quiet_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> workers_.<span class="f">empty</span>(); });
+            finished.<span class="f">swap</span>(retired_);
+        }
+        <span class="k">for</span> (<span class="k">auto</span>&amp; entry : finished) entry.second.<span class="f">join</span>();
+    }
+
+    <span class="t">void</span> <span class="f">execute</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task) {
+        <span class="k">if</span> (!task) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"empty task"</span>);
+        <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>, <span class="t">std</span>::<span class="t">thread</span>&gt; finished;
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+            <span class="k">if</span> (state_ != State::Running) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"rejected: pool is shut down"</span>);
+            <span class="k">if</span> (queue_.<span class="f">size</span>() == capacity_) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"rejected: queue is full"</span>);
+            queue_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(task));
+            pending_ += <span class="n">1</span>;
+            <span class="k">try</span> {
+                <span class="k">if</span> (queue_.<span class="f">size</span>() &gt; <span class="k">static_cast</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt;(idle_) &amp;&amp; <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(workers_.<span class="f">size</span>()) &lt; max_)
+                    <span class="f">startWorker</span>();
+                <span class="k">else</span> workAvailable_.<span class="f">notify_one</span>();
+            } <span class="k">catch</span> (...) {
+                queue_.<span class="f">pop_back</span>();              <span class="c">// rejected task was never visible outside this lock</span>
+                pending_ -= <span class="n">1</span>;
+                <span class="k">throw</span>;
+            }
+            finished.<span class="f">swap</span>(retired_);            <span class="c">// threads that retired earlier, joined outside the lock</span>
+        }
+        <span class="k">for</span> (<span class="k">auto</span>&amp; entry : finished) entry.second.<span class="f">join</span>();
+    }
+
+    <span class="t">void</span> <span class="f">waitUntilComplete</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        quiet_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> pending_ == <span class="n">0</span>; });
+    }
+
+    <span class="c">// No new tasks; everything already queued still runs. Does not wait for task completion.</span>
+    <span class="t">void</span> <span class="f">shutdown</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        <span class="k">if</span> (state_ == State::Running) state_ = State::Shutdown;
+        workAvailable_.<span class="f">notify_all</span>();            <span class="c">// idle workers wake, drain the queue, then exit</span>
+        quiet_.<span class="f">notify_all</span>();                    <span class="c">// an empty pool may already be terminated</span>
+    }
+
+    <span class="c">// No new tasks; queued tasks are removed and returned; stop is requested for running tasks.</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; <span class="f">shutdownNow</span>() {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; neverStarted;
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+            neverStarted.<span class="f">reserve</span>(queue_.<span class="f">size</span>());     <span class="c">// allocation succeeds before changing state</span>
+            state_ = State::Stop;
+            <span class="k">for</span> (<span class="k">auto</span>&amp; task : queue_) neverStarted.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(task));
+            queue_.<span class="f">clear</span>();
+            pending_ -= neverStarted.<span class="f">size</span>();
+            quiet_.<span class="f">notify_all</span>();
+            workAvailable_.<span class="f">notify_all</span>();
+        }
+        <span class="c">// request_stop invokes callbacks synchronously; never run those under the pool mutex.</span>
+        stop_.<span class="f">request_stop</span>();
+        <span class="k">return</span> neverStarted;
+    }
+
+    <span class="t">bool</span> <span class="f">awaitTermination</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> timeout) {
+        <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>, <span class="t">std</span>::<span class="t">thread</span>&gt; finished;
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+            <span class="k">if</span> (!quiet_.<span class="f">wait_for</span>(lock, timeout, [<span class="k">this</span>] { <span class="k">return</span> state_ != State::Running &amp;&amp; workers_.<span class="f">empty</span>(); }))
+                <span class="k">return</span> <span class="k">false</span>;
+            finished.<span class="f">swap</span>(retired_);
+        }
+        <span class="k">for</span> (<span class="k">auto</span>&amp; entry : finished) entry.second.<span class="f">join</span>();
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="c">// C++ threads cannot be interrupted, so cancellation is cooperative: tasks watch this token.</span>
+    <span class="t">std</span>::<span class="t">stop_token</span> <span class="f">stopToken</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        <span class="k">return</span> stop_.<span class="f">get_token</span>();
+    }
+
+    <span class="t">int</span> <span class="f">poolSize</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        <span class="k">return</span> <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(workers_.<span class="f">size</span>());
+    }
+
+<span class="k">private</span>:
+    <span class="k">enum</span> <span class="k">class</span> State { Running, Shutdown, Stop };
+
+    <span class="t">void</span> <span class="f">startWorker</span>() {                        <span class="c">// called with the lock held</span>
+        <span class="t">std</span>::<span class="t">size_t</span> id = nextId_;
+        nextId_ += <span class="n">1</span>;
+        <span class="k">auto</span> [it, inserted] = workers_.<span class="f">try_emplace</span>(id);  <span class="c">// allocate before creating a joinable thread</span>
+        <span class="k">if</span> (!inserted) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"worker id collision"</span>);
+        <span class="k">try</span> { it-&gt;second = <span class="t">std</span>::<span class="t">thread</span>([<span class="k">this</span>, id] { <span class="f">workerLoop</span>(id); }); }
+        <span class="k">catch</span> (...) { workers_.<span class="f">erase</span>(it); <span class="k">throw</span>; }
+    }
+
+    <span class="t">void</span> <span class="f">workerLoop</span>(<span class="t">std</span>::<span class="t">size_t</span> id) {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task = <span class="f">takeTask</span>(id);
+            <span class="k">if</span> (!task) <span class="k">return</span>;                          <span class="c">// takeTask has already retired this worker</span>
+            <span class="k">try</span> {
+                <span class="f">task</span>();
+            } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {         <span class="c">// an exception escaping a thread calls std::terminate</span>
+                <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"worker %zu caught: %s\n"</span>, id, e.<span class="f">what</span>());
+            } <span class="k">catch</span> (...) {
+                <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"worker %zu caught an unknown exception\n"</span>, id);
+            }
+            <span class="f">finishTask</span>();
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; <span class="f">takeTask</span>(<span class="t">std</span>::<span class="t">size_t</span> id) {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        <span class="k">auto</span> deadline = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() + keepAlive_;
+        <span class="k">auto</span> ready = [<span class="k">this</span>] { <span class="k">return</span> state_ != State::Running || !queue_.<span class="f">empty</span>(); };
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="k">if</span> (state_ == State::Stop) <span class="k">return</span> <span class="f">retire</span>(id);
+            <span class="k">if</span> (!queue_.<span class="f">empty</span>()) {
+                <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task = <span class="t">std</span>::<span class="f">move</span>(queue_.<span class="f">front</span>());
+                queue_.<span class="f">pop_front</span>();
+                <span class="k">return</span> task;
+            }
+            <span class="k">if</span> (state_ == State::Shutdown) <span class="k">return</span> <span class="f">retire</span>(id);     <span class="c">// queue drained: nothing left to do</span>
+            <span class="t">bool</span> timed = <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(workers_.<span class="f">size</span>()) &gt; core_;
+            <span class="k">if</span> (timed &amp;&amp; <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() &gt;= deadline) <span class="k">return</span> <span class="f">retire</span>(id);   <span class="c">// idle too long</span>
+            idle_ += <span class="n">1</span>;
+            <span class="k">if</span> (timed) workAvailable_.<span class="f">wait_until</span>(lock, deadline, ready);
+            <span class="k">else</span> workAvailable_.<span class="f">wait</span>(lock, ready);
+            idle_ -= <span class="n">1</span>;
+        }
+    }
+
+    <span class="c">// Called with the lock held. A thread cannot join itself, so it parks its handle for someone else to join.</span>
+    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; <span class="f">retire</span>(<span class="t">std</span>::<span class="t">size_t</span> id) {
+        retired_.<span class="f">insert</span>(workers_.<span class="f">extract</span>(id));  <span class="c">// transfer the map node without allocating</span>
+        <span class="k">if</span> (workers_.<span class="f">empty</span>()) quiet_.<span class="f">notify_all</span>();
+        <span class="k">return</span> {};
+    }
+
+    <span class="t">void</span> <span class="f">finishTask</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+        pending_ -= <span class="n">1</span>;
+        <span class="k">if</span> (pending_ == <span class="n">0</span>) quiet_.<span class="f">notify_all</span>();
+    }
+
+    <span class="k">const</span> <span class="t">int</span> core_, max_;
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> keepAlive_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> workAvailable_;     <span class="c">// idle workers wait here</span>
+    <span class="t">std</span>::<span class="t">condition_variable</span> quiet_;             <span class="c">// waitUntilComplete, awaitTermination, the destructor</span>
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; queue_;
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>, <span class="t">std</span>::<span class="t">thread</span>&gt; workers_;        <span class="c">// live workers by id</span>
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>, <span class="t">std</span>::<span class="t">thread</span>&gt; retired_; <span class="c">// retiring workers, waiting to be joined</span>
+    <span class="t">std</span>::<span class="t">stop_source</span> stop_;
+    State state_ = State::Running;
+    <span class="t">int</span> idle_ = <span class="n">0</span>;                              <span class="c">// workers waiting for work</span>
+    <span class="t">std</span>::<span class="t">size_t</span> pending_ = <span class="n">0</span>;                  <span class="c">// accepted, unfinished: queued plus claimed/running</span>
+    <span class="t">std</span>::<span class="t">size_t</span> nextId_ = <span class="n">0</span>;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    MiniPool <span class="f">pool</span>(<span class="n">2</span>, <span class="n">4</span>, <span class="n">100</span>, 100ms);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; done{<span class="n">0</span>};
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">12</span>; i += <span class="n">1</span>) {
+        pool.<span class="f">execute</span>([i, &amp;done] {
+            <span class="k">if</span> (i == <span class="n">3</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"task 3 is broken"</span>);
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(20ms);            <span class="c">// stands in for real work</span>
+            done.<span class="f">fetch_add</span>(<span class="n">1</span>);
+        });
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"threads during the burst: %d\n"</span>, pool.<span class="f">poolSize</span>());
+    pool.<span class="f">waitUntilComplete</span>();
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"completed %d of 12; task 3 threw and its worker lived on\n"</span>, done.<span class="f">load</span>());
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(400ms);                   <span class="c">// longer than keepAlive: the extra threads retire</span>
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"threads after idling: %d\n"</span>, pool.<span class="f">poolSize</span>());
+
+    <span class="t">std</span>::<span class="t">stop_token</span> token = pool.<span class="f">stopToken</span>();
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i += <span class="n">1</span>) {
+        pool.<span class="f">execute</span>([token] {
+            <span class="t">std</span>::<span class="t">mutex</span> m;                                 <span class="c">// a long wait that ends early on a stop request</span>
+            <span class="t">std</span>::<span class="t">condition_variable_any</span> cv;
+            <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m);
+            cv.<span class="f">wait_for</span>(lock, token, 5s, [] { <span class="k">return</span> <span class="k">false</span>; });
+            <span class="k">if</span> (token.<span class="f">stop_requested</span>()) <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"a task saw the stop request and stopped early\n"</span>);
+        });
+    }
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(200ms);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; neverStarted = pool.<span class="f">shutdownNow</span>();
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"shutdownNow handed back %zu tasks that never started\n"</span>, neverStarted.<span class="f">size</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"terminated: %s\n"</span>, pool.<span class="f">awaitTermination</span>(2000ms) ? <span class="s">"true"</span> : <span class="s">"false"</span>);
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207
+208
+209
+210
+211
+212
+213
+214
+215
+216
+217
+218
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">HashSet</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="c">// A pool from one lock and two conditions: execute, waitUntilComplete, shutdown, shutdownNow,</span>
+<span class="c">// awaitTermination, and threads above `core` that retire after keepAliveMs without work.</span>
+<span class="k">final</span> <span class="k">class</span> <span class="t">MiniPool</span> {
+    <span class="k">private</span> <span class="k">enum</span> <span class="t">State</span> { RUNNING, SHUTDOWN, STOP }
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> core, max, capacity;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">long</span> keepAliveNanos;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> workAvailable = lock.<span class="f">newCondition</span>();   <span class="c">// idle workers wait here</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> quiet = lock.<span class="f">newCondition</span>();           <span class="c">// waitUntilComplete, awaitTermination</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;<span class="t">Runnable</span>&gt; queue = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Set</span>&lt;<span class="t">Thread</span>&gt; workers = <span class="k">new</span> <span class="t">HashSet</span>&lt;&gt;();
+    <span class="k">private</span> <span class="t">State</span> state = <span class="t">State</span>.RUNNING;
+    <span class="k">private</span> <span class="t">int</span> idle = <span class="n">0</span>;        <span class="c">// workers waiting for work</span>
+    <span class="k">private</span> <span class="t">long</span> pending = <span class="n">0</span>;    <span class="c">// accepted, unfinished: queued plus claimed/running</span>
+    <span class="k">private</span> <span class="t">int</span> nextId = <span class="n">0</span>;
+
+    <span class="t">MiniPool</span>(<span class="t">int</span> core, <span class="t">int</span> max, <span class="t">int</span> capacity, <span class="t">long</span> keepAliveMs) {
+        <span class="k">if</span> (core &lt; <span class="n">0</span> || max &lt;= <span class="n">0</span> || core &gt; max || capacity &lt;= <span class="n">0</span> || keepAliveMs &lt;= <span class="n">0</span>)
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"invalid pool limits"</span>);
+        <span class="k">this</span>.core = core;
+        <span class="k">this</span>.max = max;
+        <span class="k">this</span>.capacity = capacity;
+        <span class="k">this</span>.keepAliveNanos = java.util.concurrent.<span class="t">TimeUnit</span>.MILLISECONDS.<span class="f">toNanos</span>(keepAliveMs);
+    }
+
+    <span class="k">void</span> <span class="f">execute</span>(<span class="t">Runnable</span> task) {
+        java.util.<span class="t">Objects</span>.<span class="f">requireNonNull</span>(task);
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">if</span> (state != <span class="t">State</span>.RUNNING) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"rejected: pool is shut down"</span>);
+            <span class="k">if</span> (queue.<span class="f">size</span>() == capacity) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"rejected: queue is full"</span>);
+            queue.<span class="f">addLast</span>(task);
+            pending += <span class="n">1</span>;
+            <span class="k">try</span> {
+                <span class="k">if</span> (queue.<span class="f">size</span>() &gt; idle &amp;&amp; workers.<span class="f">size</span>() &lt; max) <span class="f">startWorker</span>();
+                <span class="k">else</span> workAvailable.<span class="f">signal</span>();
+            } <span class="k">catch</span> (<span class="t">RuntimeException</span> | <span class="t">Error</span> failure) {
+                queue.<span class="f">removeLast</span>();             <span class="c">// still under the lock: no worker could take this task</span>
+                pending -= <span class="n">1</span>;
+                <span class="k">throw</span> failure;
+            }
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">void</span> <span class="f">waitUntilComplete</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (pending &gt; <span class="n">0</span>) quiet.<span class="f">await</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="c">// No new tasks; everything already queued still runs. Does not wait for task completion.</span>
+    <span class="k">void</span> <span class="f">shutdown</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">if</span> (state == <span class="t">State</span>.RUNNING) state = <span class="t">State</span>.SHUTDOWN;
+            workAvailable.<span class="f">signalAll</span>();           <span class="c">// idle workers wake, drain the queue, then exit</span>
+            quiet.<span class="f">signalAll</span>();                   <span class="c">// termination may already hold for an empty pool</span>
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="c">// No new tasks; queued tasks are removed and returned; running tasks are interrupted.</span>
+    <span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; <span class="f">shutdownNow</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; neverStarted = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(queue);
+            state = <span class="t">State</span>.STOP;
+            queue.<span class="f">clear</span>();
+            pending -= neverStarted.<span class="f">size</span>();
+            quiet.<span class="f">signalAll</span>();
+            <span class="k">for</span> (<span class="t">Thread</span> w : workers) w.<span class="f">interrupt</span>();   <span class="c">// only a task that checks for interrupts will stop</span>
+            workAvailable.<span class="f">signalAll</span>();
+            <span class="k">return</span> neverStarted;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="t">boolean</span> <span class="f">awaitTermination</span>(<span class="t">long</span> timeoutMs) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="t">long</span> nanos = java.util.concurrent.<span class="t">TimeUnit</span>.MILLISECONDS.<span class="f">toNanos</span>(timeoutMs);
+            <span class="k">while</span> (state == <span class="t">State</span>.RUNNING || !workers.<span class="f">isEmpty</span>()) {
+                <span class="k">if</span> (nanos &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;
+                nanos = quiet.<span class="f">awaitNanos</span>(nanos);
+            }
+            <span class="k">return</span> <span class="k">true</span>;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="t">int</span> <span class="f">poolSize</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">return</span> workers.<span class="f">size</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">startWorker</span>() {                 <span class="c">// called with the lock held</span>
+        <span class="t">Thread</span> t = <span class="k">new</span> <span class="t">Thread</span>(<span class="k">this</span>::workerLoop, <span class="s">"pool-"</span> + nextId);
+        nextId += <span class="n">1</span>;
+        workers.<span class="f">add</span>(t);
+        <span class="k">try</span> { t.<span class="f">start</span>(); }
+        <span class="k">catch</span> (<span class="t">RuntimeException</span> | <span class="t">Error</span> failure) {
+            workers.<span class="f">remove</span>(t);
+            <span class="k">throw</span> failure;
+        }
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">workerLoop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">Runnable</span> task = <span class="f">takeTask</span>();
+            <span class="k">if</span> (task == <span class="k">null</span>) <span class="k">return</span>;                    <span class="c">// takeTask has already retired this worker</span>
+            <span class="k">try</span> {
+                task.<span class="f">run</span>();
+            } <span class="k">catch</span> (<span class="t">Throwable</span> t) {                      <span class="c">// Errors too: a failing task must not kill the worker</span>
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>() + <span class="s">" caught a task failure"</span>);
+            } <span class="k">finally</span> {
+                <span class="f">finishTask</span>();
+            }
+        }
+    }
+
+    <span class="k">private</span> <span class="t">Runnable</span> <span class="f">takeTask</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">interrupted</span>();   <span class="c">// an interrupt aimed at the last task must not leak into the next one</span>
+            <span class="t">long</span> nanos = keepAliveNanos;
+            <span class="k">while</span> (<span class="k">true</span>) {
+                <span class="k">if</span> (state == <span class="t">State</span>.STOP) <span class="k">return</span> <span class="f">retire</span>();
+                <span class="t">Runnable</span> task = queue.<span class="f">pollFirst</span>();
+                <span class="k">if</span> (task != <span class="k">null</span>) <span class="k">return</span> task;
+                <span class="k">if</span> (state == <span class="t">State</span>.SHUTDOWN) <span class="k">return</span> <span class="f">retire</span>();     <span class="c">// queue drained: nothing left to do</span>
+                <span class="t">boolean</span> timed = workers.<span class="f">size</span>() &gt; core;
+                <span class="k">if</span> (timed &amp;&amp; nanos &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="f">retire</span>();         <span class="c">// idle too long: give the thread back</span>
+                idle += <span class="n">1</span>;
+                <span class="k">try</span> {
+                    <span class="k">if</span> (timed) nanos = workAvailable.<span class="f">awaitNanos</span>(nanos);
+                    <span class="k">else</span> workAvailable.<span class="f">await</span>();
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="c">// re-check the lifecycle state; interruption here is not itself an exit condition</span>
+                } <span class="k">finally</span> {
+                    idle -= <span class="n">1</span>;
+                }
+            }
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">private</span> <span class="t">Runnable</span> <span class="f">retire</span>() {                  <span class="c">// called with the lock held, so execute never counts a leaving worker</span>
+        workers.<span class="f">remove</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>());
+        <span class="k">if</span> (workers.<span class="f">isEmpty</span>()) quiet.<span class="f">signalAll</span>();
+        <span class="k">return</span> <span class="k">null</span>;
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">finishTask</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            pending -= <span class="n">1</span>;
+            <span class="k">if</span> (pending == <span class="n">0</span>) quiet.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">MiniPool</span> pool = <span class="k">new</span> <span class="t">MiniPool</span>(<span class="n">2</span>, <span class="n">4</span>, <span class="n">100</span>, <span class="n">100</span>);
+        <span class="t">AtomicInteger</span> done = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">12</span>; i += <span class="n">1</span>) {
+            <span class="t">int</span> id = i;
+            pool.<span class="f">execute</span>(() -&gt; {
+                <span class="k">if</span> (id == <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"task 3 is broken"</span>);
+                <span class="f">pause</span>(<span class="n">20</span>);                                <span class="c">// stands in for real work</span>
+                done.<span class="f">incrementAndGet</span>();
+            });
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"threads during the burst: "</span> + pool.<span class="f">poolSize</span>());
+        pool.<span class="f">waitUntilComplete</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"completed "</span> + done.<span class="f">get</span>() + <span class="s">" of 12; task 3 threw and its worker lived on"</span>);
+        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">400</span>);                               <span class="c">// longer than keepAlive: the extra threads retire</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"threads after idling: "</span> + pool.<span class="f">poolSize</span>());
+
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i += <span class="n">1</span>) {
+            pool.<span class="f">execute</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">5_000</span>);                  <span class="c">// a long task that honours interrupts</span>
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>() + <span class="s">" was interrupted and stopped early"</span>);
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            });
+        }
+        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">200</span>);
+        <span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; neverStarted = pool.<span class="f">shutdownNow</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"shutdownNow handed back "</span> + neverStarted.<span class="f">size</span>() + <span class="s">" tasks that never started"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"terminated: "</span> + pool.<span class="f">awaitTermination</span>(<span class="n">2_000</span>));
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">pause</span>(<span class="t">long</span> ms) {
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(ms);
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>threads during the burst: 4
+pool-3 caught a task failure
+completed 11 of 12; task 3 threw and its worker lived on
+threads after idling: 2
+shutdownNow handed back 4 tasks that never started
+pool-4 was interrupted and stopped early
+pool-5 was interrupted and stopped early
+pool-1 was interrupted and stopped early
+pool-2 was interrupted and stopped early
+terminated: true</pre></div><div class="runout" hidden></div></figure>
+
+<p>The output is illustrative: sleeps make the workload and idle retirement visible, but do not enforce the printed thread counts or task split. The C++ stop-token wait needs C++20. For C++17, use a task-owned mutex, condition variable and cancellation flag; publish cancellation under that mutex and notify its waiters.</p>
+<p><strong>Pool retirement is not the same instant as native thread exit.</strong> Java removes a worker immediately before its final return. C++ parks its handle before that return and later joins it. The timed methods budget condition waiting after lock acquisition; lock contention, scheduling and C++ joins can make total elapsed time longer. Keep the pool alive through every API call and task, use one external termination owner, and never wait for pool-wide completion from one of its tasks.</p>
+<p>The lines that carry the grade:</p>
+<ul>
+<li><strong>The spawn rule in <code>execute</code>.</strong> A new worker starts when there are more queued tasks than idle workers and the pool is below <code>max</code>. Comparing with the idle count, not with zero, handles the case where an idle worker was already signalled for an earlier task but has not woken yet.</li>
+<li><strong>The order of checks in <code>takeTask</code>.</strong> Stop first, then the queue, then shutdown, then the idle timeout. Because the queue is checked before the timeout, a task that arrives just as a worker times out is still taken.</li>
+<li><strong>Retire under the same lock as the decision.</strong> The worker removes itself from <code>workers</code> in the critical section where it decides to leave. If it left the set later, <code>execute</code> could count it as present, decide not to start a thread, and strand a task in the queue with no worker.</li>
+<li><strong>Clear stale interrupts (Java).</strong> A task may restore the interrupt flag on its way out. <code>Thread.interrupted()</code> before the next task stops that flag from aborting an innocent task. Java's <code>ThreadPoolExecutor</code> similarly distinguishes normal execution from its STOP state. Here the clear and STOP check hold the same lock as <code>shutdownNow</code>, so a new shutdown interrupt cannot be erased before a claimed task runs.</li>
+<li><strong>Who joins a thread that leaves on its own (C++)?</strong> A thread cannot join itself, and detaching requires a separate lifetime protocol this pool does not have. So a retiring worker moves its own <code>std::thread</code> into <code>retired_</code>, and <code>execute</code>, <code>awaitTermination</code> or the destructor joins it later, outside the lock.</li>
+<li><strong><code>shutdownNow</code> cannot kill anything.</strong> Java interrupts, and only tasks that block in interruptible calls or check the flag stop early. Standard C++ has no thread interruption API, so the pool exposes a <a class="term" data-term="stop-token" href="glossary.html#stop-token">std::stop_token</a> and the task waits on it with <code>std::condition_variable_any</code>. This is <a class="term" data-term="cooperative-cancellation" href="glossary.html#cooperative-cancellation">cooperative cancellation</a> in both languages.</li>
+</ul>
+
+<p>Claiming a task is removing it under the pool lock. <code>shutdownNow</code> returns tasks still in the queue; a worker may already have claimed a task without calling it yet, so that task receives a stop request but is not returned. The stop request is pool-wide and permanent. In C++, it happens outside the mutex because registered callbacks execute synchronously: a callback that calls <code>poolSize()</code> would otherwise deadlock. Such callbacks must return promptly; <code>shutdownNow</code> is not a constant-time operation.</p>
+<p>The C++ retirement map transfers nodes without allocation. Worker startup allocates its bookkeeping before starting the thread, and a startup failure rolls back the submission under the lock. Constructor validation prevents a zero-worker executor from accepting work it cannot execute. Assume task counts and clock arithmetic remain representable, and do not treat recovery from VM or allocator exhaustion as guaranteed.</p>
+
+<h2 id="exceptions-three-places-they-bite">Exceptions: three places they bite</h2>
+<p><strong>Inside the task.</strong> These examples catch <code>Throwable</code> in Java and <code>...</code> in C++ around each task. That retains the worker after ordinary task failures, including a Java <code>AssertionError</code>; it is not a guarantee of recovery from a VM failure. With direct <code>execute</code>, Java's <code>ThreadPoolExecutor</code> can instead let a failed worker exit and replace it as required. Completion bookkeeping must run either way, and an error handler must not throw or block indefinitely.</p>
+<p><strong>Getting results and errors back.</strong> A caller who needs a value or needs to know about the failure gets a future. The task's exception goes into the future. Java <code>get()</code> throws <code>ExecutionException</code> with the failure as its cause, while C++ <code>future::get()</code> rethrows the stored exception:</p>
+
+<figure class="code pair" data-sample="executor-without-libraries.3"><figcaption><span class="ctitle">submit on top of execute (members of MiniPool)</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</span><code><span class="c">// Needs &lt;future&gt;, &lt;memory&gt; and &lt;type_traits&gt;.</span>
+<span class="k">template</span> &lt;<span class="k">class</span> F&gt;
+<span class="k">auto</span> <span class="f">submit</span>(F work) -&gt; <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">std</span>::invoke_result_t&lt;F&amp;&gt;&gt; {
+    <span class="k">using</span> T = <span class="t">std</span>::invoke_result_t&lt;F&amp;&gt;;
+    <span class="k">auto</span> task = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="f">T</span>()&gt;&gt;(<span class="t">std</span>::<span class="f">move</span>(work));
+    <span class="t">std</span>::<span class="t">future</span>&lt;T&gt; result = task-&gt;<span class="f">get_future</span>();
+    <span class="f">execute</span>([task] { (*task)(); });      <span class="c">// packaged_task stores the value or the exception</span>
+    <span class="k">return</span> result;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="c">// Needs java.util.concurrent.Callable and CompletableFuture, used here only as a result holder.</span>
+&lt;T&gt; <span class="t">CompletableFuture</span>&lt;T&gt; <span class="f">submit</span>(<span class="t">Callable</span>&lt;T&gt; work) {
+    java.util.<span class="t">Objects</span>.<span class="f">requireNonNull</span>(work);
+    <span class="t">CompletableFuture</span>&lt;T&gt; result = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+    <span class="f">execute</span>(() -&gt; {
+        <span class="k">try</span> {
+            result.<span class="f">complete</span>(work.<span class="f">call</span>());
+        } <span class="k">catch</span> (<span class="t">Throwable</span> t) {
+            <span class="k">if</span> (t <span class="k">instanceof</span> <span class="t">InterruptedException</span>) <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            result.<span class="f">completeExceptionally</span>(t);     <span class="c">// get wraps in ExecutionException; join in CompletionException</span>
+        }
+    });
+    <span class="k">return</span> result;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>If the interviewer bans <code>CompletableFuture</code> as well, the hand-built future from <a href="build-a-future.html">build it yourself: a future</a> slots in. The <code>shared_ptr</code> in the C++ version is there because <code>std::packaged_task</code> is move-only and <code>std::function</code> needs a copyable callable.</p>
+<p><strong>Tasks that never ran.</strong> The Java queue stores lambdas, not their returned futures: cancelling the returned <code>Runnable</code> objects is not an available API. The owner must retain and complete the corresponding futures, or extend each queued task into a descriptor with both run and cancel actions. In C++, the future becomes ready with <code>broken_promise</code> only when the last wrapper owning the unrun packaged task is destroyed; keeping the returned task list alive keeps those futures pending.</p>
+<p>The Java wrapper is a result channel, not an interruptible task handle: <code>CompletableFuture.cancel(true)</code> and <code>orTimeout</code> do not stop the work. A queued cancelled wrapper can still call the original task. Use a <code>FutureTask</code> or an explicit task cancellation protocol when you need that stronger contract.</p>
+
+<h2 id="interrupts-handled-on-purpose">Interrupts, handled on purpose</h2>
+<p>"Which exceptions do you catch?" is really "do you know where an interrupt can land?" There are four places, and each needs its own answer:</p>
+<table>
+<thead><tr><th>Where it lands</th><th>Java: what the code does</th><th>C++</th></tr></thead>
+<tbody>
+<tr><td>Inside a task, in <code>sleep</code>, <code>wait</code>, <code>take</code>, or an interruptible channel operation</td><td>For <a class="term" data-term="interrupted-exception" href="glossary.html#interrupted-exception">InterruptedException</a>, propagate or clean up, restore the flag and return. Channel interruption can instead throw <code>ClosedByInterruptException</code> and close the channel; ordinary I/O is not uniformly interruptible</td><td>The task watches a stop token, for example in a <code>condition_variable_any</code> wait</td></tr>
+<tr><td>In a worker waiting for work</td><td><code>await</code> throws: treat it as "re-check the pool state", which is stop or carry on</td><td>A stop request does not wake a plain <code>condition_variable</code>, so <code>shutdownNow</code> also calls <code>notify_all</code></td></tr>
+<tr><td>Left over between tasks</td><td>Clear it with <code>Thread.interrupted()</code> before the next task, unless the pool is stopping</td><td>Not applicable: the pool's stop source is requested only by <code>shutdownNow</code></td></tr>
+<tr><td>In a caller blocked in <code>waitUntilComplete</code> or <code>awaitTermination</code></td><td>Propagate: the method declares <code>throws InterruptedException</code></td><td>Not applicable</td></tr>
+</tbody>
+</table>
+
+<h2 id="timeouts-a-task-that-runs-too-long">Timeouts: a task that runs too long</h2>
+<p>Neither language can safely kill a running thread. Java's <code>Thread.stop()</code> throws <code>UnsupportedOperationException</code> in Java 21, and C++ has no safe equivalent. So a per-task timeout is always a request plus a policy for when the request is ignored:</p>
+<ol>
+<li><strong>The caller enforces its waiting budget.</strong> A timed future wait does not cancel work. After timeout, Java <code>FutureTask.cancel(true)</code> attempts to interrupt its runner if cancellation wins; the <code>CompletableFuture</code> wrapper above does not. C++ futures have no cancellation API: pass a per-task stop token separately. Decide whether the budget includes queue time or starts on execution.</li>
+<li><strong>The pool enforces a deadline.</strong> A watchdog tracks task identity, worker assignment and deadline. In Java, serialize checking the assignment and delivering the interrupt with the worker's completion and reassignment; otherwise a late interrupt can hit the next task after it cleared its flag. A generation check followed by an unlocked interrupt is still racy. In C++, capture a per-task stop source and request it outside the pool lock; callbacks may execute synchronously.</li>
+<li><strong>A task ignores cancellation.</strong> The caller may time out while the task continues consuming resources and causing side effects. Keep it counted as running until it actually returns. Do not automatically replace stuck threads without a bound: that defeats the concurrency limit and can exhaust the process. Apply admission limits, alert, and use a process boundary when hard termination is required. Timeout and completion must race to one terminal result; cancellation cannot undo completed I/O.</li>
+</ol>
+
+<div class="box example">
+<h3>Worked example: shutdown versus shutdownNow, step by step</h3>
+<p>Consider an idealized Java schedule with negligible scheduling overhead and tasks that return when interrupted. A pool has 2 workers (<code>core = max = 2</code>). At time 0 you execute five tasks, T1 to T5, each sleeping 100 ms. At 10 ms, T1 and T2 are running and T3, T4, T5 are queued. Now compare the two calls at 10 ms:</p>
+<table>
+<thead><tr><th>Moment</th><th><code>shutdown()</code> at 10 ms</th><th><code>shutdownNow()</code> at 10 ms</th></tr></thead>
+<tbody>
+<tr><td>Return value</td><td>Nothing, at once</td><td>[T3, T4, T5], at once</td></tr>
+<tr><td><code>execute(T6)</code> at 20 ms</td><td>Rejected</td><td>Rejected</td></tr>
+<tr><td>T1, T2</td><td>Finish at about 100 ms</td><td>Interrupted in <code>sleep</code>, so they stop at about 10 ms</td></tr>
+<tr><td>T3, T4, T5</td><td>Run from 100 ms; T5 finishes at about 300 ms</td><td>Never run; the caller now owns them</td></tr>
+<tr><td><code>waitUntilComplete()</code> returns</td><td>At about 300 ms</td><td>At about 10 ms: pending dropped by 3 at once, then T1 and T2 ended</td></tr>
+<tr><td><code>awaitTermination</code> returns true</td><td>At about 300 ms, after both workers find the queue empty and retire</td><td>At about 10 ms</td></tr>
+</tbody>
+</table>
+<p>Change one detail: T1 is a CPU loop taking about 100 ms that never checks <code>isInterrupted()</code>. Then <code>shutdownNow</code> still returns at once with T3 to T5, but T1 runs its full course and <code>awaitTermination(50)</code> returns <code>false</code>. That is the sentence interviewers want: <strong>shutdownNow is a request, and termination depends on the tasks cooperating</strong>.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Decrementing <code>pending</code> only on success.</strong> One throwing task and <code>waitUntilComplete</code> hangs forever. Decrement in <code>finally</code>.</li>
+<li><strong>Running the task under the lock.</strong> The pool becomes single-threaded, and a task that calls <code>waitUntilComplete</code> deadlocks the whole pool.</li>
+<li><strong>Waking one worker on shutdown.</strong> <code>shutdown</code> changes a state every idle worker must see, so it needs <code>signalAll</code> or <code>notify_all</code>.</li>
+<li><strong>Letting <code>shutdown</code> drop queued work.</strong> Workers that exit on "closed" without checking the queue lose accepted tasks. Exit only when the queue is drained (shutdown) or the pool is stopping (shutdownNow).</li>
+<li><strong>Swallowing interrupts in the wrong place.</strong> An empty <code>catch (InterruptedException e) {}</code> inside a task hides <code>shutdownNow</code>; the task runs to the end and termination is late. In the worker's own wait, by contrast, the interrupt is only a cue to re-check the state.</li>
+<li><strong>Retiring a worker outside the lock.</strong> <code>execute</code> sees the leaving worker, starts no thread, and a task waits in the queue with nobody to run it.</li>
+<li><strong>Detaching retired threads in C++.</strong> A detached worker can still be running when the pool's destructor finishes, and it then touches a destroyed mutex. Park its handle and join it.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The phone version asks for <code>schedule</code> and <code>waitUntilComplete</code>; the 2026 version starts from a bounded queue and adds a pool with the full lifecycle. Practise these follow ups: "a task throws", "add shutdown", "now shutdownNow", "what happens to interrupted tasks", "add a per-task timeout", "threads sit idle at night, give them back", "wait only for my tasks while others keep submitting".</p>
+<blockquote>One lock guards the queue, the pending count and the pool state, with two conditions: workers wait for work or shutdown, and waitUntilComplete waits for pending to reach zero. Tasks run outside the lock, inside a catch-all, and the pending decrement is in a finally block, so a failing task can neither kill a worker nor hang a waiter. Shutdown rejects new work and lets the queue drain; shutdownNow also hands back the queued tasks and interrupts the running ones, which is a request, so termination depends on tasks honouring interrupts.</blockquote>
+<p>If asked about timeouts, say first that no thread can be killed safely, then explain task-specific cancellation, the reassignment race and a bounded policy for uncooperative tasks. If asked about idle threads, describe the timed wait and why the worker must retire inside the lock.</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth: the waiter that never finishes waiting</h3>
+<p><code>waitUntilComplete</code> waits for "pending is zero". If other threads keep scheduling, pending may never reach zero, and the waiter <a class="term" data-term="starvation" href="glossary.html#starvation">starves</a> even though its own tasks finished long ago. One fix is to wait for a <em>snapshot of all accepted tasks</em>, not for later submissions: give every task a sequence number when it is scheduled, keep the numbers of unfinished tasks in a sorted set, and wait until the smallest unfinished number is at least the next number at the moment you started waiting. Assign the sequence and insert it into the set in the same locked acceptance step. Remove it on completion or queued cancellation, and signal all waiters because their targets differ. This is not per-client waiting: explicit task groups or retained futures are needed for that. Keep sequence arithmetic from wrapping.</p>
+<figure class="code pair" data-sample="executor-without-libraries.4"><figcaption><span class="ctitle">Wait only for tasks scheduled before this call (inside the executor, with a sorted set inFlight and a counter nextSeq)</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code><span class="c">// Members: std::set&lt;long&gt; inFlight_ (unfinished sequence numbers) and long nextSeq_, both guarded by m_.</span>
+<span class="t">void</span> <span class="f">waitUntilComplete</span>() {
+    <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+    <span class="k">const</span> <span class="t">long</span> target = nextSeq_;                       <span class="c">// every task below this was scheduled before us</span>
+    allDone_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> inFlight_.<span class="f">empty</span>() || *inFlight_.<span class="f">begin</span>() &gt;= target; });
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="c">// Fields: TreeSet&lt;Long&gt; inFlight (unfinished sequence numbers) and long nextSeq, both guarded by lock.</span>
+<span class="k">void</span> <span class="f">waitUntilComplete</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="t">long</span> target = nextSeq;                          <span class="c">// every task below this was scheduled before us</span>
+        <span class="k">while</span> (!inFlight.<span class="f">isEmpty</span>() &amp;&amp; inFlight.<span class="f">first</span>() &lt; target) allDone.<span class="f">await</span>();
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Two more senior notes. Java's <code>ThreadPoolExecutor</code> packs the run state and the worker count into one atomic int (<code>ctl</code>), so some state/count transitions use compare-and-set; worker-set and lifecycle bookkeeping still use locks, and it adds the states <code>TIDYING</code> and <code>TERMINATED</code> around its <code>terminated()</code> hook; your one-lock version is the honest interview equivalent. And a task that waits on another task in the same bounded pool can deadlock the pool when every worker is waiting; see <a href="p-fix-the-pool-self-deadlock.html">the pool self-deadlock problem</a>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>One lock guards the queue, a pending count and the state; distinguish global idleness from a snapshot or task-group wait.</li>
+<li>Run tasks outside the lock, inside a catch-all, with completion bookkeeping on every path: report ordinary task failures and retain worker capacity.</li>
+<li>shutdown rejects new work and drains the queue; shutdownNow hands back queued tasks and only requests that running ones stop.</li>
+<li>Interrupts land in four places; in the worker's own wait they mean "re-check the state", and stale ones are cleared between tasks.</li>
+<li>Idle threads above core retire after a timed wait, and they must leave the worker set inside the same critical section; in C++ someone else joins them.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="executor-without-libraries"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="executor-without-libraries.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A worker finishes a task, decrements <code>pending</code> and signals <code>allDone</code>. There is one completion waiter. Which arrangement can lose a wakeup and leave that waiter asleep indefinitely?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The worker decrements and signals while holding the lock that the waiter checks <code>pending</code> under</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The waiter reads <code>pending</code> as 1 under the lock, unlocks, then locks again and waits without re-checking</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The waiter checks <code>pending</code> in a <code>while</code> loop while holding the lock, and waits inside the loop</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The worker uses <code>signalAll</code> instead of <code>signal</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Even a protected read is insufficient if the waiter unlocks between checking and committing to a wait. The worker can decrement and signal in that gap; that signal reaches nobody, and the waiter then sleeps on a count that is already zero. Checking and waiting under the same lock, in a loop, closes the gap. <code>signalAll</code> is fine here; it only wakes more waiters.</div></div><div class="mcq" data-id="executor-without-libraries.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In MiniPool, <code>core = 2</code>, <code>max = 4</code>, capacity is at least 3, and two workers are idle. Three tasks are submitted before any worker resumes or retires. What does <code>poolSize()</code> return immediately afterwards?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">2</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">3</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">4</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">5</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The rule is "start a worker if queued tasks outnumber idle workers and the pool is below max". Task 1: 1 queued, 2 idle, so signal. Task 2: 2 queued, 2 idle, so signal. Task 3: 3 queued, still 2 idle (the signalled workers have not woken), so start a third worker. The third task triggers growth to 3 workers; any worker may claim any queued task. Counts 2 and 4 do not follow this sequence, and 5 exceeds max.</div></div><div class="mcq" data-id="executor-without-libraries.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">At the locked STOP transition, two workers have claimed T1 and T2, and T3, T4 and T5 are queued. With no concurrent shutdown caller, what does <code>shutdownNow()</code> do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It returns an empty list and waits until T1 to T5 have all run</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It returns [T3, T4, T5] without joining workers; T1 and T2 receive a stop request and stop early only if they cooperate</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It returns [T1, T2, T3, T4, T5] and kills the two running threads</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It returns [T3, T4, T5] and blocks until T1 and T2 have finished</span></button></li></ol><div class="why" hidden><strong>Why.</strong> shutdownNow removes and returns the tasks still queued at the transition, then requests a stop for claimed work without joining it. C++ stop callbacks run synchronously before the requesting call returns. Waiting is the job of <code>awaitTermination</code>. No thread is killed: a task that ignores the interrupt or the stop token runs to completion.</div></div><div class="mcq" data-id="executor-without-libraries.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why must an idle worker remove itself from the worker set inside the same critical section in which it decides to retire?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because removing from a <code>HashSet</code> or <code>std::map</code> is slow</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Otherwise <code>execute</code> may count it as a live worker, start no new thread, and leave a newly queued task with no worker to run it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because a thread cannot exit while it holds a lock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">To avoid a data race on the idle counter only</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>execute</code> decides whether to start a thread by looking at the worker count. If a worker decides to leave, releases the lock, and only later removes itself, an <code>execute</code> in that gap sees the old count (for example at <code>max</code>), queues the task and starts nothing. The leaving worker then exits and the task is stranded. Making the decision and the removal one critical section removes the gap.</div></div><div class="mcq" data-id="executor-without-libraries.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">You build <code>submit(task)</code> on top of <code>execute</code>. The task throws. Where should the exception go?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Rethrown on the worker thread so the pool's uncaught exception handler logs it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Into the task's future, so the caller's <code>get()</code> reports the failure, while the worker carries on</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nowhere: a pool should ignore failed tasks</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Into a shared "last error" field that the next <code>submit</code> call throws</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The caller who submitted the work is the one who can act on its failure, and the future is the channel to that caller. <code>completeExceptionally</code> in Java and <code>std::packaged_task</code> in C++ store the exception. Java <code>get()</code> wraps it in <code>ExecutionException</code>; C++ <code>get()</code> rethrows the stored exception. Rethrowing on the worker kills or disturbs the worker for no benefit, and a shared error field reports the failure to the wrong caller.</div></div><div class="mcq" data-id="executor-without-libraries.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Why does the Java MiniPool call <code>Thread.interrupted()</code> before handing a worker its next task?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">To check whether the pool is shutting down</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A previous task may have left the interrupt flag set (for example by restoring it), and without clearing it the next task would be interrupted for no reason</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because <code>Thread.interrupted()</code> requests cancellation of the next task</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">To make the worker thread a daemon</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The interrupt flag belongs to the thread, not the task, and workers are reused. A well-behaved task that catches <code>InterruptedException</code> restores the flag before returning, and without a reset the next task's first <code>sleep</code> or <code>take</code> would throw at once. The pool's state, not the flag, says whether to stop. <code>await()</code> can throw on a set flag, but the boundary reset is also needed when a queued task is available without waiting. This static method clears status; it neither sets cancellation nor changes daemon status.</div></div><div class="mcq" data-id="executor-without-libraries.q7" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>In the C++ MiniPool, a worker that retires moves its own <code>std::thread</code> into <code>retired_</code>. Why not call <code>join()</code> or <code>detach()</code> on itself?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Moving a <code>std::thread</code> is faster than joining it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A thread cannot join itself (that throws <code>std::system_error</code> with <code>resource_deadlock_would_occur</code>), and a detached worker could still be running when the pool is destroyed</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>detach()</code> is not available in C++20</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Joining would release the pool's mutex too early</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Joining yourself is reported as a would-deadlock error. Detaching avoids the join, but then nothing guarantees the thread has finished before the pool's mutex and condition variables are destroyed, which is undefined behavior if it touches them. Parking the handle lets <code>execute</code>, <code>awaitTermination</code> or the destructor join it later, outside the lock.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="executor-without-libraries.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Add <code>waitUntilComplete(timeoutMs)</code> to the executor: after acquiring the lock it waits up to that budget, returning <code>true</code> if it observes zero pending and <code>false</code> otherwise.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="executor-without-libraries.5"><figcaption><span class="ctitle">waitUntilComplete with a timeout</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">bool</span> <span class="f">waitUntilComplete</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> timeout) {
+    <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+    <span class="k">return</span> allDone_.<span class="f">wait_for</span>(lock, timeout, [<span class="k">this</span>] { <span class="k">return</span> pending_ == <span class="n">0</span>; });
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code><span class="t">boolean</span> <span class="f">waitUntilComplete</span>(<span class="t">long</span> timeoutMs) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="t">long</span> nanos = java.util.concurrent.<span class="t">TimeUnit</span>.MILLISECONDS.<span class="f">toNanos</span>(timeoutMs);
+        <span class="k">while</span> (pending &gt; <span class="n">0</span>) {
+            <span class="k">if</span> (nanos &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;
+            nanos = allDone.<span class="f">awaitNanos</span>(nanos);    <span class="c">// keeps the remaining time across wakeups</span>
+        }
+        <span class="k">return</span> <span class="k">true</span>;
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The Java loop feeds the remaining time back into <code>awaitNanos</code>, so a spurious wakeup does not restart the clock. The C++ predicate overload does the same loop internally and returns the predicate's final value. Conversion in Java saturates rather than overflowing. Lock acquisition and scheduler delays are outside this waiting budget; it is not a strict bound on method duration.</p></div></div><div class="cq" data-q="executor-without-libraries.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain <code>shutdown</code> versus <code>shutdownNow</code> to an interviewer, covering: new submissions, queued tasks, running tasks, futures of tasks that never ran, and how the caller knows the pool has finished.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Both reject submissions once their locked state transition occurs; a racing submission may be accepted first. Neither waits for task completion, though lock contention and C++ stop callbacks can delay return. <code>shutdown</code> is the orderly one: everything already queued still runs, running tasks finish normally, and the workers exit once the queue is drained. <code>shutdownNow</code> is the urgent one: it removes tasks still queued at that transition and returns them to the caller, and it interrupts the workers in Java or requests a stop in C++. That is only a request: a task blocked in an interruptible call or checking its flag or token stops early, a task in a tight CPU loop that never checks keeps running.</p>
+<p>The tasks handed back by <code>shutdownNow</code> never ran, so if they were submitted with futures, their futures need a completion policy. Java callers must retain the future or use a task descriptor with a cancel action. In C++, destroying the last owner of an unrun packaged task makes its future ready with <code>broken_promise</code>. To know the pool has finished, the caller calls <code>awaitTermination(timeout)</code>, which returns true once shutdown and worker retirement are observed, joining collected handles in C++. A timeout may indicate slow cleanup, scheduling delay or a task ignoring cancellation; it does not diagnose which one.</p></div></div><div class="cq" data-q="executor-without-libraries.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">Find at least four bugs in this worker loop.<figure class="code pair" data-sample="executor-without-libraries.6"><figcaption><span class="ctitle">A buggy worker loop</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="t">void</span> <span class="f">workerLoop</span>() {
+    <span class="k">while</span> (!closed_) {
+        <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+        <span class="k">if</span> (queue_.<span class="f">empty</span>()) workReady_.<span class="f">wait</span>(lock);
+        <span class="k">auto</span> task = <span class="t">std</span>::<span class="f">move</span>(queue_.<span class="f">front</span>());
+        queue_.<span class="f">pop_front</span>();
+        <span class="f">task</span>();
+        pending_ -= <span class="n">1</span>;
+        allDone_.<span class="f">notify_all</span>();
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="k">private</span> <span class="k">void</span> <span class="f">workerLoop</span>() {
+    <span class="k">while</span> (!closed) {
+        lock.<span class="f">lock</span>();
+        <span class="k">if</span> (queue.<span class="f">isEmpty</span>()) workReady.<span class="f">awaitUninterruptibly</span>();
+        <span class="t">Runnable</span> task = queue.<span class="f">removeFirst</span>();
+        task.<span class="f">run</span>();
+        pending -= <span class="n">1</span>;
+        allDone.<span class="f">signalAll</span>();
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><ol>
+<li><strong><code>if</code> instead of a loop around the wait.</strong> After a spurious or stolen wakeup, or after <code>close</code> wakes everyone, the queue can be empty: Java's <code>removeFirst</code> throws <code>NoSuchElementException</code>, and C++'s <code>front()</code> on an empty deque is undefined behavior. Wait in a loop on "queue not empty or closed".</li>
+<li><strong>The task runs while holding the lock.</strong> Only one task runs at a time, and a task that calls back into the executor (for example <code>waitUntilComplete</code>) deadlocks it. Release the lock before running the task.</li>
+<li><strong>No exception safety.</strong> If the task throws, Java leaves the lock held forever (no <code>finally</code> around <code>unlock</code>), so every other thread blocks, and <code>pending</code> is never decremented. In C++ the exception escapes the thread function and <code>std::terminate</code> ends the process. Catch everything around the task and do the bookkeeping afterwards.</li>
+<li><strong><code>closed</code> is read without the lock.</strong> In C++ that is a data race on <code>closed_</code>; in Java a plain field read may never see the update. Read it under the lock, inside the wait condition.</li>
+<li><strong>Shutdown can lose work or hang.</strong> The loop exits on <code>closed</code> without draining the queue, and a worker asleep in the wait never wakes unless <code>close</code> signals all. Exit only when closed and the queue is empty, and have <code>close</code> wake every worker.</li>
+</ol>
+<p>The fixed loop is the one in Version 1 above. Pool-wide completion waits must still come from outside the pool, because a worker cannot wait for its own unfinished task.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="executor-without-libraries.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Walk me through shutdown and shutdownNow. Include a submission racing with shutdown and the futures of tasks that never run."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Linearize acceptance and shutdown under the same mutex</li><li>Orderly shutdown rejects later work and drains accepted tasks</li><li>Immediate shutdown returns still-queued tasks and requests cancellation of claimed work</li><li>Distinguish Java interrupts from C++ cooperative stop requests</li><li>Resolve unrun futures explicitly and distinguish future completion from physical task exit</li><li>Wait for termination separately without promising a strict wall-clock bound</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Both shutdown modes close admission; the difference is what happens to accepted work. I serialize submission and the state change under one mutex. If submission wins, its task is accepted. If shutdown wins, submission is rejected. Orderly shutdown keeps the queue and lets workers drain it. Immediate shutdown removes and returns tasks still queued, while requesting cancellation of work already claimed. A claimed task may not have entered its body yet, so the returned list is not every task whose body has not started. Java interrupts the worker. C++ needs a cooperative stop token or flag, and I request stop outside the pool mutex because callbacks can run synchronously. Neither mechanism safely kills an uncooperative task. I must also settle futures for removed work. In this Java wrapper the caller retains the futures, or I add task descriptors with a cancel action. In C++, destroying the last owner of an unrun packaged task produces a broken-promise error. A future reporting cancellation does not prove the task stopped. Finally, a separate termination wait observes worker retirement and performs the required joins. Its waiting budget does not eliminate lock contention or scheduling delay, and destruction must wait for all remaining access to the pool to end.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What if a stop callback calls back into the executor?</span></p></div></div><div class="sq" data-sq="executor-without-libraries.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"All my tasks finished, but waitUntilComplete is still blocked. What are your leading explanations?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Define global idleness and explain how other submissions extend the wait</li><li>Check exception-safe completion bookkeeping against queued plus claimed/running</li><li>Check for a lost wakeup between predicate inspection and waiting</li><li>Explain a sequence-boundary snapshot and out-of-order completion</li><li>Distinguish a snapshot from per-client task groups and forbid self-waiting</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first check what completion means. This implementation waits for global idleness, so another client's submissions can keep pending above zero after my own tasks finish. Next I would check the invariant: pending equals queued plus claimed or running work. An exception path that skips the decrement leaves a permanent phantom task. Then I would inspect the wait protocol. Checking pending, unlocking, and later waiting without checking again can miss the final notification even if every individual access is protected. The predicate check and condition wait must form one locked protocol. If the requirement is a snapshot, I would assign sequence numbers at acceptance, capture the next sequence under the lock, and wait until no unfinished number is below that boundary. A total completion count is insufficient because later tasks can finish before earlier ones. Remove numbers on completion or queued cancellation and notify all relevant waiters. For only one client's tasks, I need explicit task groups or futures. Finally, no worker may wait for pool-wide completion that includes itself; its own task cannot finish while it waits.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why does waiting for a total of N completions fail when tasks finish out of order?</span></p></div></div><div class="sq" data-sq="executor-without-libraries.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Add a per-task timeout. Can you just interrupt its worker and start a replacement?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A timeout bounds waiting or requests cancellation; it cannot safely kill a thread</li><li>Clarify whether the deadline includes queue time</li><li>Prevent a stale watchdog action from interrupting the next task</li><li>Distinguish FutureTask cancellation, CompletableFuture completion and per-task C++ stop sources</li><li>Keep uncooperative tasks counted and bound resources instead of replacing without limit</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would separate the deadline from actual task termination. A timeout can end the caller's wait and request cancellation, but it cannot safely kill a thread. First I would decide whether queue time consumes the budget or the clock starts when execution begins. The watchdog must target a particular task assignment. If it checks a worker, pauses, and interrupts after that worker starts another task, it cancels the wrong work. Clearing the interrupt flag between tasks does not close that race. In Java I would serialize assignment validation and interrupt delivery with completion and reassignment. A correctly used FutureTask already coordinates its own cancellation; cancelling the CompletableFuture wrapper here does not interrupt its computation. In C++, I would capture a stop source belonging to that task and request it outside the pool lock. If the task ignores cancellation, I keep counting it as running until it actually returns. Unlimited replacements would defeat the concurrency bound and exhaust resources. I would limit admission, report the stuck work, and use process isolation when hard termination is a requirement. Cancellation also cannot undo side effects already performed.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How do timeout and successful completion race to publish exactly one result?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-executor-wait-for-all.html" data-problem="executor-wait-for-all"><span class="pk">Executors and async · medium</span><b>Executor with wait for all</b><span class="pst"></span></a><a class="pcard" href="p-thread-pool-from-scratch.html" data-problem="thread-pool-from-scratch"><span class="pk">Executors and async · hard</span><b>Thread pool from scratch</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-broken-shutdown.html" data-problem="fix-the-broken-shutdown"><span class="pk">Bug hunts · hard</span><b>Fix the broken shutdown</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="system-coding-rounds.html"><span>Previous</span><b>System coding rounds: what they are and how they are graded</b></a><a class="next" href="dependency-job-runner.html"><span>Next</span><b>A parallel job runner that respects dependencies</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-question-as-it-is-asked">The question, as it is asked</a><a href="#the-state-the-invariant-the-two-conditions">The state, the invariant, the two conditions</a><a href="#version-1-schedule-and-waituntilcomplete">Version 1: schedule and waitUntilComplete</a><a href="#version-2-the-full-lifecycle">Version 2: the full lifecycle</a><a href="#exceptions-three-places-they-bite">Exceptions: three places they bite</a><a href="#interrupts-handled-on-purpose">Interrupts, handled on purpose</a><a href="#timeouts-a-task-that-runs-too-long">Timeouts: a task that runs too long</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

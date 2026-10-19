@@ -1,0 +1,1023 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Files, offsets, buffers, flush and fsync · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="file-io-and-durability" data-title="Files, offsets, buffers, flush and fsync" data-track="core" data-module="core-17" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details open><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability" class=here><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m17">Module 17: System coding rounds</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 17.5</span><span>28 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Files, offsets, buffers, flush and fsync</h1><p class="lsum">Shared offsets, positional I/O, buffering, durable replacement, sync failures, group commit and range locking for concurrent file access.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Databricks</span></div><div class="prereq"><span>Before this:</span><a href="cpu-vs-io-bound.html">CPU bound versus I/O bound work</a><a href="mutex-basics.html">Mutexes and RAII guards</a></div></header><article class="prose" id="article">
+<p class="lead">Rubrik's System Coding rounds copy files with <code>pread</code> and <code>pwrite</code> and read and write bytes at offsets; Databricks' System Programming round is officially about files, buffering, caching and storage, and the most recurring concurrency task in our research turns on fsync. This lesson is the systems knowledge both of them assume.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of sending a letter from a big housing society. You write it at your desk: that is your program's buffer. You drop it in the society's outgoing dak box: that is the operating system's cache. The postman empties the box on his own schedule, unless you request a delivery receipt and wait for it. Even the post office keeps letters on a sorting table for a while before they go into the locked room: that is the drive's own cache. A durability receipt must cover that last step too.</p>
+<p>If the building loses power, every letter still on a desk or in the dak box is gone. <strong>"I wrote it" and "it is safe" are different moments</strong>, and a system that promises durability may only say "done" after the letter is in the locked room.</p>
+</div>
+
+<h2 id="descriptors-offsets-and-the-shared-offset-trap">Descriptors, offsets and the shared-offset trap</h2>
+<p>Opening a file gives your process a <a class="term" data-term="file-descriptor" href="glossary.html#file-descriptor">file descriptor</a>: a small integer that names a kernel object, and that kernel object holds the file's <strong>current offset</strong>. This is the open file description: descriptors made with <code>dup</code> share it, whereas independent <code>open</code> calls have independent offsets. A plain <code>read</code> or <code>write</code> uses the offset and moves it forward by the bytes actually transferred. When two threads share a descriptor, they share that offset, and "seek, then write" becomes a <a class="term" data-term="check-then-act" href="glossary.html#check-then-act">check then act</a> across two system calls:</p>
+
+<figure class="timeline"><figcaption>Two threads, one descriptor, one offset</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>thread A</span><span>thread B</span><span>kernel offset</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">offset is 0</span></div><div class="tl-row"><span class="t">2</span><span class="cell">lseek(fd, 4096, SEEK_SET): wants to write record 1</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">lseek(fd, 8192, SEEK_SET): wants to write record 2</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">offset is now 8192</span></div><div class="tl-row bad"><span class="t">5</span><span class="cell bad">write(fd, record 1): lands at 8192, on top of record 2&#x27;s place</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">6</span><span class="cell empty"></span><span class="cell bad">write(fd, record 2): lands at 8192 plus record 1&#x27;s length</span><span class="cell empty"></span></div><div class="tl-note">Each call was correct. The pair was not atomic, so both records are in the wrong place.</div></div></figure>
+
+<p>A lock shared by every user around seek and write works, but serializes unrelated ranges. Prefer <strong><a class="term" data-term="positional-io" href="glossary.html#positional-io">Positional I/O</a></strong>: <code>pread(fd, buf, n, offset)</code> and <code>pwrite(fd, buf, n, offset)</code> in C++ (POSIX), and <code>FileChannel.read(buf, position)</code> and <code>write(buf, position)</code> in Java. They take the offset as an argument and neither use nor move the shared one, so each call is self-contained. Java's <code>FileChannel</code> documentation says channels are safe for concurrent threads and that operations taking an explicit position may proceed concurrently. Threads writing <em>disjoint</em> ranges of a regular file need no application lock when they own separate buffers and nobody truncates or replaces the file. The provider may still serialize operations, especially file growth.</p>
+<p><strong>Short transfers are legal.</strong> Loop until all bytes are transferred, advancing both buffer and offset by the actual count. With a nonempty read request, POSIX <code>read</code> and <code>pread</code> return zero at EOF; Java <code>FileChannel.read</code> returns <code>-1</code> at EOF and may return zero without EOF. The demos treat zero progress as an error for their blocking regular files, rather than spinning indefinitely; POSIX <code>EINTR</code> before progress is retried.</p>
+<p><code>O_APPEND</code> atomically chooses the end position for each POSIX write on supporting local file systems. It neither makes a multi-call record atomic nor makes it durable; network file systems can have weaker append behaviour. Do not mix positional writes with append mode: Java leaves that combination unspecified, and Linux <code>pwrite</code> on an <code>O_APPEND</code> descriptor appends despite the supplied offset.</p>
+
+<figure class="code pair" data-sample="file-io-and-durability.1" data-expect="ok"><figcaption><span class="ctitle">Four threads write one file at disjoint offsets, with no lock, then verify</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111</span><code><span class="p">#include &lt;fcntl.h&gt;</span>
+<span class="p">#include &lt;unistd.h&gt;</span>
+
+<span class="p">#include &lt;cerrno&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;cstring&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;system_error&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">constexpr</span> <span class="t">int</span> RECORD = <span class="n">16</span>, PER_THREAD = <span class="n">1000</span>, THREADS = <span class="n">4</span>;
+
+<span class="c">// pwrite may write fewer bytes than asked, or be interrupted by a signal: loop until done.</span>
+<span class="t">void</span> <span class="f">writeFully</span>(<span class="t">int</span> fd, <span class="k">const</span> <span class="t">char</span>* data, <span class="t">size_t</span> len, off_t offset) {
+    <span class="k">while</span> (len &gt; <span class="n">0</span>) {
+        ssize_t n = ::<span class="f">pwrite</span>(fd, data, len, offset);
+        <span class="k">if</span> (n &lt; <span class="n">0</span> &amp;&amp; errno == EINTR) <span class="k">continue</span>;
+        <span class="k">if</span> (n &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"pwrite"</span>);
+        <span class="k">if</span> (n == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"pwrite made no progress"</span>);
+        data += n;
+        len -= <span class="k">static_cast</span>&lt;<span class="t">size_t</span>&gt;(n);
+        offset += n;
+    }
+}
+
+<span class="t">void</span> <span class="f">readFully</span>(<span class="t">int</span> fd, <span class="t">char</span>* data, <span class="t">size_t</span> len, off_t offset) {
+    <span class="k">while</span> (len &gt; <span class="n">0</span>) {
+        ssize_t n = ::<span class="f">pread</span>(fd, data, len, offset);
+        <span class="k">if</span> (n &lt; <span class="n">0</span> &amp;&amp; errno == EINTR) <span class="k">continue</span>;
+        <span class="k">if</span> (n &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"pread"</span>);
+        <span class="k">if</span> (n == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"unexpected end of file"</span>);
+        data += n;
+        len -= <span class="k">static_cast</span>&lt;<span class="t">size_t</span>&gt;(n);
+        offset += n;
+    }
+}
+
+<span class="c">// Never silently downgrade the requested durability on macOS.</span>
+<span class="t">int</span> <span class="f">syncToDisk</span>(<span class="t">int</span> fd) {
+    <span class="t">int</span> result;
+    <span class="k">do</span> {
+<span class="p">#ifdef F_FULLFSYNC</span>
+        result = ::<span class="f">fcntl</span>(fd, F_FULLFSYNC);
+<span class="p">#else</span>
+        result = ::<span class="f">fsync</span>(fd);
+<span class="p">#endif</span>
+    } <span class="k">while</span> (result &lt; <span class="n">0</span> &amp;&amp; errno == EINTR);
+    <span class="k">return</span> result;
+}
+
+<span class="k">class</span> Fd {
+    <span class="t">int</span> value_;
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Fd</span>(<span class="t">int</span> value) : <span class="f">value_</span>(value) {
+        <span class="k">if</span> (value &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"open"</span>);
+    }
+    ~<span class="f">Fd</span>() { <span class="k">if</span> (value_ &gt;= <span class="n">0</span>) ::<span class="f">close</span>(value_); }
+    <span class="f">Fd</span>(<span class="k">const</span> Fd&amp;) = <span class="k">delete</span>;
+    Fd&amp; <span class="k">operator</span>=(<span class="k">const</span> Fd&amp;) = <span class="k">delete</span>;
+    <span class="t">int</span> <span class="f">get</span>() <span class="k">const</span> { <span class="k">return</span> value_; }
+    <span class="t">void</span> <span class="f">closeChecked</span>() {
+        <span class="t">int</span> old = value_;
+        value_ = -<span class="n">1</span>;                 <span class="c">// do not retry close on a possibly reused descriptor</span>
+        <span class="k">if</span> (::<span class="f">close</span>(old) != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"close"</span>);
+    }
+};
+
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Fd <span class="f">file</span>(::<span class="f">open</span>(<span class="s">"records.bin"</span>, O_CREAT | O_RDWR | O_TRUNC, <span class="n">0644</span>));
+    <span class="t">int</span> fd = file.<span class="f">get</span>();
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">exception_ptr</span>&gt; <span class="f">errors</span>(THREADS);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; writers;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; THREADS; t += <span class="n">1</span>) {
+        writers.<span class="f">emplace_back</span>([fd, t, &amp;errors] {
+            <span class="t">char</span> buf[RECORD];                                       <span class="c">// each thread owns its buffer</span>
+            <span class="k">try</span> {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; PER_THREAD; i += <span class="n">1</span>) {
+                    <span class="t">int64_t</span> record = <span class="k">static_cast</span>&lt;<span class="t">int64_t</span>&gt;(t) * PER_THREAD + i, check = record * <span class="n">31</span>;
+                    <span class="t">std</span>::<span class="f">memcpy</span>(buf, &amp;record, <span class="n">8</span>);
+                    <span class="t">std</span>::<span class="f">memcpy</span>(buf + <span class="n">8</span>, &amp;check, <span class="n">8</span>);
+                    <span class="f">writeFully</span>(fd, buf, RECORD, record * RECORD);  <span class="c">// positional: no shared offset, no lock</span>
+                }
+            } <span class="k">catch</span> (...) {
+                errors[t] = <span class="t">std</span>::<span class="f">current_exception</span>();
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; w : writers) w.<span class="f">join</span>();
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; error : errors) <span class="k">if</span> (error) <span class="t">std</span>::<span class="f">rethrow_exception</span>(error);
+    <span class="k">if</span> (<span class="f">syncToDisk</span>(fd) != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"fsync"</span>);
+
+    <span class="t">int</span> bad = <span class="n">0</span>;
+    <span class="k">for</span> (<span class="t">int64_t</span> r = <span class="n">0</span>; r &lt; THREADS * PER_THREAD; r += <span class="n">1</span>) {
+        <span class="t">char</span> buf[RECORD];
+        <span class="f">readFully</span>(fd, buf, RECORD, r * RECORD);
+        <span class="t">int64_t</span> record, check;
+        <span class="t">std</span>::<span class="f">memcpy</span>(&amp;record, buf, <span class="n">8</span>);
+        <span class="t">std</span>::<span class="f">memcpy</span>(&amp;check, buf + <span class="n">8</span>, <span class="n">8</span>);
+        <span class="k">if</span> (record != r || check != r * <span class="n">31</span>) bad += <span class="n">1</span>;
+    }
+    <span class="k">auto</span> size = ::<span class="f">lseek</span>(fd, <span class="n">0</span>, SEEK_END);
+    <span class="k">if</span> (bad != <span class="n">0</span> || size != THREADS * PER_THREAD * RECORD)
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"record verification failed"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%d records from %d threads, no lock: %d bad, file size %lld bytes\n"</span>,
+                THREADS * PER_THREAD, THREADS, bad, <span class="k">static_cast</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt;(size));
+    file.<span class="f">closeChecked</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</span><code><span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.nio.<span class="t">ByteBuffer</span>;
+<span class="k">import</span> java.nio.channels.<span class="t">FileChannel</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Path</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> <span class="k">static</span> java.nio.file.<span class="t">StandardOpenOption</span>.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> RECORD = <span class="n">16</span>, PER_THREAD = <span class="n">1_000</span>, THREADS = <span class="n">4</span>;
+
+    <span class="c">// A positional write may write fewer bytes than asked: loop until the buffer is empty.</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="f">writeFully</span>(<span class="t">FileChannel</span> ch, <span class="t">ByteBuffer</span> buf, <span class="t">long</span> position) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="k">while</span> (buf.<span class="f">hasRemaining</span>()) {
+            <span class="t">int</span> n = ch.<span class="f">write</span>(buf, position);
+            <span class="k">if</span> (n == <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IOException</span>(<span class="s">"write made no progress"</span>);
+            position += n;
+        }
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">readFully</span>(<span class="t">FileChannel</span> ch, <span class="t">ByteBuffer</span> buf, <span class="t">long</span> position) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="k">while</span> (buf.<span class="f">hasRemaining</span>()) {
+            <span class="t">int</span> n = ch.<span class="f">read</span>(buf, position);
+            <span class="k">if</span> (n &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IOException</span>(<span class="s">"unexpected end of file at "</span> + position);
+            <span class="k">if</span> (n == <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IOException</span>(<span class="s">"read made no progress"</span>);
+            position += n;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">FileChannel</span> ch = <span class="t">FileChannel</span>.<span class="f">open</span>(<span class="t">Path</span>.<span class="f">of</span>(<span class="s">"records.bin"</span>), CREATE, READ, WRITE, TRUNCATE_EXISTING)) {
+            <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; writers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+            <span class="t">IOException</span>[] errors = <span class="k">new</span> <span class="t">IOException</span>[THREADS];
+            <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; THREADS; t += <span class="n">1</span>) {
+                <span class="t">int</span> id = t;
+                writers.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                    <span class="t">ByteBuffer</span> buf = <span class="t">ByteBuffer</span>.<span class="f">allocate</span>(RECORD);       <span class="c">// each thread owns its buffer</span>
+                    <span class="k">try</span> {
+                        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; PER_THREAD; i += <span class="n">1</span>) {
+                            <span class="t">long</span> <span class="k">record</span> = (<span class="t">long</span>) id * PER_THREAD + i;
+                            buf.<span class="f">clear</span>();
+                            buf.<span class="f">putLong</span>(<span class="k">record</span>).<span class="f">putLong</span>(<span class="k">record</span> * <span class="n">31</span>);
+                            buf.<span class="f">flip</span>();
+                            <span class="f">writeFully</span>(ch, buf, <span class="k">record</span> * RECORD);       <span class="c">// positional: no shared offset, no lock</span>
+                        }
+                    } <span class="k">catch</span> (<span class="t">IOException</span> e) {
+                        errors[id] = e;
+                    }
+                }, <span class="s">"writer-"</span> + t));
+            }
+            <span class="k">for</span> (<span class="t">Thread</span> w : writers) w.<span class="f">start</span>();
+            <span class="k">for</span> (<span class="t">Thread</span> w : writers) w.<span class="f">join</span>();
+            <span class="k">for</span> (<span class="t">IOException</span> error : errors) <span class="k">if</span> (error != <span class="k">null</span>) <span class="k">throw</span> error;
+            ch.<span class="f">force</span>(<span class="k">true</span>);                                             <span class="c">// sync the file contents; directory publication is discussed below</span>
+
+            <span class="t">int</span> bad = <span class="n">0</span>;
+            <span class="t">ByteBuffer</span> buf = <span class="t">ByteBuffer</span>.<span class="f">allocate</span>(RECORD);
+            <span class="k">for</span> (<span class="t">long</span> r = <span class="n">0</span>; r &lt; (<span class="t">long</span>) THREADS * PER_THREAD; r += <span class="n">1</span>) {
+                buf.<span class="f">clear</span>();
+                <span class="f">readFully</span>(ch, buf, r * RECORD);
+                buf.<span class="f">flip</span>();
+                <span class="k">if</span> (buf.<span class="f">getLong</span>() != r || buf.<span class="f">getLong</span>() != r * <span class="n">31</span>) bad += <span class="n">1</span>;
+            }
+            <span class="k">if</span> (bad != <span class="n">0</span> || ch.<span class="f">size</span>() != (<span class="t">long</span>) THREADS * PER_THREAD * RECORD)
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"record verification failed"</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(THREADS * PER_THREAD + <span class="s">" records from "</span> + THREADS + <span class="s">" threads, no lock: "</span>
+                               + bad + <span class="s">" bad, file size "</span> + ch.<span class="f">size</span>() + <span class="s">" bytes"</span>);
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>4000 records from 4 threads, no lock: 0 bad, file size 64000 bytes</pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="where-your-bytes-wait-four-layers">Where your bytes wait: four layers</h2>
+<p>Between your <code>write</code> call and stable storage there are up to four places a byte can sit. Knowing which call moves it across which boundary is the whole topic:</p>
+<table>
+<thead><tr><th>Layer</th><th>Lives in</th><th>Survives your process crashing?</th><th>Survives a power cut?</th><th>What moves it onward</th></tr></thead>
+<tbody>
+<tr><td>1. Your buffer (<code>BufferedOutputStream</code>, an <code>std::ofstream</code>'s buffer, your own batch)</td><td>Your process's memory</td><td>No</td><td>No</td><td><code>flush()</code>, or the buffer filling up</td></tr>
+<tr><td>2. The <a class="term" data-term="page-cache" href="glossary.html#page-cache">page cache</a></td><td>Kernel memory</td><td>Yes</td><td>No</td><td>fsync, or background writeback on a configurable schedule</td></tr>
+<tr><td>3. The drive's volatile write cache</td><td>RAM inside the device</td><td>Yes</td><td>No, unless the drive has power-loss protection</td><td>The cache flush that fsync requests on Linux; on macOS, <code>F_FULLFSYNC</code></td></tr>
+<tr><td>4. Stable media</td><td>Flash cells or platters</td><td>Yes</td><td>Yes</td><td></td></tr>
+</tbody>
+</table>
+
+<p>Now the precise meaning of the calls people mix up:</p>
+<ul>
+<li><strong>flush</strong> on a buffered file stream pushes buffered bytes to its underlying file. Ordinary buffered file I/O reaches the page cache; it does not promise power-loss survival. Check errors, including C++ stream state. The base <code>OutputStream.flush()</code> does nothing, so the concrete stream matters, and another reader may need to discard its own buffered data before seeing the update.</li>
+<li><strong><a class="term" data-term="fsync" href="glossary.html#fsync">fsync</a></strong> requests file data and metadata persistence and waits for completion. Linux's fsync also requests a device-cache flush. macOS documents that its fsync does not, and offers <code>fcntl(fd, F_FULLFSYNC)</code> for the full flush.</li>
+<li><strong>fdatasync</strong> (POSIX, available on Linux) syncs the data and only the metadata needed to read it back, such as a changed file size, without being required to persist unrelated timestamps. It can be cheaper. macOS does not declare it.</li>
+<li><strong>Java:</strong> <code>FileChannel.force(true)</code> requests content and metadata persistence; <code>force(false)</code> requests content persistence. These resemble fsync and fdatasync, but the exact mapping and whether <code>false</code> saves work depend on the OS. The API guarantee is for local storage, not arbitrary remote providers. <code>FileDescriptor.sync()</code> also exists, and opening with <code>StandardOpenOption.SYNC</code> or <code>DSYNC</code> makes every write synchronous.</li>
+<li><strong>C++:</strong> iostreams have no fsync at all. For durable writes in C++, use POSIX <code>open</code>, <code>write</code> and <code>fsync</code> directly, or <code>fflush</code> a <code>FILE*</code> and then <code>fsync(fileno(f))</code>. These are OS APIs, not part of ISO C++20. C++20 also has no standard way to get an <code>ofstream</code>'s native descriptor.</li>
+</ul>
+
+<div class="box note">
+<h3>Choose the durability contract explicitly</h3>
+<p>The C++ helper uses <code>F_FULLFSYNC</code> on macOS and fsync on Linux; it propagates an unsupported operation or storage error instead of falling back to a weaker guarantee. OpenJDK 21's macOS implementation requests <code>F_FULLFSYNC</code> for both values of the <code>force</code> metadata argument; <code>false</code> therefore does not buy a cheaper data-only sync there. That is an implementation fact, not a portable Java mapping, so confirm the provider and storage stack for a strict power-loss contract. A successful call assumes the device honours flush requests; it cannot protect against hardware destruction or dishonest firmware.</p>
+<p>The runnable programs demonstrate ordering and successful sync calls, not a power-cut experiment. Their timings are illustrative, and the C++ binary records use native byte order while Java's <code>ByteBuffer</code> defaults to big endian; these demos verify their own format rather than interchange files. <code>std::jthread</code> needs C++20; with C++17, use <code>std::thread</code> and an RAII join guard.</p>
+</div>
+
+<h2 id="what-durable-means-exactly">What durable means, exactly</h2>
+<p><strong>Thread visibility is separate from crash durability.</strong> A mutex, Java <code>volatile</code>, or a C++ release/acquire pair can publish memory to another thread; none makes a file survive power loss. Conversely, fsync is not a mutex and does not make concurrent access to a shared application buffer safe. Syncing two files also does not make their updates one crash-atomic transaction; that requires a recovery protocol such as a write-ahead log.</p>
+<p>A write is <strong><a class="term" data-term="durability" href="glossary.html#durability">durable</a></strong> when it survives the failures in your contract, here a process crash, system crash or power cut on local storage. That requires a successful sync with the platform's required strength and a durable path to the file. Three consequences interviewers probe:</p>
+<ol>
+<li><strong>Acknowledge only after the sync.</strong> If a synchronous <code>append(event)</code> returns success, or an asynchronous append completes its receipt successfully, before the sync that covers the event, the system has promised something it cannot keep. This is the heart of Databricks' event writer question.</li>
+<li><strong>New files need their directory synced too.</strong> fsync on a file does not guarantee that the directory entry naming it is on disk. After creating or renaming a file, sync its parent directory using the platform's supported protocol. If new ancestor directories were created too, persist their entries as well.</li>
+<li><strong>Replacing a file safely takes four steps:</strong> write the new content to a temporary file in the same directory, sync it, rename it over the old name (rename within one file system is atomic), then sync the directory. With an already durable old file and directory, and a file system supporting this crash-consistency protocol, recovery sees a complete version. Atomic rename alone specifies visibility to live readers, not portable crash recovery; after the final directory sync succeeds, the new version is the durable one.</li>
+</ol>
+
+<p><strong>Failure after rename is an uncertain outcome.</strong> If the rename succeeds but the directory sync fails, the new version is already visible, although its crash durability is unconfirmed. Throwing does not roll the rename back; a retry or recovery procedure must inspect and reconcile the version.</p>
+
+<p>Atomic replacement publishes a new file object: existing open descriptors still refer to the old one. If permissions, ownership or other attributes must be preserved, set them on the temporary file before its sync; the demo publishes a new file with restrictive temporary-file permissions.</p>
+<p>The next demo assumes one replacement at a time and an existing parent directory on the local Mac/Linux provider. Java does not portably guarantee directory forcing or replacement of an existing target with <code>ATOMIC_MOVE</code>; unsupported cases must fail, not fall back to copy-and-delete. The C++ version syncs the target's actual parent, including for nested paths.</p>
+
+<figure class="code pair" data-sample="file-io-and-durability.2" data-expect="ok"><figcaption><span class="ctitle">Durable replacement on a supporting local file system</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</span><code><span class="p">#include &lt;fcntl.h&gt;</span>
+<span class="p">#include &lt;unistd.h&gt;</span>
+
+<span class="p">#include &lt;cerrno&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;cstdlib&gt;</span>
+<span class="p">#include &lt;filesystem&gt;</span>
+<span class="p">#include &lt;fstream&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;system_error&gt;</span>
+
+<span class="c">// Never silently downgrade the requested durability on macOS.</span>
+<span class="t">int</span> <span class="f">syncToDisk</span>(<span class="t">int</span> fd) {
+    <span class="t">int</span> result;
+    <span class="k">do</span> {
+<span class="p">#ifdef F_FULLFSYNC</span>
+        result = ::<span class="f">fcntl</span>(fd, F_FULLFSYNC);
+<span class="p">#else</span>
+        result = ::<span class="f">fsync</span>(fd);
+<span class="p">#endif</span>
+    } <span class="k">while</span> (result &lt; <span class="n">0</span> &amp;&amp; errno == EINTR);
+    <span class="k">return</span> result;
+}
+
+<span class="k">class</span> Fd {
+    <span class="t">int</span> value_;
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Fd</span>(<span class="t">int</span> value) : <span class="f">value_</span>(value) {
+        <span class="k">if</span> (value &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"open"</span>);
+    }
+    ~<span class="f">Fd</span>() { <span class="k">if</span> (value_ &gt;= <span class="n">0</span>) ::<span class="f">close</span>(value_); }
+    <span class="f">Fd</span>(<span class="k">const</span> Fd&amp;) = <span class="k">delete</span>;
+    Fd&amp; <span class="k">operator</span>=(<span class="k">const</span> Fd&amp;) = <span class="k">delete</span>;
+    <span class="t">int</span> <span class="f">get</span>() <span class="k">const</span> { <span class="k">return</span> value_; }
+    <span class="t">void</span> <span class="f">closeChecked</span>() {
+        <span class="t">int</span> old = value_;
+        value_ = -<span class="n">1</span>;                 <span class="c">// do not retry close on a possibly reused descriptor</span>
+        <span class="k">if</span> (::<span class="f">close</span>(old) != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"close"</span>);
+    }
+};
+
+
+<span class="t">void</span> <span class="f">check</span>(<span class="t">bool</span> ok, <span class="k">const</span> <span class="t">char</span>* what) {
+    <span class="k">if</span> (!ok) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), what);
+}
+
+<span class="t">void</span> <span class="f">replaceDurably</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; target, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; content) {
+    <span class="k">auto</span> parent = <span class="t">std</span>::filesystem::<span class="f">absolute</span>(target).<span class="f">parent_path</span>();
+    <span class="t">std</span>::<span class="t">string</span> pattern = (parent / <span class="s">".replace-XXXXXX"</span>).<span class="t">string</span>();
+    Fd <span class="f">file</span>(::<span class="f">mkstemp</span>(pattern.<span class="f">data</span>()));
+    <span class="k">try</span> {
+        <span class="k">const</span> <span class="t">char</span>* p = content.<span class="f">data</span>();
+        <span class="t">size_t</span> left = content.<span class="f">size</span>();
+        <span class="k">while</span> (left &gt; <span class="n">0</span>) {
+            ssize_t n = ::<span class="f">write</span>(file.<span class="f">get</span>(), p, left);
+            <span class="k">if</span> (n &lt; <span class="n">0</span> &amp;&amp; errno == EINTR) <span class="k">continue</span>;
+            <span class="f">check</span>(n &gt;= <span class="n">0</span>, <span class="s">"write"</span>);
+            <span class="k">if</span> (n == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"write made no progress"</span>);
+            p += n;
+            left -= <span class="k">static_cast</span>&lt;<span class="t">size_t</span>&gt;(n);
+        }
+        <span class="f">check</span>(<span class="f">syncToDisk</span>(file.<span class="f">get</span>()) == <span class="n">0</span>, <span class="s">"sync file"</span>);
+        file.<span class="f">closeChecked</span>();
+        <span class="f">check</span>(<span class="t">std</span>::<span class="f">rename</span>(pattern.<span class="f">c_str</span>(), target.<span class="f">c_str</span>()) == <span class="n">0</span>, <span class="s">"rename"</span>);
+        Fd <span class="f">dir</span>(::<span class="f">open</span>(parent.<span class="f">c_str</span>(), O_RDONLY));
+        <span class="f">check</span>(<span class="f">syncToDisk</span>(dir.<span class="f">get</span>()) == <span class="n">0</span>, <span class="s">"sync directory"</span>);
+        dir.<span class="f">closeChecked</span>();
+    } <span class="k">catch</span> (...) {
+        ::<span class="f">unlink</span>(pattern.<span class="f">c_str</span>());       <span class="c">// harmless if rename already consumed the temporary name</span>
+        <span class="k">throw</span>;
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="f">replaceDurably</span>(<span class="s">"config.txt"</span>, <span class="s">"version=1\n"</span>);
+    <span class="f">replaceDurably</span>(<span class="s">"config.txt"</span>, <span class="s">"version=2\n"</span>);
+    <span class="t">std</span>::ifstream <span class="f">in</span>(<span class="s">"config.txt"</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"config.txt now holds: "</span> &lt;&lt; in.<span class="f">rdbuf</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</span><code><span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.nio.<span class="t">ByteBuffer</span>;
+<span class="k">import</span> java.nio.channels.<span class="t">FileChannel</span>;
+<span class="k">import</span> java.nio.charset.<span class="t">StandardCharsets</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Files</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Path</span>;
+<span class="k">import</span> java.nio.file.<span class="t">StandardCopyOption</span>;
+<span class="k">import</span> <span class="k">static</span> java.nio.file.<span class="t">StandardOpenOption</span>.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">void</span> <span class="f">replaceDurably</span>(<span class="t">Path</span> target, <span class="t">String</span> content) <span class="k">throws</span> <span class="t">IOException</span> {
+        target = target.<span class="f">toAbsolutePath</span>();
+        <span class="t">Path</span> parent = target.<span class="f">getParent</span>();
+        <span class="t">Path</span> tmp = <span class="t">Files</span>.<span class="f">createTempFile</span>(parent, <span class="s">".replace-"</span>, <span class="s">".tmp"</span>);
+        <span class="k">try</span> {
+            <span class="k">try</span> (<span class="t">FileChannel</span> ch = <span class="t">FileChannel</span>.<span class="f">open</span>(tmp, WRITE)) {
+                <span class="t">ByteBuffer</span> buf = <span class="t">ByteBuffer</span>.<span class="f">wrap</span>(content.<span class="f">getBytes</span>(<span class="t">StandardCharsets</span>.UTF_8));
+                <span class="k">while</span> (buf.<span class="f">hasRemaining</span>()) {
+                    <span class="k">if</span> (ch.<span class="f">write</span>(buf) == <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IOException</span>(<span class="s">"write made no progress"</span>);
+                }
+                ch.<span class="f">force</span>(<span class="k">true</span>);
+            }
+            <span class="t">Files</span>.<span class="f">move</span>(tmp, target, <span class="t">StandardCopyOption</span>.ATOMIC_MOVE);
+            <span class="k">try</span> (<span class="t">FileChannel</span> dir = <span class="t">FileChannel</span>.<span class="f">open</span>(parent, READ)) {
+                dir.<span class="f">force</span>(<span class="k">true</span>);         <span class="c">// supported local provider required</span>
+            }
+        } <span class="k">finally</span> {
+            <span class="t">Files</span>.<span class="f">deleteIfExists</span>(tmp);
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">IOException</span> {
+        <span class="t">Path</span> config = <span class="t">Path</span>.<span class="f">of</span>(<span class="s">"config.txt"</span>);
+        <span class="f">replaceDurably</span>(config, <span class="s">"version=1\n"</span>);
+        <span class="f">replaceDurably</span>(config, <span class="s">"version=2\n"</span>);
+        <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"config.txt now holds: "</span> + <span class="t">Files</span>.<span class="f">readString</span>(config));
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>config.txt now holds: version=2</pre></div><div class="runout" hidden></div></figure>
+
+<p><strong>A storage error is not a retry instruction.</strong> PostgreSQL documents that on some systems a failed sync can discard dirty pages, letting a later sync succeed without saving the lost bytes; its default is to panic on such failures. Fail pending writes and treat the file as suspect after an I/O error. Retrying POSIX <code>EINTR</code> is different: it handles interruption, not evidence that failed storage has recovered.</p>
+
+<h2 id="what-fsync-costs-and-why-batching-wins">What fsync costs, and why batching wins</h2>
+<p>An fsync waits for a device, so it costs far more than a <code>write</code> into the page cache. Rough orders of magnitude, which vary a lot by device and are worth measuring yourself:</p>
+<table>
+<thead><tr><th>Storage</th><th>One fsync, roughly</th></tr></thead>
+<tbody>
+<tr><td>Spinning disk</td><td>several milliseconds</td></tr>
+<tr><td>Consumer SSD, no power-loss protection</td><td>from about 0.1 ms to a few milliseconds</td></tr>
+<tr><td>Data centre SSD with power-loss protection</td><td>tens of microseconds</td></tr>
+<tr><td>Network block volume in the cloud</td><td>around a millisecond or more</td></tr>
+</tbody>
+</table>
+<p>The consequence is a hard ceiling. <strong>A writer that syncs after every event can acknowledge at most about one event per fsync time</strong>: with a 1 ms fsync, about 1,000 durable events per second, however small the events are. The escape is <a class="term" data-term="group-commit" href="glossary.html#group-commit">group commit</a>: write many events, sync once, and acknowledge all of them. Ignoring per-event overhead, 100 events per sync gives an upper bound near 100,000 per second; real throughput also includes copying, writing and scheduling.</p>
+
+<figure class="plotfig"><figcaption>Group commit with a 1 ms fsync and 2 microseconds of work per event</figcaption><svg class="plot" viewBox="0 0 640 300" role="img" aria-label="Group commit with a 1 ms fsync and 2 microseconds of work per event"><line class="grid" x1="58" y1="250.0" x2="618" y2="250.0"/><text class="tick" x="50" y="254.0" text-anchor="end">0</text><line class="grid" x1="58" y1="207.2" x2="618" y2="207.2"/><text class="tick" x="50" y="211.2" text-anchor="end">70</text><line class="grid" x1="58" y1="164.4" x2="618" y2="164.4"/><text class="tick" x="50" y="168.4" text-anchor="end">140</text><line class="grid" x1="58" y1="121.6" x2="618" y2="121.6"/><text class="tick" x="50" y="125.6" text-anchor="end">210</text><line class="grid" x1="58" y1="78.8" x2="618" y2="78.8"/><text class="tick" x="50" y="82.8" text-anchor="end">280</text><line class="grid" x1="58" y1="36.0" x2="618" y2="36.0"/><text class="tick" x="50" y="40.0" text-anchor="end">350</text><text class="tick" x="58.0" y="268" text-anchor="middle">1</text><text class="tick" x="170.0" y="268" text-anchor="middle">200.8</text><text class="tick" x="282.0" y="268" text-anchor="middle">400.6</text><text class="tick" x="394.0" y="268" text-anchor="middle">600.4</text><text class="tick" x="506.0" y="268" text-anchor="middle">800.2</text><text class="tick" x="618.0" y="268" text-anchor="middle">1000</text><line class="axis" x1="58" y1="250" x2="618" y2="250"/><line class="axis" x1="58" y1="36" x2="58" y2="250"/><line class="mark" x1="58.0" y1="36" x2="58.0" y2="250"/><circle class="dot" cx="58.0" cy="249.4" r="4"/><text class="mtext" x="64.0" y="241.4">1</text><line class="mark" x1="113.5" y1="36" x2="113.5" y2="250"/><circle class="dot" cx="113.5" cy="199.0" r="4"/><text class="mtext" x="119.5" y="191.0">83.33</text><line class="mark" x1="337.7" y1="36" x2="337.7" y2="250"/><circle class="dot" cx="337.7" cy="97.1" r="4"/><text class="mtext" x="343.7" y="89.1">250</text><polyline class="l1" points="58.0,249.4 61.5,245.6 65.0,242.0 68.5,238.4 72.0,234.9 75.5,231.5 79.0,228.2 82.5,224.9 86.0,221.7 89.5,218.6 93.0,215.6 96.5,212.6 100.0,209.7 103.5,206.9 107.0,204.1 110.5,201.3 114.0,198.7 117.5,196.1 121.0,193.5 124.5,191.0 128.0,188.5 131.5,186.1 135.0,183.7 138.5,181.4 142.0,179.1 145.5,176.9 149.0,174.7 152.5,172.6 156.0,170.5 159.5,168.4 163.0,166.4 166.5,164.4 170.0,162.4 173.5,160.5 177.0,158.6 180.5,156.7 184.0,154.9 187.5,153.1 191.0,151.3 194.5,149.6 198.0,147.9 201.5,146.2 205.0,144.6 208.5,142.9 212.0,141.3 215.5,139.8 219.0,138.2 222.5,136.7 226.0,135.2 229.5,133.7 233.0,132.3 236.5,130.8 240.0,129.4 243.5,128.0 247.0,126.7 250.5,125.3 254.0,124.0 257.5,122.7 261.0,121.4 264.5,120.1 268.0,118.9 271.5,117.6 275.0,116.4 278.5,115.2 282.0,114.0 285.5,112.8 289.0,111.7 292.5,110.6 296.0,109.4 299.5,108.3 303.0,107.2 306.5,106.2 310.0,105.1 313.5,104.0 317.0,103.0 320.5,102.0 324.0,101.0 327.5,100.0 331.0,99.0 334.5,98.0 338.0,97.1 341.5,96.1 345.0,95.2 348.5,94.3 352.0,93.3 355.5,92.4 359.0,91.6 362.5,90.7 366.0,89.8 369.5,88.9 373.0,88.1 376.5,87.3 380.0,86.4 383.5,85.6 387.0,84.8 390.5,84.0 394.0,83.2 397.5,82.4 401.0,81.6 404.5,80.9 408.0,80.1 411.5,79.4 415.0,78.6 418.5,77.9 422.0,77.2 425.5,76.4 429.0,75.7 432.5,75.0 436.0,74.3 439.5,73.7 443.0,73.0 446.5,72.3 450.0,71.6 453.5,71.0 457.0,70.3 460.5,69.7 464.0,69.0 467.5,68.4 471.0,67.8 474.5,67.2 478.0,66.5 481.5,65.9 485.0,65.3 488.5,64.7 492.0,64.2 495.5,63.6 499.0,63.0 502.5,62.4 506.0,61.9 509.5,61.3 513.0,60.7 516.5,60.2 520.0,59.6 523.5,59.1 527.0,58.6 530.5,58.0 534.0,57.5 537.5,57.0 541.0,56.5 544.5,56.0 548.0,55.4 551.5,54.9 555.0,54.4 558.5,54.0 562.0,53.5 565.5,53.0 569.0,52.5 572.5,52.0 576.0,51.5 579.5,51.1 583.0,50.6 586.5,50.2 590.0,49.7 593.5,49.2 597.0,48.8 600.5,48.4 604.0,47.9 607.5,47.5 611.0,47.0 614.5,46.6 618.0,46.2"/><text class="alabel" x="338" y="290" text-anchor="middle">Events per fsync (batch size)</text><text class="alabel" transform="translate(16 143) rotate(-90)" text-anchor="middle">Thousand events per second</text></svg></figure>
+
+<p>The curve flattens because per-event work starts to dominate once the sync is shared widely. The price of batching is latency: an event may wait for the batch it joins plus the sync in flight. The neat trick is <strong>natural batching</strong>: no timer at all. While one sync is in flight, new events pile up, and the next write and sync take whatever has piled up. Under light load batches are small and latency is low; under heavy load batches grow by themselves. You will build exactly this in the <a href="durable-log-writer.html">durable log writer</a>.</p>
+
+<figure class="code pair" data-sample="file-io-and-durability.3" data-expect="ok"><figcaption><span class="ctitle">One sync per event versus one sync per batch</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</span><code><span class="p">#include &lt;fcntl.h&gt;</span>
+<span class="p">#include &lt;unistd.h&gt;</span>
+
+<span class="p">#include &lt;cerrno&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;system_error&gt;</span>
+
+<span class="c">// Never silently downgrade the requested durability on macOS.</span>
+<span class="t">int</span> <span class="f">syncToDisk</span>(<span class="t">int</span> fd) {
+    <span class="t">int</span> result;
+    <span class="k">do</span> {
+<span class="p">#ifdef F_FULLFSYNC</span>
+        result = ::<span class="f">fcntl</span>(fd, F_FULLFSYNC);
+<span class="p">#else</span>
+        result = ::<span class="f">fsync</span>(fd);
+<span class="p">#endif</span>
+    } <span class="k">while</span> (result &lt; <span class="n">0</span> &amp;&amp; errno == EINTR);
+    <span class="k">return</span> result;
+}
+
+<span class="k">class</span> Fd {
+    <span class="t">int</span> value_;
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Fd</span>(<span class="t">int</span> value) : <span class="f">value_</span>(value) {
+        <span class="k">if</span> (value &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"open"</span>);
+    }
+    ~<span class="f">Fd</span>() { <span class="k">if</span> (value_ &gt;= <span class="n">0</span>) ::<span class="f">close</span>(value_); }
+    <span class="f">Fd</span>(<span class="k">const</span> Fd&amp;) = <span class="k">delete</span>;
+    Fd&amp; <span class="k">operator</span>=(<span class="k">const</span> Fd&amp;) = <span class="k">delete</span>;
+    <span class="t">int</span> <span class="f">get</span>() <span class="k">const</span> { <span class="k">return</span> value_; }
+    <span class="t">void</span> <span class="f">closeChecked</span>() {
+        <span class="t">int</span> old = value_;
+        value_ = -<span class="n">1</span>;                 <span class="c">// do not retry close on a possibly reused descriptor</span>
+        <span class="k">if</span> (::<span class="f">close</span>(old) != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"close"</span>);
+    }
+};
+
+
+<span class="t">void</span> <span class="f">writeAll</span>(<span class="t">int</span> fd, <span class="k">const</span> <span class="t">char</span>* p, <span class="t">size_t</span> len) {
+    <span class="k">while</span> (len &gt; <span class="n">0</span>) {
+        ssize_t n = ::<span class="f">write</span>(fd, p, len);
+        <span class="k">if</span> (n &lt; <span class="n">0</span> &amp;&amp; errno == EINTR) <span class="k">continue</span>;
+        <span class="k">if</span> (n &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"write"</span>);
+        <span class="k">if</span> (n == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"write made no progress"</span>);
+        p += n;
+        len -= <span class="k">static_cast</span>&lt;<span class="t">size_t</span>&gt;(n);
+    }
+}
+
+<span class="t">void</span> <span class="f">sync</span>(<span class="t">int</span> fd) {
+    <span class="k">if</span> (<span class="f">syncToDisk</span>(fd) != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"fsync"</span>);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> ms = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">duration</span>&lt;<span class="t">double</span>, <span class="t">std</span>::milli&gt;;
+    <span class="t">char</span> event[<span class="n">100</span>] = {};
+    <span class="k">const</span> <span class="t">int</span> n = <span class="n">100</span>;
+    Fd <span class="f">file</span>(::<span class="f">open</span>(<span class="s">"events.log"</span>, O_CREAT | O_WRONLY | O_TRUNC, <span class="n">0644</span>));
+    <span class="t">int</span> fd = file.<span class="f">get</span>();
+    <span class="k">auto</span> t0 = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>();
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) {
+        <span class="f">writeAll</span>(fd, event, <span class="k">sizeof</span> event);
+        <span class="f">sync</span>(fd);                                   <span class="c">// durable after every event</span>
+    }
+    <span class="k">auto</span> t1 = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>();
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) <span class="f">writeAll</span>(fd, event, <span class="k">sizeof</span> event);
+    <span class="f">sync</span>(fd);                                       <span class="c">// one sync covers the whole batch</span>
+    <span class="k">auto</span> t2 = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>();
+    <span class="t">double</span> each = <span class="f">ms</span>(t1 - t0).<span class="f">count</span>(), batch = <span class="f">ms</span>(t2 - t1).<span class="f">count</span>();
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%d events, a sync after each: %.1f ms, about %.0f events per second\n"</span>, n, each, n / (each / <span class="n">1000</span>));
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%d events, one sync at the end: %.1f ms, about %.0f events per second\n"</span>, n, batch, n / (batch / <span class="n">1000</span>));
+    file.<span class="f">closeChecked</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code><span class="k">import</span> java.nio.<span class="t">ByteBuffer</span>;
+<span class="k">import</span> java.nio.channels.<span class="t">FileChannel</span>;
+<span class="k">import</span> java.nio.file.<span class="t">Path</span>;
+<span class="k">import</span> <span class="k">static</span> java.nio.file.<span class="t">StandardOpenOption</span>.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">byte</span>[] event = <span class="k">new</span> <span class="t">byte</span>[<span class="n">100</span>];
+        <span class="t">int</span> n = <span class="n">100</span>;
+        <span class="k">try</span> (<span class="t">FileChannel</span> ch = <span class="t">FileChannel</span>.<span class="f">open</span>(<span class="t">Path</span>.<span class="f">of</span>(<span class="s">"events.log"</span>), CREATE, WRITE, TRUNCATE_EXISTING)) {
+            <span class="t">long</span> t0 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) {
+                <span class="t">ByteBuffer</span> buf = <span class="t">ByteBuffer</span>.<span class="f">wrap</span>(event);
+                <span class="k">while</span> (buf.<span class="f">hasRemaining</span>()) {
+                    <span class="k">if</span> (ch.<span class="f">write</span>(buf) == <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> java.io.<span class="t">IOException</span>(<span class="s">"write made no progress"</span>);
+                }
+                ch.<span class="f">force</span>(<span class="k">false</span>);                         <span class="c">// durable after every event</span>
+            }
+            <span class="t">long</span> t1 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) {
+                <span class="t">ByteBuffer</span> buf = <span class="t">ByteBuffer</span>.<span class="f">wrap</span>(event);
+                <span class="k">while</span> (buf.<span class="f">hasRemaining</span>()) {
+                    <span class="k">if</span> (ch.<span class="f">write</span>(buf) == <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> java.io.<span class="t">IOException</span>(<span class="s">"write made no progress"</span>);
+                }
+            }
+            ch.<span class="f">force</span>(<span class="k">false</span>);                             <span class="c">// one sync covers the whole batch</span>
+            <span class="t">long</span> t2 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="t">double</span> each = (t1 - t0) / <span class="n">1e6</span>, batch = (t2 - t1) / <span class="n">1e6</span>;
+            <span class="t">System</span>.out.<span class="f">printf</span>(<span class="s">"%d events, a sync after each: %.1f ms, about %.0f events per second%n"</span>, n, each, n / (each / <span class="n">1000</span>));
+            <span class="t">System</span>.out.<span class="f">printf</span>(<span class="s">"%d events, one sync at the end: %.1f ms, about %.0f events per second%n"</span>, n, batch, n / (batch / <span class="n">1000</span>));
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>100 events, a sync after each: 412.1 ms, about 243 events per second
+100 events, one sync at the end: 5.5 ms, about 18056 events per second</pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="concurrency-patterns-for-file-access">Concurrency patterns for file access</h2>
+<table>
+<thead><tr><th>Situation</th><th>Pattern</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Many producers append to one log</td><td>One writer thread owns the file; producers hand it events through a queue</td><td>Order comes free from the queue, and the writer can batch and sync once per batch</td></tr>
+<tr><td>Threads read or write disjoint regions (a parallel copy, fixed-size records)</td><td>Positional I/O, no lock</td><td>No shared offset, no shared bytes, so nothing to protect</td></tr>
+<tr><td>Ranges may overlap (a byte store with <code>write(offset, data)</code>)</td><td><a class="term" data-term="range-lock" href="glossary.html#range-lock">Range locks</a>: one lock per block, taken in ascending block order</td><td>Calls on disjoint blocks can proceed together; byte ranges within one block still conflict; ascending order rules out lock cycles</td></tr>
+<tr><td>Writes smaller than a block on a block device</td><td>Lock the block, read it, modify the bytes, write it back</td><td>Without the lock, two writers to different bytes of one block can erase each other's change, a lost update on disk</td></tr>
+<tr><td>Coordinating separate processes</td><td>OS file locks (<code>fcntl</code> record locks, <code>FileChannel.lock</code>)</td><td>Traditional POSIX record locks and Java file locks coordinate processes, not threads within one process</td></tr>
+</tbody>
+</table>
+
+<p>That last row catches people. Java's <code>FileLock</code> is documented as held on behalf of the whole JVM and unsuitable for controlling access between threads of the same JVM; a second overlapping lock from the same JVM throws <code>OverlappingFileLockException</code>. POSIX <code>fcntl</code> record locks also belong to the process, and closing <em>any</em> descriptor for the file releases all of that process's locks on it. Between threads, use your own locks.</p>
+
+<figure class="code pair" data-sample="file-io-and-durability.4"><figcaption><span class="ctitle">Locking a byte range: one lock per block, in ascending order (members of a byte store)</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="c">// blockLocks_[i] guards block i of the store; kBlockSize is the block size in bytes.</span>
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; blockLocks_;
+
+<span class="c">// Returns the held locks; they are released when the returned vector is destroyed.</span>
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt;&gt; <span class="f">lockRange</span>(<span class="t">uint64_t</span> offset, <span class="t">uint64_t</span> length) {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt;&gt; held;
+    <span class="k">if</span> (length == <span class="n">0</span>) <span class="k">return</span> held;
+    <span class="k">for</span> (<span class="t">uint64_t</span> b = offset / kBlockSize; b &lt;= (offset + length - <span class="n">1</span>) / kBlockSize; b += <span class="n">1</span>)
+        held.<span class="f">emplace_back</span>(blockLocks_[b]);                           <span class="c">// ascending: overlapping ranges cannot cycle</span>
+    <span class="k">return</span> held;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="c">// blockLocks[i] guards block i of the store; BLOCK_SIZE is the block size in bytes.</span>
+<span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span>[] blockLocks; <span class="c">// initialized by the store constructor</span>
+
+<span class="k">void</span> <span class="f">lockRange</span>(<span class="t">long</span> offset, <span class="t">int</span> length) {
+    <span class="k">if</span> (length == <span class="n">0</span>) <span class="k">return</span>;
+    <span class="t">int</span> first = (<span class="t">int</span>) (offset / BLOCK_SIZE), last = (<span class="t">int</span>) ((offset + length - <span class="n">1</span>) / BLOCK_SIZE);
+    <span class="k">for</span> (<span class="t">int</span> b = first; b &lt;= last; b += <span class="n">1</span>) blockLocks[b].<span class="f">lock</span>();     <span class="c">// ascending: overlapping ranges cannot cycle</span>
+}
+
+<span class="k">void</span> <span class="f">unlockRange</span>(<span class="t">long</span> offset, <span class="t">int</span> length) {
+    <span class="k">if</span> (length == <span class="n">0</span>) <span class="k">return</span>;
+    <span class="t">int</span> first = (<span class="t">int</span>) (offset / BLOCK_SIZE), last = (<span class="t">int</span>) ((offset + length - <span class="n">1</span>) / BLOCK_SIZE);
+    <span class="k">for</span> (<span class="t">int</span> b = first; b &lt;= last; b += <span class="n">1</span>) blockLocks[b].<span class="f">unlock</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>These fragments assume validated nonnegative ranges within a fixed store, no overflow in <code>offset + length</code>, and an initialized lock array large enough for every block. Java callers release with <code>unlockRange</code> in a <code>finally</code> block; C++ callers retain the returned guards until all I/O finishes. Empty ranges acquire nothing.</p>
+<p>With a huge store you cannot afford a lock per block, so you stripe: block <code>b</code> uses lock <code>b % S</code>. Then sort and deduplicate the <em>stripe</em> numbers before locking, because consecutive blocks wrap around the stripes, and locking in block order would take stripes out of order and could deadlock. With <code>std::mutex</code>, deduplication also matters because locking the same mutex twice is undefined behavior.</p>
+
+<div class="box example">
+<h3>Worked example: is it durable yet?</h3>
+<p>A Java service handles <code>append(event)</code> like this: it writes the event to a <code>BufferedOutputStream</code>, calls <code>flush()</code>, and returns "OK". Walk an event through and ask, at each point, whether a power cut loses it.</p>
+<ol>
+<li>After <code>write</code> into the <code>BufferedOutputStream</code>: the bytes may still be in process memory, unless this write filled or bypassed the buffer. Neither a process-crash nor a power-loss guarantee follows from the call alone.</li>
+<li>After <code>flush()</code>: the bytes are in the page cache. A process crash no longer loses them, and other processes can read them. A power cut can still lose them, and the service has already said "OK". <strong>That is the bug.</strong></li>
+<li>Fix: write through a <code>FileChannel</code> and call <code>force(false)</code> before acknowledging. Now each acknowledgement costs one sync, so throughput falls to roughly one event per fsync time.</li>
+<li>Fix the throughput: let one writer thread take every waiting event, write them together, force once, and then acknowledge all of them. With a 1 ms sync and 100 events per batch, up to 100,000 events per second before per-event costs, under this illustrative steady load.</li>
+</ol>
+<p>The numbers behind step 4: per batch, about 1 ms of sync plus 100 events times 2 microseconds of copying, so 1.2 ms for 100 events, about 83,000 events per second. An accepted event in this drain-all model typically waits for the current batch plus its own. Two batch times is not a universal bound: queueing before admission, disk stalls, scheduling delays and batch caps can add more.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Treating flush as durable.</strong> <code>flush()</code> reaches the page cache, not the disk. Acknowledge after fsync or <code>force</code>.</li>
+<li><strong>Sharing a descriptor's offset between threads.</strong> <code>seek</code> then <code>write</code> from two threads puts data in the wrong place. Use positional I/O.</li>
+<li><strong>Ignoring short reads and writes.</strong> One <code>read</code> call may return fewer bytes than asked. Loop until the buffer is full, and handle end of file.</li>
+<li><strong>Forgetting the directory.</strong> A newly created or renamed file can vanish after a crash even though the file itself was synced.</li>
+<li><strong>Using file locks between threads.</strong> <code>FileLock</code> and <code>fcntl</code> locks are per process. They do not protect one thread from another.</li>
+<li><strong>Retrying a failed fsync and carrying on.</strong> The data may already be gone. Fail the pending writes.</li>
+<li><strong>Syncing inside the producers' lock.</strong> Every producer then waits for the disk one at a time. Sync from a single writer, outside the queue's lock.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>At Databricks this knowledge is examined through the event writer: candidates were asked about the cost of fsync, why batching helps, and what durability guarantee <code>appendEvent</code> can give. At Rubrik it shows up as code: copy a file with <code>open</code>, <code>pread</code>, <code>pwrite</code> and <code>close</code>; byte-level read, write and seek over a block API; and a byte store with <code>write(offset, data)</code> and <code>read(offset, len)</code> that must then become concurrent, where a candidate proposed range locks so non-overlapping calls do not block each other.</p>
+<blockquote>An ordinary file write can return with bytes only in process memory or the page cache; durability needs a successful sync of the required strength, so I acknowledge an event only after the sync that covers it. If a measured sync takes one millisecond, syncing per event caps us near a thousand events a second, so I use group commit: one writer thread drains everything that queued up during the last sync, writes it with a short-write loop, syncs once, and then completes all of those events.</blockquote>
+<p>Follow ups: "what if fsync fails?" (fail every pending event and stop accepting; do not retry and pretend), "what about a crash in the middle of a write?" (records need a length and a checksum so recovery can find and drop a torn tail), and "how do readers see new data?" (through the page cache, as soon as it is written, even before it is synced).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>fdatasync and file growth.</strong> Appending changes the file size, and the size is metadata that fdatasync must sync. Preallocation can reduce allocation work. To avoid size changes, extend and sync the logical file first, then write within it using explicit offsets; <code>O_APPEND</code> would instead write after that size. Space reservation with <code>FALLOC_FL_KEEP_SIZE</code> alone does not stop later file growth, and other metadata work can remain.</li>
+<li><strong>Bypassing the page cache.</strong> <code>O_DIRECT</code> on Linux (with aligned buffers and offsets) or <code>F_NOCACHE</code> on macOS skips the page cache, so the database manages its own cache and memory. It does not by itself make writes durable; you still sync.</li>
+<li><strong>Torn writes.</strong> A crash can leave a record half written. Use bounded lengths and checksums to detect an incomplete tail before appending again. Corruption inside an acknowledged prefix needs repair or fail-stop handling; do not silently truncate acknowledged data.</li>
+<li><strong>Memory-mapped files.</strong> For a shared writable file mapping, use <code>msync(..., MS_SYNC)</code> on POSIX or <code>MappedByteBuffer.force()</code> in Java to request persistence. A private mapping does not update the file. Mapping visibility still needs synchronization, and platform/device-cache caveats still apply; <code>FileChannel.force</code> is not guaranteed to persist mapped-buffer changes.</li>
+<li><strong>Group commit everywhere.</strong> Databases batch their log flushes the same way, and Linux journaling file systems can satisfy several concurrent fsync callers with one journal commit. The pattern you build by hand is the one the whole storage stack uses.</li>
+</ul>
+</div>
+
+<p>API references: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/channels/FileChannel.html">Java 21 FileChannel</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Files.html#move(java.nio.file.Path,java.nio.file.Path,java.nio.file.CopyOption...)">Files.move</a>, <a href="https://man7.org/linux/man-pages/man2/fsync.2.html">Linux sync semantics</a>, <a href="https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fsync.2.html">Apple sync semantics</a>, <a href="https://www.postgresql.org/docs/current/runtime-config-error-handling.html">PostgreSQL sync-error handling</a>, and <a href="https://github.com/openjdk/jdk21u/blob/master/src/java.base/macosx/native/libnio/ch/FileDispatcherImpl.c">OpenJDK 21 macOS forcing</a>.</p>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Threads sharing a descriptor share its offset; positional I/O (<code>pread</code>, <code>pwrite</code>, <code>FileChannel</code> with a position) removes it, and disjoint ranges then need no lock.</li>
+<li>Loop on every read and write: short transfers and interrupted calls are normal.</li>
+<li>flush reaches the kernel's page cache; only fsync or force makes data durable, and new or renamed files need their directory synced too.</li>
+<li>One fsync per event caps throughput at roughly one event per sync time; group commit shares each sync across a batch.</li>
+<li>Use range locks for overlapping access; OS file locks are for processes, not threads.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="file-io-and-durability"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="file-io-and-durability.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A service uses an ordinary buffered stream over a local file, with no synchronous-open option. It writes an event, successfully flushes the stream and replies "saved", without syncing. The machine then loses power. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is safe: flush wrote it to disk</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It can be lost: flush only moved it into the operating system's page cache, which does not survive a power cut</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It is safe if the file was opened in append mode</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is lost only if the process crashed before the power cut</span></button></li></ol><div class="why" hidden><strong>Why.</strong> For this buffered file stream, flush sends buffered bytes to the kernel. The bytes may reach storage later, so loss is possible rather than certain. A power cut can lose them even if the process never crashed first. A successful durability sync of the required platform strength, plus durable directory publication where needed, must precede the receipt. Append mode controls placement, not persistence; the base <code>OutputStream.flush()</code> alone has no such flushing guarantee.</div></div><div class="mcq" data-id="file-io-and-durability.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two threads share one file descriptor. Each runs <code>lseek(fd, myOffset, SEEK_SET)</code> and then <code>write(fd, myRecord, 64)</code>. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing bad: each system call is atomic</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A record can land at the other thread's offset, because the seek and the write are two separate calls on one shared offset</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The second <code>lseek</code> fails with an error while the first write is running</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The kernel serializes the pairs, so each record lands where it should</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Per-call offset handling does not make the pair atomic: the other thread can move the shared offset between your seek and your write. The kernel neither rejects that second seek merely because another thread is writing nor groups each thread's calls into a transaction. <code>pwrite(fd, buf, 64, myOffset)</code>, or <code>FileChannel.write(buf, position)</code> in Java, takes the offset as an argument and leaves the shared one alone, so disjoint ranges need no application lock.</div></div><div class="mcq" data-id="file-io-and-durability.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A log writer thread calls fsync after every single event, and one fsync takes about 1 ms on this disk. Ignoring per-event work, what is its approximate throughput ceiling?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">About 10</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">About 1,000</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">About 100,000</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It depends only on the size of each event</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each acknowledgement waits for its own sync, so the writer completes at most one event per millisecond, about 1,000 a second, whether the event is 10 bytes or 1,000. Ignoring copying and writing costs, sharing each sync across 100 events lifts the ceiling near 100,000 a second, which is the whole case for group commit.</div></div><div class="mcq" data-id="file-io-and-durability.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Four threads must write fixed-size records into disjoint regions of one open file. Each thread owns its buffer, append mode is off and nobody truncates the file. Which approach needs no application lock?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Each thread uses a positional write: <code>pwrite</code> in C++, <code>FileChannel.write(buffer, position)</code> in Java, looping until all bytes are written</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Each thread sets the channel's position, then calls the plain <code>write</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Each thread wraps the file in its own <code>BufferedWriter</code> and flushes at the end</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Each thread opens the file in append mode and writes its records</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Positional writes neither use nor move the shared position, and the regions do not overlap, so there is nothing to protect. Setting the position and then writing is the shared-offset race again. Separate buffered wrappers do not by themselves reserve the intended file ranges and may share or conflict over offsets. Append mode puts every record at the end, not at its own offset.</div></div><div class="mcq" data-id="file-io-and-durability.q5" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A shared regular file starts with offset zero. Thread A completes <code>pwrite(fd, &quot;A&quot;, 1, 8)</code> or Java <code>ch.write(bufferOfA, 8)</code>. After A joins, B prints the descriptor/channel position. No other I/O occurs, and append mode is off. What prints?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">0</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">1</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">8</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">9</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The explicit offset determines where A writes, but positional I/O leaves the shared position unchanged at zero. One byte was transferred and the file may grow to nine bytes, but neither the byte count nor file size becomes the shared position. A plain write after seeking to eight would leave position nine.</div></div><div class="mcq" data-id="file-io-and-durability.q6" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">You must replace <code>config.txt</code> so that after a crash you find either the complete old version or the complete new one. Assume an already durable old file and a supporting local file system. Which steps belong in the procedure? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Write the new content to a temporary file in the same directory and fsync it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Rename the temporary file over <code>config.txt</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">fsync the directory after the rename</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Delete <code>config.txt</code> first, then rename the temporary file</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Overwrite <code>config.txt</code> in place and fsync it</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Writing and syncing a temporary file makes the new bytes durable without touching the old file; rename within one file system atomically swaps which content the name points to; syncing the directory makes the rename itself durable. Deleting first opens a window with no file at all, and overwriting in place can leave a mix of old and new bytes after a crash.</div></div><div class="mcq" data-id="file-io-and-durability.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Which Java call requests content persistence without requiring all metadata to be forced, although the OS may do more?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>OutputStream.flush()</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>FileChannel.force(false)</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>FileChannel.force(true)</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>System.gc()</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>force(false)</code> requests content persistence; <code>force(true)</code> explicitly requires metadata too. The exact syscall mapping is OS-dependent. Buffered file-stream flushing does not request durability, and garbage collection has no persistence contract.</div></div><div class="mcq" data-id="file-io-and-durability.q8" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>You wrote a file with <code>std::ofstream</code> and called <code>flush()</code>. How do you make the data durable?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Call <code>flush()</code> twice</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Call <code>close()</code>: closing a stream syncs it to disk</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Iostreams cannot fsync; write durable files with POSIX <code>open</code>, <code>write</code> and <code>fsync</code> (or <code>fflush</code> a <code>FILE*</code> and <code>fsync(fileno(f))</code>), and on macOS use <code>F_FULLFSYNC</code> for the full flush</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Call <code>std::this_thread::yield()</code> so the kernel writes it</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Successful <code>flush()</code> and <code>close()</code> push buffered file bytes towards the kernel but promise no stable-storage sync. Repeating flush or yielding the thread adds no durability guarantee. C++20 has no standard fsync or stream native-handle API, so design durable file access around an OS descriptor or a library that exposes one.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="file-io-and-durability.c1" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">A Databricks interviewer asks: "What can <code>appendEvent</code> promise when it returns? Explain flush, fsync and fdatasync on the way."</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A successful ordinary OS file write transfers the returned number of bytes into the kernel's page cache; at that point the data survives my process crashing, and other readers can see it, but a power cut or kernel crash can lose it. flush only moves bytes from my own buffer into the page cache, so it is no stronger. fsync makes the kernel write the file's dirty data and metadata to the device and, on Linux, ask the device to flush its write cache, and it returns only when that is done; fdatasync does the same for the data and only the metadata needed to read it back, such as the file size, so it is often cheaper. In Java the analogous content-plus-metadata and content requests are <code>FileChannel.force(true)</code> and <code>force(false)</code>, with platform-dependent implementations.</p>
+<p>So <code>appendEvent</code> can promise durability only if it returns, or completes its future, after the fsync that covers its event has succeeded. If the sync fails, every event it covered must fail too, and I would stop accepting writes rather than retry the sync, because the kernel may have dropped the data. If measured sync latency is around a millisecond, I would batch: one writer thread syncs once for everything that queued during the previous sync and then completes all those events, which keeps the guarantee and raises throughput by the batch size.</p></div></div><div class="cq" data-q="file-io-and-durability.c2" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">On a disk where one fsync takes 2 ms, copying an event into the batch costs 5 microseconds. (a) With one fsync per event, what is the most events per second you can acknowledge? (b) With batches of 200 events, what is the throughput? Assuming an already admitted event joins the very next full batch and no scheduling or device stalls, how long can it wait? (c) You need 50,000 events per second: what is the smallest batch size that works?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>(a) Each event costs 2 ms plus 0.005 ms, about 2 ms, so about 500 events per second.</p>
+<p>(b) A batch of 200 costs 2 ms plus 200 times 0.005 ms, which is 3 ms, so 200 events per 3 ms, about 66,700 events per second. An event that arrives just after a batch started waits for that batch (up to 3 ms) and then for its own (3 ms), so about 6 ms in the worst case.</p>
+<p>(c) A batch of b events takes 2 + 0.005b milliseconds, and we need b divided by that to be at least 50 events per millisecond: b is at least 50 times (2 + 0.005b), so b is at least 100 + 0.25b, so 0.75b is at least 100, so b is at least about 134 events per batch. This is a capacity calculation, not a guaranteed batch size or latency. Under smooth arrivals the corresponding natural-batching equilibrium is about 133.3 events; burstiness and scheduling change the actual batches, so leave headroom.</p></div></div><div class="cq" data-q="file-io-and-durability.c3" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Rubrik follow up: you built a byte store with <code>write(offset, data)</code> and <code>read(offset, len)</code> over a file. "Make it concurrent, so calls that do not overlap never block each other." Describe your design and any limits of block locking.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>For strict byte-range independence I need a range-lock manager: under a short metadata mutex, wait while an active interval overlaps mine and either interval is a write, register my interval, then release the mutex for positional I/O. Remove the interval and wake waiters on completion. Even disjoint calls briefly contend for metadata, but they do not wait through each other's I/O. Block locks are simpler but weaken that requirement: disjoint byte ranges in one block conflict, and stripes add further false conflicts.</p>
+<p>For that simpler contract I divide the store into fixed blocks, say 4 KB, and keep one lock per block, or for a very large store a fixed array of S stripe locks where block b uses stripe b mod S. Every call computes the blocks its range touches and locks them in ascending order (for stripes: the sorted, deduplicated stripe numbers), does its work with positional reads and writes, and unlocks. Without striping, two calls that touch no common block take disjoint locks and can run in parallel; overlapping calls serialize on the shared blocks; ascending order means no cycle of waits, so no deadlock.</p>
+<p>If the underlying device only reads and writes whole blocks, a write that covers part of a block must read the block, change the bytes and write it back, and that read-modify-write must happen under the block's lock, or two writers to different bytes of the same block erase each other's changes. If reads dominate, each block can have a read-write lock so overlapping readers share it. I would say the trade-off out loud: a lock per block costs memory for big stores, which is why striping exists, at the price of occasional false conflicts between unrelated blocks that share a stripe.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="file-io-and-durability.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Our service flushes the file and says saved, but records disappear after a power cut. Walk me through the fix."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A buffered-stream flush is not a durability acknowledgement</li><li>Trace process buffer, kernel page cache, device cache and stable storage</li><li>Use a successful platform-appropriate sync before acknowledging; flush alone is insufficient</li><li>Persist the parent directory when creating or replacing the file</li><li>Treat storage errors as uncertain outcomes and stop accepting writes</li><li>Share each sync across a batch without weakening acknowledgement order</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would move the saved response after a successful durability sync. Flushing a buffered file stream usually moves bytes from the process into the operating system's page cache. That can survive the process dying, but not the machine losing power. The drive may have another volatile cache, so the operation must cover that boundary too. On Linux I use fsync; on macOS the C++ path requests a full device flush. In Java I use <code>FileChannel.force</code> and check the local provider's guarantees. For a newly created file I also persist the parent directory, because durable contents are useless if the filename disappears. If the sync reports a storage error, I fail the pending requests and stop using that log. I cannot assume the bytes are absent, or that another sync will repair them. Once correctness is established, I batch. If a measured sync takes one millisecond, syncing every event caps one writer near a thousand events per second before other costs. Sharing that sync across a hundred events raises capacity, but every receipt still waits for the successful sync covering its own bytes. I would test acknowledgement timing with a fake disk that pauses inside sync; successful readback alone does not test power-loss durability.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you replace a configuration file while preserving a complete version across a crash?</span></p></div></div><div class="sq" data-sq="file-io-and-durability.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Two threads seek to different offsets, then write, and records land in the wrong places. What would you change?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Seek and write are separate operations on a shared open-file offset</li><li>Give a concrete interleaving that redirects one write</li><li>Use positional I/O and advance by actual transfer counts</li><li>Keep buffers private and coordinate overlapping ranges or truncation</li><li>Block and stripe locks can serialize even disjoint byte ranges</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use positional I/O so each write carries its destination offset. With a shared descriptor, A can seek to offset four thousand, B can seek to eight thousand, and then A writes at B's position. Each call can be correct while the pair is wrong. A shared lock around both calls fixes that, but serializes unrelated work. Positional writes avoid the shared offset: <code>pwrite</code> in C++, or <code>FileChannel.write</code> with a position in Java. I loop on short writes and advance by the actual count, with a separate buffer per thread. Disjoint ranges then need no application lock, assuming nobody truncates the file. Overlapping updates still need coordination, especially a block device's read, modify, write sequence. Block locks are simple but can conflict for disjoint bytes in one block; stripe locks add more false conflicts. Positional I/O fixes placement, not durability.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if the file was opened in append mode?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-block-device-io.html" data-problem="block-device-io"><span class="pk">Concurrent systems · hard</span><b>Byte reads and writes over a block device</b><span class="pst"></span></a><a class="pcard" href="p-parallel-file-copy.html" data-problem="parallel-file-copy"><span class="pk">Concurrent systems · hard</span><b>Parallel file copy with pread and pwrite</b><span class="pst"></span></a><a class="pcard" href="p-durable-log-writer.html" data-problem="durable-log-writer"><span class="pk">Concurrent systems · senior</span><b>Durable log writer with group commit</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="debugging-rounds.html"><span>Previous</span><b>Debugging rounds: the bug in someone else&#x27;s threaded code</b></a><a class="next" href="durable-log-writer.html"><span>Next</span><b>A concurrent, ordered, durable log writer</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#descriptors-offsets-and-the-shared-offset-trap">Descriptors, offsets and the shared-offset trap</a><a href="#where-your-bytes-wait-four-layers">Where your bytes wait: four layers</a><a href="#what-durable-means-exactly">What durable means, exactly</a><a href="#what-fsync-costs-and-why-batching-wins">What fsync costs, and why batching wins</a><a href="#concurrency-patterns-for-file-access">Concurrency patterns for file access</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

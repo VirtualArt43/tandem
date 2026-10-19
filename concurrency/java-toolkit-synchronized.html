@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The toolkit: synchronized, wait and notify · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-toolkit-synchronized" data-title="The toolkit: synchronized, wait and notify" data-track="java" data-module="java-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details open><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized" class=here><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m5">Module 05: The concurrency toolkit</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.2</span><span>30 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The toolkit: synchronized, wait and notify</h1><p class="lsum">Choose the right monitor, protect shared state, wait for conditions, and build a bounded buffer with synchronized, wait and notifyAll.</p><div class="asked"><span>Asked at</span><span class="co">LinkedIn</span></div><div class="prereq"><span>Before this:</span><a href="java-classes-interfaces.html">Classes, interfaces and inheritance</a><a href="java-collections.html">The collections you will use</a><a href="java-exceptions.html">Exceptions, InterruptedException and try-with-resources</a><a href="java-toolkit-threads.html">The toolkit: Thread, Runnable, Callable and virtual threads</a></div></header><article class="prose" id="article">
+<p class="lead">A thread-safe class needs more than a lock around its writes. You must choose which object owns the lock, keep related state consistent, and let a thread wait without preventing another thread from making progress.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Imagine a kitchen with one key and a small serving shelf. A cook takes the key before adding a dish; a server takes it before removing one. If the shelf is full, the cook leaves the key and waits on a bench, so a server can make space.</p>
+<p>A call from the kitchen means "come and check the shelf". It does not reserve a space or hand over the key. Whoever comes back must get the key and look again.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<p>This is the Java spelling of a <a class="term" data-term="monitor" href="glossary.html#monitor">monitor</a>: an object's intrinsic lock plus its waiting mechanism. You will use it for queues, ordering puzzles and thread-safe LLD classes. The crucial review question is <strong>which state is guarded by which object?</strong></p>
+<p><a href="java-toolkit-threads.html">The thread toolkit</a> covers starting and joining workers; <a href="java-exceptions.html">the exceptions lesson</a> covers the cancellation policy. Here you learn the monitor protocol those workers use. JVM implementation details belong to <a href="java-under-the-hood.html">object headers, monitors and the JIT</a>.</p>
+</div>
+
+<h2 id="api-card-the-lock-and-its-waiting-methods">API card: the lock and its waiting methods</h2>
+<p><code>synchronized</code> is a language keyword. The waiting methods are <code>final</code> instance methods of <code>Object</code>, inherited by your classes; they are not methods you call on another thread to pause it. In the table, <code>m</code> is the exact object whose monitor you mean.</p>
+<table>
+<thead><tr><th>Construct or method</th><th>One-line contract</th></tr></thead>
+<tbody>
+<tr><td><code>synchronized void update()</code></td><td>Acquire <code>this</code> before the method body and release it on normal return or exception.</td></tr>
+<tr><td><code>static synchronized void update()</code> in <code>Store</code></td><td>Acquire <code>Store.class</code>, the declaring class's <code>Class</code> object, for the method body.</td></tr>
+<tr><td><code>synchronized (m) { ... }</code></td><td>Acquire the object referenced by <code>m</code> for this block; a null reference throws <code>NullPointerException</code>.</td></tr>
+<tr><td><code>m.wait()</code></td><td>With ownership of <code>m</code>, release it and wait; reacquire it before returning or throwing <code>InterruptedException</code>.</td></tr>
+<tr><td><code>m.wait(long millis)</code></td><td>Add a timeout to the wait; zero means no timeout, and a negative value is invalid.</td></tr>
+<tr><td><code>m.wait(long millis, int nanos)</code></td><td>Add 0 to 999999 nanoseconds to nonnegative milliseconds; both zero means no timeout.</td></tr>
+<tr><td><code>m.notify()</code></td><td>With ownership of <code>m</code>, select one arbitrary current waiter; keep ownership until you release it.</td></tr>
+<tr><td><code>m.notifyAll()</code></td><td>With ownership of <code>m</code>, wake all current waiters; each still has to reacquire it separately.</td></tr>
+<tr><td><code>Thread.holdsLock(m)</code></td><td>Report whether the calling thread owns <code>m</code>'s monitor; useful for diagnostics, not acquiring a lock.</td></tr>
+</tbody>
+</table>
+<p>The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long,int)">Java 21 Object API</a> specifies the wait overloads and exceptions. A timeout ends eligibility to remain asleep; scheduling and monitor reacquisition can delay the actual return. Never treat <code>wait(100)</code> as a guarantee to return within 100 milliseconds.</p>
+
+<h2 id="choose-an-object-not-a-method-name">Choose an object, not a method name</h2>
+<p>Two instance methods marked <code>synchronized</code> exclude one another when called on <strong>the same receiver</strong>. Calls on two different instances use different monitors. A static synchronized method and an instance synchronized method also use different monitors, so they can execute together.</p>
+<p>A block lets you protect a smaller region or choose a dedicated <code>private final Object lock = new Object()</code>. Keep that object private and its reference stable: callers cannot accidentally take your internal lock, and methods cannot switch to different locks halfway through the object's life. Equal objects are not necessarily the same monitor; monitor identity uses the actual object, not <code>equals</code>.</p>
+<p>Avoid string literals and boxed numbers as locks: unrelated code may share the same interned or cached object. Reassigning a boxed counter also changes which object subsequent calls lock. A dedicated <code>Object</code> avoids both traps.</p>
+
+<figure class="code single" data-sample="java-toolkit-synchronized.1" data-expect="ok"><figcaption><span class="ctitle">Identify all three monitors, then catch a wrong-monitor call</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">instanceMethod</span>() {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"instance owns this: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(<span class="k">this</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"instance owns class: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(<span class="t">Main</span>.<span class="k">class</span>));
+    }
+
+    <span class="k">static</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">classMethod</span>() {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"static owns class: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(<span class="t">Main</span>.<span class="k">class</span>));
+    }
+
+    <span class="k">void</span> <span class="f">privateBlock</span>() {
+        <span class="k">synchronized</span> (lock) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"block owns private lock: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(lock));
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"block owns this: "</span> + <span class="t">Thread</span>.<span class="f">holdsLock</span>(<span class="k">this</span>));
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Main</span> demo = <span class="k">new</span> <span class="t">Main</span>();
+        demo.<span class="f">instanceMethod</span>();
+        <span class="f">classMethod</span>();
+        demo.<span class="f">privateBlock</span>();
+        <span class="k">synchronized</span> (demo) {
+            <span class="k">try</span> {
+                demo.lock.<span class="f">notifyAll</span>();
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"wrong monitor was accepted"</span>);
+            } <span class="k">catch</span> (<span class="t">IllegalMonitorStateException</span> expected) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"owning demo does not mean owning demo.lock"</span>);
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The five ownership results are <code>true</code>, <code>false</code>, <code>true</code>, <code>true</code>, <code>false</code>. Holding <code>demo</code> does not authorize <code>demo.lock.wait()</code>, <code>notify()</code> or <code>notifyAll()</code>: all three require ownership of their own receiver and otherwise throw <code>IllegalMonitorStateException</code>. Inside <code>synchronized (lock)</code>, an unqualified <code>wait()</code> means <code>this.wait()</code>, which is usually the wrong object.</p>
+<p>Locking an object does not freeze it. Unsynchronized methods and direct field access can still run, so every access to the guarded mutable state must follow the same protocol. Do not use separate per-instance monitors to guard static state shared across all instances.</p>
+
+<h2 id="reentrancy-automatic-release-and-visibility">Reentrancy, automatic release and visibility</h2>
+<p>Java intrinsic locks are <a class="term" data-term="reentrant-lock" href="glossary.html#reentrant-lock">reentrant</a>. A thread that owns a monitor can enter another synchronized method or block using that same monitor. Each entry adds a hold; each exit removes one, and another thread gets ownership only after the final hold is released.</p>
+
+<figure class="code single" data-sample="java-toolkit-synchronized.2" data-expect="ok"><figcaption><span class="ctitle">A synchronized operation calls another on the same receiver</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Counter</span> {
+        <span class="k">private</span> <span class="t">int</span> value;
+
+        <span class="k">private</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">increment</span>() {
+            value += <span class="n">1</span>;
+        }
+
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">addPair</span>() {
+            <span class="f">increment</span>();
+            <span class="f">increment</span>();
+        }
+
+        <span class="k">synchronized</span> <span class="t">int</span> <span class="f">get</span>() {
+            <span class="k">return</span> value;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Counter</span> counter = <span class="k">new</span> <span class="t">Counter</span>();
+        <span class="t">Runnable</span> work = () -&gt; {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">10_000</span>; i += <span class="n">1</span>) counter.<span class="f">addPair</span>();
+        };
+        <span class="t">Thread</span> a = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"adder-a"</span>);
+        <span class="t">Thread</span> b = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"adder-b"</span>);
+        a.<span class="f">start</span>();
+        b.<span class="f">start</span>();
+        a.<span class="f">join</span>();
+        b.<span class="f">join</span>();
+        <span class="t">int</span> result = counter.<span class="f">get</span>();
+        <span class="k">if</span> (result != <span class="n">40_000</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(result);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"count = "</span> + result);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The inner method's exit does not release the outer method's hold. A concurrent <code>get()</code> therefore observes a completed pair, never the halfway value. Removing <code>synchronized</code> from <code>addPair()</code> would leave each increment safe individually but allow a reader between them. See <a href="check-then-act.html">compound operations</a> and <a href="reentrancy.html">reentrancy</a> for deeper reasoning.</p>
+<p><strong>Exclusion and visibility are separate guarantees.</strong> Only one thread owns a particular monitor at once. An unlock also <a class="term" data-term="happens-before" href="glossary.html#happens-before">happens-before</a> every subsequent lock of that same monitor: writes before the unlock become visible to reads after the later acquisition. This covers ordinary guarded fields; they do not also need <code>volatile</code>. The formal rule is in <a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html#jls-17.4.5">JLS 17.4.5</a>, with the reasoning developed in <a href="happens-before.html">happens-before</a>.</p>
+<p>A normal return or a thrown exception releases the holds acquired by the exited synchronized regions. It does <strong>not roll back state</strong>: if you update half an invariant and then throw, the next owner can see that broken state. Validate before mutation and keep the invariant intact at every exit.</p>
+<p>For LLD, synchronization is an implementation choice, not a promise automatically imposed on overrides. An overriding method can omit <code>synchronized</code>; invoking an inherited synchronized instance method still locks the actual receiver. Keep the locking contract explicit when extending classes, as discussed in <a href="java-inheritance-and-polymorphism.html">inheritance and overriding</a>.</p>
+
+<h2 id="wait-for-state-not-for-a-notification">Wait for state, not for a notification</h2>
+<p>Each object has one <a class="term" data-term="wait-set" href="glossary.html#wait-set">wait set</a> for threads that called its <code>wait</code> methods. A waiting condition, also called a predicate, is a statement about protected state, such as "the queue is not empty". Check it while holding the monitor; if it is false, call <code>wait()</code> on that same object inside a <code>while</code> loop.</p>
+<ol>
+<li><strong>Release and register together.</strong> <code>wait()</code> places the caller in the object's wait set and releases its monitor without letting a notifier slip between the condition check and registration.</li>
+<li><strong>Permit someone else to change state.</strong> The caller is asleep, while another owner can update the fields and notify waiters.</li>
+<li><strong>Reacquire, then recheck.</strong> Notification does not hand over ownership. Before continuing, the waiter must acquire the monitor and evaluate its condition again.</li>
+</ol>
+<p><code>wait()</code> releases all of the caller's reentrant holds on this monitor and restores them before continuing. It releases <strong>no other monitor</strong>. Waiting while holding an unrelated lock can prevent the producer you need from running. Unlike <code>wait()</code>, <code>Thread.sleep()</code> releases no monitors.</p>
+
+<figure class="code single" data-sample="java-toolkit-synchronized.3" data-expect="ok"><figcaption><span class="ctitle">A one-shot message works whether publication or waiting happens first</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="k">static</span> <span class="t">boolean</span> ready;
+    <span class="k">private</span> <span class="k">static</span> <span class="t">int</span> answer;
+
+    <span class="k">static</span> <span class="t">int</span> <span class="f">awaitAnswer</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (!ready) {
+                lock.<span class="f">wait</span>();
+            }
+            <span class="k">return</span> answer;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">int</span>[] received = {-<span class="n">1</span>};
+        <span class="t">Thread</span> reader = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                received[<span class="n">0</span>] = <span class="f">awaitAnswer</span>();
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"reader"</span>);
+        reader.<span class="f">start</span>();
+        <span class="k">synchronized</span> (lock) {
+            answer = <span class="n">42</span>;
+            ready = <span class="k">true</span>;
+            lock.<span class="f">notifyAll</span>();
+            answer = <span class="n">43</span>; <span class="c">// notification does not let the reader into this block</span>
+        }
+        reader.<span class="f">join</span>();
+        <span class="k">if</span> (received[<span class="n">0</span>] != <span class="n">43</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(received[<span class="n">0</span>]);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"received = "</span> + received[<span class="n">0</span>]);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>This prints <code>received = 43</code>. The reader cannot return while main owns the monitor, even after <code>notifyAll()</code>. If main publishes before the reader starts waiting, the notification itself is not saved, but <code>ready</code> is: the reader sees it and skips the wait. <strong>The state remembers the event.</strong> The final <code>join()</code> makes the reader's result available to main.</p>
+<p>A <a class="term" data-term="spurious-wakeup" href="glossary.html#spurious-wakeup">spurious wakeup</a> may occur without notification. Even an ordinary notification can be followed by a competing thread consuming the item first. Both require the same loop. A timeout is also just a reason to recheck; use a deadline and recalculate the remaining budget after each wakeup, as in <a href="java-time-units.html">time units and deadlines</a>.</p>
+<p>If interruption ends the wait, <code>wait()</code> reacquires the monitor before throwing <code>InterruptedException</code> and clears the interrupt status. An already interrupted caller with a valid monitor and arguments throws without releasing that monitor. Propagate the exception from a blocking method; a <code>Runnable</code> can restore the status and return, as above.</p>
+<p>If notification races with interruption, <code>wait()</code> may instead return normally with the interrupt still pending, as specified by <a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html#jls-17.2.4">JLS 17.2.4</a>. It cannot silently clear that interrupt and return normally. Entering <code>synchronized</code>, including reacquiring after a wait, cannot be cancelled by an interrupt; use the <a href="java-toolkit-locks.html">explicit lock toolkit</a> for interruptible or timed acquisition.</p>
+
+<div class="box example">
+<h3>Worked example: a notified consumer loses the item</h3>
+<p>Two consumers want one item. Assume C1 used <code>if (items.isEmpty()) lock.wait()</code> and then removed an item without rechecking. This failure needs no spurious wakeup.</p>
+<figure class="timeline"><figcaption>Notification gives no reservation</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Consumer 1</span><span>Producer</span><span>Consumer 2</span></div><div class="tl-row"><span class="t">1</span><span class="cell">owns the monitor, sees an empty queue, calls wait and releases it</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">acquires the monitor and adds item 7</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">calls notifyAll, then releases the monitor</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">acquires the monitor before C1, removes item 7, then releases it</span></div><div class="tl-row"><span class="t">5</span><span class="cell">reacquires the monitor and returns from wait</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">6</span><span class="cell bad">with if, removes from an empty queue and throws</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">With while, C1 sees that the queue is empty again and waits safely.</div></div></figure>
+<p>The wakeup says "your condition may hold". The <a href="wait-in-a-loop.html">wait-in-a-loop lesson</a> develops both spurious and stolen wakeups; <a href="condition-variables.html">condition variables and monitors</a> explains the underlying protocol across languages.</p>
+</div>
+
+<h2 id="a-complete-bounded-buffer">A complete bounded buffer</h2>
+<p>The invariant is <code>0 &lt;= items.size() &amp;&amp; items.size() &lt;= capacity</code>, with FIFO order preserved. One private monitor guards the deque, the capacity checks and every mutation. Producers wait for space; consumers wait for an item. Both groups share one wait set, so use <code>notifyAll()</code> after each successful mutation.</p>
+
+<figure class="code single" data-sample="java-toolkit-synchronized.4" data-expect="ok"><figcaption><span class="ctitle">A bounded FIFO buffer using only intrinsic synchronization</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">Arrays</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">BoundedBuffer</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;<span class="t">Integer</span>&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+
+        <span class="t">BoundedBuffer</span>(<span class="t">int</span> capacity) {
+            <span class="k">if</span> (capacity &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"capacity must be positive"</span>);
+            <span class="k">this</span>.capacity = capacity;
+        }
+
+        <span class="k">void</span> <span class="f">put</span>(<span class="t">int</span> value) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            <span class="k">synchronized</span> (lock) {
+                <span class="k">while</span> (items.<span class="f">size</span>() == capacity) {
+                    lock.<span class="f">wait</span>();
+                }
+                items.<span class="f">addLast</span>(value);
+                lock.<span class="f">notifyAll</span>();
+            }
+        }
+
+        <span class="t">int</span> <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            <span class="k">synchronized</span> (lock) {
+                <span class="k">while</span> (items.<span class="f">isEmpty</span>()) {
+                    lock.<span class="f">wait</span>();
+                }
+                <span class="t">int</span> value = items.<span class="f">removeFirst</span>();
+                lock.<span class="f">notifyAll</span>();
+                <span class="k">return</span> value;
+            }
+        }
+
+        <span class="t">int</span> <span class="f">size</span>() {
+            <span class="k">synchronized</span> (lock) {
+                <span class="k">return</span> items.<span class="f">size</span>();
+            }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">BoundedBuffer</span> buffer = <span class="k">new</span> <span class="t">BoundedBuffer</span>(<span class="n">2</span>);
+        <span class="t">Thread</span> producer = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">5</span>; i += <span class="n">1</span>) buffer.<span class="f">put</span>(i);
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"producer"</span>);
+        producer.<span class="f">start</span>();
+        <span class="t">int</span>[] received = <span class="k">new</span> <span class="t">int</span>[<span class="n">5</span>];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; received.length; i += <span class="n">1</span>) received[i] = buffer.<span class="f">take</span>();
+        producer.<span class="f">join</span>();
+        <span class="k">if</span> (!<span class="t">Arrays</span>.<span class="f">equals</span>(received, <span class="k">new</span> <span class="t">int</span>[]{<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>, <span class="n">5</span>}) || buffer.<span class="f">size</span>() != <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"FIFO or final size failed"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"received = "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(received));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"remaining = "</span> + buffer.<span class="f">size</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The class supports multiple producers and consumers; the small driver transfers five items with main acting as consumer. Each successful insertion or removal takes effect inside its locked region. A wakeup cannot overfill the buffer because the caller rechecks before adding. <code>size()</code> is a protected snapshot, not a reservation for your next call.</p>
+<p>Deque operations take amortized O(1) time, excluding waiting and notification overhead, with O(capacity) storage. <code>notifyAll()</code> can wake many threads that immediately wait again. The price buys a straightforward correctness argument when several conditions share one wait set.</p>
+<p>This buffer has no close operation, fairness promise or timeout. Cancellation follows the <code>wait()</code> rules above; a successful operation can leave an interrupt pending. The finite driver has no cancellation path. For a service, define shutdown explicitly so a departing producer cannot leave consumers waiting forever. Continue with <a href="producer-consumer.html">producer and consumer</a> and <a href="monitor-object-pattern.html">the monitor object pattern</a>.</p>
+
+<h2 id="why-notify-can-strand-useful-work">Why notify can strand useful work</h2>
+<p><code>notify()</code> cannot choose "a consumer" or "a producer". It selects an arbitrary waiter on the receiver. Consider a capacity-one queue, two consumers C1 and C2, and a producer P that will insert two items, with <code>notify()</code> used after every change:</p>
+<ol>
+<li>C1 and C2 wait because the queue is empty.</li>
+<li>P inserts the first item and notifies C1. Before C1 reacquires, P tries its second insertion, sees the full queue and waits.</li>
+<li>C1 removes the item and notifies C2 instead of P, then finishes.</li>
+<li>C2 reacquires, finds an empty queue and waits again. P remains asleep although space exists.</li>
+</ol>
+<p>No active thread remains to signal P. A spurious wakeup is permitted, but you cannot rely on one to rescue progress. <code>notifyAll()</code> makes P eligible too. See <a href="lost-wakeups-and-notify-all.html">lost wakeups and notification choices</a> for the full proof obligations.</p>
+<p><code>notify()</code> can be appropriate when any chosen waiter can use the change and the number of signals matches the work enabled. For separate not-full and not-empty wait sets, use <code>Condition</code> objects from <a href="java-toolkit-locks.html">the lock toolkit</a>. For application code, prefer a library blocking queue from <a href="java-toolkit-collections-and-synchronizers.html">concurrent collections and synchronizers</a> when its contract fits.</p>
+
+<h2 id="add-a-timeout-without-extending-it-after-every-wakeup">Add a timeout without extending it after every wakeup</h2>
+<p>Add this method inside <code>BoundedBuffer</code>. It returns an available item, or <code>null</code> when it finds the queue empty with no budget left. Zero means check without a condition wait; negative budgets are rejected. Record the start once with <code>System.nanoTime()</code>, then subtract the elapsed time from the original budget on each pass.</p>
+<figure class="code single" data-sample="java-toolkit-synchronized.5"><figcaption><span class="ctitle">A timed poll method for the bounded buffer</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="t">Integer</span> <span class="f">poll</span>(<span class="t">long</span> timeoutNanos) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    <span class="k">if</span> (timeoutNanos &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"negative timeout"</span>);
+    <span class="t">long</span> started = <span class="t">System</span>.<span class="f">nanoTime</span>();
+    <span class="k">synchronized</span> (lock) {
+        <span class="k">while</span> (items.<span class="f">isEmpty</span>()) {
+            <span class="t">long</span> remaining = timeoutNanos - (<span class="t">System</span>.<span class="f">nanoTime</span>() - started);
+            <span class="k">if</span> (remaining &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">null</span>;
+            lock.<span class="f">wait</span>(remaining / <span class="n">1_000_000</span>, (<span class="t">int</span>) (remaining % <span class="n">1_000_000</span>));
+        }
+        <span class="t">int</span> value = items.<span class="f">removeFirst</span>();
+        lock.<span class="f">notifyAll</span>();
+        <span class="k">return</span> value;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong>Never round a positive remaining budget down to <code>wait(0)</code>.</strong> That means an indefinite wait. The nanosecond argument preserves a submillisecond remainder, without promising nanosecond scheduling precision. This method checks availability before expiry, so an item found on reacquisition wins even if the budget has elapsed; initial acquisition and reacquisition can both delay return beyond the budget.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Protecting the same state with different objects.</strong> A method locks <code>this</code>, another locks <code>lock</code>: neither excludes the other. Write down the single guarding monitor.</li>
+<li><strong>Locking only setters.</strong> Readers need the same visibility protocol; <code>final</code> on the lock reference does not protect the mutable data by itself.</li>
+<li><strong>Using if around wait.</strong> Recheck in a loop, even with one producer and one consumer, because spurious wakeups remain allowed.</li>
+<li><strong>Moving notifyAll outside synchronized.</strong> Java requires ownership for notification too. Change state and notify while holding the correct monitor.</li>
+<li><strong>Replacing wait with sleep or a polling loop under the lock.</strong> The updater cannot acquire that monitor to make your condition true.</li>
+<li><strong>Restoring interruption and immediately waiting again.</strong> The next wait may throw immediately again. Restore and leave, or propagate to a caller that owns the cancellation decision.</li>
+<li><strong>Calling arbitrary callbacks while locked.</strong> Reentrancy does not prevent lock-order deadlocks or callbacks observing half-updated state. Keep external work outside, with invariants restored first.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>A LinkedIn July 2024 interview report in the research describes a bounded queue using plain threads, <code>wait</code> and <code>notify</code>, with shutdown as a follow up. Prepare to write the code and explain each line: "which object?", "why while?", "why notifyAll?", and "what does a reader see?"</p>
+<blockquote>I will guard the entire queue with one private monitor. Producers wait while it is full; consumers wait while it is empty. Each wait releases that monitor and reacquires it before rechecking. I notify all because both kinds of waiter share one wait set. Unlocking and later acquiring the same monitor also publishes the state changes.</blockquote>
+<p>If asked to compare primitives, start from the required operation: use <a href="java-toolkit-volatile-and-atomics.html">volatile and atomics</a> for their specific visibility or atomic-update contracts, and explicit locks when timed acquisition or separate conditions matter. <code>synchronized</code> gives neither FIFO fairness nor protection from deadlock; review <a href="lock-rules.html">the rules of locking</a> before adding a second lock.</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p>In a thread dump, distinguish <strong>waiting for state from waiting for ownership</strong>. An untimed <code>Object.wait()</code> uses <code>WAITING</code>; a positive timed wait uses <code>TIMED_WAITING</code>. A thread unable to enter a monitor, including after notification while reacquiring it, is <code>BLOCKED</code>. These are <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.State.html">Java thread states</a>, not OS scheduling states; use <a href="thread-dumps.html">thread dumps</a> to find the owner and its stack.</p>
+<p>On <strong>Java 21</strong>, blocking I/O inside <code>synchronized</code> can <a class="term" data-term="pinning" href="glossary.html#pinning">pin</a> a virtual thread to its carrier, occupying that underlying platform thread while blocked. Keep critical sections short; consider <code>ReentrantLock</code> for frequently executed sections with long blocking operations. This is a version-specific scalability concern, not a reason to remove synchronization or replace every short block. See the <a href="https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html">Java 21 virtual-thread guide</a> and <a href="virtual-threads-and-coroutines.html">virtual threads and coroutines</a>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Instance methods lock <code>this</code>; static methods lock the declaring <code>Class</code> object; blocks lock the object you provide.</li>
+<li>The same monitor provides exclusion and visibility. Ordinary reads must follow the guarding protocol too.</li>
+<li>Intrinsic locks are reentrant and release on exception, but neither undo mutations nor prevent deadlocks.</li>
+<li>Hold the exact monitor for wait or notification. Wait releases only that monitor and reacquires it before continuing.</li>
+<li>State remembers progress; notifications do not. Always wait in a loop and use <code>notifyAll()</code> for the buffer's mixed waiters.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-toolkit-synchronized"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-toolkit-synchronized.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>Store</code> has synchronized instance method <code>save()</code> and static synchronized method <code>reset()</code>. Objects <code>a</code> and <code>b</code> are distinct. Which pair must compete for the same monitor?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>a.save()</code> and another call to <code>a.save()</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>a.save()</code> and <code>b.save()</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>a.save()</code> and <code>Store.reset()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">All three pairs</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The receiver's identity decides the instance monitor. A different instance uses a different monitor, and the static method uses <code>Store.class</code>; sharing a class name does not make all methods share one lock.</div></div><div class="mcq" data-id="java-toolkit-synchronized.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A reader owns <code>lock</code>, waits in <code>while (!ready) lock.wait()</code>, then reads <code>x</code> under that lock. The sole writer runs <code>synchronized (lock) { x = 7; ready = true; lock.notifyAll(); x = 9; }</code>. Both fields started at zero or false. If the reader completes normally, what can it read?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">0, 7 or 9</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">7 or 9</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only 9</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only 7</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Notification does not release the monitor. The reader cannot continue until the writer unlocks, after writing 9. Reacquisition provides visibility. Even a spurious wakeup cannot bypass the predicate and lock.</div></div><div class="mcq" data-id="java-toolkit-synchronized.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An instance method executes <code>synchronized (lock) { while (!ready) wait(); }</code>. <code>lock</code> is a distinct private object, <code>ready</code> is false, and the thread does not own <code>this</code>. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It correctly releases <code>lock</code> and waits</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It waits forever because nobody called <code>notify</code> yet</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws <code>IllegalMonitorStateException</code> because the receiver is <code>this</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It acquires <code>this</code> automatically</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The unqualified call is <code>this.wait()</code>, not <code>lock.wait()</code>. Owning some monitor is insufficient; own and wait on the same object. The exception also unwinds the block and releases its hold on <code>lock</code>.</div></div><div class="mcq" data-id="java-toolkit-synchronized.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A thread enters <code>synchronized (m)</code> twice, and inside both regions calls <code>m.wait()</code>. Which statement describes an actual wait followed by normal return?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">One hold is released and one remains, so other threads cannot enter</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both holds are released during waiting and both restored before return</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">All monitors owned by the thread are released</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Both holds are released permanently; the caller must lock manually</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Wait saves and restores the full reentrant ownership of its receiver. It releases no other monitor, which is why waiting while holding a different lock can still deadlock.</div></div><div class="mcq" data-id="java-toolkit-synchronized.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A consumer wakes after <code>notifyAll()</code>, reacquires the lock, and finds the queue empty. What is the correct conclusion?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The JVM violated the notification contract</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The producer must have forgotten a volatile field</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">This is allowed; another consumer may have removed the item, so check again in a loop</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Use notify instead, which reserves an item for the selected thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A wakeup does not reserve state or confer priority in acquiring the monitor. <code>notify()</code> also offers no reservation. A spurious wakeup is another reason the predicate may still be false.</div></div><div class="mcq" data-id="java-toolkit-synchronized.q6" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">A thread is both notified and interrupted while waiting in <code>m.wait()</code>. Assume no further interrupt or explicit clearing of its status. Which outcomes are permitted for this wait? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Return normally after reacquiring <code>m</code>, with the interrupt still pending</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Throw <code>InterruptedException</code> after reacquiring <code>m</code>, clearing interrupt status</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Return normally with interrupt status cleared by <code>wait()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Throw <code>InterruptedException</code> before reacquiring <code>m</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The notification and interrupt can be ordered either way for this waiter. Notification can win, leaving the interrupt pending; interruption can win, causing an exception and clearing status. Both require monitor reacquisition, which can delay cancellation. The interrupt cannot be discarded by a normal return.</div></div><div class="mcq" data-id="java-toolkit-synchronized.q7" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which statements hold for this lesson's bounded buffer? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>size()</code> must acquire the same monitor as <code>put()</code> and <code>take()</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Using <code>notify()</code> can wake an unsuitable waiter and leave progress stranded</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>notifyAll()</code> makes all waiting threads run inside the critical section together</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A returned size smaller than capacity guarantees the caller's next put will not block</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The deque's size is mutable guarded state. All notified threads compete for the same monitor one at a time, and both conditions share its wait set. A size snapshot can become outdated before a later put, because the two calls are separate operations.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-toolkit-synchronized.c1" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A class stores a static <code>int total</code>. Its <code>add()</code> method is instance synchronized, and its static synchronized <code>get()</code> reads <code>total</code>. Two instances receive concurrent adds. Diagnose both faults and give one locking policy that fixes them.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The two add calls lock different receivers, so updates to the shared static field can overlap. The getter locks the class object, which neither add call locks, so it also lacks the intended exclusion and visibility relationship. Make both methods static synchronized on the declaring class, or use one <code>private static final Object lock</code> in all reads and writes. Do not create one private lock per instance for this static field.</p></div></div><div class="cq" data-q="java-toolkit-synchronized.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Add a close protocol to the bounded buffer in words or pseudocode. Existing items must remain readable, puts must fail after close, and every blocked thread must eventually be able to discover closure.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Add <code>closed</code>, guarded by the same monitor. <code>close()</code> acquires it, sets <code>closed = true</code>, calls <code>notifyAll()</code>, then releases it. Put waits while full and not closed, then checks closed before inserting and throws an appropriate closed-state exception if set. Take waits while empty and not closed; if empty after the loop, it reports closed, otherwise it removes the oldest item and notifies all as before.</p><p>Both wait predicates and every closure check belong under the same lock. Consumers can drain existing items after closure. Notification makes blocked threads eligible; actual completion still depends on scheduling and acquiring the monitor. Interruption remains a separate propagated cancellation outcome.</p></div></div><div class="cq" data-q="java-toolkit-synchronized.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Why can a correctly written monitor avoid a missed notification when the producer runs first? Why is replacing the consumer's loop with an unconditional wait wrong?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The producer changes protected state before releasing the monitor. If it runs first, a later consumer acquires that monitor, sees the satisfied predicate and never waits. If the consumer checks first, it still owns the monitor until wait registers it and releases ownership, so the producer cannot slip its update and notification into a gap. An unconditional wait ignores already satisfied state; since notifications are not stored, it can wait forever after the only notification has already occurred.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="java-toolkit-synchronized.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Walk me through what <code>synchronized</code> actually guarantees. Which object am I locking, and can I call another synchronized method from inside it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Instance methods lock the receiver, static methods lock the declaring <code>Class</code> object, blocks lock their supplied object</li><li>Exclusion applies only to code acquiring the same monitor</li><li>An unlock happens-before subsequent acquisition of that same monitor, providing visibility for ordinary guarded fields</li><li>Reentrancy permits the owner to enter again; other threads wait until all holds are released</li><li>Normal and exceptional exit release holds but do not roll back mutations</li><li>Use a stable private lock and protect reads as well as writes</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Synchronized gives mutual exclusion and visibility through one particular monitor. An instance method locks its receiver. A static method locks the declaring class's Class object. A block locks the object in its parentheses. That identity matters: two instances have different monitors, and a static method does not exclude an instance method merely because both say synchronized. The visibility rule is that an unlock happens before subsequent acquisition of the same monitor. So ordinary fields written before unlocking are visible after that acquisition, provided readers follow the same protocol. I can call another synchronized method on the same receiver because intrinsic locks are reentrant. The thread adds another hold and releases it when the inner method returns. Other threads still cannot enter until the outer hold is released too. Return and exception paths release the relevant holds automatically, but exceptions do not undo mutations. For an encapsulated component, I usually choose a stable private lock and use it for every access to its guarded state, including getters. I also restore invariants before any exit.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if the inner synchronized method belongs to a different object?</span></p></div></div><div class="sq" data-sq="java-toolkit-synchronized.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Your bounded queue works with one producer and one consumer. Now I add more of both and it hangs. What do you check in the wait and notify code?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Check one monitor guards every predicate check, mutation, wait and notification</li><li>Every wait is in a <code>while</code> loop because of spurious wakeups and competing consumers or producers</li><li>Wait releases the monitor and reacquires it before continuing; notification retains ownership</li><li>One wait set contains producers and consumers, so notify can choose the wrong kind and strand progress</li><li>Use <code>notifyAll()</code> after each successful state change and explain its extra contention</li><li>Check cancellation or closure so departed producers cannot strand consumers</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I first check the monitor protocol, especially whether a single notification can wake the wrong kind of waiter. Every queue access and condition check must use the same monitor. A producer waits while full and a consumer waits while empty, using while loops. Wait releases that monitor so someone else can change the queue, then reacquires it before returning. A notification does not transfer ownership or reserve an item. Another consumer can take the item before the notified consumer gets back in, which is why an if statement is unsafe. Spurious wakeups also require rechecking. With intrinsic monitors, both kinds of waiter share one wait set. Imagine two consumers asleep on an empty queue. A producer inserts, wakes one consumer, then waits on its next insertion because the queue is full. The consumer removes the item but notifies the other consumer. That consumer finds nothing and waits again, leaving the producer asleep despite available space. I use <code>notifyAll</code> after each successful change so every waiter can recheck. The cost is extra contention; separate conditions can target wakeups more precisely. Finally, I check whether a producer exited or was interrupted. A service needs an explicit closure protocol so consumers do not wait forever after production ends.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you add a timeout without restarting the full timeout after each wakeup?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-lost-wakeup.html" data-problem="fix-the-lost-wakeup"><span class="pk">Bug hunts · medium</span><b>Fix the job queue that stalls</b><span class="pst"></span></a><a class="pcard" href="p-print-in-order.html" data-problem="print-in-order"><span class="pk">Ordering puzzles · warm-up</span><b>Print in order</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-toolkit-threads.html"><span>Previous</span><b>The toolkit: Thread, Runnable, Callable and virtual threads</b></a><a class="next" href="java-toolkit-volatile-and-atomics.html"><span>Next</span><b>The toolkit: volatile and the atomic classes</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#api-card-the-lock-and-its-waiting-methods">API card: the lock and its waiting methods</a><a href="#choose-an-object-not-a-method-name">Choose an object, not a method name</a><a href="#reentrancy-automatic-release-and-visibility">Reentrancy, automatic release and visibility</a><a href="#wait-for-state-not-for-a-notification">Wait for state, not for a notification</a><a href="#a-complete-bounded-buffer">A complete bounded buffer</a><a href="#why-notify-can-strand-useful-work">Why notify can strand useful work</a><a href="#add-a-timeout-without-extending-it-after-every-wakeup">Add a timeout without extending it after every wakeup</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

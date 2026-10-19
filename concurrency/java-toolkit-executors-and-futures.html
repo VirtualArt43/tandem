@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The toolkit: executors, Future and CompletableFuture · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-toolkit-executors-and-futures" data-title="The toolkit: executors, Future and CompletableFuture" data-track="java" data-module="java-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details open><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures" class=here><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m5">Module 05: The concurrency toolkit</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.5</span><span>40 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The toolkit: executors, Future and CompletableFuture</h1><p class="lsum">Choose execution policies, bound queued work, retrieve and cancel results, schedule repeated tasks, and compose asynchronous Java computations without blocking workers.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span></div><div class="prereq"><span>Before this:</span><a href="java-toolkit-threads.html">The toolkit: Thread, Runnable, Callable and virtual threads</a><a href="java-lambdas-functional.html">Lambdas, functional interfaces and method references</a><a href="java-exceptions.html">Exceptions, InterruptedException and try-with-resources</a><a href="java-time-units.html">Time: nanoTime, Duration and TimeUnit</a></div></header><article class="prose" id="article">
+<p class="lead">Starting work is easy. The harder questions are where it waits, who sees its failure, how long the caller waits, and who stops the workers. Executors and futures make those decisions explicit.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A repair shop takes jobs at a counter, puts waiting jobs on a shelf, and gives each customer a receipt. The workers decide when to pick up each job. A receipt lets you ask for the result later; it does not guarantee that the shelf has room or that cancelling the receipt can undo a repair already made.</p>
+<p>Some jobs have instructions attached: after repairing the phone, test it; when both the phone and charger are ready, pack them together. Those instructions describe dependencies without making a worker stand idle beside another worker.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<p>An <a class="term" data-term="executor" href="glossary.html#executor">executor</a> separates a task from its execution policy. A <a class="term" data-term="future" href="glossary.html#future">future</a> represents its eventual outcome. You need both when designing a crawler, request fan-out, background job runner or an LLD service that owns workers.</p>
+<p><a href="java-toolkit-threads.html">The thread toolkit</a> explains <code>Runnable</code>, <code>Callable</code> and virtual threads; <a href="java-exceptions.html">the exceptions lesson</a> explains interruption and resource syntax. Here you choose and connect their library APIs. Synchronizers used to control examples are covered in <a href="java-toolkit-collections-and-synchronizers.html">concurrent collections and synchronizers</a>.</p>
+</div>
+
+<h2 id="api-card-execution-and-results">API card: execution and results</h2>
+<p><code>Executor</code> is the small interface; <code>ExecutorService</code> extends it with results and lifecycle. <code>ThreadPoolExecutor</code> is a configurable implementation, while <code>Executors</code> is a factory utility class. Program against the interface that your component needs.</p>
+<table>
+<thead><tr><th>Type and method</th><th>One-line semantics</th></tr></thead>
+<tbody>
+<tr><td><code>Executor.execute(Runnable)</code></td><td>Accept work under this executor's policy; return no result handle.</td></tr>
+<tr><td><code>ExecutorService.submit(Callable&lt;T&gt;)</code></td><td>Return <code>Future&lt;T&gt;</code> containing the eventual value or failure.</td></tr>
+<tr><td><code>submit(Runnable)</code> / <code>submit(Runnable, T)</code></td><td>Return a future whose successful result is respectively <code>null</code> or the supplied value.</td></tr>
+<tr><td><code>invokeAll(tasks)</code> / timed overload</td><td>Wait for the batch; return futures in input iteration order, cancelling unfinished tasks on timeout.</td></tr>
+<tr><td><code>invokeAny(tasks)</code> / timed overload</td><td>Return one successful result and cancel unfinished competitors; fail if no task succeeds.</td></tr>
+<tr><td><code>shutdown()</code></td><td>Stop accepting new work, allow accepted work to finish, and return without waiting.</td></tr>
+<tr><td><code>shutdownNow()</code></td><td>Attempt to interrupt running work and return tasks that never started; do not wait for termination.</td></tr>
+<tr><td><code>awaitTermination(timeout, unit)</code></td><td>Wait for termination after shutdown; return <code>false</code> on timeout and propagate interruption.</td></tr>
+<tr><td><code>isShutdown()</code> / <code>isTerminated()</code></td><td>Distinguish shutdown having begun from all executor tasks having finished after shutdown.</td></tr>
+<tr><td><code>close()</code></td><td>Java 19 and later: initiate shutdown and wait for termination; supports try-with-resources.</td></tr>
+<tr><td><code>Future.get()</code> / <code>get(timeout, unit)</code></td><td>Wait interruptibly for the outcome; the timed overload limits this wait.</td></tr>
+<tr><td><code>cancel(mayInterruptIfRunning)</code></td><td>Attempt cancellation; for a pool's task future, <code>true</code> permits interrupting its running thread.</td></tr>
+<tr><td><code>isDone()</code> / <code>isCancelled()</code></td><td>Inspect terminal outcome or cancellation; done includes failure and cancellation.</td></tr>
+<tr><td><code>state()</code> / <code>resultNow()</code> / <code>exceptionNow()</code></td><td>Java 19 additions: inspect state or retrieve an already available success/failure without waiting.</td></tr>
+</tbody>
+</table>
+<p><code>resultNow()</code> requires success and <code>exceptionNow()</code> requires failure; otherwise they throw <code>IllegalStateException</code>. <code>Future.State</code> has <code>RUNNING</code>, <code>SUCCESS</code>, <code>FAILED</code> and <code>CANCELLED</code>: <code>RUNNING</code> means not completed, including queued work that has not started. These are inspection APIs, not substitutes for waiting. A completed Java future can be read repeatedly and by multiple callers.</p>
+
+<h2 id="factory-methods-choose-an-overload-policy-too">Factory methods choose an overload policy too</h2>
+<table>
+<thead><tr><th><code>Executors</code> factory</th><th>What it creates</th><th>The trap</th></tr></thead>
+<tbody>
+<tr><td><code>newFixedThreadPool(n)</code></td><td>At most <code>n</code> active workers with an unbounded queue.</td><td>Workers are bounded; waiting work, memory and latency are not.</td></tr>
+<tr><td><code>newSingleThreadExecutor()</code></td><td>One active worker with an unbounded queue; tasks execute sequentially.</td><td>A blocked task delays every later task; waiting for a child on this executor can deadlock.</td></tr>
+<tr><td><code>newCachedThreadPool()</code></td><td>Reuse idle threads or create workers on demand, with direct handoff and 60-second idle expiry.</td><td>No practical thread-count bound: slow work can cause thread explosion.</td></tr>
+<tr><td><code>newScheduledThreadPool(n)</code> / <code>newSingleThreadScheduledExecutor()</code></td><td>Delayed and periodic execution with <code>n</code> core workers or one worker.</td><td>The delayed-task queue is unbounded.</td></tr>
+<tr><td><code>newWorkStealingPool()</code> / <code>newWorkStealingPool(n)</code></td><td>A <code>ForkJoinPool</code> with default or specified target parallelism.</td><td>No execution order guarantee; unmanaged blocking can waste workers.</td></tr>
+<tr><td><code>newThreadPerTaskExecutor(factory)</code> / <code>newVirtualThreadPerTaskExecutor()</code></td><td>A fresh thread per task, using the factory or Java 21 virtual threads.</td><td>No admission limit; cheap threads do not create extra database connections.</td></tr>
+</tbody>
+</table>
+<p>Most platform-thread factories also accept a <code>ThreadFactory</code> for names and other settings. Finite examples below use fixed pools for readability. For a service receiving unbounded traffic, choose explicit queue capacity and rejection. The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Executors.html">Java 21 factory reference</a> specifies these defaults.</p>
+<p>Continue with <a href="why-thread-pools.html">why pools exist</a>, <a href="sizing-pools.html">pool sizing</a>, <a href="fork-join-and-parallel.html">fork/join</a> and <a href="virtual-threads-and-coroutines.html">virtual threads</a> for workload choices. Limit the scarce resource separately instead of pooling virtual threads to imitate a platform-thread pool.</p>
+
+<h2 id="execute-versus-submit-where-does-failure-go">Execute versus submit: where does failure go?</h2>
+<p><code>execute</code> does not mean "new thread": an executor can run inline, queue work or hand it to another thread. In a normal <code>ThreadPoolExecutor</code>, an uncaught exception from a plain <code>Runnable</code> passed to <code>execute</code> reaches the worker's uncaught exception handler and ends that worker; workers are replaced as needed.</p>
+<p><code>submit</code> normally wraps work in a <a class="term" data-term="future-task" href="glossary.html#future-task">FutureTask</a>, capturing its exception for <code>get()</code>. It does not escape to the worker's uncaught exception handler. Ignoring the future can hide failure. Submission itself can still fail synchronously with <code>RejectedExecutionException</code> under a throwing rejection policy.</p>
+<p><code>FutureTask&lt;T&gt;</code> implements <code>RunnableFuture&lt;T&gt;</code>, combining <code>Runnable</code> and <code>Future&lt;T&gt;</code>. Construct it with a <code>Callable&lt;T&gt;</code> or a <code>Runnable</code> plus a result, then pass it to <code>execute</code> and retain that same object for <code>get</code> or cancellation. Its ordinary <code>run()</code> executes the computation at most once; calling <code>run()</code> yourself runs it on your thread. Calling <code>get()</code> does not start it; see the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/FutureTask.html">FutureTask contract</a>.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.1" data-expect="ok"><figcaption><span class="ctitle">The execution policy and result handle are separate</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">Executor</span> inline = <span class="t">Runnable</span>::run;
+        inline.<span class="f">execute</span>(() -&gt; <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"inline: "</span> + <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>()));
+        <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>(
+                <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"shop-"</span>, <span class="n">0</span>).<span class="f">factory</span>())) {
+            pool.<span class="f">execute</span>(() -&gt; <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"execute has no result handle"</span>));
+            <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; answer = pool.<span class="f">submit</span>(() -&gt; <span class="n">6</span> * <span class="n">7</span>);
+            <span class="k">if</span> (answer.<span class="f">get</span>() != <span class="n">42</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"wrong result"</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"answer = "</span> + answer.<span class="f">get</span>());
+            <span class="t">Future</span>&lt;?&gt; failed = pool.<span class="f">submit</span>(() -&gt; {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"bad job"</span>);
+            });
+            <span class="k">try</span> {
+                failed.<span class="f">get</span>();
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"failure disappeared"</span>);
+            } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"submit failure: "</span> + e.<span class="f">getCause</span>().<span class="f">getMessage</span>());
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Submission safely publishes prior caller actions to the task; retrieving its result with <code>get()</code> establishes the return visibility edge. This does not protect concurrent mutations after submission or sibling tasks' concurrent writes. A timeout or cancellation is not a task-exit barrier: the task may still be writing. See <a href="happens-before.html">happens-before</a> and <a href="exceptions-in-threads.html">worker failures</a>.</p>
+
+<h2 id="threadpoolexecutor-read-the-whole-constructor">ThreadPoolExecutor: read the whole constructor</h2>
+<p>The full constructor takes <code>corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue, threadFactory, handler</code>. Shorter overloads supply the default thread factory or rejection handler.</p>
+<table>
+<thead><tr><th>Parameter or method</th><th>One-line semantics</th></tr></thead>
+<tbody>
+<tr><td><code>corePoolSize</code></td><td>Below this count, submissions create workers; core workers normally remain alive while idle.</td></tr>
+<tr><td><code>maximumPoolSize</code></td><td>Worker ceiling; expansion beyond core happens only when queueing fails.</td></tr>
+<tr><td><code>keepAliveTime</code>, <code>unit</code></td><td>Idle timeout above core, not a task execution deadline.</td></tr>
+<tr><td><code>BlockingQueue&lt;Runnable&gt; workQueue</code></td><td>Stores waiting tasks; bounded queues expose overload, while <code>SynchronousQueue</code> stores none.</td></tr>
+<tr><td><code>ThreadFactory threadFactory</code></td><td>Creates workers, allowing names and an uncaught exception handler.</td></tr>
+<tr><td><code>RejectedExecutionHandler handler</code></td><td>Decides what happens on saturation or shutdown.</td></tr>
+<tr><td><code>prestartAllCoreThreads()</code></td><td>Create core workers before submissions; otherwise creation is normally lazy.</td></tr>
+<tr><td><code>allowCoreThreadTimeOut(true)</code></td><td>Apply a positive keep-alive timeout to core workers too.</td></tr>
+<tr><td><code>getPoolSize()</code>, <code>getActiveCount()</code>, <code>getQueue().size()</code></td><td>Diagnostic snapshots, not atomic admission checks.</td></tr>
+</tbody>
+</table>
+<p>The normal admission sequence is <strong>create below core, otherwise queue, otherwise grow toward maximum, otherwise reject</strong>. With an unbounded queue, increasing maximum usually changes nothing. Core and keep-alive values must be nonnegative, maximum positive, and <code>corePoolSize &lt;= maximumPoolSize</code>.</p>
+<p><code>AbortPolicy</code>, the default, throws. <code>CallerRunsPolicy</code> executes on the submitting thread while the executor is live, slowing that producer; after shutdown it discards. <code>DiscardPolicy</code> silently drops the new task; <code>DiscardOldestPolicy</code> drops the queue head and retries while live. Dropping submitted tasks without cancelling their futures can strand callers.</p>
+
+<div class="box example">
+<h3>Worked example: one core, two maximum, one queue slot</h3>
+<p>Hold running tasks at a gate. A creates the core worker, B fills the queue, C creates worker two, and D is rejected. B can start after C despite being submitted first.</p>
+<figure class="timeline"><figcaption>Queue before maximum</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Submitter</span><span>Workers</span><span>Queue</span></div><div class="tl-row"><span class="t">1</span><span class="cell">submit A</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">worker 1 takes A and waits at the gate</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">submit B</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">B fills the only slot</span></div><div class="tl-row"><span class="t">5</span><span class="cell">submit C</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell">worker 2 takes C because queueing failed</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell">submit D</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">8</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">still full with B</span></div><div class="tl-row bad"><span class="t">9</span><span class="cell bad">AbortPolicy rejects D because both worker slots are occupied</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Opening the gate lets A and C finish, then B can run.</div></div></figure>
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.2" data-expect="ok"><figcaption><span class="ctitle">Force saturation without depending on a sleep</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">CountDownLatch</span> release = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">CountDownLatch</span> running = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">2</span>);
+        <span class="t">ThreadPoolExecutor</span> pool = <span class="k">new</span> <span class="t">ThreadPoolExecutor</span>(<span class="n">1</span>, <span class="n">2</span>, <span class="n">30</span>, <span class="t">TimeUnit</span>.SECONDS,
+                <span class="k">new</span> <span class="t">ArrayBlockingQueue</span>&lt;&gt;(<span class="n">1</span>), <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"bounded-"</span>, <span class="n">0</span>).<span class="f">factory</span>(),
+                <span class="k">new</span> <span class="t">ThreadPoolExecutor</span>.<span class="t">AbortPolicy</span>());
+        <span class="t">Runnable</span> held = () -&gt; {
+            running.<span class="f">countDown</span>();
+            <span class="k">try</span> { release.<span class="f">await</span>(); }
+            <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+        };
+        <span class="k">try</span> {
+            pool.<span class="f">execute</span>(held);
+            pool.<span class="f">execute</span>(held);
+            pool.<span class="f">execute</span>(held);
+            running.<span class="f">await</span>();
+            <span class="k">if</span> (pool.<span class="f">getPoolSize</span>() != <span class="n">2</span> || pool.<span class="f">getQueue</span>().<span class="f">size</span>() != <span class="n">1</span>) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"unexpected admission"</span>);
+            }
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"workers = 2, queued = 1"</span>);
+            <span class="k">try</span> {
+                pool.<span class="f">execute</span>(held);
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"fourth task accepted"</span>);
+            } <span class="k">catch</span> (<span class="t">RejectedExecutionException</span> expected) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"fourth task rejected"</span>);
+            }
+        } <span class="k">finally</span> {
+            release.<span class="f">countDown</span>();
+            pool.<span class="f">close</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+</div>
+<p>A bounded queue does not make <code>execute</code> wait for space: it tries <code>offer</code>, not <code>put</code>, then grows or rejects as needed. The call can still take time in worker creation, queue locking or a rejection handler; <code>CallerRunsPolicy</code> runs the whole task before returning. The gate makes the diagnostic snapshot stable in this example only. The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ThreadPoolExecutor.html">ThreadPoolExecutor reference</a> specifies this policy; continue with <a href="executor-anatomy.html">executor anatomy</a> and <a href="rejection-and-pool-failures.html">rejection and pool failures</a>.</p>
+
+<h2 id="future-timeout-failure-and-cancellation-differ">Future: timeout, failure and cancellation differ</h2>
+<p><code>get()</code> can return a value, throw <code>ExecutionException</code> wrapping task failure, throw <code>CancellationException</code>, or throw <code>InterruptedException</code> because the waiting caller was interrupted. Timed <code>get</code> adds <code>TimeoutException</code>. Timeout ends <strong>this caller's wait</strong>; the task continues unless separately cancelled.</p>
+<p>For pool task futures, successful <code>cancel(false)</code> prevents a not-yet-started task from running, but does not interrupt one already executing. <code>cancel(true)</code> additionally requests interruption when running. Either may fail if the future already completed. Even successful cancellation does not prove the task stopped or rolled back side effects.</p>
+<p>A running <code>FutureTask</code> can accept <code>cancel(false)</code>: its future becomes cancelled while its computation continues, and its eventual value is discarded. Both <code>isDone()</code> and <code>isCancelled()</code> can therefore be true before the task exits. Cancellation also need not remove a queued wrapper immediately; <code>ThreadPoolExecutor.purge()</code> removes cancelled task futures from its queue when retention matters.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.3" data-expect="ok"><figcaption><span class="ctitle">Time out, cancel, then observe task exit</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">CountDownLatch</span> entered = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">CountDownLatch</span> release = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">CountDownLatch</span> exited = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>();
+        <span class="k">try</span> {
+            <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; job = pool.<span class="f">submit</span>(() -&gt; {
+                entered.<span class="f">countDown</span>();
+                <span class="k">try</span> { release.<span class="f">await</span>(); <span class="k">return</span> <span class="n">42</span>; }
+                <span class="k">finally</span> { exited.<span class="f">countDown</span>(); }
+            });
+            entered.<span class="f">await</span>();
+            <span class="k">try</span> {
+                job.<span class="f">get</span>(<span class="n">0</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"gate unexpectedly opened"</span>);
+            } <span class="k">catch</span> (<span class="t">TimeoutException</span> expected) {
+                <span class="k">if</span> (job.<span class="f">isDone</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"timeout completed the job"</span>);
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"timeout left the job running"</span>);
+            }
+            <span class="k">if</span> (!job.<span class="f">cancel</span>(<span class="k">true</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"cancellation lost"</span>);
+            <span class="k">try</span> {
+                job.<span class="f">get</span>();
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"cancelled result returned"</span>);
+            } <span class="k">catch</span> (<span class="t">CancellationException</span> expected) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"future is cancelled"</span>);
+            }
+            exited.<span class="f">await</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"task reached its exit cleanup"</span>);
+        } <span class="k">finally</span> {
+            release.<span class="f">countDown</span>();
+            pool.<span class="f">close</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The zero timeout is intentional: the closed gate proves the task is unfinished, regardless of scheduling speed. The task propagates interruption through <code>Callable</code>; <code>main</code> propagates it too. The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Future.html">Future contract</a> defines these outcomes; <a href="interruption-and-cancellation.html">cooperative cancellation</a> explains task cooperation.</p>
+
+<h2 id="invoke-all-or-invoke-any">Invoke all or invoke any?</h2>
+<p><code>invokeAll</code> waits for all tasks and returns futures in input order, not completion order. One task failing does not throw that task exception from the batch call: inspect each future. Its timed version cancels unfinished tasks after the batch budget expires and returns; it does not throw <code>TimeoutException</code>.</p>
+<p><code>invokeAny</code> returns one <strong>successful</strong> result. An early failure need not win; if every task fails, it throws <code>ExecutionException</code>. Its timed overload can throw <code>TimeoutException</code>. On normal or exceptional return it cancels unfinished competitors. Both methods propagate caller interruption and cancel unfinished tasks.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.4" data-expect="ok"><figcaption><span class="ctitle">Batch order and one successful result</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">Callable</span>&lt;<span class="t">Integer</span>&gt; broken = () -&gt; { <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"unavailable"</span>); };
+        <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">2</span>)) {
+            <span class="t">List</span>&lt;<span class="t">Callable</span>&lt;<span class="t">Integer</span>&gt;&gt; jobs = <span class="t">List</span>.<span class="f">of</span>(() -&gt; <span class="n">7</span>, broken, () -&gt; <span class="n">9</span>);
+            <span class="k">for</span> (<span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; result : pool.<span class="f">invokeAll</span>(jobs)) {
+                <span class="k">try</span> { <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"result = "</span> + result.<span class="f">get</span>()); }
+                <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"failed: "</span> + e.<span class="f">getCause</span>().<span class="f">getMessage</span>());
+                }
+            }
+            <span class="t">int</span> winner = pool.<span class="f">invokeAny</span>(<span class="t">List</span>.<span class="f">of</span>(broken, () -&gt; <span class="n">9</span>));
+            <span class="k">if</span> (winner != <span class="n">9</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(winner);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"successful result = "</span> + winner);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The output reports 7, failure, 9, then a successful 9. To consume completion order, <code>ExecutorCompletionService</code> offers <code>submit</code>, <code>take</code> and timed <code>poll</code>: <code>take()</code> returns a completed future, whose <code>get()</code> reveals success or failure; timed <code>poll</code> returns null on timeout. Do not submit and immediately <code>get</code> inside every loop iteration if you intended parallel work; submit the batch first. See <a href="futures-and-promises.html">futures and promises</a>.</p>
+
+<h2 id="lifecycle-ownership-includes-waiting-for-shutdown">Lifecycle: ownership includes waiting for shutdown</h2>
+<p>Use <code>shutdown()</code>, wait with <code>awaitTermination</code>, then escalate to <code>shutdownNow()</code> if the budget expires and wait again. A <code>false</code> result means workers may still be alive. If the owner is interrupted, request immediate shutdown and propagate interruption, or restore interrupt status at a boundary that cannot throw it.</p>
+<p>In <code>ThreadPoolExecutor</code>, <code>shutdownNow()</code> does not automatically complete the futures of removed queued tasks. Keep and cancel their handles; returned queued wrappers are also normally <code>Future</code> instances you can cancel. An interrupted running task may fail with <code>InterruptedException</code> inside <code>ExecutionException</code> without its future being marked cancelled.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.5" data-expect="ok"><figcaption><span class="ctitle">Graceful shutdown, escalation and a queued future</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">CountDownLatch</span> entered = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">CountDownLatch</span> release = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>();
+        <span class="k">try</span> {
+            <span class="t">Future</span>&lt;?&gt; active = pool.<span class="f">submit</span>(() -&gt; {
+                entered.<span class="f">countDown</span>();
+                release.<span class="f">await</span>();
+                <span class="k">return</span> <span class="k">null</span>;
+            });
+            entered.<span class="f">await</span>();
+            <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; queued = pool.<span class="f">submit</span>(() -&gt; <span class="n">99</span>);
+            pool.<span class="f">shutdown</span>();
+            <span class="k">if</span> (pool.<span class="f">awaitTermination</span>(<span class="n">0</span>, <span class="t">TimeUnit</span>.MILLISECONDS)) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"blocked worker terminated"</span>);
+            }
+            <span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; neverStarted = pool.<span class="f">shutdownNow</span>();
+            <span class="k">for</span> (<span class="t">Runnable</span> task : neverStarted) {
+                <span class="k">if</span> (task <span class="k">instanceof</span> <span class="t">Future</span>&lt;?&gt; future) future.<span class="f">cancel</span>(<span class="k">false</span>);
+            }
+            <span class="k">if</span> (neverStarted.<span class="f">size</span>() != <span class="n">1</span> || !queued.<span class="f">isCancelled</span>()) {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"queued task was not settled"</span>);
+            }
+            <span class="k">try</span> { active.<span class="f">get</span>(); <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"interrupt lost"</span>); }
+            <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+                <span class="k">if</span> (!(e.<span class="f">getCause</span>() <span class="k">instanceof</span> <span class="t">InterruptedException</span>)) <span class="k">throw</span> e;
+            }
+            <span class="k">if</span> (!pool.<span class="f">awaitTermination</span>(<span class="n">1</span>, <span class="t">TimeUnit</span>.SECONDS)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"still live"</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"queued cancelled, running interrupted, executor terminated"</span>);
+        } <span class="k">finally</span> {
+            release.<span class="f">countDown</span>();
+            pool.<span class="f">shutdownNow</span>();
+            pool.<span class="f">close</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>close()</code> suits locally owned finite work, but has <strong>no timeout</strong>. If interrupted while waiting, it requests immediate shutdown, continues waiting, and restores interrupt status before returning. Uncooperative tasks can keep it blocked. Never close an executor from one of its own tasks: that task cannot finish while awaiting its executor's termination.</p>
+<p>Only the owner shuts down a shared executor. Also await the terminal stage of an asynchronous graph before leaving its executor's resource scope: a task may later try to submit a continuation after <code>close()</code> stops admission. These lifecycle rules follow the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorService.html#close()">Java 21 ExecutorService contract</a>.</p>
+
+<h2 id="scheduledexecutorservice-clock-target-or-rest-period">ScheduledExecutorService: clock target or rest period</h2>
+<table>
+<thead><tr><th>Method</th><th>One-line semantics</th></tr></thead>
+<tbody>
+<tr><td><code>schedule(Runnable, delay, unit)</code></td><td>Run once after a relative delay; its <code>ScheduledFuture&lt;?&gt;</code> yields <code>null</code> on success.</td></tr>
+<tr><td><code>schedule(Callable&lt;T&gt;, delay, unit)</code></td><td>Run once after a delay and return a <code>ScheduledFuture&lt;T&gt;</code> for the value.</td></tr>
+<tr><td><code>scheduleAtFixedRate(task, initial, period, unit)</code></td><td>Target starts at initial delay plus successive multiples of a positive period.</td></tr>
+<tr><td><code>scheduleWithFixedDelay(task, initial, delay, unit)</code></td><td>Wait a positive delay after execution ends before enabling the next.</td></tr>
+<tr><td><code>ScheduledFuture.getDelay(unit)</code> / <code>cancel(...)</code></td><td>Inspect remaining delay or cancel through the future.</td></tr>
+<tr><td><code>ScheduledThreadPoolExecutor.setRemoveOnCancelPolicy(true)</code></td><td>Remove cancelled delayed tasks immediately instead of retaining them until their delay elapses.</td></tr>
+</tbody>
+</table>
+<p>Suppose initial delay is zero, the interval 100 ms, and every run takes 150 ms. On an otherwise idle scheduler, idealized fixed-rate starts are 0, 150, 300 ms: it runs late without overlapping executions of that registration. Fixed-delay starts are 0, 250, 500 ms: each completion gets a 100 ms rest. Real scheduling adds delays; neither is a real-time guarantee.</p>
+<p>An uncaught exception ends future repetitions of that registration. Its future fails; a healthy periodic task's <code>get()</code> never returns normally. Catch and report recoverable failures inside the task when repetitions should continue. Separate registrations of the same <code>Runnable</code> can still overlap on different workers.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.6" data-expect="ok"><figcaption><span class="ctitle">Periodic APIs stop repeating after an uncaught failure</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">void</span> <span class="f">demonstrate</span>(<span class="t">ScheduledExecutorService</span> timer, <span class="t">boolean</span> fixedRate) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">String</span> label = fixedRate ? <span class="s">"rate"</span> : <span class="s">"delay"</span>;
+        <span class="t">int</span>[] calls = {<span class="n">0</span>};
+        <span class="t">Runnable</span> tick = () -&gt; {
+            calls[<span class="n">0</span>] += <span class="n">1</span>;
+            <span class="t">System</span>.out.<span class="f">println</span>(label + <span class="s">" tick "</span> + calls[<span class="n">0</span>]);
+            <span class="k">if</span> (calls[<span class="n">0</span>] == <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"third tick failed"</span>);
+        };
+        <span class="t">ScheduledFuture</span>&lt;?&gt; handle = fixedRate
+                ? timer.<span class="f">scheduleAtFixedRate</span>(tick, <span class="n">0</span>, <span class="n">10</span>, <span class="t">TimeUnit</span>.MILLISECONDS)
+                : timer.<span class="f">scheduleWithFixedDelay</span>(tick, <span class="n">0</span>, <span class="n">10</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+        <span class="k">try</span> { handle.<span class="f">get</span>(); <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"periodic task returned normally"</span>); }
+        <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(label + <span class="s">" stopped: "</span> + e.<span class="f">getCause</span>().<span class="f">getMessage</span>());
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">ScheduledExecutorService</span> timer = <span class="t">Executors</span>.<span class="f">newSingleThreadScheduledExecutor</span>(
+                <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"timer-"</span>, <span class="n">0</span>).<span class="f">factory</span>())) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"once = "</span> + timer.<span class="f">schedule</span>(() -&gt; <span class="n">42</span>, <span class="n">0</span>, <span class="t">TimeUnit</span>.MILLISECONDS).<span class="f">get</span>());
+            <span class="f">demonstrate</span>(timer, <span class="k">true</span>);
+            <span class="f">demonstrate</span>(timer, <span class="k">false</span>);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The array belongs to successive, non-overlapping runs of one registration; the caller never reads it. <code>ScheduledThreadPoolExecutor</code> also guarantees that each run happens-before the next, even if different workers execute them. This demo checks repetition and failure, not exact timestamps.</p>
+<p>By default <code>ScheduledThreadPoolExecutor.shutdown()</code> stops periodic work but still executes existing delayed one-shot tasks, so a far-future job prolongs termination. Policies are configurable. See the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ScheduledThreadPoolExecutor.html">scheduler reference</a> and <a href="scheduled-executors.html">scheduled executors and timers</a>.</p>
+
+<h2 id="api-card-completablefuture-describes-dependencies">API card: CompletableFuture describes dependencies</h2>
+<p><a class="term" data-term="completable-future" href="glossary.html#completable-future">CompletableFuture</a> implements <code>Future&lt;T&gt;</code> and <code>CompletionStage&lt;T&gt;</code>. It is an outcome holder you can complete and a place to register a <a class="term" data-term="continuation" href="glossary.html#continuation">continuation</a>: work triggered when a preceding result is available. It does not itself own a worker thread.</p>
+<table>
+<thead><tr><th>Method</th><th>One-line semantics</th></tr></thead>
+<tbody>
+<tr><td><code>supplyAsync(supplier, executor)</code> / <code>runAsync(task, executor)</code></td><td>Schedule initial work producing a value or <code>Void</code>; overloads omit the executor.</td></tr>
+<tr><td><code>completedFuture(value)</code> / <code>failedFuture(error)</code></td><td>Create an already successful or failed future.</td></tr>
+<tr><td><code>complete(value)</code> / <code>completeExceptionally(error)</code></td><td>Attempt to settle an incomplete future; the first successful completion wins.</td></tr>
+<tr><td><code>thenApply(f)</code></td><td>On success, transform <code>T</code> into <code>U</code>, returning a new future for <code>U</code>.</td></tr>
+<tr><td><code>thenCompose(f)</code></td><td>Invoke <code>T -&gt; CompletionStage&lt;U&gt;</code> on success and flatten the dependent result.</td></tr>
+<tr><td><code>thenCombine(other, f)</code></td><td>After both inputs succeed, combine their values into a new result.</td></tr>
+<tr><td><code>thenAccept(action)</code> / <code>thenRun(action)</code></td><td>Run a success-only action with the value or without it, producing <code>Void</code>.</td></tr>
+<tr><td><code>exceptionally(recovery)</code></td><td>On failure, compute a replacement value; success passes through.</td></tr>
+<tr><td><code>handle((value, error) -&gt; result)</code></td><td>Transform success or failure; the error is null on success.</td></tr>
+<tr><td><code>whenComplete(observer)</code></td><td>Observe either outcome without replacing it; a throwing observer can fail a successful stage.</td></tr>
+<tr><td><code>allOf(futures...)</code></td><td>Return <code>CompletableFuture&lt;Void&gt;</code> that settles after all inputs settle, failing if any failed.</td></tr>
+<tr><td><code>anyOf(futures...)</code></td><td>Return <code>CompletableFuture&lt;Object&gt;</code> with an input's first completion, success or failure.</td></tr>
+<tr><td><code>get()</code> / <code>join()</code></td><td>Retrieve the outcome; <code>get</code> is interruptible with checked failures, while <code>join</code> uses unchecked failure reporting.</td></tr>
+<tr><td><code>orTimeout(time, unit)</code> / <code>completeOnTimeout(value, time, unit)</code></td><td>Complete this future exceptionally or with a fallback if still incomplete at timeout.</td></tr>
+<tr><td><code>minimalCompletionStage()</code></td><td>Expose a restricted stage view when callers should compose results without completing your future.</td></tr>
+</tbody>
+</table>
+<p>For task failure, <code>get</code> wraps the cause in <code>ExecutionException</code>; <code>join</code> throws unchecked <code>CompletionException</code>. A directly cancelled future throws <code>CancellationException</code>. <code>join</code> has no interruptible-wait contract like <code>get</code>, and no timed overload. Timeout completion and <code>CompletableFuture.cancel(true)</code> do <strong>not interrupt the supplier</strong>; its cancellation flag argument has no effect on interruption.</p>
+
+<h2 id="apply-compose-and-combine-follow-the-types">Apply, compose and combine: follow the types</h2>
+<p>Choose <code>thenApply</code> for an ordinary transformation, <code>thenCompose</code> when it returns another asynchronous operation, and <code>thenCombine</code> for independent results. Returning a future from <code>thenApply</code> creates a nested future. Calling <code>get</code> or <code>join</code> inside that callback to flatten it can occupy the worker needed by the child.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.7" data-expect="ok"><figcaption><span class="ctitle">Independent discount plus a dependent price lookup</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; <span class="f">lookupPrice</span>(<span class="t">int</span> nameLength, <span class="t">Executor</span> io) {
+        <span class="k">return</span> <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; nameLength * <span class="n">10</span>, io);
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">ExecutorService</span> io = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">2</span>,
+                    <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"lookup-"</span>, <span class="n">0</span>).<span class="f">factory</span>());
+                <span class="t">ExecutorService</span> cpu = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>(
+                    <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"format-"</span>, <span class="n">0</span>).<span class="f">factory</span>())) {
+            <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; user = <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; <span class="s">"Shubhi"</span>, io);
+            <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; discount = <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; <span class="n">10</span>, io);
+            <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; receipt = user
+                    .<span class="f">thenApply</span>(<span class="t">String</span>::length)
+                    .<span class="f">thenCompose</span>(length -&gt; <span class="f">lookupPrice</span>(length, io))
+                    .<span class="f">thenCombine</span>(discount, (price, reduction) -&gt; price - reduction)
+                    .<span class="f">thenApplyAsync</span>(total -&gt; <span class="s">"total = "</span> + total, cpu);
+            <span class="t">String</span> result = receipt.<span class="f">get</span>();
+            <span class="k">if</span> (!result.<span class="f">equals</span>(<span class="s">"total = 50"</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(result);
+            <span class="t">System</span>.out.<span class="f">println</span>(result);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The lookups are stand-ins for I/O operations. Only the outer caller waits. <code>lookupPrice</code> borrows an <code>Executor</code>, so cannot manage the owner's lifecycle through that interface. The graph finishes before resource closure. See <a href="java-oop-design-for-lld.html">LLD design</a> for ownership and <a href="composing-async.html">async composition</a> for deeper graphs.</p>
+
+<h2 id="which-thread-runs-each-stage">Which thread runs each stage?</h2>
+<table>
+<thead><tr><th>Call</th><th>Execution context</th></tr></thead>
+<tbody>
+<tr><td><code>thenApply</code>, <code>thenCompose</code>, <code>handle</code> and other non-async callbacks</td><td>May run on a completing thread; registering against an already completed stage can run the callback immediately on the registering thread.</td></tr>
+<tr><td><code>supplyAsync(supplier)</code> or <code>thenApplyAsync(f)</code> on ordinary <code>CompletableFuture</code></td><td>Use <code>ForkJoinPool.commonPool()</code>; if parallelism is below two, the default falls back to a new thread per task.</td></tr>
+<tr><td><code>thenApplyAsync(f, chosenExecutor)</code></td><td>Delegate to that executor; an executor can still have an inline policy.</td></tr>
+</tbody>
+</table>
+<p><strong>Executor choice is not inherited down the chain.</strong> <code>supplyAsync(f, io).thenApplyAsync(g)</code> normally sends <code>g</code> to the common pool, not <code>io</code>. Pass an executor at each async boundary needing isolation. Keep non-async callbacks short and put blocking I/O on a suitable executor with downstream limits, rather than occupying shared common-pool workers. Subclasses can override the default executor; these rules describe ordinary <code>CompletableFuture</code> instances.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.8" data-expect="ok"><figcaption><span class="ctitle">Completion, registration and explicit executor threads</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">ExecutorService</span> completer = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>(
+                    <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"complete-"</span>, <span class="n">0</span>).<span class="f">factory</span>());
+                <span class="t">ExecutorService</span> callbacks = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>(
+                    <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"callback-"</span>, <span class="n">0</span>).<span class="f">factory</span>())) {
+            <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; source = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+            <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; early = source.<span class="f">thenApply</span>(value -&gt; <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>());
+            completer.<span class="f">submit</span>(() -&gt; source.<span class="f">complete</span>(<span class="n">7</span>)).<span class="f">get</span>();
+            <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; late = source.<span class="f">thenApply</span>(value -&gt; <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>());
+            <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; explicit = source.<span class="f">thenApplyAsync</span>(
+                    value -&gt; <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>(), callbacks);
+            <span class="t">String</span> a = early.<span class="f">get</span>(), b = late.<span class="f">get</span>(), c = explicit.<span class="f">get</span>();
+            <span class="k">if</span> (!a.<span class="f">equals</span>(<span class="s">"complete-0"</span>) || !b.<span class="f">equals</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>())
+                    || !c.<span class="f">equals</span>(<span class="s">"callback-0"</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"unexpected context"</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"early = "</span> + a + <span class="s">", late = "</span> + b + <span class="s">", explicit = "</span> + c);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>This Java 21 example fixes completion and registration order, giving stable observed names. In a racing program, do not depend on one particular thread for a non-async callback. The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html">CompletableFuture execution policies</a> permit completion callers to perform dependent actions.</p>
+
+<h2 id="recovery-and-aggregation-failure-is-also-completion">Recovery and aggregation: failure is also completion</h2>
+<p>A failed source skips success transformations; their dependent stages fail too. <code>exceptionally</code> supplies a fallback on failure, while <code>handle</code> maps either outcome. Check the error argument, not whether the value is null: success can legitimately return null. If recovery throws, its new stage fails.</p>
+<p><code>allOf</code> waits for every input, does not collect values, and does not fail immediately on the first failure. <code>anyOf</code> can finish exceptionally before another input succeeds, unlike <code>invokeAny</code>. Neither cancels unfinished inputs automatically. Cancelling a dependent stage does not automatically cancel its upstream work.</p>
+<p>A success-only dependent that propagates source cancellation fails with <code>CompletionException</code> wrapping <code>CancellationException</code>, rather than necessarily reporting <code>isCancelled()</code>. If a <code>whenComplete</code> observer throws after an upstream failure, that upstream failure takes precedence. Use <code>handle</code> or <code>exceptionally</code> when you intend recovery.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.9" data-expect="ok"><figcaption><span class="ctitle">First failure, all settled, and typed recovered results</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; first = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; second = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt; all = <span class="t">CompletableFuture</span>.<span class="f">allOf</span>(first, second);
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Object</span>&gt; any = <span class="t">CompletableFuture</span>.<span class="f">anyOf</span>(first, second);
+        first.<span class="f">completeExceptionally</span>(<span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"lookup failed"</span>));
+        <span class="k">if</span> (all.<span class="f">isDone</span>() || !any.<span class="f">isCompletedExceptionally</span>()) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"wrong aggregation semantics"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"any = "</span> + any.<span class="f">exceptionally</span>(error -&gt; <span class="s">"fallback"</span>).<span class="f">join</span>());
+        second.<span class="f">complete</span>(<span class="n">9</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(all.<span class="f">handle</span>((value, error) -&gt; error == <span class="k">null</span> ? <span class="s">"all succeeded"</span> : <span class="s">"all failed"</span>).<span class="f">join</span>());
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; recovered = first.<span class="f">exceptionally</span>(error -&gt; -<span class="n">1</span>);
+        <span class="t">CompletableFuture</span>&lt;<span class="t">List</span>&lt;<span class="t">Integer</span>&gt;&gt; results = <span class="t">CompletableFuture</span>.<span class="f">allOf</span>(recovered, second)
+                .<span class="f">thenApply</span>(ignored -&gt; <span class="t">List</span>.<span class="f">of</span>(recovered.<span class="f">join</span>(), second.<span class="f">join</span>()));
+        <span class="k">if</span> (!results.<span class="f">join</span>().<span class="f">equals</span>(<span class="t">List</span>.<span class="f">of</span>(-<span class="n">1</span>, <span class="n">9</span>))) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(results.<span class="f">join</span>());
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"results = "</span> + results.<span class="f">join</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The joins in the final transformation cannot wait: its success callback runs only after both recovered inputs succeed. With no inputs, <code>allOf()</code> is already successful with null; <code>anyOf()</code> stays incomplete. If several inputs fail, do not rely on a particular failure being selected. For a complete report, convert each input into an outcome using <code>handle</code>, then aggregate.</p>
+<p><code>orTimeout</code> and <code>completeOnTimeout</code> mutate and return the same future, affecting other callers sharing it. Apply the timeout to <code>shared.copy()</code> when only one caller's view should expire. Timeout is not underlying I/O cancellation. Choose a cancellation owner and retain necessary task or I/O handles.</p>
+
+<figure class="code single" data-sample="java-toolkit-executors-and-futures.10" data-expect="ok"><figcaption><span class="ctitle">A request timeout does not settle the shared lookup</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; shared = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; request = shared.<span class="f">copy</span>();
+        <span class="k">if</span> (request.<span class="f">orTimeout</span>(<span class="n">0</span>, <span class="t">TimeUnit</span>.MILLISECONDS) != request) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"timeout returned another future"</span>);
+        }
+        <span class="k">try</span> {
+            request.<span class="f">get</span>();
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"timeout disappeared"</span>);
+        } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+            <span class="k">if</span> (!(e.<span class="f">getCause</span>() <span class="k">instanceof</span> <span class="t">TimeoutException</span>)) <span class="k">throw</span> e;
+        }
+        <span class="k">if</span> (shared.<span class="f">isDone</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"shared lookup was changed"</span>);
+        shared.<span class="f">complete</span>(<span class="n">42</span>);
+        <span class="k">if</span> (request.<span class="f">state</span>() != <span class="t">Future</span>.<span class="t">State</span>.FAILED || shared.<span class="f">resultNow</span>() != <span class="n">42</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"wrong outcomes"</span>);
+        }
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; fallback = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt;()
+                .<span class="f">completeOnTimeout</span>(-<span class="n">1</span>, <span class="n">0</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+        <span class="k">if</span> (fallback.<span class="f">get</span>() != -<span class="n">1</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"fallback lost"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"request timed out, shared = "</span> + shared.<span class="f">resultNow</span>()
+                + <span class="s">", fallback = "</span> + fallback.<span class="f">resultNow</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The zero timeout needs no sleep: the original future stays incomplete until the caller explicitly completes it. <code>copy()</code> is an independent outcome holder, not a deep copy of the eventual value. For APIs that expose only composition, return <code>minimalCompletionStage()</code>; declaring a mutable future as <code>CompletionStage</code> alone still lets callers cast it back. See the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html#copy()">copy and restricted-view APIs</a> and the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletionStage.html">dependency and failure rules</a>.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Bounded workers, unbounded waiting.</strong> A fixed pool can still exhaust memory. Bound admission and define rejection.</li>
+<li><strong>Get inside every submission iteration.</strong> Submit independent work first; otherwise the loop serializes it.</li>
+<li><strong>Discarding a submitted future.</strong> Arrange failure observation instead of assuming the uncaught exception handler sees it.</li>
+<li><strong>Waiting for a child on the same saturated pool.</strong> Every worker can wait while every child is queued. Compose dependencies or separate execution resources.</li>
+<li><strong>Equating timeout, cancellation and termination.</strong> A timed-out caller or cancelled outcome does not prove the task stopped.</li>
+<li><strong>Assuming Async inherits the previous executor.</strong> Supply the executor where execution policy matters.</li>
+<li><strong>Ignoring periodic failures or lifecycle ownership.</strong> Observe scheduled handles, stop owned executors, and never close borrowed ones.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Expect "Why is my pool stuck at core size?", "Where did this exception go?" and "Which thread runs this callback?" Start with admission, results and lifecycle. Identify which thread blocks and which thread must make progress.</p>
+<blockquote>I separate work from policy. I choose a bounded queue and explicit rejection, observe every outcome, and give shutdown one owner. For dependent asynchronous steps I compose stages so a worker does not block waiting for a queued child.</blockquote>
+<p>A <a href="https://leetcode.com/discuss/post/1806959/">2022 Rubrik report</a> describes improving a crawler with <code>CompletableFuture</code>; a <a href="https://leetcode.com/discuss/post/5166437/">2024 report</a> bans <code>ExecutorService</code> for dependency scheduling. Establish the allowed toolbox before coding. If libraries are forbidden, rebuild these contracts in <a href="build-thread-pool.html">a thread pool</a>, <a href="executor-without-libraries.html">an executor without libraries</a> and <a href="build-a-future.html">a completable future</a>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>An executor chooses where work runs; a future carries its outcome. Neither alone bounds admission.</li>
+<li><code>ThreadPoolExecutor</code> queues before growing beyond core. Queue capacity and rejection determine overload behavior.</li>
+<li>Timed <code>get</code> limits waiting, <code>cancel</code> requests cancellation, and termination needs task cooperation.</li>
+<li>Own shutdown; <code>close</code> waits without a deadline.</li>
+<li>Fixed rate targets a schedule; fixed delay waits after completion. Uncaught failure ends repetition.</li>
+<li>Apply transforms values, compose chains dependent stages, and combine merges independent results. Specify execution context and failure handling.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-toolkit-executors-and-futures"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-toolkit-executors-and-futures.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A pool has core size 2, maximum 8 and an unbounded queue. Both core workers are busy and 100 more tasks arrive. What normally happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Six workers are added before queueing the remaining tasks</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The tasks queue; maximum 8 does not trigger growth while queueing succeeds</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The submitting thread blocks until a worker is free</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Tasks beyond the first eight are rejected immediately</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Admission queues after reaching core, so it does not first add six workers. Only failed queue admission triggers growth toward maximum. An unbounded queue accepts the waiting tasks instead of rejecting at eight; submission does not wait for queue space.</div></div><div class="mcq" data-id="java-toolkit-executors-and-futures.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A task submitted with <code>submit</code> throws <code>IllegalStateException</code>. No one examines its future. Which statement is correct for a normal <code>ThreadPoolExecutor</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The submitting thread immediately receives the task exception</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The worker's uncaught exception handler necessarily receives it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The future captures it; a later <code>get</code> throws <code>ExecutionException</code> with that cause</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The failed task is automatically retried on another worker</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The task wrapper captures failure, so neither the submitter nor the worker's uncaught exception handler receives this task exception directly. This differs from a plain <code>Runnable</code> passed to <code>execute</code>. The pool does not retry failed tasks automatically. Rejection at submission is a separate synchronous failure.</div></div><div class="mcq" data-id="java-toolkit-executors-and-futures.q3" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">A timed <code>Future.get</code> throws <code>TimeoutException</code>. Which statements are true? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The task may still be running</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A later <code>get</code> can return a result if the task eventually succeeds</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The task is now cancelled and its side effects have been undone</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A subsequent successful <code>cancel(true)</code> proves the worker has exited the task</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Timeout limits one wait and does not settle the future, so a later <code>get()</code> may still succeed. Cancellation is separate: even when it succeeds, execution can continue. Neither timeout nor cancellation rolls back side effects.</div></div><div class="mcq" data-id="java-toolkit-executors-and-futures.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">One periodic registration takes 150 ms per run, with initial delay zero and interval 100 ms. Ignoring other scheduling delays, what are its first three fixed-delay start times?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">0, 100, 200 ms</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">0, 150, 300 ms</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">0, 250, 500 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">0, 150, 250 ms</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each run takes 150 ms followed by a 100 ms delay, giving 0, 250, 500 ms. Fixed rate would run late at 0, 150, 300 ms in this idealized case. Starting at 100 ms would overlap the first run; starting at 150 ms would omit the required delay.</div></div><div class="mcq" data-id="java-toolkit-executors-and-futures.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>source</code> is a <code>CompletableFuture&lt;String&gt;</code> and <code>fetch</code> returns <code>CompletableFuture&lt;Integer&gt;</code>. Which expression produces <code>CompletableFuture&lt;Integer&gt;</code> without blocking for the dependent result?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>source.thenApply(name -&gt; fetch(name))</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>source.thenCompose(name -&gt; fetch(name))</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>source.thenApply(name -&gt; fetch(name).join())</code>, because join never blocks</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>CompletableFuture.allOf(source)</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>thenCompose</code> flattens the stage. <code>thenApply</code> creates a nested future unless you wait inside it; <code>join</code> can block and starve the child. <code>allOf</code> returns a future of <code>Void</code>.</div></div><div class="mcq" data-id="java-toolkit-executors-and-futures.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?<figure class="code single" data-sample="java-toolkit-executors-and-futures.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code><span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; a = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+<span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; b = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+<span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt; all = <span class="t">CompletableFuture</span>.<span class="f">allOf</span>(a, b);
+<span class="t">CompletableFuture</span>&lt;<span class="t">Object</span>&gt; any = <span class="t">CompletableFuture</span>.<span class="f">anyOf</span>(a, b);
+a.<span class="f">completeExceptionally</span>(<span class="k">new</span> <span class="t">IllegalStateException</span>());
+<span class="t">System</span>.out.<span class="f">println</span>(all.<span class="f">isDone</span>() + <span class="s">" "</span> + any.<span class="f">isCompletedExceptionally</span>());</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>true true</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>false true</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>false false</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The print blocks until b completes</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>allOf</code> still waits for <code>b</code>, while <code>anyOf</code> mirrors <code>a</code>'s exceptional completion. Status methods do not block. The tempting <code>true true</code> answer assumes <code>allOf</code> fails immediately; <code>false false</code> incorrectly ignores the failure already completing <code>anyOf</code>.</div></div><div class="mcq" data-id="java-toolkit-executors-and-futures.q7" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Ordinary <code>CompletableFuture</code> instances are used in <code>supplyAsync(load, io).thenApplyAsync(parse).thenApply(format)</code>. Assume all stages succeed. What can you safely claim about execution policy?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">All three callbacks run on <code>io</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>parse</code> runs on <code>io</code>, while <code>format</code> always runs on main</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>load</code> uses <code>io</code>; <code>parse</code> uses the default async executor; <code>format</code> has no dedicated executor guarantee</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Every callback creates a new platform thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The explicit executor applies to <code>load</code> only. <code>parse</code> normally uses the common pool, with its low-parallelism fallback. <code>format</code> may run during completion or registration, so do not infer thread affinity.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-toolkit-executors-and-futures.c1" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">One worker runs a parent task that submits a child to the same single-thread executor and calls <code>child.get()</code>. The queue has room. Explain the hang and repair it without sleeps.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The parent occupies the sole worker and waits for the child. The child is queued but needs that same worker to start. No lock cycle is necessary: the dependency and limited execution capacity cause starvation. Express the parent as an asynchronous stage, use <code>thenCompose</code> to return the child stage, and let only an external caller wait. Separate executors can remove this dependency cycle, but increasing one pool's size only postpones it when enough parents occupy all workers.</p></div></div><div class="cq" data-q="java-toolkit-executors-and-futures.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A component receives an <code>ExecutorService</code> from its caller. A request must stop waiting after 200 ms. Describe results, cancellation and ownership, including what changes with <code>CompletableFuture</code>.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The component borrows the executor and does not close it. Use timed <code>get</code>, distinguish timeout from task failure and caller interruption, and retain the task future if policy calls for <code>cancel(true)</code>. Tasks must cooperate with interruption; remote side effects need their own semantics. Carry the remaining request budget across multiple waits instead of restarting 200 ms at every step.</p><p><code>CompletableFuture.orTimeout</code> completes that future exceptionally but does not interrupt its supplier. It also changes the shared future itself, unlike a timed get's local wait; use <code>copy().orTimeout(...)</code> for a separate caller's view. Define who owns cancellation and retain any task or I/O handle needed to stop the operation. Observe terminal failure and leave shutdown to the executor's actual owner.</p></div></div><div class="cq" data-q="java-toolkit-executors-and-futures.c3" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Given independent <code>CompletableFuture&lt;Integer&gt;</code> values <code>price</code> and <code>shipping</code>, produce a future of their sum, recover failure to -1, and report the final outcome. Where could callbacks run?</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="java-toolkit-executors-and-futures.12"><figcaption><span class="ctitle">Combine, recover, then classify</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; status = price
+        .<span class="f">thenCombine</span>(shipping, <span class="t">Integer</span>::sum)
+        .<span class="f">exceptionally</span>(error -&gt; -<span class="n">1</span>)
+        .<span class="f">handle</span>((value, error) -&gt; error == <span class="k">null</span> ? <span class="s">"value = "</span> + value : <span class="s">"failed"</span>);</code></div></pre></div><div class="runout" hidden></div></figure><p>All callbacks are non-async and may run during completion or registration. Recovery converts upstream failure into normal completion with -1, so status normally reports a value. If a sentinel hides a useful distinction, use an explicit outcome type. Use async overloads with an explicit executor when callback execution needs isolation.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="java-toolkit-executors-and-futures.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Our pool has a maximum of 100 threads, but it stays at 10 while latency and memory grow. What would you inspect and change?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Inspect core size and queue type; an unbounded queue explains lack of growth beyond core</li><li>Explain admission: create below core, queue, grow only after queue failure, then reject</li><li>Relate backlog to retained memory and queueing latency</li><li>Choose queue capacity and rejection based on workload and downstream limits</li><li>Explain CallerRunsPolicy's caller-thread cost and silent-discard future risk</li><li>Measure queue age, rejection and dependency latency before tuning workers</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would inspect the queue first. If core size is ten and the queue is unbounded, this behavior is expected. ThreadPoolExecutor creates workers below core, then tries to queue. Only when queueing fails does it grow toward maximum. Changing maximum to a hundred does not drain that backlog. Each queued task retains memory and waits longer before starting, explaining both symptoms. I would choose queue capacity and an overload response based on the latency budget and downstream capacity. AbortPolicy makes rejection visible so the caller can shed load or retry under a controlled policy. CallerRunsPolicy slows the producer by executing work on its thread, which can be unacceptable on an event loop. Silent discard is especially dangerous when callers hold futures that never complete. I would measure queue age, rejection counts, worker activity and dependency latency before changing concurrency. More workers can help some blocking workloads, but they can also overwhelm the database. The goal is bounded admitted work with an observable failure policy, not just a larger thread count.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What happens if every worker submits a child to this pool and waits for it?</span></p></div></div><div class="sq" data-sq="java-toolkit-executors-and-futures.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Compare thenApply, thenCompose and thenCombine for me. Then tell me which thread runs the callbacks."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Apply transforms a value, compose flattens a dependent stage, combine merges independent successes</li><li>Give dependent and independent lookup examples</li><li>Explain why joining a child inside apply can starve a bounded pool</li><li>Non-async callbacks can run during completion or registration</li><li>Async uses the default executor unless one is supplied; the preceding executor is not inherited</li><li>Observe the terminal result before closing executors needed by the graph</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Apply transforms a value, compose chains an asynchronous dependency, and combine joins independent successful results. If I have a user, apply can extract an identifier. If that identifier starts an asynchronous order lookup, compose gives me a future of orders instead of a future containing another future. If an independent discount lookup is running, combine can merge its result with the order total. I would not flatten the nested result by joining inside apply. That occupies a worker, and the child may need the same saturated pool. Non-async callbacks have no dedicated worker guarantee. They can run during completion, or immediately on the registering thread when the source is already complete. Async methods on ordinary CompletableFuture use the common pool by default, subject to its low-parallelism fallback. An explicitly supplied executor controls that boundary only; it is not inherited by later async calls. I would keep inline callbacks short, specify executors where isolation matters, and observe the terminal stage before closing any executor the graph still needs.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How does anyOf differ from invokeAny when the fastest operation fails?</span></p></div></div><div class="sq" data-sq="java-toolkit-executors-and-futures.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"A request timed out, so I cancelled its future and shut down the pool. Can I tell the caller that the work has stopped?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Timeout ends a wait, not the task</li><li>Pool Future cancellation can request interruption but cannot stop uncooperative work or roll back effects</li><li>CompletableFuture cancellation does not interrupt its supplier</li><li>Shutdown rejects new work; shutdownNow attempts interruption and returns pending tasks</li><li>Await termination and settle abandoned queued futures; close has no deadline</li><li>Only the owner shuts down the pool; remote effects need separate confirmation</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">No. Those calls do not prove the work has stopped. Timed get limits my wait. Cancelling a pool task future can request interruption, but the task must cooperate, and cancellation does not roll back effects. CompletableFuture cancellation completes the outcome exceptionally without interrupting its supplier. Shutdown rejects new work while accepted tasks finish. ShutdownNow attempts interruption and returns queued tasks that never started; I must settle their futures so callers are not stranded. I would await termination and check its result before reporting that the executor's tasks finished. Close waits too, but has no deadline and can hang on uncooperative work. Finally, only the owner should shut down the executor. Stopping a borrowed pool affects unrelated requests. Even local termination does not confirm that a remote payment or write was undone, so that requires a separate application-level contract and confirmation.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you cancel a supplier blocked in an external API call?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-executor-wait-for-all.html" data-problem="executor-wait-for-all"><span class="pk">Executors and async · medium</span><b>Executor with wait for all</b><span class="pst"></span></a><a class="pcard" href="p-thread-pool-from-scratch.html" data-problem="thread-pool-from-scratch"><span class="pk">Executors and async · hard</span><b>Thread pool from scratch</b><span class="pst"></span></a><a class="pcard" href="p-scheduled-executor.html" data-problem="scheduled-executor"><span class="pk">Executors and async · hard</span><b>Scheduled executor</b><span class="pst"></span></a><a class="pcard" href="p-future-from-scratch.html" data-problem="future-from-scratch"><span class="pk">Build a primitive · hard</span><b>A future from scratch</b><span class="pst"></span></a><a class="pcard" href="p-dependency-job-runner.html" data-problem="dependency-job-runner"><span class="pk">Executors and async · hard</span><b>Dependency-aware job runner</b><span class="pst"></span></a><a class="pcard" href="p-web-crawler-multithreaded.html" data-problem="web-crawler-multithreaded"><span class="pk">Concurrent systems · hard</span><b>Multithreaded web crawler</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-toolkit-locks.html"><span>Previous</span><b>The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</b></a><a class="next" href="java-toolkit-collections-and-synchronizers.html"><span>Next</span><b>The toolkit: concurrent collections and synchronizers</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#api-card-execution-and-results">API card: execution and results</a><a href="#factory-methods-choose-an-overload-policy-too">Factory methods choose an overload policy too</a><a href="#execute-versus-submit-where-does-failure-go">Execute versus submit: where does failure go?</a><a href="#threadpoolexecutor-read-the-whole-constructor">ThreadPoolExecutor: read the whole constructor</a><a href="#future-timeout-failure-and-cancellation-differ">Future: timeout, failure and cancellation differ</a><a href="#invoke-all-or-invoke-any">Invoke all or invoke any?</a><a href="#lifecycle-ownership-includes-waiting-for-shutdown">Lifecycle: ownership includes waiting for shutdown</a><a href="#scheduledexecutorservice-clock-target-or-rest-period">ScheduledExecutorService: clock target or rest period</a><a href="#api-card-completablefuture-describes-dependencies">API card: CompletableFuture describes dependencies</a><a href="#apply-compose-and-combine-follow-the-types">Apply, compose and combine: follow the types</a><a href="#which-thread-runs-each-stage">Which thread runs each stage?</a><a href="#recovery-and-aggregation-failure-is-also-completion">Recovery and aggregation: failure is also completion</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

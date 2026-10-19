@@ -1,0 +1,1136 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Code review set 1: locks, flags and lifecycles · Drill · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-test page-drill" data-test="drill-review-01" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><section class="pagehead"><p class="eyebrow"><a href="practice.html#drills">Timed drills</a> · Code review</p><h1>Code review set 1: locks, flags and lifecycles</h1><p class="hhsub">Ten code reviews in your language: find every real problem in a class that claims to be thread safe.</p><p>Amazon's online assessment has shown a mutex guarded, C style C++ container that claims thread safe indexed access and asked candidates to pick every problem (deadlock, leak, corruption); Microsoft has asked candidates to find the issues in a snippet "assuming that there is multithreading involved", and Rubrik runs whole debugging rounds on broken concurrent code. Each question here is one class of 20 to 60 lines in your language. Several options are usually right and some wrong options are things that look wrong but are fine, so judge every option on its own. Every snippet compiles; the key failures (self deadlock, the reentrant <code>ConcurrentModificationException</code>, the busy loop) were reproduced by running them.</p><div class="drillstart" id="dstart"><p>10 questions, 25 minutes. Answers and explanations stay hidden until you submit or the clock runs out. Multi answer questions say so; pick every option that is true.</p><button type="button" class="btn" data-dstart><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Start the clock</button><span class="tbest" data-testbest="drill-review-01"></span></div><div class="testbar drillbar" hidden><span class="dtimer" id="dtimer">25:00</span><span id="tprog">0 answered</span><span id="tscore"></span><button type="button" class="btn small" data-dsubmit>Submit</button><button type="button" class="btn ghost small" data-treset hidden>Start again</button></div></section><section class="testbody quiz drillbody" data-test="drill-review-01" data-drill="review-01" data-minutes="25" hidden><div class="mcq" data-id="d-review-01.q1" data-a="1,2,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>The author says this is "a thread safe growable int array". Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.1"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="k">class</span> <span class="t">IntArray</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> mutex = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">1</span>);   <span class="c">// used as a lock</span>
+    <span class="k">private</span> <span class="t">int</span>[] data = <span class="k">new</span> <span class="t">int</span>[<span class="n">4</span>];
+    <span class="k">private</span> <span class="t">int</span> size = <span class="n">0</span>;
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">set</span>(<span class="t">int</span> i, <span class="t">int</span> v) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        mutex.<span class="f">acquire</span>();
+        <span class="k">if</span> (i &gt;= data.length) {
+            <span class="f">grow</span>(i + <span class="n">1</span>);
+        }
+        data[i] = v;
+        size = <span class="t">Math</span>.<span class="f">max</span>(size, i + <span class="n">1</span>);
+        mutex.<span class="f">release</span>();
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">grow</span>(<span class="t">int</span> min) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        mutex.<span class="f">acquire</span>();
+        data = <span class="t">Arrays</span>.<span class="f">copyOf</span>(data, <span class="t">Math</span>.<span class="f">max</span>(min, data.length * <span class="n">2</span>));
+        mutex.<span class="f">release</span>();
+    }
+
+    <span class="k">public</span> <span class="t">int</span> <span class="f">get</span>(<span class="t">int</span> i) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        mutex.<span class="f">acquire</span>();
+        <span class="k">if</span> (i &gt;= size) {
+            <span class="k">return</span> -<span class="n">1</span>;
+        }
+        <span class="t">int</span> v = data[i];
+        mutex.<span class="f">release</span>();
+        <span class="k">return</span> v;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>grow()</code> leaks the old array, because nothing frees it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>set()</code> blocks forever the first time it needs to grow: <code>grow()</code> asks for the only permit, which <code>set()</code> already holds</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>get()</code> with an index past the end returns while holding the permit, so every later call on this array blocks forever</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A <code>Semaphore</code> remembers which thread took the permit, so the holder can acquire it again</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>set()</code> with a negative index throws <code>ArrayIndexOutOfBoundsException</code> after <code>acquire()</code>, and the permit is never released</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> A semaphore with one permit works as a lock but has no owner, so it is not reentrant: when <code>set()</code> calls <code>grow()</code>, the second <code>acquire()</code> waits for a permit that only this same thread could release. We ran it: <code>set(10, 1)</code> on a new array hung. <code>get()</code> returns <code>-1</code> on its early path without <code>release()</code>, and an exception thrown between <code>acquire()</code> and <code>release()</code> skips the release too; both leave the permit gone for good. The fix is <code>try { ... } finally { mutex.release(); }</code> (or a <code>ReentrantLock</code> with try/finally) and a <code>grow</code> that assumes the lock is held instead of taking it. The old array is garbage collected, so there is no leak in Java.</div></div><div class="mcq" data-id="d-review-01.q2" data-a="0,2,3" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>The author says this is "a thread safe growable int array". Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.2"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</span><code><span class="k">class</span> concurrent_container {
+    <span class="t">int</span>* data_;
+    <span class="t">size_t</span> size_ = <span class="n">0</span>;
+    <span class="t">size_t</span> cap_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+
+    <span class="t">void</span> <span class="f">resize</span>(<span class="t">size_t</span> n) {
+        m_.<span class="f">lock</span>();
+        <span class="t">int</span>* bigger = <span class="k">static_cast</span>&lt;<span class="t">int</span>*&gt;(<span class="f">malloc</span>(n * <span class="k">sizeof</span>(<span class="t">int</span>)));
+        <span class="f">memcpy</span>(bigger, data_, size_ * <span class="k">sizeof</span>(<span class="t">int</span>));
+        data_ = bigger;
+        cap_ = n;
+        m_.<span class="f">unlock</span>();
+    }
+
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">concurrent_container</span>(<span class="t">size_t</span> cap)
+        : <span class="f">data_</span>(<span class="k">static_cast</span>&lt;<span class="t">int</span>*&gt;(<span class="f">malloc</span>(cap * <span class="k">sizeof</span>(<span class="t">int</span>)))), <span class="f">cap_</span>(cap) {}
+
+    <span class="t">void</span> <span class="t">set</span>(<span class="t">size_t</span> i, <span class="t">int</span> v) {
+        m_.<span class="f">lock</span>();
+        <span class="k">if</span> (i &gt;= cap_) {
+            <span class="f">resize</span>(i * <span class="n">2</span> + <span class="n">1</span>);
+        }
+        data_[i] = v;
+        <span class="k">if</span> (i &gt;= size_) size_ = i + <span class="n">1</span>;
+        m_.<span class="f">unlock</span>();
+    }
+
+    <span class="t">int</span> <span class="f">get</span>(<span class="t">size_t</span> i) {
+        m_.<span class="f">lock</span>();
+        <span class="k">if</span> (i &gt;= size_) {
+            <span class="k">return</span> -<span class="n">1</span>;
+        }
+        <span class="t">int</span> v = data_[i];
+        m_.<span class="f">unlock</span>();
+        <span class="k">return</span> v;
+    }
+};</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>set()</code> relocks <code>m_</code> inside <code>resize()</code> while already holding it: undefined behaviour, in practice a self deadlock the first time the array grows</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>memcpy</code> copies <code>size_</code> elements, which can read past the end of the old buffer</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>get()</code> with an index past the end returns with <code>m_</code> still locked, preventing another thread from acquiring it while the owner never unlocks it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>resize()</code> never frees the old buffer (and nothing frees the last one), so memory leaks</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>get()</code> can run while <code>set()</code> is writing, because the two functions use the lock differently</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>std::mutex</code> is not recursive, so <code>set()</code> calling <code>resize()</code> while holding <code>m_</code> violates the locking precondition; a self deadlock is a common manifestation. The early <code>return -1</code> in <code>get()</code> leaks ownership. Another thread cannot acquire that mutex while the owner never unlocks it; the owner attempting to lock it again instead violates the same non recursive precondition. <code>resize()</code> also overwrites <code>data_</code> without freeing the old allocation, and no destructor frees the last one. For valid indices, successful allocations and arithmetic without overflow, the intended invariant is <code>size_ &lt;= cap_</code>, so the copy length itself is not an extra bounds bug. Both public operations use the same mutex. Use <code>std::vector&lt;int&gt;</code>, RAII guards and a resize helper that assumes the lock is already held; also validate indices and allocation limits.</div></div><div class="mcq" data-id="d-review-01.q3" data-a="1,3" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Many ATM threads share these accounts. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.3"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</span><code><span class="k">class</span> <span class="t">Account</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="t">long</span> balance;
+
+    <span class="k">public</span> <span class="t">long</span> <span class="f">getBalance</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">return</span> balance;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            balance += amount;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">withdraw</span>(<span class="t">long</span> amount) {
+        lock.<span class="f">lock</span>();
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"amount must be positive"</span>);
+        }
+        balance -= amount;
+        lock.<span class="f">unlock</span>();
+    }
+}
+
+<span class="k">class</span> <span class="t">Atm</span> {
+    <span class="t">boolean</span> <span class="f">tryWithdraw</span>(<span class="t">Account</span> acct, <span class="t">long</span> amount) {
+        <span class="k">if</span> (acct.<span class="f">getBalance</span>() &gt;= amount) {
+            acct.<span class="f">withdraw</span>(amount);
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>getBalance()</code> and <code>withdraw()</code> can deadlock each other, because they use the same lock</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Two ATMs can both see enough money and both withdraw, driving the balance negative</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Declaring <code>balance</code> as <code>volatile</code> would make <code>tryWithdraw</code> safe</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>withdraw(0)</code> throws while the lock is held, so every other thread that touches this account then blocks forever</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">In <code>getBalance()</code>, the <code>finally</code> block unlocks before the return value is read, so the read is unprotected</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>tryWithdraw</code> is check then act across two separately locked calls: between <code>getBalance()</code> and <code>withdraw()</code> another ATM can withdraw, so both pass the check. Each call is safe; the pair is not. The fix is one method on <code>Account</code>, such as <code>withdrawIfAtLeast(amount)</code>, that checks and subtracts under one lock acquisition. In <code>withdraw</code>, the exception leaves without <code>unlock()</code>, and a <code>ReentrantLock</code> stays owned by that thread until it unlocks, which it never will; the lock call must be followed by <code>try</code>/<code>finally</code>. Two methods that take the same single lock cannot deadlock each other, <code>volatile</code> does nothing for a two step decision, and in <code>getBalance()</code> the return value is computed before the <code>finally</code> runs, which is the correct idiom.</div></div><div class="mcq" data-id="d-review-01.q4" data-a="2,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>Many ATM threads share these accounts. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.4"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">class</span> Account {
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">long</span> balance_ = <span class="n">0</span>;
+<span class="k">public</span>:
+    <span class="t">long</span> <span class="f">balance</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="k">return</span> balance_;
+    }
+    <span class="t">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        balance_ += amount;
+    }
+    <span class="t">void</span> <span class="f">withdraw</span>(<span class="t">long</span> amount) {
+        m_.<span class="f">lock</span>();
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"amount must be positive"</span>);
+        }
+        balance_ -= amount;
+        m_.<span class="f">unlock</span>();
+    }
+};
+
+<span class="t">bool</span> <span class="f">try_withdraw</span>(Account&amp; acct, <span class="t">long</span> amount) {
+    <span class="k">if</span> (acct.<span class="f">balance</span>() &gt;= amount) {
+        acct.<span class="f">withdraw</span>(amount);
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+    <span class="k">return</span> <span class="k">false</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>balance()</code> is unprotected, because the <code>lock_guard</code> is destroyed before the return value is copied out</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>balance()</code> should not compile: a <code>const</code> member function cannot lock a member mutex</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two threads can both see enough money and both withdraw, driving the balance negative</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Making <code>balance_</code> a <code>std::atomic&lt;long&gt;</code> would make <code>try_withdraw</code> safe</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>withdraw(0)</code> throws with <code>m_</code> still locked, so the next thread that locks this account blocks forever</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>try_withdraw</code> checks in one critical section and acts in another, so another thread can withdraw in between and both pass the check. The fix is a member such as <code>bool withdraw_if_at_least(long)</code> that checks and subtracts under one <code>lock_guard</code>. In <code>withdraw</code>, the <code>throw</code> leaves <code>m_</code> locked, because a manual <code>lock()</code> has no destructor to undo it; use <code>std::lock_guard</code> so unwinding unlocks it. The return value of <code>balance()</code> is initialized before local objects are destroyed, so the read is protected. <code>mutable</code> exists precisely so a <code>const</code> member can lock a mutex. An atomic balance makes each access atomic, but the decision still spans two steps.</div></div><div class="mcq" data-id="d-review-01.q5" data-a="1,3,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Request threads and a reporting thread use this registry. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.5"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code><span class="k">class</span> <span class="t">Session</span> {
+    <span class="k">final</span> <span class="t">String</span> user;
+    <span class="t">long</span> lastSeen;
+    <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; events = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="t">Session</span>(<span class="t">String</span> user) { <span class="k">this</span>.user = user; }
+}
+
+<span class="k">class</span> <span class="t">Registry</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Session</span>&gt; sessions = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">add</span>(<span class="t">String</span> id, <span class="t">Session</span> s) { sessions.<span class="f">put</span>(id, s); }
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">remove</span>(<span class="t">String</span> id) { sessions.<span class="f">remove</span>(id); }
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="t">Session</span> <span class="f">get</span>(<span class="t">String</span> id) { <span class="k">return</span> sessions.<span class="f">get</span>(id); }
+
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="t">Collection</span>&lt;<span class="t">Session</span>&gt; <span class="f">all</span>() {
+        <span class="k">return</span> <span class="t">Collections</span>.<span class="f">unmodifiableCollection</span>(sessions.<span class="f">values</span>());
+    }
+}
+
+<span class="k">class</span> <span class="t">Handlers</span> {
+    <span class="k">void</span> <span class="f">onRequest</span>(<span class="t">Registry</span> registry, <span class="t">String</span> id) {          <span class="c">// many threads</span>
+        <span class="t">Session</span> s = registry.<span class="f">get</span>(id);
+        <span class="k">if</span> (s != <span class="k">null</span>) {
+            s.lastSeen = <span class="t">System</span>.<span class="f">currentTimeMillis</span>();
+            s.events.<span class="f">add</span>(<span class="s">"ping"</span>);
+        }
+    }
+    <span class="k">void</span> <span class="f">onReport</span>(<span class="t">Registry</span> registry) {                       <span class="c">// one thread</span>
+        <span class="k">for</span> (<span class="t">Session</span> s : registry.<span class="f">all</span>()) {
+            <span class="f">report</span>(s.user, s.events.<span class="f">size</span>());
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>unmodifiableCollection</code> makes <code>all()</code> safe, because callers can no longer change the map</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The report loop iterates the live <code>HashMap</code> after <code>all()</code> has released the monitor, so a concurrent <code>add</code> or <code>remove</code> can make it throw <code>ConcurrentModificationException</code> or skip entries</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A <code>Session</code> returned by <code>get()</code> can be freed by <code>remove()</code> while a request thread still uses it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Two request threads for the same session can call <code>s.events.add</code> at the same time on an unsynchronized <code>ArrayList</code></span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">The report thread calls <code>s.events.size()</code> with no lock while request threads add to that list, so it can see a stale or half updated list</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> A <code>synchronized</code> getter protects only the moment it runs. <code>all()</code> returns a view backed by the live map, and the caller iterates it after the monitor is released; <code>unmodifiableCollection</code> blocks writes through the view but is still a live window onto a map other threads change. Likewise <code>get()</code> hands out a mutable <code>Session</code> whose fields are then changed and read with no lock, so <code>events</code> (an <code>ArrayList</code>) can be corrupted. Fixes: return a snapshot (<code>List.copyOf(sessions.values())</code>), and give <code>Session</code> its own synchronization or make it immutable. Java has no dangling references: a removed <code>Session</code> stays alive while anyone holds it.</div></div><div class="mcq" data-id="d-review-01.q6" data-a="0,2,3" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>Request threads and a reporting thread use this registry. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</span><code><span class="k">struct</span> Session {
+    <span class="t">std</span>::<span class="t">string</span> user;
+    <span class="t">long</span> last_seen = <span class="n">0</span>;
+};
+
+<span class="k">class</span> Registry {
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, Session&gt; sessions_;
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">add</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id, Session s) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        sessions_[id] = <span class="t">std</span>::<span class="f">move</span>(s);
+    }
+    <span class="t">void</span> <span class="f">remove</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        sessions_.<span class="f">erase</span>(id);
+    }
+    <span class="k">const</span> Session&amp; <span class="f">get</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id) <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="k">return</span> sessions_.<span class="f">at</span>(id);
+    }
+    Session <span class="f">copy</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id) <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="k">return</span> sessions_.<span class="f">at</span>(id);
+    }
+    <span class="k">auto</span> <span class="f">find</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="k">return</span> sessions_.<span class="f">find</span>(id);
+    }
+    <span class="k">auto</span> <span class="f">end</span>() { <span class="k">return</span> sessions_.<span class="f">end</span>(); }
+};
+
+<span class="t">void</span> <span class="f">on_request</span>(Registry&amp; registry, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id) {
+    <span class="k">auto</span> it = registry.<span class="f">find</span>(id);
+    <span class="k">if</span> (it != registry.<span class="f">end</span>()) {
+        <span class="f">log</span>(it-&gt;second.user);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>get()</code> returns a reference that outlives the lock; a concurrent <code>remove()</code> can destroy the <code>Session</code> while the caller still reads it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>copy()</code> has the same bug as <code>get()</code>, because the <code>lock_guard</code> is released before the returned <code>Session</code> is constructed</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Calling <code>end()</code> after <code>find()</code> does not protect the escaped iterator from invalidation by concurrent modifications</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The iterator from <code>find()</code> can be invalidated by a concurrent <code>add()</code> that rehashes, or by <code>remove()</code> of that element, before the caller uses it</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>get()</code> is safe as long as callers only read through the reference</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>get()</code> returns a reference after releasing the guard. Erasing that element can end its lifetime, and replacing the same session can race with reads through the reference. <code>find()</code> similarly leaks an iterator that erase or rehash can invalidate before comparison or dereference. Rehash invalidates iterators, but does not by itself invalidate references to surviving elements. The unlocked <code>end()</code> call supplies no protection for that escaped iterator. Do not infer a definite race merely from the call to <code>end()</code>: this libc++ implements it as a null sentinel without reading map state. <code>copy()</code> constructs its result while the guard is still alive, so it returns independent data safely. Prefer copied values, or keep the lookup and use inside one guarded operation that does not let references escape.</div></div><div class="mcq" data-id="d-review-01.q7" data-a="1,3,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Which statements about this event bus are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.7"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="k">class</span> <span class="t">EventBus</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">List</span>&lt;<span class="t">Consumer</span>&lt;<span class="t">String</span>&gt;&gt; listeners = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Writer</span> audit;
+
+    <span class="t">EventBus</span>(<span class="t">Writer</span> audit) { <span class="k">this</span>.audit = audit; }
+
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">subscribe</span>(<span class="t">Consumer</span>&lt;<span class="t">String</span>&gt; listener) {
+        listeners.<span class="f">add</span>(listener);
+    }
+
+    <span class="k">public</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">publish</span>(<span class="t">String</span> event) <span class="k">throws</span> <span class="t">IOException</span> {
+        audit.<span class="f">write</span>(event + <span class="s">"\n"</span>);
+        audit.<span class="f">flush</span>();                      <span class="c">// a disk write</span>
+        <span class="k">for</span> (<span class="t">Consumer</span>&lt;<span class="t">String</span>&gt; l : listeners) {
+            l.<span class="f">accept</span>(event);                <span class="c">// code we do not control</span>
+        }
+    }
+}
+
+<span class="k">class</span> <span class="t">Wiring</span> {
+    <span class="k">void</span> <span class="f">wire</span>(<span class="t">EventBus</span> bus) {
+        bus.<span class="f">subscribe</span>(e -&gt; {
+            <span class="k">if</span> (e.<span class="f">startsWith</span>(<span class="s">"user-created"</span>)) {
+                bus.<span class="f">subscribe</span>(other -&gt; <span class="f">welcome</span>(other));
+            }
+        });
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">When that listener subscribes from inside <code>accept</code>, the thread deadlocks on the monitor it already holds</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When that listener subscribes from inside <code>accept</code>, the same thread reenters the monitor and adds to <code>listeners</code> mid iteration, so the loop throws <code>ConcurrentModificationException</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>audit.write</code> needs its own lock, because two publishers could write at the same time</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A slow disk or a slow listener blocks every other publisher and subscriber for the whole time</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">A listener that hands work to another thread and waits for it can deadlock if that thread calls <code>publish</code> or <code>subscribe</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Java monitors are reentrant, so the listener can call <code>subscribe()</code> while <code>publish()</code> owns the monitor. That changes the <code>ArrayList</code> during iteration; the reproduced <code>user-created</code> call threw <code>ConcurrentModificationException</code>. Slow I/O or callbacks hold up every other operation using the bus monitor. A callback that waits for a different thread that needs that monitor can also deadlock. The shown publishers already serialize access to <code>audit</code>; removing their monitor protection without a replacement would introduce a new problem. Snapshot listeners under the monitor, then invoke them after releasing it. Move audit work to a separately synchronized writer or a dedicated logging thread, preserving any required event ordering. Merely moving the write outside the monitor does not establish a new concurrency contract for an arbitrary <code>Writer</code>.</div></div><div class="mcq" data-id="d-review-01.q8" data-a="1,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>Which statements about this event bus are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.8"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">class</span> EventBus {
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;)&gt;&gt; listeners_;
+    <span class="t">std</span>::ofstream audit_{<span class="s">"audit.log"</span>};
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">subscribe</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;)&gt; l) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        listeners_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(l));
+    }
+    <span class="t">void</span> <span class="f">publish</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; event) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        audit_ &lt;&lt; event &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;           <span class="c">// endl flushes: a disk write</span>
+        <span class="k">for</span> (<span class="k">auto</span>&amp; l : listeners_) {
+            <span class="f">l</span>(event);                            <span class="c">// code we do not control</span>
+        }
+    }
+};
+
+<span class="t">void</span> <span class="f">wire</span>(EventBus&amp; bus) {
+    bus.<span class="f">subscribe</span>([&amp;bus](<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; e) {
+        <span class="k">if</span> (e.<span class="f">rfind</span>(<span class="s">"user-created"</span>, <span class="n">0</span>) == <span class="n">0</span>) {
+            bus.<span class="f">subscribe</span>([](<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; other) { <span class="f">welcome</span>(other); });
+        }
+    });
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Copying <code>listeners_</code> under the lock and calling the copies after releasing it fixes the reentrancy and the blocking</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When that listener calls <code>subscribe</code>, the thread locks <code>m_</code> again while holding it: undefined behaviour, in practice a self deadlock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Changing <code>m_</code> to a <code>std::recursive_mutex</code> makes subscribing from a listener safe</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Two publishers can interleave their writes to <code>audit_</code>, because <code>std::ofstream</code> is not thread safe</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">A slow disk or a slow listener blocks every other publisher and subscriber for the whole time</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>publish()</code> calls listeners while holding a non recursive mutex. A listener that calls <code>subscribe()</code> relocks that mutex, violating its precondition. A recursive mutex does not make the iteration safe: <code>push_back</code> invalidates the cached end iterator even without reallocation, and reallocation invalidates the element references too. A slow callback or audit flush also holds the bus mutex. Snapshotting listeners and calling the copies outside the lock fixes callback reentrancy and callback blocking, but does not fix audit I/O that still holds the lock, so the option claiming both problems are fixed is too broad. To remove that bottleneck, serialize audit writes separately or use one logging thread. Simply moving concurrent <code>ofstream</code> writes outside all synchronization would introduce a data race. In the original code, the shared mutex already serializes those writes.</div></div><div class="mcq" data-id="d-review-01.q9" data-a="1,3,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span><code>start()</code> and <code>stop()</code> are called from a controller thread. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">class</span> <span class="t">Heartbeat</span> {
+    <span class="k">private</span> <span class="t">boolean</span> running = <span class="k">true</span>;
+    <span class="k">private</span> <span class="t">Thread</span> worker;
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">start</span>() {
+        worker = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">while</span> (running) {
+                <span class="f">sendPing</span>();
+                <span class="k">try</span> {
+                    <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">1_000</span>);
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="c">// ignore and keep pinging</span>
+                }
+            }
+        });
+        worker.<span class="f">start</span>();
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">stop</span>() {
+        running = <span class="k">false</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>volatile</code> is not enough for a stop flag; it has to be an <code>AtomicBoolean</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing guarantees the worker ever sees <code>running = false</code>, because the field is neither <code>volatile</code> nor accessed under a lock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Reading a <code>boolean</code> without synchronization can return a torn, half written value</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">An interrupt alone is not a reliable stop request here: the catch discards it and the loop never checks interrupt status</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Calling <code>start()</code> twice creates a second worker and loses this object's stored reference for joining the first</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The plain <code>running</code> flag has no happens before edge from <code>stop()</code> to the worker, so continued reads of true are allowed. A <code>volatile boolean</code> is enough for this single stop flag; it cannot tear, and compare and set is unnecessary. An interrupt alone is not a reliable stop request here: <code>sleep</code> clears the status when it throws, the catch ignores it, and the loop never checks interrupt status. Restore the flag and exit on interruption, or use an interrupt-aware loop with a matching catch policy. A second <code>start()</code> overwrites the stored reference to the first thread, so this object loses its handle for joining it. Finally, <code>stop()</code> does not join either worker, so returning from it does not establish that pinging has ended.</div></div><div class="mcq" data-id="d-review-01.q10" data-a="0,2,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span><code>start()</code> and <code>stop()</code> are called from a controller thread. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.10"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">class</span> Heartbeat {
+    <span class="t">bool</span> running_ = <span class="k">true</span>;
+    <span class="t">std</span>::<span class="t">thread</span> worker_;
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">start</span>() {
+        worker_ = <span class="t">std</span>::<span class="t">thread</span>([<span class="k">this</span>] {
+            <span class="k">while</span> (running_) {
+                <span class="f">send_ping</span>();
+                <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">seconds</span>(<span class="n">1</span>));
+            }
+        });
+    }
+    <span class="t">void</span> <span class="f">stop</span>() {
+        running_ = <span class="k">false</span>;
+    }
+    ~<span class="f">Heartbeat</span>() = <span class="k">default</span>;
+};</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>running_</code> is written by one thread and read by another without synchronization: a data race, so the behaviour is undefined</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Declaring <code>running_</code> as <code>volatile</code> fixes the race</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Destroying a <code>Heartbeat</code> whose worker is still joinable calls <code>std::terminate</code>, even after <code>stop()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The call to <code>sleep_for</code> forces the compiler to reload <code>running_</code>, so the race is harmless</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Calling <code>start()</code> a second time move assigns into a joinable <code>std::thread</code>, which calls <code>std::terminate</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> A plain <code>bool</code> shared between threads with a writer is a data race, and a data race is undefined behaviour, whatever the loop contains; in C++ <code>volatile</code> does not create synchronization, and "a function call forces a reload" is an observation about one compiler, not a guarantee. Use <code>std::atomic&lt;bool&gt;</code>. <code>stop()</code> never joins, so the defaulted destructor destroys a joinable <code>std::thread</code> and the program terminates; assigning a new thread over a joinable one terminates too. The clean C++20 version is a <code>std::jthread</code> member whose lambda takes a <code>std::stop_token</code> and waits on a <code>std::condition_variable_any</code> with that token, so a stop request ends the sleep at once and the destructor joins.</div></div><div class="mcq" data-id="d-review-01.q11" data-a="1,3,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Which statements about this gate are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code><span class="k">class</span> <span class="t">Gate</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="k">volatile</span> <span class="t">boolean</span> open = <span class="k">false</span>;
+    <span class="k">private</span> <span class="t">int</span> waiting = <span class="n">0</span>;
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">await</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            waiting += <span class="n">1</span>;
+            <span class="k">while</span> (!open) {
+                lock.<span class="f">wait</span>();
+            }
+            waiting -= <span class="n">1</span>;
+        }
+    }
+
+    <span class="k">public</span> <span class="t">boolean</span> <span class="f">await</span>(<span class="t">long</span> millis) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">if</span> (!open) {
+                lock.<span class="f">wait</span>(millis);
+            }
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">open</span>() {
+        open = <span class="k">true</span>;
+        lock.<span class="f">notifyAll</span>();
+    }
+
+    <span class="k">public</span> <span class="t">int</span> <span class="f">waiting</span>() {
+        <span class="k">return</span> waiting;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>waiting -= 1</code> runs without the monitor, because <code>wait()</code> released it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>open()</code> throws <code>IllegalMonitorStateException</code> because it does not hold <code>lock</code>'s monitor; no notification is sent, so parked waiters may remain blocked</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A thread parked in <code>lock.wait()</code> keeps holding the monitor, so <code>open()</code> could never get it anyway</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The timed <code>await</code> returns <code>true</code> even when it timed out, or woke spuriously, with the gate still closed</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>waiting()</code> reads <code>waiting</code> without the lock, so it can return a stale count</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>open()</code> writes the volatile flag, then calls <code>notifyAll()</code> without owning <code>lock</code>, so it throws <code>IllegalMonitorStateException</code> and sends no notification. Parked waiters may remain blocked; a spurious wakeup can still let one see the now true flag and return. Put the flag update and notification inside <code>synchronized (lock)</code>. The timed overload returns true even after timing out with the gate closed; it needs a predicate loop, a deadline and a result reflecting <code>open</code>. The untimed overload also leaks its <code>waiting</code> count when interrupted: <code>wait()</code> throws before the decrement. Decrement in <code>finally</code> while holding the monitor, and read the count under that same monitor. <code>wait()</code> releases the monitor only while waiting and reacquires it before returning or throwing, so the normal decrement is protected.</div></div><div class="mcq" data-id="d-review-01.q12" data-a="0,2,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>Which statements about this gate are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.12"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">class</span> Gate {
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; open_{<span class="k">false</span>};
+    <span class="t">int</span> waiting_ = <span class="n">0</span>;
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">wait</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        waiting_ += <span class="n">1</span>;
+        cv_.<span class="f">wait</span>(lk, [<span class="k">this</span>] { <span class="k">return</span> open_.<span class="f">load</span>(); });
+        waiting_ -= <span class="n">1</span>;
+    }
+    <span class="t">bool</span> <span class="f">wait_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> limit) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="k">if</span> (!open_) {
+            cv_.<span class="f">wait_for</span>(lk, limit);
+        }
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+    <span class="t">void</span> <span class="f">open</span>() {
+        open_ = <span class="k">true</span>;
+        cv_.<span class="f">notify_all</span>();
+    }
+    <span class="t">int</span> <span class="f">waiting</span>() <span class="k">const</span> {
+        <span class="k">return</span> waiting_;
+    }
+};</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A waiter can check <code>open_</code> (false), then <code>open()</code> stores and notifies before the waiter blocks; that waiter then sleeps forever</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Because <code>open_</code> is atomic, <code>wait()</code> does not need the mutex at all</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>wait_for()</code> returns <code>true</code> even on a timeout or a spurious wakeup with the gate still closed</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Calling <code>notify_all()</code> without holding <code>m_</code> is undefined behaviour</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>waiting()</code> reads <code>waiting_</code> without the lock while waiters change it: a data race</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The predicate is checked under <code>m_</code>, but <code>open()</code> changes it without <code>m_</code>, so the store and the notify can land between the waiter's check and the moment it blocks: a lost wakeup. Atomic makes the flag race free, not the protocol. Fix: <code>{ std::lock_guard&lt;std::mutex&gt; g(m_); open_ = true; } cv_.notify_all();</code>. Notifying without holding the mutex is legal and often faster; the bug is changing the predicate outside it. <code>wait_for</code> should use the predicate overload, <code>return cv_.wait_for(lk, limit, [this] { return open_.load(); });</code>, which returns whether the gate is open. <code>waiting_</code> is an <code>int</code> written under <code>m_</code> and read without it, which is a data race. A condition variable always needs its mutex.</div></div><div class="mcq" data-id="d-review-01.q13" data-a="0,1,2,3" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>About 200 request threads call <code>onEvent</code>; four writers drain the queue. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.13"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="k">class</span> <span class="t">Ingest</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">BlockingQueue</span>&lt;<span class="t">Event</span>&gt; queue = <span class="k">new</span> <span class="t">LinkedBlockingQueue</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ExecutorService</span> writers = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">4</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Db</span> db;
+
+    <span class="t">Ingest</span>(<span class="t">Db</span> db) { <span class="k">this</span>.db = db; }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">onEvent</span>(<span class="t">Event</span> e) {
+        queue.<span class="f">offer</span>(e);
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">startWriters</span>() {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">4</span>; i += <span class="n">1</span>) {
+            writers.<span class="f">submit</span>(() -&gt; {
+                <span class="k">while</span> (<span class="k">true</span>) {
+                    <span class="k">try</span> {
+                        <span class="t">Event</span> e = queue.<span class="f">take</span>();
+                        db.<span class="f">insert</span>(e);              <span class="c">// about 20 ms each</span>
+                    } <span class="k">catch</span> (<span class="t">InterruptedException</span> ex) {
+                        <span class="c">// keep going</span>
+                    } <span class="k">catch</span> (<span class="t">Exception</span> ex) {
+                        <span class="f">log</span>(ex);
+                    }
+                }
+            });
+        }
+    }
+
+    <span class="k">public</span> <span class="k">void</span> <span class="f">stop</span>() {
+        writers.<span class="f">shutdownNow</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">If the queue reaches capacity, <code>offer()</code> returns false and <code>onEvent()</code> silently loses the event because it ignores that result</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Sustained input above roughly 200 events per second builds a backlog that can exhaust memory before the very large default capacity is reached</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>stop()</code> cannot stop the writers: they swallow the interrupt and go straight back to <code>take()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">During sustained overload, the increasing backlog increases the delay before an event reaches the database</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Two hundred threads calling <code>offer()</code> at once can corrupt the <code>LinkedBlockingQueue</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Four writers taking about 20 ms per insert can drain roughly 200 events per second, assuming independent inserts. The default <code>LinkedBlockingQueue</code> capacity is <code>Integer.MAX_VALUE</code>, so it is practically huge, not infinite. Sustained excess input builds backlog and latency and may exhaust memory before reaching that capacity. If the queue does reach capacity, <code>offer()</code> returns false; <code>onEvent()</code> ignores the result and therefore loses that event without reporting it. Configure a useful capacity and choose blocking, a timeout or explicit rejection, then handle the outcome. The queue itself supports concurrent producers. <code>shutdownNow()</code> interrupts workers, but this loop catches and ignores the interrupt, so it does not implement cancellation. On <code>InterruptedException</code>, restore the flag and return instead of calling <code>take()</code> again.</div></div><div class="mcq" data-id="d-review-01.q14" data-a="1,2,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>About 200 request threads call <code>on_event</code>; four writers drain the queue. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.14"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">class</span> Ingest {
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">queue</span>&lt;Event&gt; q_;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; writers_;
+    <span class="t">bool</span> stopping_ = <span class="k">false</span>;
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">on_event</span>(Event e) {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+            q_.<span class="f">push</span>(<span class="t">std</span>::<span class="f">move</span>(e));
+        }
+        cv_.<span class="f">notify_one</span>();
+    }
+    <span class="t">void</span> <span class="f">start_writers</span>() {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">4</span>; i += <span class="n">1</span>) {
+            writers_.<span class="f">emplace_back</span>([<span class="k">this</span>] {
+                <span class="k">for</span> (;;) {
+                    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+                    cv_.<span class="f">wait</span>(lk, [<span class="k">this</span>] { <span class="k">return</span> stopping_ || !q_.<span class="f">empty</span>(); });
+                    <span class="k">if</span> (stopping_) <span class="k">return</span>;
+                    Event e = <span class="t">std</span>::<span class="f">move</span>(q_.<span class="f">front</span>());
+                    q_.<span class="f">pop</span>();
+                    <span class="f">db_insert</span>(e);                  <span class="c">// about 20 ms, m_ still held</span>
+                }
+            });
+        }
+    }
+    ~<span class="f">Ingest</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+            stopping_ = <span class="k">true</span>;
+        }
+        cv_.<span class="f">notify_all</span>();
+        <span class="k">for</span> (<span class="k">auto</span>&amp; t : writers_) t.<span class="f">join</span>();
+    }
+};</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>notify_one()</code> after releasing the lock can lose the wakeup</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Destruction drops every event still in the queue, because the writers return as soon as <code>stopping_</code> is set</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The queue has no configured capacity, so producers that get the mutex ahead of the writers can accumulate a large backlog</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The destructor can deadlock, because it joins while holding <code>m_</code></span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>db_insert</code> runs while <code>m_</code> is held, so only one writer inserts at a time and an <code>on_event</code> call cannot enqueue during that insert</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> There is no configured queue capacity or overload policy, so producers that get the mutex ahead of the writers can build a large backlog. Mutex contention does slow producers, but it is not a deliberate capacity limit. <code>lk</code> stays held through <code>db_insert</code>, so only one writer inserts at a time and producers cannot enqueue during that insert. Release the lock after popping and before calling the database. Once <code>stopping_</code> is true, writers return even if items remain queued, so destruction abandons those items. A draining shutdown should return only when stopping and empty, and must reject new producers or ensure they have stopped before destruction. The predicate update is protected by the mutex before notification, and the destructor releases that mutex before joining, so neither of the proposed notification or join deadlocks follows from this code.</div></div><div class="mcq" data-id="d-review-01.q15" data-a="0,3,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A pool of <code>Fetcher</code> workers is stopped with the shutdown code below. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.15"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="k">class</span> <span class="t">Fetcher</span> <span class="k">implements</span> <span class="t">Runnable</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">BlockingQueue</span>&lt;<span class="t">String</span>&gt; urls;
+
+    <span class="t">Fetcher</span>(<span class="t">BlockingQueue</span>&lt;<span class="t">String</span>&gt; urls) { <span class="k">this</span>.urls = urls; }
+
+    <span class="a">@Override</span>
+    <span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">String</span> url;
+            <span class="k">try</span> {
+                url = urls.<span class="f">take</span>();
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="k">continue</span>;                                  <span class="c">// (1)</span>
+            }
+            <span class="k">for</span> (<span class="t">int</span> attempt = <span class="n">1</span>; attempt &lt;= <span class="n">3</span>; attempt += <span class="n">1</span>) {
+                <span class="k">try</span> {
+                    <span class="f">fetch</span>(url);
+                    <span class="k">break</span>;
+                } <span class="k">catch</span> (<span class="t">IOException</span> e) {
+                    <span class="k">try</span> {
+                        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">1_000L</span> * attempt);    <span class="c">// back off</span>
+                    } <span class="k">catch</span> (<span class="t">InterruptedException</span> ie) {
+                        ie.<span class="f">printStackTrace</span>();              <span class="c">// (2)</span>
+                    }
+                }
+            }
+        }
+    }
+}
+
+<span class="k">class</span> <span class="t">Shutdown</span> {
+    <span class="t">boolean</span> <span class="f">stop</span>(<span class="t">ExecutorService</span> pool) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        pool.<span class="f">shutdownNow</span>();
+        <span class="k">return</span> pool.<span class="f">awaitTermination</span>(<span class="n">5</span>, <span class="t">TimeUnit</span>.SECONDS);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A worker parked in <code>take()</code> cannot be stopped: (1) swallows the interrupt and loops back into <code>take()</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Changing (1) to <code>Thread.currentThread().interrupt(); continue;</code> fixes it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>take()</code> cannot be interrupted; only <code>poll()</code> with a timeout responds to interrupts</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">With ordinary non daemon pool workers that remain in this loop, the termination wait can time out with false and the workers keep the JVM alive</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">An interrupt during the backoff sleep is lost: (2) logs it, the flag stays cleared, and the retries go on</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>shutdownNow()</code> interrupts the workers but cannot force them to exit. <code>BlockingQueue.take()</code> is interruptible: it throws <code>InterruptedException</code> and clears the status, after which (1) immediately waits again. The backoff sleep also clears the status when it throws, and (2) merely logs and continues retrying. Restoring the flag while keeping <code>continue</code> is another bug: the next <code>take()</code> throws immediately, producing a busy loop. A probe repeated that immediate failure ten times. Restore the flag and return to implement cancellation. If ordinary non daemon pool workers stay in this loop, the termination wait can return false on timeout and those workers keep the JVM alive. This rule is specific to interruptible calls; not every blocking operation in <code>java.util.concurrent</code> throws on interruption.</div></div><div class="mcq" data-id="d-review-01.q16" data-a="1,3,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span><code>BlockingQueue::take()</code> waits on a mutex and condition variable until an item arrives. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.16"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">class</span> Fetcher {
+    BlockingQueue&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&amp; urls_;
+    <span class="t">std</span>::<span class="t">jthread</span> worker_;
+
+    <span class="t">void</span> <span class="f">run</span>(<span class="t">std</span>::<span class="t">stop_token</span> st) {
+        <span class="k">while</span> (!st.<span class="f">stop_requested</span>()) {
+            <span class="t">std</span>::<span class="t">string</span> url = urls_.<span class="f">take</span>();
+            <span class="k">for</span> (<span class="t">int</span> attempt = <span class="n">1</span>; attempt &lt;= <span class="n">3</span>; attempt += <span class="n">1</span>) {
+                <span class="k">try</span> {
+                    <span class="f">fetch</span>(url);
+                    <span class="k">break</span>;
+                } <span class="k">catch</span> (...) {
+                    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">seconds</span>(attempt));
+                }
+            }
+        }
+    }
+
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Fetcher</span>(BlockingQueue&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&amp; urls)
+        : <span class="f">urls_</span>(urls), <span class="f">worker_</span>([<span class="k">this</span>](<span class="t">std</span>::<span class="t">stop_token</span> st) { <span class="f">run</span>(st); }) {}
+};</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">If the worker is still blocked after a timeout, the <code>jthread</code> destructor detaches it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Destruction can hang if the worker is already blocked in the empty queue with no future producer: the stop request does not wake this <code>take()</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>worker_</code> may start <code>run()</code> before <code>urls_</code> is initialized</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>catch (...)</code> also swallows programming errors such as <code>std::out_of_range</code> or <code>std::bad_alloc</code> from <code>fetch</code>, hiding them behind retries</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">A stop requested during backoff is not checked until the retry loop finishes; further sleeps and <code>fetch()</code> calls can run first</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> If the worker is already blocked in <code>take()</code> and no item will arrive, destroying <code>Fetcher</code> can hang: the <code>jthread</code> destructor requests stop and joins, but the queue wait never observes the token. An empty queue alone is not enough to guarantee a hang; a worker that sees stop before entering the outer loop exits without calling <code>take()</code>. During retries, stop is checked only at the next outer-loop condition. A request during the first backoff can therefore be followed by all three sleeps, about six seconds in total, plus more <code>fetch()</code> calls with no stated duration bound. The probe observed three attempts and about six seconds. Use token-aware queue and backoff waits and check cancellation between attempts. Catch expected I/O failures; report unexpected exceptions at the thread boundary because an uncaught exception escaping a thread terminates the process. Declaration order initializes <code>urls_</code> before <code>worker_</code> starts.</div></div><div class="mcq" data-id="d-review-01.q17" data-a="1,2,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span><code>build</code> is called once per report request. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.17"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">class</span> <span class="t">ReportService</span> {
+    <span class="k">public</span> <span class="t">byte</span>[] <span class="f">build</span>(<span class="t">List</span>&lt;<span class="t">String</span>&gt; parts) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">8</span>);   <span class="c">// a new pool for every call</span>
+        <span class="t">List</span>&lt;<span class="t">Future</span>&lt;<span class="t">byte</span>[]&gt;&gt; futures = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">String</span> p : parts) {
+            futures.<span class="f">add</span>(pool.<span class="f">submit</span>(() -&gt; <span class="f">render</span>(p)));
+        }
+        <span class="t">ByteArrayOutputStream</span> out = <span class="k">new</span> <span class="t">ByteArrayOutputStream</span>();
+        <span class="k">for</span> (<span class="t">Future</span>&lt;<span class="t">byte</span>[]&gt; f : futures) {
+            out.<span class="f">write</span>(f.<span class="f">get</span>());          <span class="c">// throws if that part failed</span>
+        }
+        pool.<span class="f">shutdown</span>();
+        <span class="k">return</span> out.<span class="f">toByteArray</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>pool.shutdown()</code> interrupts render tasks that are still running</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">If any part fails, <code>f.get()</code> throws before <code>shutdown()</code> runs, so up to 8 idle non daemon threads leak on every failed call</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">When one part fails, the remaining tasks keep running even though their results will be thrown away</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A task that throws is swallowed by the executor, so a failed part goes unnoticed here</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">On Java 21, <code>try (ExecutorService pool = Executors.newFixedThreadPool(8)) { ... }</code> closes the pool on every path, waiting for its tasks</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> A fixed pool creates workers as tasks arrive, up to eight here. If <code>f.get()</code> throws before <code>shutdown()</code>, the created workers are left alive; they may still be rendering and then wait idle, keeping the JVM alive. The leak is up to eight workers per failed call, not necessarily eight for a report with fewer parts. Other submitted tasks are not cancelled automatically. In Java 21, try with resources calls <code>ExecutorService.close()</code> on every exit path and waits for termination, which the probe confirmed even when the body threw. On failure, also cancel sibling futures when their work is no longer needed; interruption still requires cooperation. <code>shutdown()</code> does not interrupt running work, and <code>get()</code> reports task failure through <code>ExecutionException</code>. A shared pool with bounded submission is usually preferable to a fresh pool per report.</div></div><div class="mcq" data-id="d-review-01.q18" data-a="0,2,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span><code>build</code> is called once per report request. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.18"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</span><code><span class="k">class</span> ReportService {
+<span class="k">public</span>:
+    <span class="t">std</span>::<span class="t">string</span> <span class="f">build</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&amp; parts) {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">pieces</span>(parts.<span class="f">size</span>());
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; workers;
+        <span class="k">for</span> (<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; parts.<span class="f">size</span>(); i += <span class="n">1</span>) {
+            workers.<span class="f">emplace_back</span>([&amp;pieces, &amp;parts, i] {
+                pieces[i] = <span class="f">render</span>(parts[i]);   <span class="c">// render may throw</span>
+            });
+        }
+        <span class="k">for</span> (<span class="k">auto</span>&amp; w : workers) {
+            w.<span class="f">join</span>();
+        }
+        <span class="t">std</span>::<span class="t">string</span> out;
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; p : pieces) {
+            out += p;
+        }
+        <span class="k">return</span> out;
+    }
+};</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It attempts one thread creation per part with no concurrency limit, so a 10,000 part report can exhaust thread resources</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Writing <code>pieces[i]</code> from several threads at once is a data race, because they share one vector</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">If creating a thread fails partway (<code>emplace_back</code> throws <code>std::system_error</code>), the vector destroys threads that are still joinable, which calls <code>std::terminate</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Capturing <code>parts</code> and <code>pieces</code> by reference is a dangling reference bug</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">If <code>render</code> throws, the exception escapes the thread function and <code>std::terminate</code> ends the whole process</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The loop attempts one thread creation per part with no configured concurrency limit. Some workers may finish before later ones start, and resource exhaustion may prevent all creations. If creation throws after earlier threads were added, unwinding destroys joinable <code>std::thread</code> objects and calls <code>std::terminate</code>; a finished thread remains joinable until joined. If <code>render()</code> itself throws out of a worker, that also terminates the process, as the probe confirmed. Use a bounded executor for a concurrency limit and catch worker failures into futures or <code>std::exception_ptr</code>. If using direct threads, <code>std::jthread</code> gives joining during unwinding but does not transport exceptions or cap concurrency. Each worker writes a different element of a vector that is not resized, so those writes do not race. On the normal path, joins complete before the referenced vectors go out of scope.</div></div><div class="mcq" data-id="d-review-01.q19" data-a="1,2,4" data-multi="1" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Many request threads call <code>Pricing.get().price(sku)</code>. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.19"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">class</span> <span class="t">Pricing</span> {
+    <span class="k">private</span> <span class="k">static</span> <span class="t">Pricing</span> instance;
+    <span class="k">private</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Double</span>&gt; rates;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Long</span>&gt; hits = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+
+    <span class="k">private</span> <span class="t">Pricing</span>() {
+        rates = <span class="f">loadRates</span>();
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="t">Pricing</span> <span class="f">get</span>() {
+        <span class="k">if</span> (instance == <span class="k">null</span>) {
+            <span class="k">synchronized</span> (<span class="t">Pricing</span>.<span class="k">class</span>) {
+                <span class="k">if</span> (instance == <span class="k">null</span>) {
+                    instance = <span class="k">new</span> <span class="t">Pricing</span>();
+                }
+            }
+        }
+        <span class="k">return</span> instance;
+    }
+
+    <span class="k">public</span> <span class="t">double</span> <span class="f">price</span>(<span class="t">String</span> sku) {
+        hits.<span class="f">put</span>(sku, hits.<span class="f">getOrDefault</span>(sku, <span class="n">0L</span>) + <span class="n">1</span>);
+        <span class="k">return</span> rates.<span class="f">get</span>(sku);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Two threads can each construct a <code>Pricing</code>, because both can pass the first <code>null</code> check</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Without <code>volatile</code> on <code>instance</code>, another thread can see a non null <code>instance</code> whose <code>rates</code> field is still <code>null</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>hits</code> is a plain <code>HashMap</code> updated by many threads: counts get lost and the map can be corrupted</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Switching <code>hits</code> to a <code>ConcurrentHashMap</code> while keeping the <code>getOrDefault</code> then <code>put</code> lines makes the counts exact</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Making <code>instance</code> volatile (or using a holder class) fixes the publication problem but not the counting problem</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The unsynchronized first check can see the reference before the constructor's write to <code>rates</code> (no happens before edge), and <code>rates</code> is not <code>final</code>, so a reader may get <code>null</code> and throw. The inner check under the lock does prevent a second construction. <code>volatile</code> on <code>instance</code>, or the holder class idiom, fixes publication. The counter is a separate bug: concurrent <code>put</code>s can corrupt a <code>HashMap</code>, and even on a <code>ConcurrentHashMap</code> a read followed by a write is a check then act that loses increments. Use <code>hits.merge(sku, 1L, Long::sum)</code> on a <code>ConcurrentHashMap</code>, or a <code>LongAdder</code> per key.</div></div><div class="mcq" data-id="d-review-01.q20" data-a="1,3,4" data-multi="1" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>Many request threads call <code>Pricing::get().price(sku)</code>. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-review-01.20"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">class</span> Pricing {
+    <span class="k">static</span> Pricing* instance_;
+    <span class="k">static</span> <span class="t">std</span>::<span class="t">mutex</span> init_m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">double</span>&gt; rates_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">long</span>&gt; hits_;
+
+    <span class="f">Pricing</span>() : <span class="f">rates_</span>(<span class="f">load_rates</span>()) {}
+
+<span class="k">public</span>:
+    <span class="k">static</span> Pricing&amp; <span class="f">get</span>() {
+        <span class="k">if</span> (instance_ == <span class="k">nullptr</span>) {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(init_m_);
+            <span class="k">if</span> (instance_ == <span class="k">nullptr</span>) {
+                instance_ = <span class="k">new</span> <span class="f">Pricing</span>();
+            }
+        }
+        <span class="k">return</span> *instance_;
+    }
+
+    <span class="t">double</span> <span class="f">price</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; sku) {
+        hits_[sku] += <span class="n">1</span>;
+        <span class="k">return</span> rates_.<span class="f">at</span>(sku);
+    }
+};
+
+Pricing* Pricing::instance_ = <span class="k">nullptr</span>;
+<span class="t">std</span>::<span class="t">mutex</span> Pricing::init_m_;</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Concurrent <code>rates_.at()</code> calls are a data race too, even though nothing modifies <code>rates_</code> after construction</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The first read of <code>instance_</code> races with the write under the lock: a data race, and a reader can see the pointer before the object is fully built</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A function local static, <code>static Pricing p; return p;</code>, would have the same race</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>hits_[sku] += 1</code> from many threads modifies the map concurrently, which is undefined behaviour (a rehash can corrupt it)</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Making <code>instance_</code> a <code>std::atomic&lt;Pricing*&gt;</code>, read with acquire and written with release, fixes the publication bug</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The first read of plain <code>instance_</code> is outside the mutex while construction writes it under that mutex, so it is a data race and the whole program has undefined behaviour. It is not limited to seeing partially initialized fields. Release stores and acquire loads on an atomic pointer fix publication when the locked second check is retained; a function local static is simpler and has synchronized initialization. After publication is repaired, concurrent read-only <code>rates_.at()</code> calls need no extra lock because nothing mutates that map. The separate <code>hits_[sku] += 1</code> operations modify an unordered map and its counters without synchronization, which remains undefined behaviour even after publication is fixed. Protect hit updates with a mutex, shard them, or use atomic counters in a map whose structure is established before concurrent use.</div></div></section><section class="testend" id="testend" hidden></section></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

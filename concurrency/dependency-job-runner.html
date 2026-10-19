@@ -1,0 +1,1084 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>A parallel job runner that respects dependencies · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="dependency-job-runner" data-title="A parallel job runner that respects dependencies" data-track="core" data-module="core-17" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details open><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner" class=here><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m17">Module 17: System coding rounds</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 17.3</span><span>40 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>A parallel job runner that respects dependencies</h1><p class="lsum">Run dependent jobs in parallel on N workers, reject cycles, and join every worker after success or cooperative cancellation.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Uber</span><span class="co">Apple</span><span class="co">Microsoft</span></div><div class="prereq"><span>Before this:</span><a href="executor-without-libraries.html">An executor without libraries: submit, wait for all, shutdown and shutdownNow</a><a href="condition-variables.html">Condition variables and monitors</a></div></header><article class="prose" id="article">
+<p class="lead">Rubrik reports repeatedly describe this pattern, with variants and follow ups: a pipeline manager, a job runner, a scheduler for overnight tasks. Run jobs in parallel as soon as their dependencies have succeeded, and stop everything on the first failure.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of building a house with a team of three workers. The foundation must be done before the walls; plumbing and wiring both need the walls but not each other, so two workers can do them at the same time; painting needs both. A good site manager keeps one list on the wall: for each job, how many jobs it is still waiting for. When a job finishes, the manager crosses it off and reduces the count of every job that was waiting for it. Any job whose count reaches zero goes on the "ready" board, and a free worker takes it.</p>
+<p>If the wiring catches fire, the manager does two things at once: nobody starts anything new, and everyone still working is told to put their tools down. The manager reports "wiring failed" only after the last worker has actually stopped, so <strong>nothing is left running when the report goes out</strong>. And if the plan says painting needs plumbing, plumbing needs painting, the manager refuses the plan before anyone picks up a brick.</p>
+</div>
+
+<h2 id="the-question-in-its-reported-forms">The question in its reported forms</h2>
+<ul>
+<li><strong>Pipeline manager</strong> (senior, 2024): jobs form a <a class="term" data-term="dag" href="glossary.html#dag">directed acyclic graph</a>; each job's <code>doWork()</code> may throw; <code>execute()</code> ends on full success or on the first failure, with no job left running.</li>
+<li><strong>Job runner</strong> (G6, 2025): given <code>getDependentTasks(completed)</code> and tasks with <code>doWork()</code>; the first exception must stop everything immediately; library queues and executors are banned, so you build them with locks. Clarify which primitives are allowed.</li>
+<li><strong>Scheduler</strong> (L4, 2025): <code>get_next_jobs(finished_jobs)</code> returns the runnable jobs; run every available job concurrently while respecting dependencies.</li>
+<li><strong>Overnight tasks</strong> (screen, 2024): tasks doing I/O and network calls, an API that returns what can run now, maximum concurrency, no <code>ExecutorService</code>.</li>
+<li><strong>Graph problem</strong> (G5, 2025): solvable with a <a class="term" data-term="topological-sort" href="glossary.html#topological-sort">topological sort</a>, graded on code quality, then "how do you make it thread-safe?"</li>
+</ul>
+<p>Outside Rubrik, an Uber machine coding round asked for a multithreaded job scheduler with prerequisites and maximum parallelism, an Apple screen asked to optimize a topological sort for multi-core execution, and a Microsoft LLD round asked for a cron or Airflow style scheduler with dependencies and thread safety. Two API shapes cover all of them: <strong>the whole graph given up front</strong>, or <strong>an oracle that tells you what can run next</strong>. Build the first, then adapt it.</p>
+
+<h2 id="the-design-count-what-each-job-is-waiting-for">The design: count what each job is waiting for</h2>
+<p>Kahn's algorithm, the classic topological sort, already contains the parallel runner. Keep, for every job, the number of dependencies that have not yet succeeded. Jobs at zero are ready. When a job succeeds, decrement the count of each job that depends on it, and any count that reaches zero puts that job on the ready queue.</p>
+<p>The shared state, all under <strong>one lock</strong>:</p>
+<ul>
+<li><code>waitingOn[job]</code>: unfinished dependencies, and <code>dependents[job]</code>: who waits for this job;</li>
+<li><code>ready</code>: jobs whose count is zero and that have not started;</li>
+<li><code>running</code>: how many jobs are executing right now;</li>
+<li><code>firstFailure</code>: empty until a job fails, then the error and the job's name.</li>
+</ul>
+<p>Each of N workers loops: take a ready job under the lock, run it outside the lock, then come back under the lock to record the outcome. One lock is the right granularity here. Jobs run outside it, and the critical sections only touch a few counters, so this is a useful baseline. Tiny jobs or very large fan-outs can still make this lock a bottleneck; measure before replacing it.</p>
+
+<h3>The termination rule</h3>
+<p>The subtle part is knowing when a worker may leave. "Ready is empty" is not enough: a running job may finish in a moment and release three more. The rule that works is:</p>
+<blockquote>Wait while nothing is ready but something is running. If nothing is ready and nothing is running, no job can ever become ready again, so exit.</blockquote>
+<p>It holds because only a finishing job can make another job ready. With nothing running, nothing will finish, so the ready queue stays empty forever. For a validated static DAG, that means success. A recorded failure lets idle workers exit immediately, while the caller joins the remaining workers. Without validation, quiescence could instead mean a cycle: compare completed jobs with the total before claiming success.</p>
+
+<figure class="timeline"><figcaption>Waiting only for a ready job hangs at the end</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>worker A</span><span>worker B</span><span>shared state</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">report is the last job, and A is running it; ready is empty</span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">ready is empty, so B waits for a signal</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">report succeeds; it has no dependents, so nothing becomes ready</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">signals all, then loops: ready is empty, so A waits too</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">wakes, ready is still empty, waits again</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">ready empty, running 0, both workers asleep: <code>run()</code> never returns</span></div><div class="tl-note">Fix: wait only while ready is empty AND running is above zero. When both are zero, exit.</div></div></figure>
+
+<h3>Stopping on the first failure</h3>
+<p>"Stop everything" has three parts, and interviewers check each one:</p>
+<ol>
+<li><strong>No new job is claimed after failure is recorded.</strong> Record the failure and clear the ready queue in the same critical section. Workers check the failure field under the lock before taking a job. Claiming a job is its scheduling start: a worker that claimed before the failure can enter the job body later, so jobs must check cancellation before side effects.</li>
+<li><strong>Running jobs are asked to stop.</strong> Java: interrupt exactly the workers that are running a job (keep them in a set under the lock). C++: request a stop on a <code>std::stop_source</code> whose tokens every job received. Jobs must cooperate: an interrupt or a stop request is a request.</li>
+<li><strong>The call returns only when nothing is running.</strong> Idle workers exit when the failure is set; busy workers exit after their own job ends; <code>run()</code> joins them and then reports the first failure. Later failures (often caused by the stop request itself) are ignored.</li>
+</ol>
+<p>Here, "first" means the first failure recorded under the lock, not necessarily the first exception thrown in wall-clock time. Cancellation cannot force an arbitrary job to finish: a job that ignores it, blocks forever, or leaves detached work behind violates the job contract. Jobs must finish their own child work before returning. There is no finite return-time guarantee without a cancellation or completion bound.</p>
+<p>One more rule hides in step 2: a job that stopped early may return normally. It must not count as a success, or its dependents would start. The runner only releases dependents when no failure has been recorded.</p>
+
+<h3>Cycles</h3>
+<p>Run Kahn's algorithm once, single-threaded, on a copy of the counts before starting any worker. Every job that never reaches zero is on a cycle or depends on one. Rejecting the plan up front beats discovering it at the end, after half the graph has already run and produced side effects.</p>
+
+<h2 id="the-full-runner">The full runner</h2>
+<p>The demo builds a six-job pipeline, then a fresh runner with one failing job, then a cyclic graph. Configuration and <code>run()</code> belong to one caller, without concurrent or reentrant calls: the graph is frozen when <code>run()</code> begins and the runner is single use. Reject duplicate names, unknown dependencies, empty names, null jobs and nonpositive worker counts; repeated dependency edges count once. An empty graph succeeds.</p>
+<p>The code uses Java 21 locks and conditions and C++20 stop tokens. With only Java monitors allowed, use one monitor with <code>wait</code> loops and <code>notifyAll</code>, retaining the same bookkeeping. For C++17, use <code>std::thread</code> with explicit joins and a shared cancellation flag; blocking jobs also need a wakeup mechanism or a bounded wait. The demo delays simulate work; they do not prove a particular schedule. Infrastructure allocation failures during bookkeeping and fatal runtime failure are outside this teaching implementation.</p>
+
+<figure class="code pair" data-sample="dependency-job-runner.1" data-expect="ok"><figcaption><span class="ctitle">A DAG job runner: parallel, fail fast, cycle check, no library executor</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;set&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="c">// Runs a DAG of jobs on N threads: a job starts once all its dependencies succeeded, independent jobs</span>
+<span class="c">// run in parallel, the first failure stops everything, and a cycle is rejected before anything runs.</span>
+<span class="k">class</span> DagRunner {
+<span class="k">public</span>:
+    <span class="c">// A job receives a stop token: once another job has failed, a long job should return early.</span>
+    <span class="k">using</span> Job = <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>(<span class="t">std</span>::<span class="t">stop_token</span>)&gt;;
+
+    <span class="c">// Add every job once, before run().</span>
+    <span class="t">void</span> <span class="f">add</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; name, Job job, <span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&amp; dependsOn = {}) {
+        <span class="k">if</span> (started_) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"runner already started"</span>);
+        <span class="k">if</span> (name.<span class="f">empty</span>() || !job || jobs_.<span class="f">count</span>(name))
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid or duplicate job name"</span>);
+        <span class="t">std</span>::<span class="t">set</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">deps</span>(dependsOn.<span class="f">begin</span>(), dependsOn.<span class="f">end</span>());   <span class="c">// a repeated dependency counts once</span>
+        jobs_[name] = <span class="t">std</span>::<span class="f">move</span>(job);
+        waitingOn_[name] = <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(deps.<span class="f">size</span>());
+        dependents_[name];                        <span class="c">// every job gets an entry, even with no dependents</span>
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; d : deps) dependents_[d].<span class="f">push_back</span>(name);
+    }
+
+    <span class="c">// Blocks until every job succeeded, or throws once the first failure has stopped everything.</span>
+    <span class="t">void</span> <span class="f">run</span>(<span class="t">int</span> threads) {
+        <span class="k">if</span> (threads &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"threads must be positive"</span>);
+        <span class="k">if</span> (started_) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"runner is single use"</span>);
+        started_ = <span class="k">true</span>;
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [d, ignored] : dependents_)
+            <span class="k">if</span> (!jobs_.<span class="f">count</span>(d)) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"unknown job: "</span> + d);
+        <span class="k">if</span> (<span class="t">std</span>::<span class="t">string</span> stuck = <span class="f">neverReady</span>(); !stuck.<span class="f">empty</span>())
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"cycle: these jobs can never start: "</span> + stuck);
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [name, n] : waitingOn_)
+            <span class="k">if</span> (n == <span class="n">0</span>) ready_.<span class="f">push_back</span>(name);
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; workers;
+        workers.<span class="f">reserve</span>(threads);
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; threads; i += <span class="n">1</span>) workers.<span class="f">emplace_back</span>([<span class="k">this</span>] { <span class="f">workerLoop</span>(); });
+        } <span class="k">catch</span> (...) {
+            {
+                <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+                <span class="k">if</span> (!firstFailure_) {
+                    firstFailure_ = <span class="t">std</span>::<span class="f">current_exception</span>();
+                    failedJob_ = <span class="s">"worker startup"</span>;
+                    ready_.<span class="f">clear</span>();
+                }
+            }
+            changed_.<span class="f">notify_all</span>();
+            stop_.<span class="f">request_stop</span>();                 <span class="c">// callbacks run without the scheduler mutex</span>
+        }
+        <span class="k">for</span> (<span class="k">auto</span>&amp; t : workers) t.<span class="f">join</span>();         <span class="c">// join makes the workers' writes visible here</span>
+        <span class="k">if</span> (!firstFailure_) <span class="k">return</span>;
+        <span class="k">try</span> {
+            <span class="t">std</span>::<span class="f">rethrow_exception</span>(firstFailure_);
+        } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+            <span class="t">std</span>::<span class="f">throw_with_nested</span>(<span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"job "</span> + failedJob_ + <span class="s">" failed: "</span> + e.<span class="f">what</span>()));
+        } <span class="k">catch</span> (...) {
+            <span class="t">std</span>::<span class="f">throw_with_nested</span>(<span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"job "</span> + failedJob_ + <span class="s">" failed"</span>));
+        }
+    }
+
+<span class="k">private</span>:
+    <span class="c">// Kahn's algorithm on a copy of the counts: whatever never reaches zero is on a cycle or behind one.</span>
+    <span class="t">std</span>::<span class="t">string</span> <span class="f">neverReady</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">int</span>&gt; left = waitingOn_;
+        <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; q;
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [name, n] : left)
+            <span class="k">if</span> (n == <span class="n">0</span>) q.<span class="f">push_back</span>(name);
+        <span class="k">while</span> (!q.<span class="f">empty</span>()) {
+            <span class="t">std</span>::<span class="t">string</span> name = q.<span class="f">front</span>();
+            q.<span class="f">pop_front</span>();
+            <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; d : dependents_.<span class="f">at</span>(name)) {
+                left[d] -= <span class="n">1</span>;
+                <span class="k">if</span> (left[d] == <span class="n">0</span>) q.<span class="f">push_back</span>(d);
+            }
+        }
+        <span class="t">std</span>::<span class="t">string</span> stuck;
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [name, n] : left)
+            <span class="k">if</span> (n &gt; <span class="n">0</span>) stuck += (stuck.<span class="f">empty</span>() ? <span class="s">""</span> : <span class="s">", "</span>) + name;
+        <span class="k">return</span> stuck;
+    }
+
+    <span class="t">void</span> <span class="f">workerLoop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">std</span>::<span class="t">string</span> name;
+            <span class="t">std</span>::<span class="t">stop_token</span> token;
+            {
+                <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m_);
+                <span class="c">// nothing ready but something running: a finishing job may release more work, so wait</span>
+                changed_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !ready_.<span class="f">empty</span>() || running_ == <span class="n">0</span> || firstFailure_; });
+                <span class="c">// a failure, or nothing ready and nothing running: no job can ever become ready again</span>
+                <span class="k">if</span> (firstFailure_ || ready_.<span class="f">empty</span>()) <span class="k">return</span>;
+                name = ready_.<span class="f">front</span>();
+                ready_.<span class="f">pop_front</span>();
+                running_ += <span class="n">1</span>;
+                token = stop_.<span class="f">get_token</span>();
+            }
+            <span class="t">std</span>::<span class="t">exception_ptr</span> error;
+            <span class="k">try</span> {
+                jobs_.<span class="f">at</span>(name)(token);                    <span class="c">// outside the lock: jobs run in parallel</span>
+            } <span class="k">catch</span> (...) {
+                error = <span class="t">std</span>::<span class="f">current_exception</span>();
+            }
+            <span class="t">bool</span> requestStop = <span class="k">false</span>;
+            {
+                <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lock</span>(m_);
+                running_ -= <span class="n">1</span>;
+                <span class="k">if</span> (error &amp;&amp; !firstFailure_) {
+                    firstFailure_ = error;
+                    failedJob_ = name;
+                    ready_.<span class="f">clear</span>();
+                    requestStop = <span class="k">true</span>;
+                } <span class="k">else</span> <span class="k">if</span> (!error &amp;&amp; !firstFailure_) {
+                    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; d : dependents_.<span class="f">at</span>(name)) {
+                        waitingOn_[d] -= <span class="n">1</span>;
+                        <span class="k">if</span> (waitingOn_[d] == <span class="n">0</span>) ready_.<span class="f">push_back</span>(d);
+                    }
+                }
+            }
+            <span class="c">// request_stop can invoke job-supplied callbacks synchronously. Never hold m_ here.</span>
+            changed_.<span class="f">notify_all</span>();
+            <span class="k">if</span> (requestStop) stop_.<span class="f">request_stop</span>();
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, Job&gt; jobs_;
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&gt; dependents_;   <span class="c">// job, then the jobs waiting for it</span>
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">int</span>&gt; waitingOn_;                         <span class="c">// job, then its unfinished dependencies</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> changed_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; ready_;
+    <span class="t">int</span> running_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">exception_ptr</span> firstFailure_;
+    <span class="t">std</span>::<span class="t">string</span> failedJob_;
+    <span class="t">std</span>::<span class="t">stop_source</span> stop_;
+    <span class="t">bool</span> started_ = <span class="k">false</span>;
+};
+
+<span class="c">// Stands in for real work: sleeps, but returns early when a stop is requested.</span>
+<span class="k">static</span> <span class="t">void</span> <span class="f">work</span>(<span class="k">const</span> <span class="t">char</span>* name, <span class="t">int</span> ms, <span class="t">std</span>::<span class="t">stop_token</span> token) {
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"  start %s\n"</span>, name);
+    <span class="t">std</span>::<span class="t">mutex</span> m;
+    <span class="t">std</span>::<span class="t">condition_variable_any</span> cv;
+    <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lock</span>(m);
+    cv.<span class="f">wait_for</span>(lock, token, <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(ms), [] { <span class="k">return</span> <span class="k">false</span>; });
+    <span class="k">if</span> (token.<span class="f">stop_requested</span>()) <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"  %s saw the stop request and stopped\n"</span>, name);
+}
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">build</span>(DagRunner&amp; r, <span class="t">bool</span> failParseB) {
+    r.<span class="f">add</span>(<span class="s">"fetch-a"</span>, [](<span class="t">std</span>::<span class="t">stop_token</span> t) { <span class="f">work</span>(<span class="s">"fetch-a"</span>, <span class="n">30</span>, t); });
+    r.<span class="f">add</span>(<span class="s">"fetch-b"</span>, [](<span class="t">std</span>::<span class="t">stop_token</span> t) { <span class="f">work</span>(<span class="s">"fetch-b"</span>, <span class="n">30</span>, t); });
+    r.<span class="f">add</span>(<span class="s">"parse-a"</span>, [](<span class="t">std</span>::<span class="t">stop_token</span> t) { <span class="f">work</span>(<span class="s">"parse-a"</span>, <span class="n">300</span>, t); }, {<span class="s">"fetch-a"</span>});
+    r.<span class="f">add</span>(<span class="s">"parse-b"</span>, [failParseB](<span class="t">std</span>::<span class="t">stop_token</span> t) {
+        <span class="f">work</span>(<span class="s">"parse-b"</span>, <span class="n">20</span>, t);
+        <span class="k">if</span> (failParseB) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"corrupt input"</span>);
+    }, {<span class="s">"fetch-b"</span>});
+    r.<span class="f">add</span>(<span class="s">"join"</span>, [](<span class="t">std</span>::<span class="t">stop_token</span> t) { <span class="f">work</span>(<span class="s">"join"</span>, <span class="n">10</span>, t); }, {<span class="s">"parse-a"</span>, <span class="s">"parse-b"</span>});
+    r.<span class="f">add</span>(<span class="s">"report"</span>, [](<span class="t">std</span>::<span class="t">stop_token</span> t) { <span class="f">work</span>(<span class="s">"report"</span>, <span class="n">10</span>, t); }, {<span class="s">"join"</span>});
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"run 1: everything succeeds\n"</span>);
+    {
+        DagRunner r;
+        <span class="f">build</span>(r, <span class="k">false</span>);
+        r.<span class="f">run</span>(<span class="n">3</span>);
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"  all jobs succeeded\n"</span>);
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"run 2: parse-b fails; other claimed jobs are cancelled\n"</span>);
+    <span class="k">try</span> {
+        DagRunner r;
+        <span class="f">build</span>(r, <span class="k">true</span>);
+        r.<span class="f">run</span>(<span class="n">3</span>);
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"  %s\n"</span>, e.<span class="f">what</span>());
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"run 3: a cycle\n"</span>);
+    <span class="k">try</span> {
+        DagRunner r;
+        <span class="k">auto</span> nothing = [](<span class="t">std</span>::<span class="t">stop_token</span>) {};
+        r.<span class="f">add</span>(<span class="s">"a"</span>, nothing, {<span class="s">"c"</span>});
+        r.<span class="f">add</span>(<span class="s">"b"</span>, nothing, {<span class="s">"a"</span>});
+        r.<span class="f">add</span>(<span class="s">"c"</span>, nothing, {<span class="s">"b"</span>});
+        r.<span class="f">add</span>(<span class="s">"d"</span>, nothing, {<span class="s">"c"</span>});
+        r.<span class="f">run</span>(<span class="n">2</span>);
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::invalid_argument&amp; e) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"  rejected before running: %s\n"</span>, e.<span class="f">what</span>());
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">HashMap</span>;
+<span class="k">import</span> java.util.<span class="t">HashSet</span>;
+<span class="k">import</span> java.util.<span class="t">LinkedHashMap</span>;
+<span class="k">import</span> java.util.<span class="t">LinkedHashSet</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="c">// Runs a DAG of jobs on N threads: a job starts once all its dependencies succeeded, independent jobs</span>
+<span class="c">// run in parallel, the first failure stops everything, and a cycle is rejected before anything runs.</span>
+<span class="k">final</span> <span class="k">class</span> <span class="t">DagRunner</span> {
+    <span class="k">interface</span> <span class="t">Job</span> { <span class="k">void</span> <span class="f">run</span>() <span class="k">throws</span> <span class="t">Exception</span>; }
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Job</span>&gt; jobs = <span class="k">new</span> <span class="t">LinkedHashMap</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">String</span>&gt;&gt; dependents = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();   <span class="c">// job, then the jobs waiting for it</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; waitingOn = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();         <span class="c">// job, then its unfinished dependencies</span>
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> changed = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;<span class="t">String</span>&gt; ready = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Set</span>&lt;<span class="t">Thread</span>&gt; busy = <span class="k">new</span> <span class="t">HashSet</span>&lt;&gt;();     <span class="c">// workers running a job, so a failure can interrupt them</span>
+    <span class="k">private</span> <span class="t">int</span> running = <span class="n">0</span>;
+    <span class="k">private</span> <span class="t">Throwable</span> firstFailure = <span class="k">null</span>;
+    <span class="k">private</span> <span class="t">String</span> failedJob = <span class="k">null</span>;
+    <span class="k">private</span> <span class="t">boolean</span> started = <span class="k">false</span>;
+
+    <span class="c">// Add every job once, before run().</span>
+    <span class="k">void</span> <span class="f">add</span>(<span class="t">String</span> name, <span class="t">Job</span> job, <span class="t">String</span>... dependsOn) {
+        <span class="k">if</span> (started) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"runner already started"</span>);
+        <span class="k">if</span> (name == <span class="k">null</span> || name.<span class="f">isEmpty</span>() || job == <span class="k">null</span> || jobs.<span class="f">containsKey</span>(name))
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"invalid or duplicate job name"</span>);
+        <span class="t">Set</span>&lt;<span class="t">String</span>&gt; deps = <span class="k">new</span> <span class="t">LinkedHashSet</span>&lt;&gt;(<span class="t">List</span>.<span class="f">of</span>(dependsOn));   <span class="c">// a repeated dependency counts once</span>
+        jobs.<span class="f">put</span>(name, job);
+        waitingOn.<span class="f">put</span>(name, deps.<span class="f">size</span>());
+        dependents.<span class="f">putIfAbsent</span>(name, <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;());
+        <span class="k">for</span> (<span class="t">String</span> d : deps) dependents.<span class="f">computeIfAbsent</span>(d, k -&gt; <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;()).<span class="f">add</span>(name);
+    }
+
+    <span class="c">// Blocks until every job succeeded, or throws once the first failure has stopped everything.</span>
+    <span class="k">void</span> <span class="f">run</span>(<span class="t">int</span> threads) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">if</span> (threads &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"threads must be positive"</span>);
+        <span class="k">if</span> (started) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"runner is single use"</span>);
+        started = <span class="k">true</span>;
+        <span class="k">for</span> (<span class="t">String</span> d : dependents.<span class="f">keySet</span>())
+            <span class="k">if</span> (!jobs.<span class="f">containsKey</span>(d)) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"unknown job: "</span> + d);
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; stuck = <span class="f">neverReady</span>();
+        <span class="k">if</span> (!stuck.<span class="f">isEmpty</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"cycle: these jobs can never start: "</span> + stuck);
+        <span class="k">for</span> (<span class="t">String</span> name : jobs.<span class="f">keySet</span>()) <span class="k">if</span> (waitingOn.<span class="f">get</span>(name) == <span class="n">0</span>) ready.<span class="f">addLast</span>(name);
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; workers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; threads; i += <span class="n">1</span>) workers.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(<span class="k">this</span>::workerLoop, <span class="s">"dag-"</span> + i));
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">Thread</span> t : workers) t.<span class="f">start</span>();
+        } <span class="k">catch</span> (<span class="t">RuntimeException</span> | <span class="t">Error</span> e) {
+            <span class="f">cancel</span>(<span class="s">"worker startup"</span>, e);
+        }
+        <span class="t">boolean</span> interrupted = <span class="k">false</span>;
+        <span class="k">for</span> (<span class="t">Thread</span> t : workers) {
+            <span class="k">while</span> (<span class="k">true</span>) {
+                <span class="k">try</span> { t.<span class="f">join</span>(); <span class="k">break</span>; }
+                <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    interrupted = <span class="k">true</span>;
+                    <span class="f">cancel</span>(<span class="s">"caller interruption"</span>, e);
+                }
+            }
+        }
+        <span class="c">// Finish cleanup before preserving the caller's cancellation request.</span>
+        <span class="k">if</span> (interrupted) <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        <span class="k">if</span> (firstFailure != <span class="k">null</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">Exception</span>(<span class="s">"job "</span> + failedJob + <span class="s">" failed: "</span> + firstFailure.<span class="f">getMessage</span>(), firstFailure);
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">cancel</span>(<span class="t">String</span> name, <span class="t">Throwable</span> error) {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> { <span class="f">failLocked</span>(name, error); }
+        <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+
+    <span class="c">// Called with lock held, including when startup or the caller fails.</span>
+    <span class="k">private</span> <span class="k">void</span> <span class="f">failLocked</span>(<span class="t">String</span> name, <span class="t">Throwable</span> error) {
+        <span class="k">if</span> (firstFailure != <span class="k">null</span>) <span class="k">return</span>;
+        firstFailure = error;
+        failedJob = name;
+        ready.<span class="f">clear</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : busy) t.<span class="f">interrupt</span>();
+        changed.<span class="f">signalAll</span>();
+    }
+
+    <span class="c">// Kahn's algorithm on a copy of the counts: whatever never reaches zero is on a cycle or behind one.</span>
+    <span class="k">private</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; <span class="f">neverReady</span>() {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; left = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;(waitingOn);
+        <span class="t">ArrayDeque</span>&lt;<span class="t">String</span>&gt; q = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">String</span> name : jobs.<span class="f">keySet</span>()) <span class="k">if</span> (left.<span class="f">get</span>(name) == <span class="n">0</span>) q.<span class="f">addLast</span>(name);
+        <span class="k">while</span> (!q.<span class="f">isEmpty</span>()) {
+            <span class="k">for</span> (<span class="t">String</span> d : dependents.<span class="f">get</span>(q.<span class="f">pollFirst</span>())) {
+                <span class="k">if</span> (left.<span class="f">merge</span>(d, -<span class="n">1</span>, <span class="t">Integer</span>::sum) == <span class="n">0</span>) q.<span class="f">addLast</span>(d);
+            }
+        }
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; stuck = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">String</span> name : jobs.<span class="f">keySet</span>()) <span class="k">if</span> (left.<span class="f">get</span>(name) &gt; <span class="n">0</span>) stuck.<span class="f">add</span>(name);
+        <span class="k">return</span> stuck;
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">workerLoop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">String</span> name;
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="c">// nothing ready but something running: a finishing job may release more work, so wait.</span>
+                <span class="c">// Only running jobs are ever interrupted, so a waiting worker has no interrupt to answer.</span>
+                <span class="k">while</span> (ready.<span class="f">isEmpty</span>() &amp;&amp; running &gt; <span class="n">0</span> &amp;&amp; firstFailure == <span class="k">null</span>) changed.<span class="f">awaitUninterruptibly</span>();
+                <span class="c">// a failure, or nothing ready and nothing running: no job can ever become ready again</span>
+                <span class="k">if</span> (firstFailure != <span class="k">null</span> || ready.<span class="f">isEmpty</span>()) <span class="k">return</span>;
+                name = ready.<span class="f">pollFirst</span>();
+                running += <span class="n">1</span>;
+                busy.<span class="f">add</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>());
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+            <span class="t">Throwable</span> error = <span class="k">null</span>;
+            <span class="k">try</span> {
+                jobs.<span class="f">get</span>(name).<span class="f">run</span>();                     <span class="c">// outside the lock: jobs run in parallel</span>
+            } <span class="k">catch</span> (<span class="t">Throwable</span> t) {
+                error = t;
+            }
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                running -= <span class="n">1</span>;
+                busy.<span class="f">remove</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>());
+                <span class="t">Thread</span>.<span class="f">interrupted</span>();                     <span class="c">// a stop request meant for the job that just ended</span>
+                <span class="k">if</span> (error != <span class="k">null</span> &amp;&amp; firstFailure == <span class="k">null</span>) {
+                    <span class="f">failLocked</span>(name, error);              <span class="c">// first error wins; ask busy workers to stop</span>
+                } <span class="k">else</span> <span class="k">if</span> (error == <span class="k">null</span> &amp;&amp; firstFailure == <span class="k">null</span>) {
+                    <span class="k">for</span> (<span class="t">String</span> d : dependents.<span class="f">get</span>(name)) {
+                        <span class="k">if</span> (waitingOn.<span class="f">merge</span>(d, -<span class="n">1</span>, <span class="t">Integer</span>::sum) == <span class="n">0</span>) ready.<span class="f">addLast</span>(d);
+                    }
+                }
+                changed.<span class="f">signalAll</span>();                      <span class="c">// new ready jobs, a failure, or one fewer running</span>
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"run 1: everything succeeds"</span>);
+        <span class="f">build</span>(<span class="k">false</span>).<span class="f">run</span>(<span class="n">3</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"  all jobs succeeded"</span>);
+
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"run 2: parse-b fails; other claimed jobs are cancelled"</span>);
+        <span class="k">try</span> {
+            <span class="f">build</span>(<span class="k">true</span>).<span class="f">run</span>(<span class="n">3</span>);
+        } <span class="k">catch</span> (<span class="t">Exception</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"  "</span> + e.<span class="f">getMessage</span>());
+        }
+
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"run 3: a cycle"</span>);
+        <span class="t">DagRunner</span> cyclic = <span class="k">new</span> <span class="t">DagRunner</span>();
+        cyclic.<span class="f">add</span>(<span class="s">"a"</span>, () -&gt; {}, <span class="s">"c"</span>);
+        cyclic.<span class="f">add</span>(<span class="s">"b"</span>, () -&gt; {}, <span class="s">"a"</span>);
+        cyclic.<span class="f">add</span>(<span class="s">"c"</span>, () -&gt; {}, <span class="s">"b"</span>);
+        cyclic.<span class="f">add</span>(<span class="s">"d"</span>, () -&gt; {}, <span class="s">"c"</span>);
+        <span class="k">try</span> {
+            cyclic.<span class="f">run</span>(<span class="n">2</span>);
+        } <span class="k">catch</span> (<span class="t">IllegalArgumentException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"  rejected before running: "</span> + e.<span class="f">getMessage</span>());
+        }
+    }
+
+    <span class="k">static</span> <span class="t">DagRunner</span> <span class="f">build</span>(<span class="t">boolean</span> failParseB) {
+        <span class="t">DagRunner</span> r = <span class="k">new</span> <span class="t">DagRunner</span>();
+        r.<span class="f">add</span>(<span class="s">"fetch-a"</span>, () -&gt; <span class="f">work</span>(<span class="s">"fetch-a"</span>, <span class="n">30</span>));
+        r.<span class="f">add</span>(<span class="s">"fetch-b"</span>, () -&gt; <span class="f">work</span>(<span class="s">"fetch-b"</span>, <span class="n">30</span>));
+        r.<span class="f">add</span>(<span class="s">"parse-a"</span>, () -&gt; <span class="f">work</span>(<span class="s">"parse-a"</span>, <span class="n">300</span>), <span class="s">"fetch-a"</span>);
+        r.<span class="f">add</span>(<span class="s">"parse-b"</span>, () -&gt; {
+            <span class="f">work</span>(<span class="s">"parse-b"</span>, <span class="n">20</span>);
+            <span class="k">if</span> (failParseB) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"corrupt input"</span>);
+        }, <span class="s">"fetch-b"</span>);
+        r.<span class="f">add</span>(<span class="s">"join"</span>, () -&gt; <span class="f">work</span>(<span class="s">"join"</span>, <span class="n">10</span>), <span class="s">"parse-a"</span>, <span class="s">"parse-b"</span>);
+        r.<span class="f">add</span>(<span class="s">"report"</span>, () -&gt; <span class="f">work</span>(<span class="s">"report"</span>, <span class="n">10</span>), <span class="s">"join"</span>);
+        <span class="k">return</span> r;
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">work</span>(<span class="t">String</span> name, <span class="t">long</span> ms) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"  start "</span> + name);
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(ms);                             <span class="c">// stands in for real work</span>
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"  "</span> + name + <span class="s">" was interrupted and stopped"</span>);
+            <span class="k">throw</span> e;
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>run 1: everything succeeds
+  start fetch-a
+  start fetch-b
+  start parse-a
+  start parse-b
+  start join
+  start report
+  all jobs succeeded
+run 2: parse-b fails; other claimed jobs are cancelled
+  start fetch-a
+  start fetch-b
+  start parse-a
+  start parse-b
+  parse-a was interrupted and stopped
+  job parse-b failed: corrupt input
+run 3: a cycle
+  rejected before running: cycle: these jobs can never start: [a, b, c, d]</pre></div><div class="runout" hidden></div></figure>
+
+<p>The output above is one Java schedule; C++ prints a stop-token message and formats the cycle list differently. Scheduling may change the order of independent jobs.</p>
+<p>Points worth saying while you write it:</p>
+<ul>
+<li><strong>The wait condition is the termination rule.</strong> Java's <code>while (ready.isEmpty() &amp;&amp; running &gt; 0 &amp;&amp; firstFailure == null)</code> and the C++ predicate are the same sentence: sleep only if there is nothing to take, someone may still produce work, and nothing has failed.</li>
+<li><strong><code>signalAll</code> after every outcome.</strong> One finishing job can release several jobs, make the run finished, or record a failure, and different idle workers need to see different things. <code>notify_one</code> here can leave a worker asleep at the end.</li>
+<li><strong>Interrupt only the busy (Java).</strong> The runner tracks which workers are running a job and interrupts exactly those, under the lock. Each worker clears its own flag under the same lock after its job ends, so an interrupt aimed at an old job never leaks into a wait or a later job.</li>
+<li><strong>One stop source for the run (C++).</strong> Every job gets a token from the same <code>std::stop_source</code>, and the first failure calls <code>request_stop()</code>. Stop-state operations are thread-safe. Call <code>request_stop()</code> outside the scheduler lock: it synchronously invokes registered callbacks, which must finish promptly and must not throw. The failure flag already prevents new claims during this gap.</li>
+<li><strong>Only the first failure wins.</strong> The check <code>firstFailure == null</code> happens under the lock, so two jobs failing at the same moment cannot both claim it. The jobs that end with an error because they were stopped are ignored.</li>
+</ul>
+
+<div class="box example">
+<h3>Worked example: tracing the run on two workers</h3>
+<p>Run the demo pipeline on 2 workers instead of 3. For an idealized trace, ignore scheduling, lock and wakeup overhead. Durations: fetch-a 30 ms, fetch-b 30, parse-a 300, parse-b 20, join 10, report 10. The waiting counts start as: parse-a 1, parse-b 1, join 2, report 1.</p>
+<table>
+<thead><tr><th>Time (ms)</th><th>Event</th><th>Counts that change</th><th>Ready</th><th>Running</th></tr></thead>
+<tbody>
+<tr><td>0</td><td>W1 takes fetch-a, W2 takes fetch-b</td><td></td><td>empty</td><td>2</td></tr>
+<tr><td>30</td><td>fetch-a done (W1), fetch-b done (W2)</td><td>parse-a 0, parse-b 0</td><td>parse-a, parse-b</td><td>0, then 2</td></tr>
+<tr><td>50</td><td>parse-b done (W2)</td><td>join 1</td><td>empty</td><td>1, so W2 waits</td></tr>
+<tr><td>330</td><td>parse-a done (W1)</td><td>join 0</td><td>join</td><td>0, then 1</td></tr>
+<tr><td>340</td><td>join done</td><td>report 0</td><td>report</td><td>0, then 1</td></tr>
+<tr><td>350</td><td>report done</td><td></td><td>empty</td><td>0, so both workers exit</td></tr>
+</tbody>
+</table>
+<p>The ideal run takes 350 ms against 400 ms of total work. In this model, <strong>with enough workers, the run takes as long as the longest dependency chain</strong> (the critical path: fetch-a, parse-a, join, report). A third worker cannot shorten this ideal schedule, and that observation is a good thing to say when asked "how many threads?".</p>
+<p>Now make parse-b fail at 50 ms. In that critical section the runner records the failure, clears the ready queue (already empty) and interrupts W1, which is in parse-a's sleep. W2 sees the failure and exits. W1's job throws <code>InterruptedException</code> at about 50 ms; its error is ignored because a failure is already recorded; <code>running</code> drops to 0 and W1 exits. <code>run()</code> joins both and reports "job parse-b failed", with nothing left running.</p>
+</div>
+
+<h2 id="the-oracle-variant">The oracle variant</h2>
+<p>Some Rubrik versions hide the graph behind an API: you call <code>getNextJobs(finished)</code> with the set of finished jobs and get back the jobs that may run now. These changes adapt the runner:</p>
+<ol>
+<li><strong>Dedupe.</strong> If the oracle returns every job that is runnable, including ones you already started, keep a <code>started</code> set and only enqueue jobs you have not seen. The name means reserved here: insert on enqueue, not when a worker later starts. First call the oracle with an empty finished set to discover roots.</li>
+<li><strong>Call it with a consistent snapshot.</strong> Call the oracle while holding the lock (simplest, and it serializes calls if the oracle is not thread-safe), or have a single coordinator thread own the finished set and the oracle while workers only run jobs and report back. If the oracle is slow, say I/O bound, prefer the coordinator so the lock is never held across a slow call.</li>
+<li><strong>Define quiescence.</strong> Assume a finite static job universe and a synchronous oracle. A coordinator calling the oracle outside the lock must count that discovery as in flight, or workers could mistake a temporarily empty queue for completion. Treat oracle exceptions as run failures. Without an expected job set or a completion signal, an empty oracle result cannot distinguish success from blocked hidden jobs.</li>
+<li><strong>Cycles cannot be checked up front.</strong> You do not see the graph. The termination rule still ends the run; afterwards, a run that ended with no failure but without every expected job finished means something could never start.</li>
+</ol>
+
+<figure class="code pair" data-sample="dependency-job-runner.2"><figcaption><span class="ctitle">The oracle variant: what replaces the count bookkeeping (called with the lock held)</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code><span class="c">// Members, all guarded by m_: std::set&lt;std::string&gt; finished_, started_, and source_,</span>
+<span class="c">// where source_.nextJobs(const std::set&lt;std::string&gt;&amp;) returns a std::vector&lt;std::string&gt;.</span>
+<span class="t">void</span> <span class="f">onSuccess</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; name) {
+    finished_.<span class="f">insert</span>(name);
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; j : source_.<span class="f">nextJobs</span>(finished_)) {
+        <span class="k">if</span> (started_.<span class="f">insert</span>(j).second) ready_.<span class="f">push_back</span>(j);   <span class="c">// the oracle may repeat jobs already started</span>
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code><span class="c">// Fields, all guarded by lock: Set&lt;String&gt; finished, Set&lt;String&gt; started, and JobSource source,</span>
+<span class="c">// where JobSource has List&lt;String&gt; nextJobs(Set&lt;String&gt; finished).</span>
+<span class="k">private</span> <span class="k">void</span> <span class="f">onSuccess</span>(<span class="t">String</span> name) {
+    finished.<span class="f">add</span>(name);
+    <span class="k">for</span> (<span class="t">String</span> j : source.<span class="f">nextJobs</span>(<span class="t">Set</span>.<span class="f">copyOf</span>(finished))) {   <span class="c">// a snapshot: the oracle sees a stable set</span>
+        <span class="k">if</span> (started.<span class="f">add</span>(j)) ready.<span class="f">addLast</span>(j);                    <span class="c">// the oracle may repeat jobs already started</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="prove-the-invariants-and-test-the-boundaries">Prove the invariants and test the boundaries</h2>
+<p>For V jobs and E edges, each edge is processed once in validation and at most once in execution. Indexed adjacency lists give O(V + E) bookkeeping and storage. Java hash maps give expected linear bookkeeping with bounded-cost keys; the C++ <code>std::map</code> and <code>std::set</code> version adds logarithmic lookup and construction costs, roughly O((V + E) log(V + 1)) for bounded-size names. Broadcasting after completions can also add worker wakeup overhead.</p>
+<p>Publication matters as much as ordering: a predecessor writes its result before taking and releasing the scheduler lock at completion. A successor acquires that same lock to claim its job before reading the result. That establishes the needed happens-before path. Independent jobs still need their own synchronization if they share mutable output. A lower bound on ideal duration is the larger of total work divided by N and the critical-path duration; real execution adds overhead.</p>
+<p>Test an empty graph, one worker, disconnected roots, a diamond whose child must run exactly once, duplicate edges, unknown jobs, duplicate names, invalid worker counts, and a cycle with a downstream tail. Use gates to force sibling overlap and a failure while another job is active; verify cancellation, no descendant execution and zero active jobs after return. Interrupt the Java caller while it joins, and simulate startup failure when a test seam permits it. Progress assumes workers get scheduled and every job eventually returns or honours cancellation.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Exiting when the ready queue is empty.</strong> Workers leave early and the pool loses its parallelism, or, with the opposite mistake, they wait forever at the end. Use the two-part rule.</li>
+<li><strong>Releasing the dependents of a failed job.</strong> Decrement counts only on success, and only while no failure is recorded, or the next stage starts on bad input.</li>
+<li><strong>Returning from <code>run()</code> while jobs still run.</strong> The prompt says nothing is left running. Wait for <code>running</code> to reach zero (join the workers) before reporting the failure.</li>
+<li><strong>Running the job under the lock.</strong> Every job would run one at a time, which is a sequential topological sort with extra steps.</li>
+<li><strong>Checking the failure flag without the lock.</strong> A worker reads "no failure", another thread records one and clears the queue, and the first worker then starts a job anyway. Check and take in the same critical section.</li>
+<li><strong>Interrupting idle workers, or every worker.</strong> An interrupt delivered to a worker between jobs leaks into its next wait or job. Track the busy workers and clear the flag after each job.</li>
+<li><strong>A thread per job.</strong> Easy to write, and the prompt usually says N threads. A 10,000 job graph would start up to 10,000 threads.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Practise starting with a single-threaded topological sort, then answering "make it run on N threads", then "what if a job throws", then "stop everything immediately", then "what if there is a cycle" or "what if you only get <code>getNextJobs</code>". Interviewers have graded this one on code quality and LLD too, so keep the graph bookkeeping, the worker loop and the job interface separate.</p>
+<blockquote>I keep, for each job, the number of dependencies that have not succeeded, and a ready queue of jobs at zero, all under one lock. N workers take ready jobs and run them outside the lock. On success a worker decrements its dependents and enqueues any that reach zero; on failure it records the first error, clears the ready queue and asks the running jobs to stop. A worker waits only while nothing is ready and something is still running; when both are empty, no job can ever become ready, so it exits. <code>run()</code> joins the workers, so it returns only when nothing is running, and a cycle is rejected up front by running Kahn's algorithm on a copy of the counts.</blockquote>
+<p>Follow ups to prepare: "how many threads?" (the critical path bounds the speedup; for I/O bound jobs more threads help until the slowest shared resource saturates), "retry a failed job twice before failing the run", "keep running branches that do not depend on the failure", and "how do you test it?" (a graph with known parallelism, a job that blocks until its sibling starts to prove they overlap, a failing job plus a slow job to prove nothing keeps running).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>Retries.</strong> Keep descendants blocked while a retry is pending. Release each outgoing edge once, only after final success. Use bounded attempts, cancellable backoff and idempotent effects; quiescence must include delayed retries, not just running jobs. Do not sleep under the scheduler lock.</li>
+<li><strong>Keep going instead of failing fast.</strong> <code>make -k</code> style: on failure, mark the failed job's descendants as skipped (a graph walk from the failed job) and keep running every job that does not depend on it. Report all failures at the end.</li>
+<li><strong>Which ready job first?</strong> When workers are scarce, start jobs on the longest remaining path first (critical path first). It is the classic list scheduling heuristic and often shortens the run noticeably on lopsided graphs.</li>
+<li><strong>Resource limits per job type.</strong> A semaphore can enforce "at most 2 database jobs", but waiting for permits inside workers can occupy the entire pool. To preserve useful parallelism, reserve capacity during dispatch and release it at completion, with cancellation waking the scheduler.</li>
+<li><strong>Without a central lock.</strong> Give each job an atomic count; whoever decrements a count to zero submits that job to the pool. In Java the library version is <code>CompletableFuture.allOf(dependencies).thenRunAsync(job, pool)</code>. This needs atomic read-modify-write decrements and a thread-safe submission queue, including publication of predecessor results. <code>allOf</code> takes a future array, <code>thenRunAsync</code> takes a <code>Runnable</code>, and exceptional completion suppresses that dependent action; this expression alone neither cancels siblings nor implements the full fail-fast contract. The one-lock design is easier to explain and audit.</li>
+<li><strong>Across machines.</strong> Airflow style schedulers keep job state in a database, hand out jobs with leases, and need jobs to be idempotent, because a worker can die after doing the work but before reporting it. See <a href="idempotency-and-exactly-once.html">idempotency and exactly-once effects</a>.</li>
+</ul>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Count unfinished dependencies per job; a job whose count reaches zero goes on the ready queue. That is Kahn's algorithm, made parallel.</li>
+<li>One lock over the counts, the ready queue, the running count and the first failure; jobs run outside it.</li>
+<li>Wait while nothing is ready and something runs; exit when nothing is ready and nothing runs.</li>
+<li>After failure is recorded: no new job is claimed, running jobs are asked to stop, and <code>run()</code> returns only after they have ended.</li>
+<li>Reject cycles before running by checking which jobs a single-threaded Kahn pass can never release.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="dependency-job-runner"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="dependency-job-runner.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the DAG runner, when may an idle worker safely exit?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">As soon as the ready queue is empty</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When the ready queue is empty and no job is running (or a failure has been recorded)</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">When the running count is zero, whatever the ready queue holds</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only after a fixed timeout with no new work</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Only a finishing job can make another job ready. If nothing is running, nothing will finish, so an empty ready queue stays empty forever and the worker can leave. Exiting on "ready is empty" alone gives up workers while a running job may still release more work, and "running is zero" alone is true at the very start, when the roots are waiting in the ready queue.</div></div><div class="mcq" data-id="dependency-job-runner.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Job A has no dependencies; B, C and D each depend only on A; E depends on B, C and D. The runner has 4 threads and every job takes the same time. What is the largest number of jobs running at once?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">1</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">2</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">3</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">4</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A runs alone. When it finishes, B, C and D all reach zero and run together on three threads. E waits for all three. At most three workers can be busy at once. One or two understates the available sibling parallelism; four exceeds what the dependencies permit.</div></div><div class="mcq" data-id="dependency-job-runner.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A buggy runner releases dependents of a failed job under the lock, unlocks, and only later records the failure. What can another worker do in that gap?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: the failure is recorded, so the run stops anyway</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A dependent of the failed job can reach zero and start, running on top of a failed input</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The counts can go negative and the runner deadlocks</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The cycle check reports a false cycle</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Decrementing on failure tells the dependents that their input succeeded. Another worker may claim the newly ready dependent before failure is recorded. If failure were already recorded and every claim checked it under the same lock, an incorrect enqueue alone would not let that dependent run. One erroneous decrement per edge need not make a count negative, and preflight cycle validation has already happened. Release dependents only on success, and only while no failure is recorded.</div></div><div class="mcq" data-id="dependency-job-runner.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Kahn's algorithm finishes with some jobs whose waiting count is still above zero. What are those jobs?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Exactly the jobs that lie on a cycle</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Jobs on a cycle, plus every job that depends, directly or indirectly, on a job on a cycle</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Jobs that have no dependencies</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Jobs that nobody depends on</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A job on a cycle can never reach zero because its cycle partner never finishes, and a job downstream of the cycle waits for something that never finishes either. In the demo, d is not on the cycle a, b, c, yet it can never start. To name the cycle itself, follow the remaining edges or run a depth-first search with colours.</div></div><div class="mcq" data-id="dependency-job-runner.q5" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The prompt says: "on the first failure, stop, with nothing left running". Which behaviour meets it?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No new job is claimed after failure is recorded, running jobs are asked to stop, and <code>run()</code> reports the first recorded failure after every worker ends</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>run()</code> returns the failure at once, and the running jobs finish in the background</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The runner kills the threads that are running jobs</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Jobs that do not depend on the failed job keep running to the end</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Returning at once leaves work running behind the caller's back, which the prompt forbids. Killing threads is not possible safely in either language, so stopping is a request (an interrupt or a stop token) and the runner waits for <code>running</code> to reach zero. Letting independent branches finish is a different policy ("keep going") that you may offer as a follow up.</div></div><div class="mcq" data-id="dependency-job-runner.q6" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which properties does the one-lock, count-per-job design guarantee? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A job never starts before all of its dependencies have succeeded</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Each dependency edge is processed at most once during execution, separate from preflight validation</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No more than N jobs run at the same time</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Jobs always start in the same order on every run</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">The total time is the sum of all job durations divided by N</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Counts reach zero only through successful dependencies; each edge causes at most one execution decrement, and only N workers take jobs. Linear edge visits do not make the map-based C++ implementation linear-time. The start order among ready jobs depends on timing, so it varies between runs. Total work divided by N and the critical-path duration are both lower bounds in the ideal model. Dependencies can prevent achieving the work-divided-by-N bound.</div></div><div class="mcq" data-id="dependency-job-runner.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Why does the Java runner use <code>awaitUninterruptibly()</code> for idle workers and still stay correct under its own cancellation interrupts?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because interrupts cannot be delivered to threads waiting on a <code>Condition</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Because it only ever interrupts workers that are running a job, and each worker clears its flag under the lock right after its job, before it can wait again</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because <code>awaitUninterruptibly()</code> clears every pending interrupt</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because idle workers are daemon threads</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Interrupts are sent under the lock, only to threads in the busy set. A worker leaves that set under the same lock and clears its flag there, so runner-generated interrupts cannot reach a waiting worker. This assumes outsiders do not interrupt private worker threads; <code>awaitUninterruptibly()</code> itself preserves the interrupt status and does not provide cancellation. Interrupts can be delivered to threads waiting on a <code>Condition</code> (plain <code>await()</code> would throw), which is exactly why the runner is careful about whom it interrupts.</div></div><div class="mcq" data-id="dependency-job-runner.q8" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>After the first failure, parse-a sees its stop token, stops early and returns normally, with no exception. Why does the C++ runner not start parse-a's dependents?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because <code>request_stop()</code> also clears the ready queue of jobs that finish later</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Because dependents are released only when the job succeeded and no failure has been recorded, and a failure is already recorded</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because a job that returns after a stop request throws automatically</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because <code>std::stop_token</code> marks the job as failed</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A job that stopped early did not complete its work, yet it returned normally. The runner protects against that by releasing dependents only under the condition "no error and no recorded failure". Stop tokens carry no result; they are only a request the job may observe.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="dependency-job-runner.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">The interviewer changes the API: you no longer get the graph. You get <code>getNextJobs(finished)</code>, which returns the jobs that can run given the set of finished jobs. What changes in your runner, and what new risks appear?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The counts and dependents lists go away. On every success, under the lock, I add the job to a <code>finished</code> set and call <code>getNextJobs</code> with a snapshot of it. If the oracle repeats already discovered jobs, I keep a <code>started</code> set and enqueue only jobs I have not started. At the start I call it with the empty set to get the roots.</p>
+<p>New risks: the oracle may not be thread-safe, so I either call it under the lock or give it to a single coordinator thread that owns the finished set, with workers only running jobs and reporting outcomes through a queue. If the oracle is slow (it does I/O), the coordinator design avoids holding the lock across a slow call. I can no longer reject a cycle before starting, because I never see the graph; the termination rule must also account for in-flight oracle calls, and if the run ends with no failure but with jobs the caller expected still unfinished, I report that they could never start. Fail fast is unchanged: record the first failure, stop asking the oracle, ask running jobs to stop, and return after they end.</p></div></div><div class="cq" data-q="dependency-job-runner.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write the cycle check on its own: given each job's dependencies, return the jobs that can never start.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="dependency-job-runner.3"><figcaption><span class="ctitle">Kahn&#x27;s algorithm as a cycle check</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">neverReady</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&gt;&amp; dependsOn) {
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">int</span>&gt; left;
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&gt; dependents;
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [job, deps] : dependsOn) {
+        left[job] = <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(deps.<span class="f">size</span>());
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; d : deps) dependents[d].<span class="f">push_back</span>(job);
+    }
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; q;
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [job, n] : left)
+        <span class="k">if</span> (n == <span class="n">0</span>) q.<span class="f">push_back</span>(job);
+    <span class="k">while</span> (!q.<span class="f">empty</span>()) {
+        <span class="t">std</span>::<span class="t">string</span> job = q.<span class="f">front</span>();
+        q.<span class="f">pop_front</span>();
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; d : dependents[job]) {
+            left[d] -= <span class="n">1</span>;
+            <span class="k">if</span> (left[d] == <span class="n">0</span>) q.<span class="f">push_back</span>(d);
+        }
+    }
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; stuck;
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [job, n] : left)
+        <span class="k">if</span> (n &gt; <span class="n">0</span>) stuck.<span class="f">push_back</span>(job);
+    <span class="k">return</span> stuck;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</span><code><span class="k">import</span> java.util.*;
+
+<span class="k">static</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; <span class="f">neverReady</span>(<span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">String</span>&gt;&gt; dependsOn) {
+    <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; left = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+    <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">List</span>&lt;<span class="t">String</span>&gt;&gt; dependents = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+    <span class="k">for</span> (<span class="k">var</span> e : dependsOn.<span class="f">entrySet</span>()) {
+        left.<span class="f">put</span>(e.<span class="f">getKey</span>(), e.<span class="f">getValue</span>().<span class="f">size</span>());
+        <span class="k">for</span> (<span class="t">String</span> d : e.<span class="f">getValue</span>()) dependents.<span class="f">computeIfAbsent</span>(d, k -&gt; <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;()).<span class="f">add</span>(e.<span class="f">getKey</span>());
+    }
+    <span class="t">ArrayDeque</span>&lt;<span class="t">String</span>&gt; q = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">for</span> (<span class="k">var</span> e : left.<span class="f">entrySet</span>()) <span class="k">if</span> (e.<span class="f">getValue</span>() == <span class="n">0</span>) q.<span class="f">addLast</span>(e.<span class="f">getKey</span>());
+    <span class="k">while</span> (!q.<span class="f">isEmpty</span>()) {
+        <span class="k">for</span> (<span class="t">String</span> d : dependents.<span class="f">getOrDefault</span>(q.<span class="f">pollFirst</span>(), <span class="t">List</span>.<span class="f">of</span>())) {
+            <span class="k">if</span> (left.<span class="f">merge</span>(d, -<span class="n">1</span>, <span class="t">Integer</span>::sum) == <span class="n">0</span>) q.<span class="f">addLast</span>(d);
+        }
+    }
+    <span class="t">List</span>&lt;<span class="t">String</span>&gt; stuck = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+    <span class="k">for</span> (<span class="k">var</span> e : left.<span class="f">entrySet</span>()) <span class="k">if</span> (e.<span class="f">getValue</span>() &gt; <span class="n">0</span>) stuck.<span class="f">add</span>(e.<span class="f">getKey</span>());
+    <span class="k">return</span> stuck;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>With bounded-size names the Java hash-map version is expected O(V + E); C++ ordered maps add a log(V + 1) lookup factor. Both use O(V + E) storage. Every dependency must itself be a job; validate that first or a missing job is indistinguishable from a cycle. Here duplicate edges are counted and removed consistently, although deduplication is usually a clearer API contract.</p></div></div><div class="cq" data-q="dependency-job-runner.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">The interviewer asks: "Convince me that your runner never starts a job too early, never hangs, and returns only when nothing is running."</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>Never too early:</strong> a job enters the ready queue only when its waiting count reaches zero, and a count is decremented only when one of its dependencies succeeds, under the lock, while no failure is recorded. So by the time a job is ready, every dependency has succeeded. Workers take jobs only from the ready queue, under the same lock.</p>
+<p><strong>Progress, assuming jobs terminate and workers are scheduled:</strong> a worker sleeps only while the ready queue is empty, some job is running, and no failure is recorded. Every finishing job takes the lock, updates the state and signals all workers, so each change that could end a sleep is announced after it happened, under the lock the sleepers check. When the last running job finishes with nothing ready, the sleepers wake, see nothing ready and nothing running, and exit. Cycles are rejected before starting, so every job in an accepted graph eventually becomes ready unless a failure stops the run.</p>
+<p><strong>Nothing left running:</strong> after the first failure, the ready queue is cleared and no worker takes a new job, because the failure check and the take happen in one critical section. The running jobs are asked to stop, and workers exit only when they see the failure and finish their own job. <code>run()</code> joins every worker before reporting, so when it returns, no job is executing.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="dependency-job-runner.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"You have a graph of jobs and four workers. Walk me through your design, including how you know you are finished."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Count unfinished dependencies and seed a ready queue with roots</li><li>Protect counts, ready jobs, running count and failure state with one lock</li><li>Claim jobs under the lock, execute outside it, and release dependents only on success</li><li>Wait only while ready is empty, running is positive and no failure is recorded</li><li>Broadcast completion changes and join workers before returning</li><li>Reject cycles before execution and state the job-termination assumption</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use a ready queue and a count of unfinished dependencies for each job. I validate the whole graph with a topological pass before starting workers, so a cycle cannot cause partial execution. Initially, only roots enter the ready queue. One lock protects the queue, dependency counts, running count and failure state. A worker claims a job and increments the running count under that lock, then releases it before invoking user code. When the job succeeds, the worker takes the lock again, decrements its children's counts and enqueues each child that reaches zero. For example, if two parents feed one child, the first completion leaves the count at one and only the second releases it. The worker then broadcasts the state change. An empty queue alone does not mean completion: a running parent could release more jobs. A worker waits while the queue is empty, something is running and no failure is recorded. Without ready or running jobs, it can leave. On failure, idle workers can leave immediately, and the caller joins everyone before reporting. This progress argument assumes the jobs eventually finish and workers get scheduled. It does not make an arbitrary blocking job terminate.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How does a child's read of its parents' results become safe even though jobs run outside your lock?</span></p></div></div><div class="sq" data-sq="dependency-job-runner.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A job fails. Can you promise to stop immediately and return with nothing still running?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Separate immediate rejection of new claims from cooperative cancellation and eventual return</li><li>Record the first observed failure and clear ready work under the claim lock</li><li>Treat already claimed jobs as running, even before their bodies execute</li><li>Interrupt busy Java workers or request the shared C++ stop token outside callback-sensitive locks</li><li>Join every worker and state that uncooperative jobs prevent bounded completion</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I can stop admitting new jobs immediately after recording failure, but I cannot promise that arbitrary running code stops immediately. Under the same lock used to claim work, I record the first failure and clear the ready queue. Another worker then either claimed its job before that point or sees the failure and exits. An already claimed job might enter its body afterwards, so it should check cancellation before side effects. I interrupt busy workers in Java, or request the shared stop source in C++. In C++, I make that request outside the scheduler lock because registered stop callbacks can execute synchronously. A job that returns early after cancellation must not release its dependents. Finally, I join every worker and report the recorded failure. That guarantees nothing remains running when the call returns, assuming jobs also join any child work they created. If a job ignores cancellation or blocks forever, the call may never return. A timeout can report that situation, but cannot safely kill an arbitrary thread or undo its effects.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What must happen if the caller itself is interrupted while joining the Java workers?</span></p></div></div><div class="sq" data-sq="dependency-job-runner.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Now the graph is hidden. An API returns jobs that are ready given the finished set. What changes?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Discover roots using an empty successful-completion set</li><li>Deduplicate on enqueue and add only successful jobs to the finished set</li><li>Serialize oracle access with a consistent snapshot, preferably through a coordinator for slow calls</li><li>Count in-flight discovery when deciding termination and treat oracle errors as failures</li><li>Require an expected job universe or explicit completion signal to distinguish hidden blockage from success</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I replace the dependency counts with discovery through the API. I first call it with an empty finished set to find roots. Whenever a job succeeds, I add it to that set and ask again. I deduplicate when enqueuing, because the oracle may repeatedly return a job that is already queued or running. Calls need a consistent snapshot and serialized access if the oracle is not thread-safe. For a slow oracle, I would use one coordinator so workers never hold the scheduler lock across I/O. Discovery itself counts as outstanding work; otherwise an empty queue could look finished while an oracle call is still running. Oracle errors follow the same failure policy as job errors. I cannot validate hidden cycles up front. Without an expected job set or an explicit completion signal, no ready jobs could mean either completion or permanently blocked work.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would delayed retries change your definition of outstanding work?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-dependency-job-runner.html" data-problem="dependency-job-runner"><span class="pk">Executors and async · hard</span><b>Dependency-aware job runner</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="executor-without-libraries.html"><span>Previous</span><b>An executor without libraries: submit, wait for all, shutdown and shutdownNow</b></a><a class="next" href="debugging-rounds.html"><span>Next</span><b>Debugging rounds: the bug in someone else&#x27;s threaded code</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-question-in-its-reported-forms">The question in its reported forms</a><a href="#the-design-count-what-each-job-is-waiting-for">The design: count what each job is waiting for</a><a href="#the-full-runner">The full runner</a><a href="#the-oracle-variant">The oracle variant</a><a href="#prove-the-invariants-and-test-the-boundaries">Prove the invariants and test the boundaries</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

@@ -1,0 +1,955 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Scheduled executors and timers · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="scheduled-executors" data-title="Scheduled executors and timers" data-track="core" data-module="core-9" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details open><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors" class=here><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m9">Module 09: Thread pools and async</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 09.8</span><span>27 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Scheduled executors and timers</h1><p class="lsum">Schedule delayed and periodic work with correct cancellation, monotonic deadlines, timed waits and explicit overload policies.</p><div class="asked"><span>Asked at</span><span class="co">LinkedIn</span><span class="co">Netflix</span><span class="co">Confluent</span><span class="co">Rubrik</span><span class="co">Google</span></div><div class="prereq"><span>Before this:</span><a href="build-thread-pool.html">Build it yourself: a thread pool with futures and shutdown</a><a href="condition-variables.html">Condition variables and monitors</a></div></header><article class="prose" id="article">
+<p class="lead">"Run this in 5 seconds; run that every minute." A delayed task scheduler is reported in concurrency interviews at LinkedIn, Netflix, Confluent and Rubrik, and it tests one waiting skill a plain queue does not: sleeping until the right moment, and waking earlier when something more urgent arrives.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A receptionist keeps a stack of appointment cards sorted by time. She looks at the earliest card, sets a kitchen timer for it, and reads a book. When the timer rings she calls that appointment, then sets the timer for the next card. If someone walks in with an appointment earlier than the one her timer is set for, they must tap her on the shoulder, or she will happily read until the old timer rings and that person will be seen late.</p>
+<p>Two kinds of repeating appointments exist. "Every hour on the hour", like a bus timetable, is <strong>fixed rate</strong>. "An hour after the last dose", like medicine, is <strong>fixed delay</strong>.</p>
+</div>
+
+<h2 id="what-a-scheduler-promises">What a scheduler promises</h2>
+<p>A <a class="term" data-term="scheduled-executor" href="glossary.html#scheduled-executor">scheduled executor</a> runs a task after a delay, or repeatedly. Java names the three operations as follows; the same timing rules apply to a C++ implementation:</p>
+<ul>
+<li><code>schedule(task, delay, unit)</code>: run once, no earlier than <code>delay</code> from now. Returns a <code>ScheduledFuture</code>, which you can cancel.</li>
+<li><code>scheduleAtFixedRate(task, initialDelay, period, unit)</code>: run at <code>initialDelay</code>, <code>initialDelay + period</code>, <code>initialDelay + 2 × period</code>, and so on, measured from the plan, not from when runs happen to finish.</li>
+<li><code>scheduleWithFixedDelay(task, initialDelay, delay, unit)</code>: run, wait <code>delay</code> after that run <strong>ends</strong>, run again.</li>
+</ul>
+<p>The deadline makes a task <strong>eligible</strong>, not guaranteed to start immediately. Java's scheduled executor never starts it before that deadline, and successive executions of one periodic registration never overlap. Different registrations of the same callback can overlap.</p>
+<p><strong>Cancellation races with starting.</strong> A successful cancellation before execution suppresses the task. In Java, <code>cancel(false)</code> lets an already running body finish, while <code>cancel(true)</code> requests interruption; neither undoes effects nor guarantees that the body has stopped when cancellation returns. The custom scheduler below instead commits to a run when it removes the due job under its lock.</p>
+
+<figure class="timeline"><figcaption>Ideal timeline: period 100 ms, each run takes 30 ms</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Fixed rate</span><span>Fixed delay</span></div><div class="tl-row"><span class="t">1</span><span class="cell">runs at 0 ms, done at 30</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">runs at 0 ms, done at 30</span></div><div class="tl-row"><span class="t">3</span><span class="cell">runs at 100 (the plan: 0 + 100)</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">runs at 130 (30 + 100 after the previous end)</span></div><div class="tl-row"><span class="t">5</span><span class="cell">runs at 200</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell">runs at 260</span></div><div class="tl-row risk"><span class="t">7</span><span class="cell risk">a run that takes 150 ms makes the next start late, eligible right after it ends, never in parallel</span><span class="cell empty"></span></div><div class="tl-note">Fixed rate keeps a timetable and catches up after delays; fixed delay keeps a gap between runs.</div></div></figure>
+
+<div class="only only-java"><span class="otag">Java</span>
+<h3>The JDK version: ScheduledThreadPoolExecutor</h3>
+<p><code>Executors.newScheduledThreadPool(n)</code> builds a <code>ScheduledThreadPoolExecutor</code>: a core pool of <code>n</code> workers sharing an unbounded delay queue ordered by due time. This demo shows a one-shot task, the difference between rate and delay, and the sharpest edge in the API.</p>
+<figure class="code single" data-sample="scheduled-executors.3" data-expect="ok"><figcaption><span class="ctitle">One-shot, fixed rate, fixed delay, and a periodic task that dies quietly</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ScheduledExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ScheduledFuture</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">void</span> <span class="f">work</span>() {
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">10</span>); <span class="c">// simulated work to make the timing difference visible</span>
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">ScheduledExecutorService</span> ses = <span class="t">Executors</span>.<span class="f">newScheduledThreadPool</span>(
+                <span class="n">2</span>, <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"timer-"</span>, <span class="n">0</span>).<span class="f">factory</span>())) {
+            <span class="t">ScheduledFuture</span>&lt;<span class="t">String</span>&gt; once = ses.<span class="f">schedule</span>(() -&gt; <span class="s">"one-shot completed"</span>, <span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">System</span>.out.<span class="f">println</span>(once.<span class="f">get</span>());
+            <span class="t">AtomicInteger</span> rate = <span class="k">new</span> <span class="t">AtomicInteger</span>(), delay = <span class="k">new</span> <span class="t">AtomicInteger</span>(), fragile = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+            <span class="t">ScheduledFuture</span>&lt;?&gt; r = ses.<span class="f">scheduleAtFixedRate</span>(() -&gt; {
+                rate.<span class="f">incrementAndGet</span>();
+                <span class="f">work</span>(); <span class="c">// eligible every 20 ms; actual starts can be late</span>
+            }, <span class="n">0</span>, <span class="n">20</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">ScheduledFuture</span>&lt;?&gt; d = ses.<span class="f">scheduleWithFixedDelay</span>(() -&gt; {
+                delay.<span class="f">incrementAndGet</span>();
+                <span class="f">work</span>(); <span class="c">// next eligibility is 20 ms after this run ends</span>
+            }, <span class="n">0</span>, <span class="n">20</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">ScheduledFuture</span>&lt;?&gt; f = ses.<span class="f">scheduleAtFixedRate</span>(() -&gt; {
+                <span class="k">if</span> (fragile.<span class="f">incrementAndGet</span>() == <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"third run failed"</span>);
+            }, <span class="n">0</span>, <span class="n">20</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="k">try</span> {
+                f.<span class="f">get</span>(<span class="n">2</span>, <span class="t">TimeUnit</span>.SECONDS); <span class="c">// observe completion, rather than guessing how long to sleep</span>
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"a periodic future must not complete normally"</span>);
+            } <span class="k">catch</span> (<span class="t">ExecutionException</span> expected) {
+                <span class="k">if</span> (!(expected.<span class="f">getCause</span>() <span class="k">instanceof</span> <span class="t">IllegalStateException</span>) || fragile.<span class="f">get</span>() != <span class="n">3</span>)
+                    <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(expected);
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"periodic failure observed after 3 runs"</span>);
+            }
+            r.<span class="f">cancel</span>(<span class="k">false</span>);
+            d.<span class="f">cancel</span>(<span class="k">false</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"observed counts: rate="</span> + rate.<span class="f">get</span>() + <span class="s">", delay="</span> + delay.<span class="f">get</span>());
+        } <span class="c">// Java 21 close initiates shutdown and waits for termination</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The first two lines are <code>one-shot completed</code> and <code>periodic failure observed after 3 runs</code>; the observed counts vary with scheduling. <strong>An uncaught failure suppresses later executions of that periodic registration.</strong> The future records the failure; the executor does not log it automatically. A successful periodic future never completes normally, so <code>get()</code> waits until failure or cancellation. Catch expected recoverable failures inside the body if the job should continue, and report failures rather than hiding them.</p>
+<p>Use <code>ScheduledThreadPoolExecutor</code> directly for its policies. <code>setRemoveOnCancelPolicy(true)</code> removes cancelled queued tasks promptly; the default retains them until their delay elapses. <code>maximumPoolSize</code> does not expand this unbounded-queue executor beyond its core pool, so increasing it does not fix late jobs. Successive runs of one periodic registration have a happens-before relationship, even if different workers execute them; unrelated readers still need synchronization.</p>
+<p>After <code>shutdown()</code>, new submissions are rejected, queued one-shot delays run by default, and periodic schedules stop. <code>setExecuteExistingDelayedTasksAfterShutdownPolicy(false)</code> drops those delayed jobs; <code>setContinueExistingPeriodicTasksAfterShutdownPolicy(true)</code> keeps periodic jobs active, which can prevent termination. <code>shutdownNow()</code> attempts interruption and returns queued work; it cannot forcibly stop an uncooperative callback.</p>
+<p>The older <code>java.util.Timer</code> uses one thread, and an uncaught task exception terminates that timer thread, preventing all its later tasks. Its wall-clock-based scheduling is sensitive to clock adjustments. Prefer <code>ScheduledThreadPoolExecutor</code> for this use case; OpenJDK measures its relative deadlines with <code>System.nanoTime()</code>.</p>
+</div>
+<div class="only only-cpp"><span class="otag">C++</span>
+<h3>What C++ gives you</h3>
+<p>The C++20 standard library has no scheduled executor or timer callback service. Libraries do: Boost.Asio's <code>steady_timer</code> with <code>async_wait</code> runs a handler on an <code>io_context</code> when the timer expires, and most event loops have an equivalent. In interviews you build one, from <code>std::priority_queue</code> (or a vector with <code>std::push_heap</code>), <code>std::mutex</code> and <code>std::condition_variable::wait_until</code>, using <code>std::chrono::steady_clock</code>. That is the rest of this lesson.</p>
+</div>
+
+<h2 id="building-one-a-heap-a-lock-and-a-timed-wait">Building one: a heap, a lock and a timed wait</h2>
+<p>The design has one data structure and one waiting rule:</p>
+<ul>
+<li>A <strong>min-heap of jobs ordered by due time</strong>, with a sequence number to break ties, so two jobs due at the same instant run in the order they were scheduled.</li>
+<li>One worker thread loops: if the heap is empty, wait until something is scheduled; if the head is not due yet, <strong>wait until its due time</strong>, but on a condition that <code>schedule</code> signals; if the head is due, pop it, release the lock, run it.</li>
+<li><strong><code>schedule</code> signals only when the new job becomes the head.</strong> Anything later than the current head cannot change what the worker is waiting for.</li>
+</ul>
+<p>Every wait is a loop that re-checks, so it does not matter why the worker woke up: its timer expired, a new earlier job arrived, a shutdown began, or nothing at all (a spurious wakeup). Java waits with <code>awaitNanos(remaining)</code>; C++ with <code>wait_until(lock, due, predicate)</code>. Both use a monotonic clock (<code>System.nanoTime()</code>, <code>std::chrono::steady_clock</code>), never the wall clock, which can jump.</p>
+
+<figure class="timeline"><figcaption>An earlier job must wake the worker</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Worker</span><span>schedule() caller</span><span>Heap head</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">job A, due in 300 ms</span></div><div class="tl-row"><span class="t">2</span><span class="cell">waits until A&#x27;s due time (300 ms)</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">schedules B, due in 100 ms: B becomes the head</span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">4</span><span class="cell empty"></span><span class="cell good">signals the condition</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell">wakes early, looks again: the head is B, due at 100 ms</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell">waits until 100 ms, then pops B, unlocks, runs B</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell">looks again: the head is A, due at 300 ms; waits</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Without the signal, the worker sleeps until 300 ms and B runs 200 ms late. That is the lost wakeup of schedulers.</div></div></figure>
+
+<p>Cancellation is <strong>lazy</strong>: <code>cancel(id)</code> removes the id from a set of live jobs, and the worker drops a heap entry whose id is no longer live when it reaches the top. Removing from the middle of a heap is O(n) in Java's <code>PriorityQueue</code> and has no direct API in <code>std::priority_queue</code>, so marking and skipping is a simple choice. An indexed heap can remove a known entry in O(log n); the JDK also supports eager removal. Periodic jobs are re-inserted after each run with <code>due + period</code> (fixed rate), only if they are still live.</p>
+
+<p>This teaching implementation uses one worker, cancels pending work at shutdown, and continues periodic work after a recoverable callback exception. It assumes successful allocation, no id or sequence wrap, and deadlines and retained overdue jobs separated by less than half the clock's numeric range. Use bounded delays in practice: Java subtraction handles <code>nanoTime()</code> wrap only within that range, while C++ deadline arithmetic must stay representable.</p>
+<figure class="code pair" data-sample="scheduled-executors.1" data-expect="ok"><figcaption><span class="ctitle">A delayed scheduler with cancellation and fixed-rate jobs</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;latch&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;unordered_set&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Scheduler {
+<span class="k">public</span>:
+    <span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>;     <span class="c">// monotonic: immune to wall clock changes</span>
+
+    <span class="f">Scheduler</span>() {
+        worker_ = <span class="t">std</span>::<span class="t">thread</span>([<span class="k">this</span>] { <span class="f">loop</span>(); });
+    }
+
+    ~<span class="f">Scheduler</span>() {                               <span class="c">// pending jobs are dropped; a running one finishes</span>
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            stopping_ = <span class="k">true</span>;
+        }
+        changed_.<span class="f">notify_one</span>();
+        worker_.<span class="f">join</span>();                          <span class="c">// never destroy the scheduler from inside one of its tasks</span>
+    }
+
+    <span class="t">std</span>::<span class="t">uint64_t</span> <span class="f">schedule</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task, Clock::<span class="t">duration</span> delay) {
+        <span class="k">return</span> <span class="f">add</span>(<span class="t">std</span>::<span class="f">move</span>(task), delay, Clock::<span class="t">duration</span>::<span class="f">zero</span>());
+    }
+
+    <span class="t">std</span>::<span class="t">uint64_t</span> <span class="f">scheduleAtFixedRate</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task, Clock::<span class="t">duration</span> initial, Clock::<span class="t">duration</span> period) {
+        <span class="k">if</span> (period &lt;= Clock::<span class="t">duration</span>::<span class="f">zero</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"period must be positive"</span>);
+        <span class="k">return</span> <span class="f">add</span>(<span class="t">std</span>::<span class="f">move</span>(task), initial, period);
+    }
+
+    <span class="t">bool</span> <span class="f">cancel</span>(<span class="t">std</span>::<span class="t">uint64_t</span> id) {              <span class="c">// lazy: the heap entry is skipped when it comes up</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> live_.<span class="f">erase</span>(id) &gt; <span class="n">0</span>;
+    }
+
+<span class="k">private</span>:
+    <span class="k">struct</span> Job {
+        Clock::<span class="t">time_point</span> due;
+        <span class="t">std</span>::<span class="t">uint64_t</span> seq;                       <span class="c">// a tie: first scheduled runs first</span>
+        <span class="t">std</span>::<span class="t">uint64_t</span> id;
+        Clock::<span class="t">duration</span> period;                  <span class="c">// zero means run once</span>
+        <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task;
+    };
+
+    <span class="k">struct</span> Later {                               <span class="c">// turns std::push_heap into a min-heap on (due, seq)</span>
+        <span class="t">bool</span> <span class="k">operator</span>()(<span class="k">const</span> Job&amp; a, <span class="k">const</span> Job&amp; b) <span class="k">const</span> {
+            <span class="k">return</span> a.due != b.due ? a.due &gt; b.due : a.seq &gt; b.seq;
+        }
+    };
+
+    <span class="t">std</span>::<span class="t">uint64_t</span> <span class="f">add</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task, Clock::<span class="t">duration</span> delay, Clock::<span class="t">duration</span> period) {
+        <span class="k">if</span> (!task) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"empty callback"</span>);
+        delay = <span class="t">std</span>::<span class="f">max</span>(delay, Clock::<span class="t">duration</span>::<span class="f">zero</span>());
+        <span class="t">std</span>::<span class="t">uint64_t</span> id;
+        <span class="t">bool</span> newHead;
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            <span class="k">if</span> (stopping_) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"scheduler is shut down"</span>);
+            id = nextId_;
+            nextId_ += <span class="n">1</span>;
+            heap_.<span class="f">push_back</span>(Job{Clock::<span class="f">now</span>() + delay, nextSeq_, id, period, <span class="t">std</span>::<span class="f">move</span>(task)});
+            nextSeq_ += <span class="n">1</span>;
+            <span class="t">std</span>::<span class="f">push_heap</span>(heap_.<span class="f">begin</span>(), heap_.<span class="f">end</span>(), Later{});
+            live_.<span class="f">insert</span>(id);
+            newHead = heap_.<span class="f">front</span>().id == id;
+        }
+        <span class="k">if</span> (newHead) changed_.<span class="f">notify_one</span>();      <span class="c">// a new earliest job: the worker must re-aim its timer</span>
+        <span class="k">return</span> id;
+    }
+
+    <span class="t">void</span> <span class="f">loop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            Job job;
+            {
+                <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+                <span class="k">while</span> (<span class="k">true</span>) {
+                    <span class="k">if</span> (stopping_) <span class="k">return</span>;
+                    <span class="k">if</span> (heap_.<span class="f">empty</span>()) {
+                        changed_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> stopping_ || !heap_.<span class="f">empty</span>(); });
+                        <span class="k">continue</span>;
+                    }
+                    <span class="k">if</span> (!live_.<span class="f">contains</span>(heap_.<span class="f">front</span>().id)) {
+                        <span class="t">std</span>::<span class="f">pop_heap</span>(heap_.<span class="f">begin</span>(), heap_.<span class="f">end</span>(), Later{});
+                        heap_.<span class="f">pop_back</span>();
+                        <span class="k">continue</span>;
+                    }
+                    <span class="k">auto</span> due = heap_.<span class="f">front</span>().due;
+                    <span class="k">if</span> (Clock::<span class="f">now</span>() &lt; due) {
+                        changed_.<span class="f">wait_until</span>(lock, due, [<span class="k">this</span>, due] {
+                            <span class="k">return</span> stopping_ || heap_.<span class="f">front</span>().due &lt; due;
+                        });
+                        <span class="k">continue</span>; <span class="c">// always re-check the deadline after a wakeup</span>
+                    }
+                    <span class="t">std</span>::<span class="f">pop_heap</span>(heap_.<span class="f">begin</span>(), heap_.<span class="f">end</span>(), Later{});
+                    job = <span class="t">std</span>::<span class="f">move</span>(heap_.<span class="f">back</span>());
+                    heap_.<span class="f">pop_back</span>();
+                    <span class="k">if</span> (job.period == Clock::<span class="t">duration</span>::<span class="f">zero</span>()) live_.<span class="f">erase</span>(job.id);
+                    <span class="k">break</span>; <span class="c">// popping commits this run, even if cancel wins after the unlock</span>
+                }
+            } <span class="c">// release the lock before calling user code</span>
+            <span class="k">try</span> {
+                job.<span class="f">task</span>();
+            } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+                <span class="t">std</span>::<span class="f">fprintf</span>(stderr, <span class="s">"scheduled task failed: %s\n"</span>, e.<span class="f">what</span>());
+            } <span class="k">catch</span> (...) {
+                <span class="t">std</span>::<span class="f">fprintf</span>(stderr, <span class="s">"scheduled task failed with a non-standard exception\n"</span>);
+            }
+            {
+                <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+                <span class="k">if</span> (job.period != Clock::<span class="t">duration</span>::<span class="f">zero</span>() &amp;&amp; !stopping_ &amp;&amp; live_.<span class="f">contains</span>(job.id)) {
+                    job.due += job.period;
+                    job.seq = nextSeq_;
+                    nextSeq_ += <span class="n">1</span>;
+                    heap_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(job));
+                    <span class="t">std</span>::<span class="f">push_heap</span>(heap_.<span class="f">begin</span>(), heap_.<span class="f">end</span>(), Later{});
+                }
+            }
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> changed_;            <span class="c">// "the earliest job changed, or we are stopping"</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;Job&gt; heap_;                      <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">unordered_set</span>&lt;<span class="t">std</span>::<span class="t">uint64_t</span>&gt; live_;     <span class="c">// ids that may still run, guarded by m_</span>
+    <span class="t">std</span>::<span class="t">uint64_t</span> nextSeq_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">uint64_t</span> nextId_ = <span class="n">0</span>;
+    <span class="t">bool</span> stopping_ = <span class="k">false</span>;
+    <span class="t">std</span>::<span class="t">thread</span> worker_;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::<span class="t">chrono</span>;
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    <span class="t">std</span>::<span class="t">mutex</span> orderMutex;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; order;
+    <span class="t">std</span>::<span class="t">latch</span> <span class="f">bothRan</span>(<span class="n">2</span>);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; ticks{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt; bAtMs{<span class="n">0</span>};
+    <span class="k">auto</span> t0 = <span class="t">steady_clock</span>::<span class="f">now</span>();
+    {
+        <span class="k">auto</span> record = [&amp;](<span class="k">const</span> <span class="t">char</span>* name) {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(orderMutex);
+            order.<span class="f">push_back</span>(name);
+        };
+        Scheduler s;
+        s.<span class="f">schedule</span>([&amp;] { <span class="f">record</span>(<span class="s">"A"</span>); bothRan.<span class="f">count_down</span>(); }, 300ms);
+        s.<span class="f">schedule</span>([&amp;] { <span class="f">record</span>(<span class="s">"B"</span>); bAtMs = duration_cast&lt;<span class="t">milliseconds</span>&gt;(<span class="t">steady_clock</span>::<span class="f">now</span>() - t0).<span class="f">count</span>(); bothRan.<span class="f">count_down</span>(); }, 100ms);
+        <span class="k">auto</span> c = s.<span class="f">schedule</span>([&amp;] { <span class="f">record</span>(<span class="s">"C"</span>); }, 200ms);
+        <span class="k">auto</span> tick = s.<span class="f">scheduleAtFixedRate</span>([&amp;] { ticks += <span class="n">1</span>; }, 0ms, 40ms);
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"cancel C before it runs: %s\n"</span>, s.<span class="f">cancel</span>(c) ? <span class="s">"true"</span> : <span class="s">"false"</span>);
+
+        bothRan.<span class="f">wait</span>();
+        s.<span class="f">cancel</span>(tick);
+    }                                            <span class="c">// the destructor stops the worker and joins it</span>
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"one-shot jobs ran in order: ["</span>);
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; order.<span class="f">size</span>(); i += <span class="n">1</span>) <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%s%s"</span>, i ? <span class="s">", "</span> : <span class="s">""</span>, order[i].<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"]\n"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"B was not early: %s\n"</span>, bAtMs.<span class="f">load</span>() &gt;= <span class="n">100</span> ? <span class="s">"true"</span> : <span class="s">"false"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"observed 40 ms ticks: %d\n"</span>, ticks.<span class="f">load</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">HashSet</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">PriorityQueue</span>;
+<span class="k">import</span> java.util.<span class="t">Objects</span>;
+<span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">Scheduler</span> {
+    <span class="k">private</span> <span class="k">record</span> <span class="t">Job</span>(<span class="t">long</span> dueNanos, <span class="t">long</span> seq, <span class="t">long</span> id, <span class="t">long</span> periodNanos, <span class="t">Runnable</span> task) {}
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> changed = lock.<span class="f">newCondition</span>();       <span class="c">// "the earliest job changed, or we are stopping"</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">PriorityQueue</span>&lt;<span class="t">Job</span>&gt; heap = <span class="k">new</span> <span class="t">PriorityQueue</span>&lt;&gt;((a, b) -&gt; {
+        <span class="t">long</span> d = a.<span class="f">dueNanos</span>() - b.<span class="f">dueNanos</span>();                     <span class="c">// compare by difference within the documented horizon</span>
+        <span class="k">return</span> d != <span class="n">0</span> ? (d &lt; <span class="n">0</span> ? -<span class="n">1</span> : <span class="n">1</span>) : <span class="t">Long</span>.<span class="f">compare</span>(a.<span class="f">seq</span>(), b.<span class="f">seq</span>());   <span class="c">// a tie: first scheduled runs first</span>
+    });
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Set</span>&lt;<span class="t">Long</span>&gt; live = <span class="k">new</span> <span class="t">HashSet</span>&lt;&gt;();               <span class="c">// ids that may still run; cancel removes them</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Thread</span> worker = <span class="k">new</span> <span class="t">Thread</span>(<span class="k">this</span>::loop, <span class="s">"scheduler"</span>);
+    <span class="k">private</span> <span class="t">long</span> nextSeq;
+    <span class="k">private</span> <span class="t">long</span> nextId;
+    <span class="k">private</span> <span class="t">boolean</span> stopping;
+
+    <span class="t">Scheduler</span>() {
+        worker.<span class="f">start</span>();
+    }
+
+    <span class="t">long</span> <span class="f">schedule</span>(<span class="t">Runnable</span> task, <span class="t">long</span> delay, <span class="t">TimeUnit</span> unit) {
+        <span class="k">return</span> <span class="f">add</span>(task, unit.<span class="f">toNanos</span>(delay), <span class="n">0</span>);
+    }
+
+    <span class="t">long</span> <span class="f">scheduleAtFixedRate</span>(<span class="t">Runnable</span> task, <span class="t">long</span> initialDelay, <span class="t">long</span> period, <span class="t">TimeUnit</span> unit) {
+        <span class="k">if</span> (period &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"period must be positive"</span>);
+        <span class="k">return</span> <span class="f">add</span>(task, unit.<span class="f">toNanos</span>(initialDelay), unit.<span class="f">toNanos</span>(period));
+    }
+
+    <span class="t">boolean</span> <span class="f">cancel</span>(<span class="t">long</span> id) {                                    <span class="c">// lazy: the heap entry is skipped when it comes up</span>
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">return</span> live.<span class="f">remove</span>(id);
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">void</span> <span class="f">shutdown</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {                <span class="c">// pending jobs are dropped; a claimed one finishes</span>
+        <span class="k">if</span> (<span class="t">Thread</span>.<span class="f">currentThread</span>() == worker) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"cannot join self"</span>);
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            stopping = <span class="k">true</span>;
+            heap.<span class="f">clear</span>();
+            live.<span class="f">clear</span>();
+            changed.<span class="f">signal</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+        worker.<span class="f">join</span>();                                           <span class="c">// never call this from inside a task</span>
+    }
+
+    <span class="k">private</span> <span class="t">long</span> <span class="f">add</span>(<span class="t">Runnable</span> task, <span class="t">long</span> delayNanos, <span class="t">long</span> periodNanos) {
+        <span class="t">Objects</span>.<span class="f">requireNonNull</span>(task);
+        delayNanos = <span class="t">Math</span>.<span class="f">max</span>(<span class="n">0</span>, delayNanos);
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">if</span> (stopping) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"scheduler is shut down"</span>);
+            <span class="t">long</span> id = nextId;
+            nextId += <span class="n">1</span>;
+            <span class="t">Job</span> job = <span class="k">new</span> <span class="t">Job</span>(<span class="t">System</span>.<span class="f">nanoTime</span>() + delayNanos, nextSeq, id, periodNanos, task);
+            nextSeq += <span class="n">1</span>;
+            heap.<span class="f">add</span>(job);
+            live.<span class="f">add</span>(id);
+            <span class="k">if</span> (heap.<span class="f">peek</span>() == job) changed.<span class="f">signal</span>();             <span class="c">// a new earliest job: the worker must re-aim its timer</span>
+            <span class="k">return</span> id;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">loop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">Job</span> job;
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (<span class="k">true</span>) {
+                    <span class="k">if</span> (stopping) <span class="k">return</span>;
+                    <span class="t">Job</span> head = heap.<span class="f">peek</span>();
+                    <span class="k">if</span> (head == <span class="k">null</span>) {
+                        changed.<span class="f">await</span>();                          <span class="c">// nothing scheduled: sleep until something is</span>
+                    } <span class="k">else</span> <span class="k">if</span> (!live.<span class="f">contains</span>(head.<span class="f">id</span>())) {
+                        heap.<span class="f">poll</span>();                              <span class="c">// cancelled: drop it and look again</span>
+                    } <span class="k">else</span> {
+                        <span class="t">long</span> wait = head.<span class="f">dueNanos</span>() - <span class="t">System</span>.<span class="f">nanoTime</span>();
+                        <span class="k">if</span> (wait &lt;= <span class="n">0</span>) {
+                            job = heap.<span class="f">poll</span>();
+                            <span class="k">break</span>;
+                        }
+                        changed.<span class="f">awaitNanos</span>(wait);                 <span class="c">// wakes early if an earlier job arrives</span>
+                    }
+                }
+                <span class="k">if</span> (job.<span class="f">periodNanos</span>() == <span class="n">0</span>) live.<span class="f">remove</span>(job.<span class="f">id</span>()); <span class="c">// claiming a one-shot makes cancellation too late</span>
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                stopping = <span class="k">true</span>;
+                heap.<span class="f">clear</span>();
+                live.<span class="f">clear</span>();
+                <span class="k">return</span>;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+            <span class="k">try</span> {
+                job.<span class="f">task</span>().<span class="f">run</span>();                                 <span class="c">// outside the lock: a slow task must not block schedule()</span>
+            } <span class="k">catch</span> (<span class="t">RuntimeException</span> e) {
+                <span class="t">System</span>.err.<span class="f">println</span>(<span class="s">"scheduled task failed: "</span> + e);   <span class="c">// keep the schedule alive</span>
+            }
+            <span class="k">if</span> (job.<span class="f">periodNanos</span>() &gt; <span class="n">0</span>) <span class="f">reschedule</span>(job);
+        }
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">reschedule</span>(<span class="t">Job</span> job) {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">if</span> (stopping || !live.<span class="f">contains</span>(job.<span class="f">id</span>())) <span class="k">return</span>;     <span class="c">// cancelled while it was running</span>
+            <span class="t">long</span> due = job.<span class="f">dueNanos</span>() + job.<span class="f">periodNanos</span>();        <span class="c">// fixed rate: from the planned time, not from now</span>
+            heap.<span class="f">add</span>(<span class="k">new</span> <span class="t">Job</span>(due, nextSeq, job.<span class="f">id</span>(), job.<span class="f">periodNanos</span>(), job.<span class="f">task</span>()));
+            nextSeq += <span class="n">1</span>;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">Scheduler</span> s = <span class="k">new</span> <span class="t">Scheduler</span>();
+        <span class="t">long</span> t0 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; order = <span class="t">Collections</span>.<span class="f">synchronizedList</span>(<span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;());
+        <span class="t">CountDownLatch</span> bothRan = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">2</span>);
+        <span class="t">AtomicInteger</span> ticks = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">AtomicLong</span> bAtNanos = <span class="k">new</span> <span class="t">AtomicLong</span>();
+
+        <span class="k">try</span> {
+            s.<span class="f">schedule</span>(() -&gt; { order.<span class="f">add</span>(<span class="s">"A"</span>); bothRan.<span class="f">countDown</span>(); }, <span class="n">300</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            s.<span class="f">schedule</span>(() -&gt; { order.<span class="f">add</span>(<span class="s">"B"</span>); bAtNanos.<span class="f">set</span>(<span class="t">System</span>.<span class="f">nanoTime</span>() - t0); bothRan.<span class="f">countDown</span>(); }, <span class="n">100</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">long</span> c = s.<span class="f">schedule</span>(() -&gt; order.<span class="f">add</span>(<span class="s">"C"</span>), <span class="n">200</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">long</span> tick = s.<span class="f">scheduleAtFixedRate</span>(ticks::incrementAndGet, <span class="n">0</span>, <span class="n">40</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"cancel C before it runs: "</span> + s.<span class="f">cancel</span>(c));
+
+            <span class="k">if</span> (!bothRan.<span class="f">await</span>(<span class="n">2</span>, <span class="t">TimeUnit</span>.SECONDS)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"one-shot jobs stalled"</span>);
+            s.<span class="f">cancel</span>(tick);
+        } <span class="k">finally</span> {
+            s.<span class="f">shutdown</span>();
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"one-shot jobs ran in order: "</span> + order);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"B was not early: "</span> + (bAtNanos.<span class="f">get</span>() &gt;= <span class="n">100_000_000L</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"observed 40 ms ticks: "</span> + ticks.<span class="f">get</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>cancel C before it runs: true
+one-shot jobs ran in order: [B, A]
+B was not early: true
+observed 40 ms ticks: 8</pre></div><div class="runout" hidden></div></figure>
+
+<p>The output is illustrative: a busy host can delay submissions as well as execution, so cancellation success, ordering between relative deadlines and tick counts can vary. The latch waits for both one-shot jobs, and shutdown joins the worker; neither relies on a sleep to establish completion. The C++ demo uses C++20 <code>std::latch</code> and <code>contains</code>; in C++17 use a promise/future for completion and <code>find(id) != end()</code> for set membership.</p>
+<p>Walk through the details an interviewer will poke at:</p>
+<ul>
+<li><strong>Tasks run outside the lock.</strong> Holding it would block every <code>schedule</code> and <code>cancel</code> for as long as a task runs, and a task that schedules a follow-up would deadlock on a non-recursive C++ mutex.</li>
+<li><strong>Removing a due job commits that run.</strong> A one-shot then leaves the live set, so cancellation returns false even if the callback has not yet begun. Cancelling a claimed periodic job returns true and prevents re-arming, but cannot prevent the claimed run. This is deliberately narrower than Java future cancellation, which may succeed during execution.</li>
+<li><strong>Fixed rate re-arms from the planned time</strong> (<code>due + period</code>), not from now. If a run is late, the next one may already be due and can run straight after, so the timetable catches up. Fixed delay would use <code>now + delay</code> after the run instead; the required changes are in the checkpoint.</li>
+<li><strong>Recoverable exceptions are logged and periodic jobs continue.</strong> Java catches <code>RuntimeException</code>, not fatal <code>Error</code>; the C++ callback boundary catches all thrown exceptions. This is a teaching policy, unlike the JDK periodic future, which suppresses later runs on failure. A production service also needs worker-failure monitoring.</li>
+<li><strong>Shutdown drops pending jobs</strong> and lets a claimed one finish, then joins the worker. The owner must also ensure other callers have stopped before destroying the C++ object. Never shut down or destroy the scheduler from inside one of its own tasks: the worker would be joining itself.</li>
+<li><strong>Bounded arithmetic.</strong> Java compares <code>nanoTime</code> values by subtraction, within the documented half-range assumption. C++ time points compare directly, but adding an unrepresentable delay is still an overflow bug. Zero or negative one-shot delays mean immediate eligibility; periodic intervals must be positive.</li>
+</ul>
+
+<h2 id="more-workers-the-leader-and-the-followers">More workers: the leader and the followers</h2>
+<p>One worker thread means a slow task delays every task due after it. Two common fixes, as preparation for the reported multi-worker scheduler follow up ("now make it run tasks on 4 threads"):</p>
+<ul>
+<li><strong>Split timing from execution.</strong> The scheduler thread only decides when; when a job is due it hands it to a worker pool (the pool from <a href="build-thread-pool.html">the previous build-it lesson</a>). Re-arm both kinds from a completion callback: fixed rate uses the previous planned due time plus period; fixed delay uses completion time plus delay. Keep at most one queued or running execution per periodic registration.</li>
+<li><strong>Several workers share the heap.</strong> Naively, every idle worker does a timed wait for the same head and they all wake at once. The JDK's <code>DelayQueue</code> and the scheduled executor's internal queue use the <strong>leader-follower pattern</strong> instead: exactly one thread, the leader, waits with a timeout for the head; the others wait without a timeout. A new earlier head invalidates the current leader designation and signals a waiter to time the new head. An outgoing leader wakes a successor when needed. Briefly, an old timed wait can coexist with the replacement; the design avoids giving every worker a timer for each head.</li>
+</ul>
+
+<h2 id="millions-of-timers-timer-wheels">Millions of timers: timer wheels</h2>
+<p>A binary heap costs O(log n) heap work per insert and per expiry, with amortized allocation costs for a vector-backed heap. That may become expensive for a server with millions of frequently reset idle timeouts, especially when most are cancelled before firing. Measure churn and latency before replacing the heap. The classic answer is a <a class="term" data-term="timer-wheel" href="glossary.html#timer-wheel">timer wheel</a> (Varghese and Lauck, "Hashed and Hierarchical Timing Wheels", 1987):</p>
+<ul>
+<li>A circular array of N buckets, each a list of timers, and a cursor that advances one bucket per tick (say every 10 ms).</li>
+<li>Inserting a timer due in d ticks puts it in bucket <code>(cursor + d) mod N</code>, for an integer <code>d &gt;= 1</code>, with <code>floor((d - 1) / N)</code> earlier visits to skip. Thus a deadline exactly one rotation away fires on the next visit to that bucket, rather than waiting an extra rotation. Insertion is O(1).</li>
+<li>Cancelling is O(1) too, by unlinking its node from the bucket's doubly linked list.</li>
+<li>Each tick processes one bucket: timers whose rotation count is zero fire, the others count down.</li>
+<li>The trade-off is precision: a timer fires on a tick boundary, so rounding a deadline up to a 10 ms tick adds less than one tick of quantization delay. Worker congestion or long pauses can add arbitrarily more lateness; never round down and fire early. Hierarchical wheels (like a clock's second, minute and hour hands) cover long delays with few buckets, moving timers down to finer wheels as they approach.</li>
+</ul>
+<p>Netty's <code>HashedWheelTimer</code> is a library example. Bucket processing still costs O(k) for k entries visited; a simple rotation counter can revisit long-lived timers, and many expiries in one bucket cause a burst. In an interview, one paragraph like this is enough: say when a heap stops being good enough, and what the wheel trades away.</p>
+
+<div class="box example">
+<h3>Worked example: the LinkedIn delayed scheduler, follow up by follow up</h3>
+<p>LinkedIn reports repeatedly describe implementing delayed scheduling like <code>ScheduledExecutorService</code>, sometimes with working code required. Treat those reports as examples, not a probability of being asked. Build the answer in stages:</p>
+<ol>
+<li><strong>One thread, a heap, a condition.</strong> State the invariant: the worker sleeps until the head is due or the head changes.</li>
+<li><strong>"A task scheduled later but due earlier runs late."</strong> The signal-on-new-head rule. Explain the lost wakeup it prevents.</li>
+<li><strong>"Add cancellation."</strong> Lazy deletion with a live set; say why removing from a heap's middle is avoided.</li>
+<li><strong>"Add periodic tasks."</strong> Re-insert after the run; state fixed rate versus fixed delay, and what happens when a run takes longer than its period.</li>
+<li><strong>"Run tasks in parallel."</strong> Dispatch to a pool, or leader-follower workers.</li>
+<li><strong>"Shut it down."</strong> Stop flag under the lock, signal, join; decide what happens to pending and periodic tasks (the JDK runs pending delayed tasks after <code>shutdown</code> by default but drops periodic ones).</li>
+<li><strong>"What if the system clock changes?"</strong> Nothing, because you used a monotonic clock.</li>
+</ol>
+<p>The same core appears as Confluent's "delayed task runner" (wake for an earlier deadline, many workers, shutdown, monotonic clock, no spinning), Netflix's "implement a scheduled thread pool executor", Rubrik's non-blocking "run this Runnable after waitTime", and a Google phone screen built around one hardware timer with callbacks registered from any thread.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Not signalling when a new job becomes the head.</strong> The worker sleeps through the earlier deadline.</li>
+<li><strong>Polling instead of waiting:</strong> <code>sleep(10)</code> in a loop that checks the head. It causes unnecessary wakeups and adds polling delay, potentially more than 10 ms with scheduling overhead, and interviewers ask for "block without spinning" explicitly.</li>
+<li><strong>Using the wall clock</strong> (<code>System.currentTimeMillis</code>, <code>std::chrono::system_clock</code>) for delays. A clock adjustment runs jobs early or hours late.</li>
+<li><strong>Running tasks while holding the lock.</strong> A slow task blocks every caller of <code>schedule</code> and <code>cancel</code>.</li>
+<li><strong><code>wait</code> with a fixed timeout instead of the head's due time,</strong> or a single <code>if</code> instead of a loop, so a spurious or early wakeup runs a job before it is due.</li>
+<li><strong>A thread per delayed task</strong> that sleeps and then runs. Ten thousand pending timers become ten thousand sleeping threads.</li>
+<li><strong>Forgetting that a periodic JDK task dies on its first exception.</strong> Catch inside the body.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Reports: LinkedIn's concurrency round (several delayed scheduler reports), Netflix (implement a scheduled thread pool executor, sometimes as the phone screen), Confluent (a scheduler or "delayed task runner" that had to run), Rubrik (a non-blocking API that runs a Runnable after a delay; implement <code>ScheduledExecutorService</code>), Uber and Microsoft (job schedulers in machine coding), and Google (a delayed task scheduler over one hardware timer). Interviewers grade the waiting: no spinning, no missed earlier deadline, correct shutdown.</p>
+<blockquote>I keep jobs in a min-heap by due time with a sequence number for ties, guarded by one lock. A worker waits on a condition until the head is due, using a timed wait on a monotonic clock, and schedule signals only when the new job becomes the head, so an earlier job always wakes it. Due jobs are popped and run outside the lock. Cancellation marks the job and the worker skips it, periodic jobs are re-inserted at due plus period for fixed rate or now plus delay for fixed delay, and to run tasks in parallel I hand due jobs to a pool or use leader-follower workers.</blockquote>
+<p>Follow ups: "Fixed rate with a task slower than its period?" (runs start late, back to back, never overlapping), "Why not <code>Timer</code>?" (one thread, dies on an exception, wall clock), "How would you handle a million timers?" (a hashed timing wheel), and "What happens to pending tasks at shutdown?" (your choice; state it; the JDK's defaults are above).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Catch-up bursts.</strong> Fixed rate re-arms from the plan, so after a long pause (a garbage collection pause or a stuck task) several runs are overdue at once and execute back to back. Decide whether missed intervals should be replayed, skipped or coalesced. Replaying samples cannot recover observations that were never taken; heartbeats often need skipped ticks rather than catch-up bursts. Some schedulers let you choose; if yours does not, compute the next due time as the first planned time after now.</p>
+<p><strong>Time is not just a clock.</strong> For testability, inject the clock: a scheduler that takes a clock interface can be tested deterministically by advancing fake time, but inject the waiting mechanism too, or advancing a fake clock will leave a real timed wait asleep. Test earlier-head insertion, cancellation around claim, exceptions and shutdown using explicit gates. Monotonic does not specify whether a clock advances during machine suspend; calendar jobs also need a wall-clock, timezone and daylight-saving policy.</p>
+<p><strong>Bound the backlog.</strong> Separate eligibility lag from worker-queue delay and callback duration. An unbounded timer heap or dispatcher queue can exhaust memory. Bound admission, define rejection and missed-tick policies, and avoid caller-runs rejection on the timing thread because it makes that thread execute slow callbacks.</p>
+<p><strong>One hardware timer, many logical timers.</strong> Keep the same heap and arm the hardware timer for its head. Insertion of an earlier head or cancellation of the head must re-arm it under a consistent synchronization protocol. Treat an interrupt as a prompt to inspect current state: verify the deadline and generation, ignore stale interrupts, move all due jobs to a worker queue and arm the next deadline. Never run arbitrary user callbacks on the interrupt thread. The <a href="p-timer-multiplexer.html">timer multiplexer problem</a> drills this variant.</p>
+<p><strong>Scheduling across machines</strong> is a different problem: two instances of a cron-like service must not both run the nightly job, which needs a lease or a lock with fencing (<a href="distributed-locks-and-fencing.html">distributed locks</a>), not a better heap.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A scheduler is a min-heap by due time, one lock, and a worker doing a timed wait on a monotonic clock until the head is due.</li>
+<li><code>schedule</code> must signal when the new job becomes the head, or an earlier job runs late; every wait is a loop that re-checks.</li>
+<li>Fixed rate re-arms from the plan (catch-up, never overlapping); fixed delay re-arms from the end of the run.</li>
+<li>Cancel lazily; run tasks outside the lock; in the JDK, an exception silently ends a periodic task.</li>
+<li>Scale out with a dispatcher plus pool or leader-follower workers; for millions of timers, a timing wheel trades precision for O(1) insertion and cancellation with node handles.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="scheduled-executors"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="scheduled-executors.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">One periodic registration uses Java fixed-rate semantics with a period of 100 ms, but each run takes 150 ms. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Runs overlap: a new one starts every 100 ms on another thread</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Every second run is skipped to stay on the timetable</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">After the first run, each next run is overdue and eligible when its predecessor ends; runs never overlap</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The scheduler throws because the period is too short</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Runs of one periodic task never overlap. Each next run is already overdue when the previous one finishes, so it is immediately eligible, although workers or the OS can delay it further. A positive period is legal even when work takes longer, and fixed rate does not skip missed runs; it keeps trying to catch up with the plan, which here it never can.</div></div><div class="mcq" data-id="scheduled-executors.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The worker is waiting for the head job, due in 10 s. Another thread schedules a job due in 1 s; the <code>schedule</code> method pushes it onto the heap but does not signal the condition. Assume no spurious wakeup, interrupt, other signal or worker, and negligible dispatch overhead. When does the new job run?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">At about 1 s, because the heap reorders itself</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">At about 10 s, when the worker's timed wait for the old head ends</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Never</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Immediately, because new jobs run first</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The heap is correct, but the worker is asleep with a timer set for the old head and nothing wakes it. When it finally wakes and re-checks, it runs the new job about 9 s late. Signalling when the new job becomes the head is the fix.</div></div><div class="mcq" data-id="scheduled-executors.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A scheduler waits until an absolute wall-clock deadline, rechecking that clock before dispatch. A clock correction steps the system clock back by one hour. What happens to a job that was due in 5 minutes?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: deadlines are unaffected by clock corrections</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It runs about an hour and 5 minutes from now, because its due time now looks an hour further away</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It runs immediately</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is cancelled</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A wall clock deadline is an absolute time; when the clock jumps back, the remaining wait grows by the jump. A jump forward would make jobs run early. Elapsed-time clocks (<code>System.nanoTime()</code>, <code>steady_clock</code>) are unaffected by this wall-clock step. NTP need not step time; the question explicitly assumes a backward step. The deadline is neither cancelled nor immediately reached.</div></div><div class="mcq" data-id="scheduled-executors.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A fixed-rate scheduler stores <code>previousDue = 100</code> and <code>period = 100</code>, in milliseconds. The callback finishes at 130. Its re-arm code prints <code>next = finishTime + period</code>, so it prints 230. What is wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: 230 is the next fixed-rate deadline</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It implemented fixed delay; the next planned fixed-rate deadline should be 200</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The next deadline must be 130, because periodic work always restarts immediately</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It must start a second overlapping execution at 200</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Fixed rate advances the previous planned deadline: 100 + 100 = 200. Adding the interval to completion instead gives fixed delay: 130 + 100 = 230. No run is overdue here, so restarting at 130 is early. The timing policy never requires overlapping executions of one registration.</div></div><div class="mcq" data-id="scheduled-executors.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A server keeps an idle timeout for each of a million connections and resets it on every packet. Why might a hashed timing wheel beat a binary heap here?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A heap cannot hold a million entries</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">With a handle to each list node, a wheel inserts and cancels in O(1), while an indexed binary heap needs O(log n) for insertion and removal, and nearly every timer here is cancelled before it fires; the cost is precision, rounded to the tick</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A wheel fires timers more precisely than a heap</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A wheel needs no locking</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Resetting a timeout is a cancel plus an insert, done constantly. The wheel makes both O(1) by hashing the due tick to a bucket and unlinking from a list. It fires on tick boundaries, so it is less precise, which is fine for idle timeouts.</div></div><div class="mcq" data-id="scheduled-executors.q6" data-a="2" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A task scheduled with <code>scheduleAtFixedRate</code> throws a <code>RuntimeException</code> on its third run. What happens next?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The executor logs the exception and the fourth run remains scheduled</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The scheduler thread dies and every scheduled task stops</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No further runs of that task happen; the exception is stored in its <code>ScheduledFuture</code>, and a default executor does not log it automatically</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The task is retried immediately</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The JDK documents that an exception in any execution suppresses all later executions; <code>get()</code> on the returned future throws <code>ExecutionException</code> with the cause. Other tasks are unaffected. (It is <code>java.util.Timer</code> whose thread dies and takes every task with it.) Catch inside periodic bodies.</div></div><div class="mcq" data-id="scheduled-executors.q7" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>The C++ scheduler's destructor sets the stop flag and calls <code>worker_.join()</code>. A scheduled task drops the last owner of the scheduler, so the destructor runs on the worker thread itself. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The worker finishes the task and exits cleanly</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The destructor waits forever</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>join()</code> detects the thread would join itself and throws <code>std::system_error</code>; thrown from a destructor, that ends in <code>std::terminate</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The pending jobs run first, then the destructor returns</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Joining yourself is reported as <code>resource_deadlock_would_occur</code>. Destructors are <code>noexcept</code> by default, so the exception calls <code>std::terminate</code>. Never destroy a thread owner or call a shutdown method that joins the calling worker from inside that worker. A nonblocking stop request is different.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="scheduled-executors.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Add <code>scheduleWithFixedDelay(task, initialDelay, delay)</code> to the scheduler. Which lines change, and why is it different from fixed rate?</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Store which kind a periodic job is, and re-arm from the end of the run instead of from the plan. Add the flag to <code>Job</code>, thread it through the <code>add</code> parameter and initial job construction, and pass false from existing one-shot and fixed-rate methods. Reject nonpositive periodic delays. Capture completion time immediately after the callback, before reacquiring the scheduler lock, and pass that timestamp to re-arming. The heap, cancellation and waiting rules stay the same.</p>
+<figure class="code pair" data-sample="scheduled-executors.2"><figcaption><span class="ctitle">Fixed delay re-arms from the end of the run</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="c">// Job gains a member: bool fixedDelay = false;</span>
+<span class="t">std</span>::<span class="t">uint64_t</span> <span class="f">scheduleWithFixedDelay</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task, Clock::<span class="t">duration</span> initial, Clock::<span class="t">duration</span> delay) {
+    <span class="k">if</span> (delay &lt;= Clock::<span class="t">duration</span>::<span class="f">zero</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"delay must be positive"</span>);
+    <span class="k">return</span> <span class="f">add</span>(<span class="t">std</span>::<span class="f">move</span>(task), initial, delay, <span class="c">/*fixedDelay=*/</span><span class="k">true</span>);
+}
+
+<span class="c">// In loop(), capture auto finished = Clock::now() immediately after the callback.</span>
+<span class="c">// When re-inserting a live periodic job under the lock:</span>
+job.due = job.fixedDelay
+        ? finished + job.period                  <span class="c">// fixed delay: a gap after this run ended</span>
+        : job.due + job.period;                      <span class="c">// fixed rate: the next slot on the timetable</span></code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="c">// Job gains a flag: record Job(long dueNanos, long seq, long id, long periodNanos, boolean fixedDelay, Runnable task)</span>
+<span class="t">long</span> <span class="f">scheduleWithFixedDelay</span>(<span class="t">Runnable</span> task, <span class="t">long</span> initialDelay, <span class="t">long</span> delay, <span class="t">TimeUnit</span> unit) {
+    <span class="k">if</span> (delay &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"delay must be positive"</span>);
+    <span class="k">return</span> <span class="f">add</span>(task, unit.<span class="f">toNanos</span>(initialDelay), unit.<span class="f">toNanos</span>(delay), <span class="k">true</span>);
+}
+
+<span class="c">// In reschedule(job, finishedNanos), after capturing finishedNanos at callback completion:</span>
+<span class="t">long</span> due = job.<span class="f">fixedDelay</span>()
+        ? finishedNanos + job.<span class="f">periodNanos</span>()      <span class="c">// fixed delay: a gap after this run ended</span>
+        : job.<span class="f">dueNanos</span>() + job.<span class="f">periodNanos</span>();        <span class="c">// fixed rate: the next slot on the timetable</span>
+heap.<span class="f">add</span>(<span class="k">new</span> <span class="t">Job</span>(due, nextSeq, job.<span class="f">id</span>(), job.<span class="f">periodNanos</span>(), job.<span class="f">fixedDelay</span>(), job.<span class="f">task</span>()));
+nextSeq += <span class="n">1</span>;</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Fixed rate keeps a timetable, so a run that overruns the next planned deadline makes its successor immediately eligible; fixed delay guarantees a gap between runs, so it drifts later and never bursts. Choose fixed delay for polling and heartbeats where bursts are harmful, fixed rate for sampling where the timetable matters.</p></div></div><div class="cq" data-q="scheduled-executors.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">The interviewer says: "Now tasks can be slow. Run them on 4 threads, but keep scheduling precise." Describe two designs and their trade-offs.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>Dispatcher plus pool.</strong> Keep the single scheduler thread exactly as is, but instead of running a due job it submits it to a fixed pool of 4. Slow callbacks no longer directly block deadline processing, but worker saturation can still delay actual starts. Re-arm from a completion callback for both policies, using the previous planned due time plus period for fixed rate and the captured completion time plus delay for fixed delay. This preserves non-overlap without silently skipping fixed-rate executions. Cancellation must cover the handoff: keep a per-job state and recheck it before committing the callback. Cost: one extra thread and a handoff. If the pool's queue fills, decide whether to reject, drop, or delay.</p>
+<p><strong>Leader-follower workers.</strong> Four threads share the heap. Only the leader does a timed wait for the head; the others wait untimed. When the leader takes a due job, it signals one follower to become the new leader and then runs the job itself. This avoids the extra handoff and the stampede of four timed waiters, and is how the JDK's delay queues work. Cost: more subtle code (who is leader must be tracked under the lock, and a newly scheduled earlier job must reset the leader and signal). In an interview I would build the dispatcher first because it reuses two pieces I already trust.</p></div></div><div class="cq" data-q="scheduled-executors.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Why should <code>schedule</code> signal the worker only when the new job becomes the earliest? What goes wrong if it never signals, and what does it cost if it always signals?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The worker is sleeping until the current head's due time. Only a job due earlier than that head can change what the worker should do, and that is exactly the case where the new job becomes the head. If schedule never signals, an earlier job waits until the old head's timer expires, so it runs late: a lost wakeup, which is the bug interviewers are looking for. If schedule signals every time, it is still correct, because the worker re-checks the head in a loop, but it can cause unnecessary wakeups and lock handoffs when a worker is waiting. A signal to one waiter is not itself a thundering herd; signalling all workers would add that risk. Signalling exactly when the head changes is both correct and cheap.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="scheduled-executors.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Design a delayed task scheduler. What makes an earlier task wake it, and what does cancellation promise?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Use a min-heap of monotonic deadlines with a sequence number for ties, protected by one lock</li><li>Wait in a predicate loop and signal when insertion creates a new earliest deadline</li><li>Remove a due job under the lock, then execute the callback outside it</li><li>Define the claim as the point after which cancellation cannot prevent that run</li><li>Use completion callbacks to re-arm periodic work without overlap when adding a worker pool</li><li>Define shutdown, admission limits and measurements of lateness</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use a min-heap of monotonic deadlines, guarded by one lock, with a sequence number to break ties. One worker waits until the head is due. If another thread inserts an earlier job, it signals the condition so the worker recomputes its wait. Every wakeup goes through the predicate loop, including a timeout or a spurious wakeup.
+When a job is due, I remove it under the lock and run its callback outside the lock. That removal commits the run. Cancellation before the claim prevents execution; cancellation after it cannot undo the claim. For a periodic job it can still prevent future runs. I would document that boundary rather than promise cancellation always wins.
+For example, if I am waiting ten seconds and a job arrives due in one second, inserting into the heap alone is insufficient. The signal changes the wait.
+If callbacks are slow, I would hand them to a bounded worker pool. Completion re-arms periodic work, so one registration cannot overlap itself. Shutdown rejects new work, drops pending jobs under our chosen policy, wakes the worker and joins it from an owning thread. I would measure deadline lateness separately from worker-queue delay, and bound admission so overload cannot grow memory indefinitely.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would cancellation change if a job has left the timer heap but is still queued in the worker pool?</span></p></div></div><div class="sq" data-sq="scheduled-executors.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Our cleanup job stopped running, and our heartbeat sometimes runs in bursts. How would you investigate both?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Check the periodic future for failure because one uncaught exception suppresses later runs</li><li>Observe and report recoverable failures, rather than silently swallowing every failure</li><li>Explain fixed rate from the planned deadline and fixed delay from completion</li><li>Use a 150 ms task with a 100 ms period to explain overdue runs without overlap</li><li>Choose fixed delay or an explicit skip policy for heartbeats and inspect worker saturation</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first inspect the cleanup job's scheduled future. In Java, an uncaught failure ends that periodic registration, while other tasks keep running. The future becomes done, and getting it exposes the cause. I would report the failure and catch recoverable exceptions inside the callback only if continuing is the intended policy.
+The heartbeat bursts suggest fixed-rate catch-up. Fixed rate advances the previous planned deadline by one period. If a run takes a hundred and fifty milliseconds but the period is a hundred, the next run is already overdue when the first finishes. It becomes eligible immediately, but the same registration never overlaps itself.
+Fixed delay instead waits a full interval after completion. That gives breathing room, although the schedule drifts relative to the original timetable. For heartbeats I would usually choose fixed delay, or explicitly skip missed fixed-rate ticks. Replaying old heartbeats does not repair a missed observation. Finally, I would check callback duration, pool saturation and process pauses: neither scheduling mode guarantees that an eligible job starts on time.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Does cancelling the future with interruption enabled guarantee that the running callback has stopped?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-scheduled-executor.html" data-problem="scheduled-executor"><span class="pk">Executors and async · hard</span><b>Scheduled executor</b><span class="pst"></span></a><a class="pcard" href="p-delay-queue.html" data-problem="delay-queue"><span class="pk">Thread-safe structures · hard</span><b>Delay queue</b><span class="pst"></span></a><a class="pcard" href="p-timer-multiplexer.html" data-problem="timer-multiplexer"><span class="pk">Executors and async · hard</span><b>Many timers on one hardware timer</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="build-thread-pool.html"><span>Previous</span><b>Build it yourself: a thread pool with futures and shutdown</b></a><a class="next" href="fork-join-and-parallel.html"><span>Next</span><b>Fork/join, work stealing and parallel algorithms</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#what-a-scheduler-promises">What a scheduler promises</a><a href="#building-one-a-heap-a-lock-and-a-timed-wait">Building one: a heap, a lock and a timed wait</a><a href="#more-workers-the-leader-and-the-followers">More workers: the leader and the followers</a><a href="#millions-of-timers-timer-wheels">Millions of timers: timer wheels</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

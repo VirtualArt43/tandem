@@ -1,0 +1,1040 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Bulkheads, timeouts, retries and circuit breakers · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="bulkheads-timeouts-retries" data-title="Bulkheads, timeouts, retries and circuit breakers" data-track="core" data-module="core-15" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details open><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries" class=here><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m15">Module 15: Concurrency in services</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 15.5</span><span>30 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Bulkheads, timeouts, retries and circuit breakers</h1><p class="lsum">Isolate slow dependencies with bulkheads, propagated deadlines, cooperative cancellation, bounded retries, circuit breakers and carefully budgeted hedging.</p><div class="asked"><span>Asked at</span><span class="co">Databricks</span><span class="co">Uber</span><span class="co">Rubrik</span></div><div class="prereq"><span>Before this:</span><a href="backpressure-and-load-shedding.html">Backpressure, bounded queues and load shedding</a><a href="semaphores.html">Semaphores: permits as a resource limit</a></div></header><article class="prose" id="article">
+<p class="lead">A service can fail when one dependency gets slow while everything that calls it waits, retries and piles up. Bulkheads, timeouts, retries and circuit breakers are the four tools that keep a slow dependency from becoming a dead service, and they work best as a deliberate policy.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A ship's hull is divided into watertight compartments called bulkheads, so one hole floods one compartment instead of sinking the ship. A sensible caller hangs up after a while instead of holding forever. If the line is busy, they try again later, not every second, and not all at the same moment as everyone else. And after a few failed calls to a number that is clearly down, they stop dialing for a while and check back once in a bit.</p>
+<p>Those are a <a class="term" data-term="bulkhead" href="glossary.html#bulkhead">bulkhead</a>, a timeout, a retry with backoff and jitter, and a <a class="term" data-term="circuit-breaker" href="glossary.html#circuit-breaker">circuit breaker</a>. <strong>Each protects you from a different way that waiting spreads.</strong></p>
+</div>
+
+<h2 id="how-one-slow-dependency-takes-down-a-service">How one slow dependency takes down a service</h2>
+<p>A service has one pool of 200 request threads. The payments provider, normally 50 ms, slows to 5 seconds. Payment requests now hold a thread 100 times longer, and 40 completed payment calls per second at a mean duration of 5 seconds would occupy all 200 threads on average (40 × 5 = 200). Now login, search and health checks wait for threads too. The load balancer sees failing health checks and pulls the instance, which pushes its traffic onto the others, which fill up the same way. <strong>A failure in one dependency has become an outage of everything</strong>, and nothing crashed.</p>
+<p>Three things went wrong: one shared resource (the pool) for every kind of work, no limit on how long a call may wait, and nothing stopping the service from sending more calls to a dependency that was clearly struggling. The four tools address different parts of that chain; none removes the need to bound admission.</p>
+
+<h2 id="bulkheads-one-compartment-per-risk">Bulkheads: one compartment per risk</h2>
+<p>A bulkhead gives each dependency or class of work its own bounded resource, so it can exhaust only its own share. The two common forms: a <em>separate thread pool</em> per workload (CPU-heavy reports in one pool, user requests in another), and a <em>semaphore per dependency</em>, limiting how many calls to it may be in flight. Useful boundaries: per downstream dependency (the most important one), per endpoint class (cheap versus expensive), per tenant (so one customer's burst cannot starve the others) and background versus user-facing work.</p>
+<p>Here, 8 checkouts hit a payments service that takes 200 ms, behind a bulkhead of 3 permits with a 50 ms wait. Two searches run at the same time.</p>
+
+<figure class="code pair" data-sample="bulkheads-timeouts-retries.1" data-expect="ok"><figcaption><span class="ctitle">A semaphore bulkhead with a bounded wait</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+<span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>;
+
+<span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">3</span>&gt; <span class="f">payments_bulkhead</span>(<span class="n">3</span>);     <span class="c">// at most 3 calls in flight to payments</span>
+<span class="k">const</span> Clock::<span class="t">time_point</span> t0 = Clock::<span class="f">now</span>();
+
+<span class="t">long</span> <span class="f">ms</span>() { <span class="k">return</span> <span class="k">static_cast</span>&lt;<span class="t">long</span>&gt;(<span class="t">std</span>::<span class="t">chrono</span>::duration_cast&lt;<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>&gt;(Clock::<span class="f">now</span>() - t0).<span class="f">count</span>()); }
+
+<span class="k">struct</span> Permit {                                      <span class="c">// gives the permit back however the call ends</span>
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">3</span>&gt;&amp; sem;
+    <span class="k">explicit</span> <span class="f">Permit</span>(<span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">3</span>&gt;&amp; s) : <span class="f">sem</span>(s) {}
+    <span class="f">Permit</span>(<span class="k">const</span> Permit&amp;) = <span class="k">delete</span>;
+    Permit&amp; <span class="k">operator</span>=(<span class="k">const</span> Permit&amp;) = <span class="k">delete</span>;
+    ~<span class="f">Permit</span>() { sem.<span class="f">release</span>(); }
+};
+
+<span class="t">std</span>::<span class="t">string</span> <span class="f">charge</span>() {
+    <span class="k">if</span> (!payments_bulkhead.<span class="f">try_acquire_for</span>(50ms)) {
+        <span class="k">return</span> <span class="s">"payments busy: rejected"</span>;     <span class="c">// reject; no work has been queued</span>
+    }
+    Permit permit{payments_bulkhead};
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(200ms);               <span class="c">// the slow dependency (demo timing)</span>
+    <span class="k">return</span> <span class="s">"charged"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; requests;
+    <span class="k">for</span> (<span class="t">int</span> id = <span class="n">1</span>; id &lt;= <span class="n">8</span>; id += <span class="n">1</span>) {
+        requests.<span class="f">emplace_back</span>([id] {
+            <span class="t">std</span>::<span class="t">string</span> result = <span class="f">charge</span>();
+            <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"checkout %d: %-32s at %3ld ms\n"</span>, id, result.<span class="f">c_str</span>(), <span class="f">ms</span>());
+        });
+    }
+    <span class="k">for</span> (<span class="t">int</span> id = <span class="n">1</span>; id &lt;= <span class="n">2</span>; id += <span class="n">1</span>) {
+        requests.<span class="f">emplace_back</span>([id] { <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"search %d:   %-32s at %3ld ms\n"</span>, id, <span class="s">"results"</span>, <span class="f">ms</span>()); });
+    }
+}                                                     <span class="c">// every request thread joins here</span></code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="c">// At most 3 calls in flight to the payments service, however many request threads there are.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Semaphore</span> paymentsBulkhead = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">3</span>);
+    <span class="k">static</span> <span class="k">final</span> <span class="t">long</span> T0 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+
+    <span class="k">static</span> <span class="t">long</span> <span class="f">ms</span>() { <span class="k">return</span> (<span class="t">System</span>.<span class="f">nanoTime</span>() - T0) / <span class="n">1_000_000</span>; }
+
+    <span class="k">static</span> <span class="t">String</span> <span class="f">charge</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (!paymentsBulkhead.<span class="f">tryAcquire</span>(<span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS)) {
+            <span class="k">return</span> <span class="s">"payments busy: rejected"</span>;     <span class="c">// reject; no work has been queued</span>
+        }
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">200</span>);                            <span class="c">// the slow dependency (demo timing)</span>
+            <span class="k">return</span> <span class="s">"charged"</span>;
+        } <span class="k">finally</span> {
+            paymentsBulkhead.<span class="f">release</span>();                   <span class="c">// always give the permit back</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="k">try</span> (<span class="t">ExecutorService</span> requests = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">12</span>, <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"request-"</span>, <span class="n">1</span>).<span class="f">factory</span>())) {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">8</span>; i += <span class="n">1</span>) {
+                <span class="t">int</span> id = i;
+                requests.<span class="f">submit</span>(() -&gt; {
+                    <span class="t">String</span> result = <span class="f">charge</span>();
+                    <span class="t">System</span>.out.<span class="f">printf</span>(<span class="s">"checkout %d: %-32s at %3d ms%n"</span>, id, result, <span class="f">ms</span>());
+                    <span class="k">return</span> <span class="k">null</span>;
+                });
+            }
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">2</span>; i += <span class="n">1</span>) {
+                <span class="t">int</span> id = i;
+                requests.<span class="f">submit</span>(() -&gt; <span class="t">System</span>.out.<span class="f">printf</span>(<span class="s">"search %d:   %-32s at %3d ms%n"</span>, id, <span class="s">"results"</span>, <span class="f">ms</span>()));
+            }
+        }                                                 <span class="c">// close() waits for every request</span>
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>search 1:   results                          at   2 ms
+search 2:   results                          at   3 ms
+checkout 5: payments busy: rejected           at  54 ms
+checkout 1: payments busy: rejected           at  54 ms
+checkout 7: payments busy: rejected           at  54 ms
+checkout 3: payments busy: rejected           at  54 ms
+checkout 8: payments busy: rejected           at  54 ms
+checkout 6: charged                          at 204 ms
+checkout 2: charged                          at 206 ms
+checkout 4: charged                          at 206 ms</pre></div><div class="runout" hidden></div></figure>
+
+<p>In this illustrative trace, three checkouts run and five are rejected after roughly 50 ms; no retry or queue is created. Scheduling can change that split and the timestamps. The 12 request workers leave room for searches in this small demo; a semaphore alone does not reserve workers for other endpoints.</p>
+<p>Estimate mean occupancy with Little's law using the dependency's admitted rate and mean latency, then choose headroom within its measured capacity, and keep the wait short: a long <code>tryAcquire</code> timeout quietly turns the bulkhead back into a queue. The cost to say out loud: partitioned resources are used less efficiently than one shared pool. You are <strong>trading peak efficiency for a smaller blast radius</strong>.</p>
+
+<p>Bound the number of callers waiting for admission too. Thousands of request threads waiting 50 ms for three permits can still exhaust a shared pool; immediate rejection or a separate bounded executor gives stronger isolation. The C++ semaphore and <code>std::jthread</code> need C++20; in C++17 use a mutex with a condition variable and a permit count, plus explicitly joined <code>std::thread</code>s.</p>
+
+<h2 id="timeouts-and-deadlines-that-travel">Timeouts, and deadlines that travel</h2>
+<p>Every remote call needs a timeout; an unbounded blocking call can occupy a worker indefinitely. Three rules make timeouts work:</p>
+<ul>
+<li><strong>Set them from data.</strong> Choose an acceptable false-timeout rate and the matching observed latency percentile, then add network and setup margin within the caller's budget. A p99-based timeout can expire roughly 1 percent of otherwise healthy calls; the appropriate percentile depends on the service. A 30 second default on a call that normally takes 20 ms can leave each stalled blocking call holding a worker for 30 seconds.</li>
+<li><strong>Per attempt and total are different numbers.</strong> Three attempts of 2 seconds each plus backoff can take 7 seconds; if the caller's budget is 1 second, the retries are meaningless.</li>
+<li><strong>Propagate a <a class="term" data-term="deadline-propagation" href="glossary.html#deadline-propagation">deadline</a>, not a fresh budget.</strong> The edge gives the request 800 ms; queueing, connection setup, work and retries all spend it. Each hop uses the remaining time and reserves time to return the response. gRPC Java stubs expose <code>withDeadlineAfter(long, TimeUnit)</code> and inherit the current RPC context's deadline; preserve that context when offloading work. In C++, <code>grpc::ClientContext::set_deadline</code> sets a deadline, and <code>grpc::ClientContext::FromServerContext</code> creates an outgoing context with propagation options.</li>
+</ul>
+<p><strong>Use monotonic time locally.</strong> Java uses <code>System.nanoTime()</code> differences; C++ uses <code>std::chrono::steady_clock</code>. Their origins are local, so do not serialize those values to another process. At the gRPC C++ API boundary, <code>set_deadline</code> accepts an absolute deadline such as a <code>std::chrono::system_clock::time_point</code>; derive it from the remaining local budget. gRPC transmits a remaining timeout to avoid requiring synchronized wall clocks. Without such a protocol, define how transit time and clock skew are handled rather than resetting the original timeout at every hop.</p>
+<p>Set each attempt's timeout to the smaller of its configured cap and the remaining request budget minus response overhead. Include DNS, connection establishment and TLS in the total budget; a socket read timeout alone need not cover them. Neither a percentile nor a deadline predicts an individual completion time, and scheduling can delay timeout handling.</p>
+
+<h2 id="a-timeout-is-not-a-cancellation">A timeout is not a cancellation</h2>
+<p>When a caller's timeout fires, the caller stops waiting. <strong>The work does not stop</strong> unless something tells it to. A worker thread keeps computing, a database keeps executing the query, a downstream service keeps processing the request. Under overload, that is how a fleet fills up with work nobody will ever read, the <a class="term" data-term="zombie-work" href="glossary.html#zombie-work">zombie work</a> from the previous lesson.</p>
+
+<figure class="code pair" data-sample="bulkheads-timeouts-retries.2" data-expect="ok"><figcaption><span class="ctitle">A timeout alone versus a timeout plus cancellation</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+<span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>;
+<span class="k">const</span> Clock::<span class="t">time_point</span> t0 = Clock::<span class="f">now</span>();
+
+<span class="t">long</span> <span class="f">ms</span>() { <span class="k">return</span> <span class="k">static_cast</span>&lt;<span class="t">long</span>&gt;(<span class="t">std</span>::<span class="t">chrono</span>::duration_cast&lt;<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>&gt;(Clock::<span class="f">now</span>() - t0).<span class="f">count</span>()); }
+
+<span class="c">// A slow job: 30 steps of 10 ms, checking for a stop request between steps.</span>
+<span class="t">int</span> <span class="f">build_report</span>(<span class="k">const</span> <span class="t">char</span>* name, <span class="t">std</span>::<span class="t">stop_token</span> st) {
+    <span class="k">for</span> (<span class="t">int</span> step = <span class="n">1</span>; step &lt;= <span class="n">30</span>; step += <span class="n">1</span>) {
+        <span class="k">if</span> (st.<span class="f">stop_requested</span>()) {
+            <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%s: cancelled at %ld ms\n"</span>, name, <span class="f">ms</span>());
+            <span class="k">return</span> -<span class="n">1</span>;
+        }
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(10ms);             <span class="c">// stands in for real work</span>
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%s: finished at %ld ms, long after its caller left\n"</span>, name, <span class="f">ms</span>());
+    <span class="k">return</span> <span class="n">42</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="c">// 1. A timeout alone: the caller stops waiting, the work does not stop.</span>
+    <span class="c">//    A default stop_token can never be stopped, so job A always runs to the end.</span>
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; a = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, build_report, <span class="s">"job A"</span>, <span class="t">std</span>::<span class="t">stop_token</span>{});
+    <span class="k">if</span> (a.<span class="f">wait_for</span>(50ms) == <span class="t">std</span>::future_status::timeout) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"caller: gave up on job A at %ld ms\n"</span>, <span class="f">ms</span>());
+    }
+
+    <span class="c">// 2. A timeout plus cancellation: a jthread whose stop token we can trigger.</span>
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; result;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; b = result.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">job_b</span>([&amp;result](<span class="t">std</span>::<span class="t">stop_token</span> st) { result.<span class="f">set_value</span>(<span class="f">build_report</span>(<span class="s">"job B"</span>, st)); });
+    <span class="k">if</span> (b.<span class="f">wait_for</span>(50ms) == <span class="t">std</span>::future_status::timeout) {
+        job_b.<span class="f">request_stop</span>();                          <span class="c">// the job stops at its next check</span>
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"caller: gave up on job B at %ld ms and requested cancellation\n"</span>, <span class="f">ms</span>());
+    }
+}   <span class="c">// job_b joins here; then a's destructor blocks until job A has finished all its work</span></code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeoutException</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">long</span> T0 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+    <span class="k">static</span> <span class="t">long</span> <span class="f">ms</span>() { <span class="k">return</span> (<span class="t">System</span>.<span class="f">nanoTime</span>() - T0) / <span class="n">1_000_000</span>; }
+
+    <span class="c">// A slow job: 30 steps of 10 ms. Thread.sleep responds to an interrupt by throwing.</span>
+    <span class="k">static</span> <span class="t">String</span> <span class="f">buildReport</span>(<span class="t">String</span> name) {
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">int</span> step = <span class="n">1</span>; step &lt;= <span class="n">30</span>; step += <span class="n">1</span>) {
+                <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">10</span>);                          <span class="c">// stands in for real work</span>
+            }
+            <span class="t">System</span>.out.<span class="f">println</span>(name + <span class="s">": finished at "</span> + <span class="f">ms</span>() + <span class="s">" ms, long after its caller left"</span>);
+            <span class="k">return</span> <span class="s">"report"</span>;
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(name + <span class="s">": cancelled at "</span> + <span class="f">ms</span>() + <span class="s">" ms"</span>);
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();            <span class="c">// preserve the interruption signal</span>
+            <span class="k">return</span> <span class="k">null</span>;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">2</span>,
+                <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"report-"</span>, <span class="n">1</span>).<span class="f">factory</span>())) {
+
+            <span class="c">// 1. A timeout alone: the caller stops waiting, the work does not stop.</span>
+            <span class="t">Future</span>&lt;<span class="t">String</span>&gt; a = pool.<span class="f">submit</span>(() -&gt; <span class="f">buildReport</span>(<span class="s">"job A"</span>));
+            <span class="k">try</span> {
+                a.<span class="f">get</span>(<span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            } <span class="k">catch</span> (<span class="t">TimeoutException</span> e) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"caller: gave up on job A at "</span> + <span class="f">ms</span>() + <span class="s">" ms"</span>);
+            }
+
+            <span class="c">// 2. Request cancellation; this worker cooperates by responding to interruption.</span>
+            <span class="t">Future</span>&lt;<span class="t">String</span>&gt; b = pool.<span class="f">submit</span>(() -&gt; <span class="f">buildReport</span>(<span class="s">"job B"</span>));
+            <span class="k">try</span> {
+                b.<span class="f">get</span>(<span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            } <span class="k">catch</span> (<span class="t">TimeoutException</span> e) {
+                b.<span class="f">cancel</span>(<span class="k">true</span>);                                <span class="c">// request interruption if still running</span>
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"caller: gave up on job B at "</span> + <span class="f">ms</span>() + <span class="s">" ms and requested cancellation"</span>);
+            }
+
+        } <span class="c">// close waits for both jobs, including uncancelled job A</span>
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>caller: gave up on job A at 55 ms
+caller: gave up on job B at 110 ms and requested cancellation
+job B: cancelled at 117 ms
+job A: finished at 355 ms, long after its caller left</pre></div><div class="runout" hidden></div></figure>
+
+<p><strong>Cancellation is cooperative in both languages</strong>: the caller can only ask, and the work has to check. In Java that means <code>Future.cancel(true)</code> plus code that responds to interruption (blocking calls that throw <code>InterruptedException</code>, or loops that check <code>Thread.currentThread().isInterrupted()</code>). In C++ it means a <code>std::stop_token</code> checked between steps. Across the network, use the transport cancellation mechanism and server-side deadline checks. A disconnected client does not guarantee that application work stops, especially with proxies or multiplexed connections; a database needs its own query cancellation or statement timeout. Cancellation cannot roll back a committed side effect. See <a href="interruption-and-cancellation.html">interruption and cooperative cancellation</a>.</p>
+<p>Two sharp edges catch people:</p>
+<ul>
+<li><strong><code>CompletableFuture.cancel(true)</code> does not interrupt anything.</strong> Its documentation says the flag has no effect, and <code>orTimeout</code> only completes the future exceptionally while the underlying task keeps running.</li>
+<li><strong>Releasing the last reference to an unfinished <code>std::launch::async</code> shared state can block</strong> until its task finishes, which is why the C++ program above still waits for job A at the end.</li>
+</ul>
+<p>Keep a bulkhead permit until the protected operation actually stops using the resource, not merely until its future reports cancellation. Releasing it early admits replacements while the original operations still run. A <code>std::jthread</code> destructor requests stop and joins; it is also not a way to abandon uncooperative work. In C++17, pass a shared atomic stop flag and join explicitly.</p>
+
+<h2 id="retries-medicine-with-a-maximum-dose">Retries: medicine with a maximum dose</h2>
+<p>A retry can turn a transient failure (a dropped connection, one overloaded replica) into a success. It also multiplies load at exactly the moment a dependency is struggling. The discipline:</p>
+<ul>
+<li><strong>Retry only what is safe to repeat.</strong> Reads, and writes that are idempotent or carry an idempotency key (see <a href="idempotency-and-exactly-once.html">idempotency</a>). Retrying a card charge without a key is how customers get charged twice.</li>
+<li><strong>Retry only retryable errors.</strong> Timeouts, connection resets and 503s may be retryable under the operation contract; they are not automatic permission to retry. A timeout leaves a write outcome unknown. An unchanged 400 Bad Request normally needs correction, not another attempt.</li>
+<li><strong><a class="term" data-term="exponential-backoff" href="glossary.html#exponential-backoff">Exponential backoff</a> with full <a class="term" data-term="jitter" href="glossary.html#jitter">jitter</a>.</strong> Wait a random time between 0 and <code>min(cap, base × 2^k)</code>, where <code>k = 0</code> for the first retry. Backoff spreads the retries out in time; jitter spreads them across clients, so a thousand clients that failed together do not all come back at the same instant.</li>
+<li><strong>Stay inside the deadline.</strong> Check the remaining budget before every attempt and after every backoff; give the operation that same deadline. Skip a retry when the remaining time is too small for useful work.</li>
+<li><strong>Respect the server's signal.</strong> If a 503 or 429 carries <code>Retry-After</code>, do not retry earlier; if its delay does not fit the deadline, give up. The header can contain delay seconds or an HTTP date.</li>
+</ul>
+
+<figure class="code pair" data-sample="bulkheads-timeouts-retries.3" data-expect="ok"><figcaption><span class="ctitle">A retry helper: full jitter, attempt limits and a shared deadline</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;random&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>;
+<span class="k">using</span> Ms = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>;
+<span class="k">struct</span> TransientError : <span class="t">std</span>::<span class="t">runtime_error</span> { <span class="k">using</span> <span class="t">std</span>::<span class="t">runtime_error</span>::<span class="t">runtime_error</span>; };
+<span class="k">struct</span> DeadlineExpired : <span class="t">std</span>::<span class="t">runtime_error</span> { <span class="k">using</span> <span class="t">std</span>::<span class="t">runtime_error</span>::<span class="t">runtime_error</span>; };
+
+<span class="c">// Durations are nonnegative integer milliseconds; int inputs keep the arithmetic bounded.</span>
+<span class="c">// op must honor its deadline; this helper cannot interrupt arbitrary blocking code.</span>
+<span class="k">template</span> &lt;<span class="k">class</span> T&gt;
+T <span class="f">retry</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">function</span>&lt;<span class="f">T</span>(Clock::<span class="t">time_point</span>)&gt;&amp; op, <span class="t">int</span> max_attempts, <span class="t">int</span> base_ms,
+        <span class="t">int</span> cap_ms, <span class="t">int</span> budget_ms, <span class="t">std</span>::mt19937&amp; rng) {
+    <span class="k">if</span> (max_attempts &lt; <span class="n">1</span> || base_ms &lt; <span class="n">0</span> || cap_ms &lt; base_ms || budget_ms &lt; <span class="n">0</span>)
+        <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid retry policy"</span>);
+    <span class="k">const</span> <span class="k">auto</span> deadline = Clock::<span class="f">now</span>() + <span class="f">Ms</span>(budget_ms);
+    <span class="t">long</span> <span class="t">long</span> ceiling = base_ms;
+    <span class="k">for</span> (<span class="t">int</span> attempt = <span class="n">1</span>; ; attempt += <span class="n">1</span>) {
+        <span class="k">if</span> (Clock::<span class="f">now</span>() &gt;= deadline) <span class="k">throw</span> <span class="f">DeadlineExpired</span>(<span class="s">"deadline expired"</span>);
+        <span class="k">try</span> {
+            T value = <span class="f">op</span>(deadline);
+            <span class="k">if</span> (Clock::<span class="f">now</span>() &gt;= deadline) <span class="k">throw</span> <span class="f">DeadlineExpired</span>(<span class="s">"late result"</span>);
+            <span class="k">return</span> value;
+        } <span class="k">catch</span> (<span class="k">const</span> TransientError&amp;) {
+            <span class="k">if</span> (attempt == max_attempts) <span class="k">throw</span>;
+            <span class="t">std</span>::uniform_int_distribution&lt;<span class="t">long</span> <span class="t">long</span>&gt; <span class="f">pick</span>(<span class="n">0</span>, ceiling);
+            <span class="k">auto</span> delay = <span class="f">Ms</span>(<span class="f">pick</span>(rng));
+            <span class="k">if</span> (deadline - Clock::<span class="f">now</span>() &lt;= delay) <span class="k">throw</span> <span class="f">DeadlineExpired</span>(<span class="s">"no retry budget remains"</span>);
+            <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"attempt %d failed; sleeping %lld ms of at most %lld\n"</span>,
+                        attempt, <span class="k">static_cast</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt;(delay.<span class="f">count</span>()), ceiling);
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(delay);
+            ceiling = <span class="t">std</span>::<span class="f">min</span>(<span class="k">static_cast</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt;(cap_ms), ceiling * <span class="n">2</span>);
+        } <span class="c">// recheck the deadline after waking, even if sleep overshot</span>
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> calls = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">std</span>::<span class="t">string</span>(Clock::<span class="t">time_point</span>)&gt; flaky = [&amp;calls](Clock::<span class="t">time_point</span> deadline) {
+        <span class="k">if</span> (Clock::<span class="f">now</span>() &gt;= deadline) <span class="k">throw</span> <span class="f">DeadlineExpired</span>(<span class="s">"deadline expired"</span>);
+        calls += <span class="n">1</span>;
+        <span class="k">if</span> (calls &lt;= <span class="n">3</span>) <span class="k">throw</span> <span class="f">TransientError</span>(<span class="s">"503 from inventory"</span>);
+        <span class="k">return</span> <span class="t">std</span>::<span class="t">string</span>(<span class="s">"inventory reserved"</span>);
+    };
+    <span class="t">std</span>::mt19937 <span class="f">rng</span>(<span class="n">42</span>);
+    <span class="t">std</span>::<span class="t">string</span> result = <span class="f">retry</span>(flaky, <span class="n">5</span>, <span class="n">20</span>, <span class="n">400</span>, <span class="n">2000</span>, rng);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"%s after %d attempts\n"</span>, result.<span class="f">c_str</span>(), calls);
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="k">import</span> java.util.<span class="t">Random</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeoutException</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">TransientException</span> <span class="k">extends</span> <span class="t">Exception</span> {
+        <span class="t">TransientException</span>(<span class="t">String</span> message) { <span class="k">super</span>(message); }
+    }
+    <span class="k">interface</span> <span class="t">DeadlineCall</span>&lt;T&gt; { T <span class="f">call</span>(<span class="t">long</span> deadlineNanos) <span class="k">throws</span> <span class="t">Exception</span>; }
+
+    <span class="c">// The operation must honor the supplied deadline; this helper cannot interrupt arbitrary code.</span>
+    <span class="k">static</span> &lt;T&gt; T <span class="f">retry</span>(<span class="t">DeadlineCall</span>&lt;T&gt; op, <span class="t">int</span> maxAttempts, <span class="t">int</span> baseMs, <span class="t">int</span> capMs,
+                       <span class="t">int</span> budgetMs, <span class="t">Random</span> rng) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">if</span> (maxAttempts &lt; <span class="n">1</span> || baseMs &lt; <span class="n">0</span> || capMs &lt; baseMs || budgetMs &lt; <span class="n">0</span>)
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"invalid retry policy"</span>);
+        <span class="t">long</span> deadline = <span class="t">System</span>.<span class="f">nanoTime</span>() + <span class="t">TimeUnit</span>.MILLISECONDS.<span class="f">toNanos</span>(budgetMs);
+        <span class="t">long</span> ceiling = baseMs;
+        <span class="k">for</span> (<span class="t">int</span> attempt = <span class="n">1</span>; ; attempt += <span class="n">1</span>) {
+            <span class="k">if</span> (<span class="t">Thread</span>.<span class="f">interrupted</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">InterruptedException</span>();
+            <span class="k">if</span> (deadline - <span class="t">System</span>.<span class="f">nanoTime</span>() &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">TimeoutException</span>(<span class="s">"deadline expired"</span>);
+            <span class="k">try</span> {
+                T value = op.<span class="f">call</span>(deadline);
+                <span class="k">if</span> (deadline - <span class="t">System</span>.<span class="f">nanoTime</span>() &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">TimeoutException</span>(<span class="s">"late result"</span>);
+                <span class="k">return</span> value;
+            } <span class="k">catch</span> (<span class="t">TransientException</span> e) {
+                <span class="k">if</span> (attempt == maxAttempts) <span class="k">throw</span> e;
+                <span class="t">long</span> sleepMs = rng.<span class="f">nextLong</span>(ceiling + <span class="n">1</span>); <span class="c">// full jitter, inclusive endpoints</span>
+                <span class="t">long</span> left = deadline - <span class="t">System</span>.<span class="f">nanoTime</span>();
+                <span class="k">if</span> (left &lt;= <span class="t">TimeUnit</span>.MILLISECONDS.<span class="f">toNanos</span>(sleepMs))
+                    <span class="k">throw</span> <span class="k">new</span> <span class="t">TimeoutException</span>(<span class="s">"no retry budget remains"</span>);
+                <span class="t">System</span>.out.<span class="f">printf</span>(<span class="s">"attempt %d failed; sleeping %d ms of at most %d%n"</span>,
+                        attempt, sleepMs, ceiling);
+                <span class="t">Thread</span>.<span class="f">sleep</span>(sleepMs);
+                ceiling = <span class="t">Math</span>.<span class="f">min</span>((<span class="t">long</span>) capMs, ceiling * <span class="n">2</span>);
+            } <span class="c">// the next loop iteration rechecks after any oversleep</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">AtomicInteger</span> calls = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">DeadlineCall</span>&lt;<span class="t">String</span>&gt; flaky = deadline -&gt; {
+            <span class="k">if</span> (deadline - <span class="t">System</span>.<span class="f">nanoTime</span>() &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">TimeoutException</span>();
+            <span class="k">if</span> (calls.<span class="f">incrementAndGet</span>() &lt;= <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">TransientException</span>(<span class="s">"503 from inventory"</span>);
+            <span class="k">return</span> <span class="s">"inventory reserved"</span>;
+        };
+        <span class="t">String</span> result = <span class="f">retry</span>(flaky, <span class="n">5</span>, <span class="n">20</span>, <span class="n">400</span>, <span class="n">2_000</span>, <span class="k">new</span> <span class="t">Random</span>(<span class="n">42</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(result + <span class="s">" after "</span> + calls.<span class="f">get</span>() + <span class="s">" attempts"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The helper checks its deadline before each attempt, passes it to the operation and rejects a late result. It cannot forcibly stop an operation that ignores the deadline; real I/O must set its own timeout from the remaining budget. A late write may already have committed. This is a per-request helper: a shared retry-ratio budget and <code>Retry-After</code> handling belong in the policy around it. C++ backoff here uses <code>sleep_for</code>, which is not stop-token aware; a cancellable caller needs a stop-aware wait as well.</p>
+
+<p>Java and C++ use different random distributions and can choose different sleeps. With full jitter, only the ceiling grows exponentially, not each sampled delay. The fixed seed makes the demo repeatable; real clients must use independently seeded generators so they do not repeat the same retry schedule. The AWS Architecture Blog's well known comparison of backoff strategies found full jitter cuts total work sharply compared with plain exponential backoff, because synchronized clients stop colliding.</p>
+
+<h3>Retry amplification, and why budgets beat counts</h3>
+<p>Retries multiply across layers. If a user request passes through three services and each makes up to 3 attempts (the first try plus 2 retries) when the layer below fails, then when the bottom dependency is down, one user request can cause up to 3 × 3 × 3 = <strong>27 calls</strong> to it. Four layers make 81. The dependency is buried by retries at exactly the moment it is trying to recover.</p>
+<ul>
+<li><strong>Choose one retry owner for an operation</strong>, with enough context to know whether repetition is safe. Audit SDK, proxy and application retries together; nested retry loops multiply even if each looks small.</li>
+<li><strong>Use a <a class="term" data-term="retry-budget" href="glossary.html#retry-budget">retry budget</a> as well as an attempt limit.</strong> For example, permit at most 10 retries per 100 original requests over a defined window: extra attempts are then bounded at 10 percent over that window, not necessarily every second. Define the denominator; limiting retries to 10 percent of all attempts instead permits about 11.1 retries per 100 originals. The Google SRE book describes per-client budgets alongside per-request limits. gRPC retry throttling is related, but uses failure-depleted, success-replenished tokens rather than enforcing this exact ratio.</li>
+<li><strong>Do not retry on overload signals</strong> without the requested delay: a 503 with <code>Retry-After</code> is the server asking for less load.</li>
+</ul>
+
+<h2 id="circuit-breakers-stop-calling-what-is-clearly-down">Circuit breakers: stop calling what is clearly down</h2>
+<p>A circuit breaker sits in front of a dependency and watches results. <em>Closed</em>: calls flow, failures are counted. When failures cross a threshold, it trips to <em>open</em>: calls fail immediately, without touching the dependency, for a cool-down period. Then it goes <em>half-open</em>: a few trial calls go through; if they succeed it closes, if not it opens again. The breaker avoids another downstream wait and gives the dependency room to recover. It does not cap concurrent calls while closed; a bulkhead still does that.</p>
+
+<figure class="code pair" data-sample="bulkheads-timeouts-retries.4" data-expect="ok"><figcaption><span class="ctitle">A thread-safe circuit breaker with a fake clock</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88</span><code><span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">class</span> CircuitBreaker {
+    <span class="k">struct</span> Completion {
+        <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> <span class="t">int</span>&gt; generation;
+        <span class="t">bool</span> reported = <span class="k">false</span>;
+    };
+<span class="k">public</span>:
+    <span class="k">enum</span> <span class="k">class</span> State { Closed, Open, HalfOpen };
+    <span class="k">using</span> Ticket = <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;Completion&gt;; <span class="c">// copies share one completion flag</span>
+
+    <span class="f">CircuitBreaker</span>(<span class="t">int</span> threshold, <span class="t">long</span> <span class="t">long</span> open_ms, <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">long</span> <span class="t">long</span>()&gt; clock_ms)
+        : <span class="f">threshold_</span>(threshold), <span class="f">open_ms_</span>(open_ms), <span class="f">clock_ms_</span>(<span class="t">std</span>::<span class="f">move</span>(clock_ms)) {
+        <span class="k">if</span> (threshold &lt; <span class="n">1</span> || open_ms &lt; <span class="n">0</span> || !clock_ms_) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid policy"</span>);
+    }
+    Ticket <span class="f">allow_request</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">g</span>(m_);
+        <span class="k">if</span> (state_ == State::Open &amp;&amp; <span class="f">clock_ms_</span>() - opened_at_ &gt;= open_ms_) <span class="f">transition</span>(State::HalfOpen);
+        <span class="k">if</span> (state_ == State::Open || (state_ == State::HalfOpen &amp;&amp; trial_in_flight_)) <span class="k">return</span> {};
+        <span class="k">auto</span> ticket = <span class="t">std</span>::<span class="t">make_shared</span>&lt;Completion&gt;(Completion{generation_, <span class="k">false</span>});
+        <span class="k">if</span> (state_ == State::HalfOpen) trial_in_flight_ = <span class="k">true</span>;
+        <span class="k">return</span> ticket;
+    }
+    <span class="t">void</span> <span class="f">complete</span>(<span class="k">const</span> Ticket&amp; ticket, <span class="t">bool</span> success) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">g</span>(m_);
+        <span class="k">if</span> (!ticket || ticket-&gt;generation != generation_ || ticket-&gt;reported) <span class="k">return</span>;
+        ticket-&gt;reported = <span class="k">true</span>;
+        <span class="k">if</span> (state_ == State::HalfOpen) {
+            <span class="f">transition</span>(success ? State::Closed : State::Open);
+        } <span class="k">else</span> <span class="k">if</span> (success) {
+            failures_ = <span class="n">0</span>;
+        } <span class="k">else</span> <span class="k">if</span> (++failures_ &gt;= threshold_) {
+            <span class="f">transition</span>(State::Open);
+        }
+    }
+    State <span class="f">state</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">g</span>(m_);
+        <span class="k">return</span> state_;
+    }
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">transition</span>(State next) { <span class="c">// caller holds m_</span>
+        generation_ = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> <span class="t">int</span>&gt;(<span class="n">0</span>);
+        state_ = next;
+        failures_ = <span class="n">0</span>;
+        trial_in_flight_ = <span class="k">false</span>;
+        <span class="k">if</span> (next == State::Open) opened_at_ = <span class="f">clock_ms_</span>();
+    }
+    <span class="k">const</span> <span class="t">int</span> threshold_;
+    <span class="k">const</span> <span class="t">long</span> <span class="t">long</span> open_ms_;
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">long</span> <span class="t">long</span>()&gt; clock_ms_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_; <span class="c">// guards state and every ticket's reported flag</span>
+    State state_ = State::Closed;
+    <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> <span class="t">int</span>&gt; generation_ = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> <span class="t">int</span>&gt;(<span class="n">0</span>);
+    <span class="t">int</span> failures_ = <span class="n">0</span>;
+    <span class="t">long</span> <span class="t">long</span> opened_at_ = <span class="n">0</span>;
+    <span class="t">bool</span> trial_in_flight_ = <span class="k">false</span>;
+};
+
+<span class="k">const</span> <span class="t">char</span>* <span class="f">name</span>(CircuitBreaker::State s) {
+    <span class="k">switch</span> (s) {
+        <span class="k">case</span> CircuitBreaker::State::Closed: <span class="k">return</span> <span class="s">"CLOSED"</span>;
+        <span class="k">case</span> CircuitBreaker::State::Open: <span class="k">return</span> <span class="s">"OPEN"</span>;
+        <span class="k">case</span> CircuitBreaker::State::HalfOpen: <span class="k">return</span> <span class="s">"HALF_OPEN"</span>;
+    }
+    <span class="k">return</span> <span class="s">"?"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">long</span> <span class="t">long</span> now = <span class="n">0</span>; <span class="c">// only this thread updates the fake clock</span>
+    CircuitBreaker <span class="f">breaker</span>(<span class="n">3</span>, <span class="n">1000</span>, [&amp;now] { <span class="k">return</span> now; });
+    <span class="k">const</span> <span class="t">long</span> <span class="t">long</span> calls[][<span class="n">2</span>] = {{<span class="n">0</span>, <span class="n">0</span>}, {<span class="n">100</span>, <span class="n">0</span>}, {<span class="n">200</span>, <span class="n">0</span>}, {<span class="n">300</span>, <span class="n">0</span>}, {<span class="n">400</span>, <span class="n">0</span>}, {<span class="n">1200</span>, <span class="n">0</span>}, {<span class="n">1300</span>, <span class="n">0</span>}, {<span class="n">2300</span>, <span class="n">1</span>}, {<span class="n">2400</span>, <span class="n">1</span>}};
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; call : calls) {
+        now = call[<span class="n">0</span>];
+        <span class="k">auto</span> ticket = breaker.<span class="f">allow_request</span>();
+        <span class="k">const</span> <span class="t">char</span>* outcome = <span class="s">"rejected fast"</span>;
+        <span class="k">if</span> (ticket) {
+            <span class="t">bool</span> success = call[<span class="n">1</span>] == <span class="n">1</span>;
+            breaker.<span class="f">complete</span>(ticket, success);
+            outcome = success ? <span class="s">"succeeded"</span> : <span class="s">"failed"</span>;
+        }
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"t=%4lld ms  call %-13s breaker is now %s\n"</span>, call[<span class="n">0</span>], outcome, <span class="f">name</span>(breaker.<span class="f">state</span>()));
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72</span><code><span class="k">import</span> java.util.<span class="t">Objects</span>;
+<span class="k">import</span> java.util.function.<span class="t">LongSupplier</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">CircuitBreaker</span> {
+        <span class="k">enum</span> <span class="t">State</span> { CLOSED, OPEN, HALF_OPEN }
+        <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Ticket</span> {
+            <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> generation;
+            <span class="k">private</span> <span class="t">boolean</span> reported;
+            <span class="k">private</span> <span class="t">Ticket</span>(<span class="t">Object</span> generation) { <span class="k">this</span>.generation = generation; }
+        }
+        <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> threshold;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">long</span> openMs;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">LongSupplier</span> clockMs;
+        <span class="k">private</span> <span class="t">State</span> state = <span class="t">State</span>.CLOSED; <span class="c">// all mutable fields use this monitor</span>
+        <span class="k">private</span> <span class="t">Object</span> generation = <span class="k">new</span> <span class="t">Object</span>();
+        <span class="k">private</span> <span class="t">int</span> failures;
+        <span class="k">private</span> <span class="t">long</span> openedAt;
+        <span class="k">private</span> <span class="t">boolean</span> trialInFlight;
+
+        <span class="t">CircuitBreaker</span>(<span class="t">int</span> threshold, <span class="t">long</span> openMs, <span class="t">LongSupplier</span> clockMs) {
+            <span class="k">if</span> (threshold &lt; <span class="n">1</span> || openMs &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>();
+            <span class="k">this</span>.threshold = threshold;
+            <span class="k">this</span>.openMs = openMs;
+            <span class="k">this</span>.clockMs = <span class="t">Objects</span>.<span class="f">requireNonNull</span>(clockMs);
+        }
+        <span class="k">private</span> <span class="k">void</span> <span class="f">transition</span>(<span class="t">State</span> next) { <span class="c">// caller holds the monitor</span>
+            generation = <span class="k">new</span> <span class="t">Object</span>(); <span class="c">// old completions cannot affect a later generation</span>
+            state = next;
+            failures = <span class="n">0</span>;
+            trialInFlight = <span class="k">false</span>;
+            <span class="k">if</span> (next == <span class="t">State</span>.OPEN) openedAt = clockMs.<span class="f">getAsLong</span>();
+        }
+        <span class="k">synchronized</span> <span class="t">Ticket</span> <span class="f">allowRequest</span>() {
+            <span class="k">if</span> (state == <span class="t">State</span>.OPEN &amp;&amp; clockMs.<span class="f">getAsLong</span>() - openedAt &gt;= openMs)
+                <span class="f">transition</span>(<span class="t">State</span>.HALF_OPEN);
+            <span class="k">if</span> (state == <span class="t">State</span>.OPEN || (state == <span class="t">State</span>.HALF_OPEN &amp;&amp; trialInFlight)) <span class="k">return</span> <span class="k">null</span>;
+            <span class="t">Ticket</span> ticket = <span class="k">new</span> <span class="t">Ticket</span>(generation);
+            <span class="k">if</span> (state == <span class="t">State</span>.HALF_OPEN) trialInFlight = <span class="k">true</span>;
+            <span class="k">return</span> ticket;
+        }
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">complete</span>(<span class="t">Ticket</span> ticket, <span class="t">boolean</span> success) {
+            <span class="k">if</span> (ticket == <span class="k">null</span> || ticket.generation != generation || ticket.reported) <span class="k">return</span>;
+            ticket.reported = <span class="k">true</span>; <span class="c">// duplicate terminal notifications are ignored</span>
+            <span class="k">if</span> (state == <span class="t">State</span>.HALF_OPEN) {
+                <span class="f">transition</span>(success ? <span class="t">State</span>.CLOSED : <span class="t">State</span>.OPEN);
+            } <span class="k">else</span> <span class="k">if</span> (success) {
+                failures = <span class="n">0</span>;
+            } <span class="k">else</span> <span class="k">if</span> (++failures &gt;= threshold) {
+                <span class="f">transition</span>(<span class="t">State</span>.OPEN);
+            }
+        }
+        <span class="k">synchronized</span> <span class="t">State</span> <span class="f">state</span>() { <span class="k">return</span> state; }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">long</span>[] now = {<span class="n">0</span>}; <span class="c">// this trace updates its fake clock on one thread only</span>
+        <span class="t">CircuitBreaker</span> breaker = <span class="k">new</span> <span class="t">CircuitBreaker</span>(<span class="n">3</span>, <span class="n">1_000</span>, () -&gt; now[<span class="n">0</span>]);
+        <span class="t">long</span>[][] calls = {{<span class="n">0</span>, <span class="n">0</span>}, {<span class="n">100</span>, <span class="n">0</span>}, {<span class="n">200</span>, <span class="n">0</span>}, {<span class="n">300</span>, <span class="n">0</span>}, {<span class="n">400</span>, <span class="n">0</span>}, {<span class="n">1200</span>, <span class="n">0</span>}, {<span class="n">1300</span>, <span class="n">0</span>}, {<span class="n">2300</span>, <span class="n">1</span>}, {<span class="n">2400</span>, <span class="n">1</span>}};
+        <span class="k">for</span> (<span class="t">long</span>[] call : calls) {
+            now[<span class="n">0</span>] = call[<span class="n">0</span>];
+            <span class="t">CircuitBreaker</span>.<span class="t">Ticket</span> ticket = breaker.<span class="f">allowRequest</span>();
+            <span class="t">String</span> outcome = <span class="s">"rejected fast"</span>;
+            <span class="k">if</span> (ticket != <span class="k">null</span>) {
+                <span class="t">boolean</span> success = call[<span class="n">1</span>] == <span class="n">1</span>;
+                breaker.<span class="f">complete</span>(ticket, success);
+                outcome = success ? <span class="s">"succeeded"</span> : <span class="s">"failed"</span>;
+            }
+            <span class="t">System</span>.out.<span class="f">printf</span>(<span class="s">"t=%4d ms  call %-13s breaker is now %s%n"</span>, call[<span class="n">0</span>], outcome, breaker.<span class="f">state</span>());
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>t=   0 ms  call failed        breaker is now CLOSED
+t= 100 ms  call failed        breaker is now CLOSED
+t= 200 ms  call failed        breaker is now OPEN
+t= 300 ms  call rejected fast breaker is now OPEN
+t= 400 ms  call rejected fast breaker is now OPEN
+t=1200 ms  call failed        breaker is now OPEN
+t=1300 ms  call rejected fast breaker is now OPEN
+t=2300 ms  call succeeded     breaker is now CLOSED
+t=2400 ms  call succeeded     breaker is now CLOSED</pre></div><div class="runout" hidden></div></figure>
+
+<p>Follow the trace: three failures trip the breaker at 200 ms; calls at 300 and 400 ms fail fast; at 1,200 ms the cool-down has passed, the breaker goes half-open and lets one trial through, which fails, so it opens again; at 2,300 ms the next trial succeeds and it closes. The fake clock makes every transition testable without sleeping.</p>
+<p><strong>Admission needs an identity.</strong> Each accepted call gets a ticket tied to the current state generation. Report through that same breaker; duplicate reports and reports from an earlier generation are ignored. The lock protects both admission and completion, but never the remote call itself. Consecutive failures here means completion order, not start order. Use a monotonic, nonthrowing clock whose differences fit the chosen integer type; the fake clock is single-threaded, while concurrent tests need an atomic clock. This small state machine assumes every admitted operation eventually reports; production integration must also handle abandoned probes and stuck operations.</p>
+<figure class="timeline"><figcaption>Why a late success must not close a half-open breaker</figcaption><div class="tl c4"><div class="tl-head"><span class="t">step</span><span>Old call</span><span>Other calls</span><span>Probe</span><span>Breaker</span></div><div class="tl-row"><span class="t">1</span><span class="cell">admitted while CLOSED, with generation X</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">enough failures arrive to trip the breaker</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">OPEN, generation changes; X is now stale</span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">after cool-down, admitted as the only HALF_OPEN probe</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell">returns success carrying generation X</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell good">ignores the stale result; probe is still running</span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">returns failure with the current generation</span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">8</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell good">returns to OPEN</span></div><div class="tl-note">A lock alone prevents data races, but a ticket prevents stale results changing the new state.</div></div></figure>
+
+<p>Production breakers often use a <strong>failure rate over a sliding window</strong> with a minimum sample size. Resilience4j names these settings <code>failureRateThreshold</code>, <code>slidingWindowSize</code> and <code>minimumNumberOfCalls</code>; it tracks slow-call rate separately, using <code>slowCallRateThreshold</code> and <code>slowCallDurationThreshold</code>. Classify dependency failures separately from business errors, local bulkhead rejection and caller cancellation.</p>
+<p>Every admitted call must report exactly one terminal outcome or explicitly relinquish its probe reservation. Arrange this on every completion path; a <code>finally</code> block does not execute while an operation is stuck. Half-open probes therefore need deadlines and a bounded probe lifetime. Envoy also has per-host outlier ejection; its upstream circuit-breaking limits cover resources such as active requests, pending requests, connections and retries.</p>
+
+<h2 id="hedged-requests-with-a-warning-label">Hedged requests, with a warning label</h2>
+<p>A <a class="term" data-term="hedged-request" href="glossary.html#hedged-request">hedged request</a> attacks tail latency: send to one replica, then optionally send a second copy if the first has not completed by a measured threshold, such as its normal p95 latency. Accept the first successful, usable response and request cancellation of the loser. At an unchanged latency distribution, a p95 trigger duplicates roughly 5 percent of calls; during an incident that fraction can rise sharply, so enforce a separate cap.</p>
+<p>The warning label, which you should state in the same breath:</p>
+<ul>
+<li><strong>Only for idempotent operations</strong>: reads, or writes with an idempotency key. Hedging a non-idempotent write duplicates it.</li>
+<li><strong>It adds load exactly when things are slow.</strong> Cap hedges with a budget (a few percent of requests), and turn them off when the service is overloaded, or they become a retry storm.</li>
+<li><strong>It helps most when slowness is weakly correlated</strong> across replicas (one replica in a GC pause). If every replica is slow because of a shared database, a hedge can add load without improving the tail.</li>
+<li><strong>Cancel the loser</strong>, and account for any work it already did. Cancellation does not undo completed work or guarantee that the remote handler stops.</li>
+</ul>
+
+<div class="box example">
+<h3>Worked example: a checkout with a 1 second budget</h3>
+<p>The edge gives checkout requests a deadline of 1,000 ms. Checkout calls inventory (p99 80 ms, idempotent reservation with a key) and then payments (p99 300 ms, charges carry an idempotency key).</p>
+<ul>
+<li><strong>Bulkheads.</strong> Assume payments has a measured mean latency of 100 ms and can tolerate 30 concurrent calls. At 60 checkouts per second, mean occupancy is 60 × 0.1 = 6; a cap of 30 is a capacity-tested choice, not a result obtained by substituting p99 into Little's law. Inventory has its own cap; both use immediate rejection so there are no permit waiters.</li>
+<li><strong>Timeouts.</strong> Inventory: 150 ms per attempt. Payments: 500 ms per attempt. Clip both to the remaining deadline and reserve 100 ms for local work, fallback and the response.</li>
+<li><strong>Retries.</strong> Inventory: at most two attempts, with at most 50 ms jitter between them. Payments: one foreground attempt, retaining its idempotency key for later reconciliation. Allocated budget: 150 + 50 + 150 + 500 + 100 = 950 ms. The absolute deadline still handles scheduling delays; attempting two full 500 ms payment calls would not fit.</li>
+<li><strong>Circuit breaker</strong> on payments, tripping at a 50 percent failure rate over the last 20 calls, only after 20 samples. Return "payment pending" only after durably recording the order and a recoverable payment job. That job reuses the idempotency key, reconciles uncertain outcomes and revalidates any expired inventory hold; otherwise return an honest error.</li>
+<li><strong>No hedging</strong> on payments (a write, and slow for everyone when slow), but hedging is reasonable on the idempotent inventory read path if its tail is caused by single slow replicas.</li>
+</ul>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>One shared pool for every dependency</strong>: the slowest dependency decides everyone's latency.</li>
+<li><strong>No timeout, or a library default</strong> of 30 seconds or infinity.</li>
+<li><strong>Timeouts without cancellation</strong>: callers leave, the work continues, the fleet fills with zombies.</li>
+<li><strong>Retries at every layer</strong>, with no jitter and no budget: 27 times the load during an outage.</li>
+<li><strong>Retrying non-idempotent operations</strong> without an idempotency key.</li>
+<li><strong>A circuit breaker on a tiny sample</strong> (two failures out of three calls trips it) or with no fallback when open.</li>
+<li><strong>Hedging non-idempotent writes</strong>, or hedging without a budget during overload.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>These tools are asked about directly and inside designs. A Databricks candidate was asked to build a circuit breaker for a leader-follower database, with code that compiled and ran; an Uber L4 candidate built one that opens on request count, with OPEN, CLOSED and HALF_OPEN states, and was expected to answer the concurrency questions properly; a Rubrik thread pool question added a per-task timeout as a follow up. In design rounds the prompt is usually "a downstream gets slow; what happens?"</p>
+<blockquote>Its latency rise immediately inflates our in-flight count, since concurrency is rate times duration, so the semaphore in front of that dependency fills first, by design. Further calls fail fast in milliseconds and take the degraded path, cached data or a partial response, while the rest of the service keeps its threads. Every call carries a deadline derived from the request's budget and gets a cancellation request when it passes. I measure whether operations actually stop; cancellation alone does not prove that. Retries happen at one layer only, with exponential backoff, full jitter and an explicit budget, for example 10 retries per 100 originals, so we cannot multiply the load on a struggling service. If failures persist, the circuit breaker opens; only bounded recovery probes are admitted after its cool-down.</blockquote>
+<p>Follow ups: "Why jitter?" (synchronized clients retry together and re-create the spike). "What do you do while the breaker is open?" (a fallback: cache, default, queue for later, or a clear error). "Is your breaker thread-safe?" (one lock around state transitions, one trial in half-open, and exactly one outcome tied to its admission generation). "When would you hedge?" (idempotent reads with independent per-replica tails, under a budget).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>The tools interact.</strong> Retries inside a bulkhead consume permits for longer; a breaker in front of a retry loop sees one failure per call, behind it one per attempt; hedges count against the same budget as retries. Decide the order deliberately: deadline check, breaker admission, bulkhead admission, then an attempt with a timeout and a retry decision. If the bulkhead rejects after reserving a half-open trial, release that reservation without recording a downstream failure. Release the resource permit when the attempt truly ends, before backoff, and acquire anew for each retry or hedge.</p>
+<p><strong>Thread pool bulkheads versus semaphore bulkheads.</strong> A separate bounded pool contains blocked workers if the caller can stop waiting without joining them, at the cost of a handoff and idle reserved capacity. Hung work still consumes that pool, and shutdown may wait indefinitely. A semaphore avoids the handoff, but synchronous work uses the caller's thread; bound admission waits and reserve enough capacity for unrelated work. Resilience4j offers both as <code>ThreadPoolBulkhead</code> and <code>Bulkhead</code>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Bulkheads give each dependency or workload its own bounded resource, so one slow dependency exhausts only its own share.</li>
+<li>Every remote call needs a timeout set from data, inside a deadline that propagates; a timeout does not cancel the work unless you make it.</li>
+<li>Retry only safe operations and retryable errors, with exponential backoff and full jitter, at one layer, under a budget: three layers of three attempts is 27 times the load.</li>
+<li>Circuit breakers fail fast while a dependency is down and probe with trial calls before closing.</li>
+<li>Hedge only idempotent requests, under a budget, when replica latency is sufficiently independent to justify the extra work.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="bulkheads-timeouts-retries"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="bulkheads-timeouts-retries.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A request passes through four services. Each service makes up to 2 attempts (one retry) when the call below it fails. The bottom database fails immediately, all four layers exhaust their attempts, and the deadline does not stop them early. At most how many calls can one user request cause at the database?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">8</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">16</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">4</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">2</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each layer multiplies the attempts below it: 2 × 2 × 2 × 2 = 16. With 3 attempts per layer across three layers it would be 27. That is why you retry at one layer and use budgets.</div></div><div class="mcq" data-id="bulkheads-timeouts-retries.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the ticket-based breaker above, use threshold 1 and a 100 ms cool-down. Admit old call A and call B while closed; B fails and opens the breaker. At 100 ms admit probe P, then A reports success. Print the state; P then fails and you print again. What does the trace show?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">CLOSED, then CLOSED</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">HALF_OPEN, then OPEN</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">CLOSED, then OPEN</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">OPEN, then HALF_OPEN</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A's ticket belongs to the old closed generation, so its late success cannot close the half-open breaker. Only P's current ticket can resolve that probe, and its failure opens the breaker. CLOSED first would mean a stale success was accepted; OPEN first would ignore the admitted probe transition. The lock prevents concurrent field access, while the generation check prevents this logical race.</div></div><div class="mcq" data-id="bulkheads-timeouts-retries.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which sleep before retry <code>k</code>, where <code>k = 0</code> is the first retry, is "exponential backoff with full jitter"?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Exactly base × 2^k</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A random time between 0 and min(cap, base × 2^k)</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">base × 2^k plus or minus 1 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A random time between 0 and base, every attempt</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Full jitter draws the whole sleep at random under an exponentially growing, capped ceiling. A fixed exponential schedule keeps clients that failed together in lockstep; a tiny jitter barely separates them; a constant small range does not back off at all.</div></div><div class="mcq" data-id="bulkheads-timeouts-retries.q4" data-a="0,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Assume spare capacity and a small hedge budget. Which requests are reasonable candidates for hedging? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A read-only GET of a user profile from cache replicas with independent occasional stalls</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A POST that charges a card, with no idempotency key</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A search query against several identical index replicas, where tail latency comes from occasional GC pauses on single replicas</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Any request, during an overload, to speed things up</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> These candidates are idempotent and have sufficiently independent replica tails to justify a bounded hedge. A non-idempotent charge would be duplicated, and hedging during overload adds load exactly when the system can least afford it.</div></div><div class="mcq" data-id="bulkheads-timeouts-retries.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A request has 40 ms remaining on its propagated deadline. You reserve 10 ms to form and return the response. The dependency's configured per-attempt timeout is 200 ms. Ignoring setup overhead already accounted for, what is the largest timeout you may give this attempt?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">200 ms, because per-attempt settings override inherited deadlines</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">40 ms, because the response reserve is outside the request budget</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">30 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A fresh 200 ms for each retry</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The attempt receives min(200, 40 - 10) = 30 ms. The response reserve is part of the caller's budget. Resetting a timeout on each retry would extend that budget. This calculation bounds useful waiting; it does not guarantee the query finishes in 30 ms or that cancellation stops it immediately.</div></div><div class="mcq" data-id="bulkheads-timeouts-retries.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A task was started with <code>CompletableFuture.supplyAsync(...)</code>. The future is still incomplete and <code>future.cancel(true)</code> succeeds. What happens to the running task?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is interrupted, like a <code>FutureTask</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Cancellation does not stop the running task: the future completes exceptionally with a <code>CancellationException</code>, but <code>CompletableFuture</code> does not interrupt the thread running the task</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The common pool kills the worker thread</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>cancel</code> throws <code>UnsupportedOperationException</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> The <code>CompletableFuture</code> documentation says the <code>mayInterruptIfRunning</code> flag has no effect, because interrupts are not used to control its processing. If the work must stop, it needs its own cancellation signal, or you run it as a <code>FutureTask</code> on an executor and cancel that.</div></div><div class="mcq" data-id="bulkheads-timeouts-retries.q7" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>A function starts work with <code>auto f = std::async(std::launch::async, slow_work);</code>, calls <code>f.wait_for(100ms)</code>, sees a timeout, and returns an error. How long does the function take to return?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">About 100 ms</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">As long as <code>slow_work</code> takes, because the destructor of a future returned by <code>std::async</code> blocks until the task finishes</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It returns at once and the task is detached</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws <code>std::future_error</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Releasing this last reference to the unfinished <code>std::launch::async</code> state waits for the task. A timed out wait does not change that, so the "timeout" still blocks at scope exit. A <code>std::jthread</code> also joins on destruction, so a stop token helps only if the worker cooperates. A longer-lived executor can own unfinished work while the request returns, but still needs bounded capacity and a shutdown policy.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="bulkheads-timeouts-retries.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Your service calls a recommendations service (nice to have, p99 120 ms) and an inventory service (required, p99 60 ms) for every product page, with an overall page budget of 400 ms. Recommendations has started having 5 second stalls a few times an hour. Design the protection, with numbers.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>Bulkheads.</strong> Separate concurrency limits for each dependency. Assume 500 page views per second and measured mean latencies of 40 ms for recommendations and 20 ms for inventory: mean occupancy is 20 and 10. The supplied p99 values cannot determine those means. If load tests confirm downstream capacity, start with caps of 40 and 30 respectively and immediate rejection. Separate bounded executors or nonblocking I/O keep stalled recommendations from exhausting inventory's request workers.</p>
+<p><strong>Deadlines and timeouts.</strong> The page carries a 400 ms deadline. Inventory gets a 100 ms timeout per attempt; recommendations 150 ms, and in any case no more than what remains of the budget minus what rendering needs. Both calls run in parallel. On timeout, request cancellation through the transport and use a server-side timeout too. Keep accounting for the slot until resource use really ends; a cancelled future alone cannot prove that a connection is safe to reuse.</p>
+<p><strong>Retries.</strong> Inventory reads are idempotent: one retry with up to 50 ms full jitter if 150 ms plus the rendering reserve remain, under a budget of 10 retries per 100 originals. Recommendations: no retries at all; it is optional, so a failure just means the page renders without it.</p>
+<p><strong>Circuit breaker</strong> on recommendations, tripping when the failure rate or the rate of calls slower than 150 ms reaches 50 percent over the last 50 calls, after at least 50 samples, with a 30 second cool-down and a few trial calls in half-open. While open, the page renders with a cached or generic "popular items" block, without calling recommendations. We target a 150 ms recommendations wait, plus scheduling and response overhead. The page deadline remains the final bound on useful work; monitor cancellation lag and fallback latency instead of promising perfect isolation.</p></div></div><div class="cq" data-q="bulkheads-timeouts-retries.c2" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">Three layers each make up to 3 attempts. There are 1,000 new user requests per second, normally one bottom-service call each. Assume immediate failures and enough budget to exhaust all attempts during a sustained outage. (a) What request rate can it see during the outage? (b) With at most 10 retries per 100 original requests over the measurement window at the top layer only, and no retries below, what is the average offered rate over that window instead?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>(a) Each user request can turn into 3 × 3 × 3 = 27 calls at the bottom, so the upper bound on the sustained offered rate is 27,000 requests per second, 27 times normal load, aimed at a service that is already failing. Even if it starts to recover, that load can knock it straight back down.</p>
+<p>(b) With retries only at the top, limited to 10 percent of requests, the bottom sees at most an average of 1,000 original requests plus 100 retries per second over that window, 1,100 in total: 1.1 times normal. The lower layers fail fast instead of retrying, the extra load is bounded no matter how long the outage lasts, and the service has room to recover. Jitter reduces synchronization; it guarantees neither an even distribution nor a strict per-second cap.</p></div></div><div class="cq" data-q="bulkheads-timeouts-retries.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "We already have timeouts on every call. Why would we still see overload get worse during an incident?" Explain.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Because a timeout only ends the caller's wait. Unless the timeout also cancels the work, everything below keeps running: the worker thread finishes its computation, the database finishes the query, the downstream service finishes the request, all for a caller that has already left. During an incident that zombie work can be most of what the system is doing, so capacity goes to dead requests while live ones queue and time out too.</p>
+<p>Timeouts also interact with retries. Each timed-out request is typically retried, so the system receives the original work, which is still running, plus a new copy. With retries at several layers this multiplies. And if the timeouts are longer than the callers' own, the work outlives every caller in the chain.</p>
+<p>The fixes: propagate deadlines so each hop knows how much time is left and refuses work it cannot finish; cancel on timeout (interrupts, stop tokens, transport cancellation, database statement timeouts); check the deadline before expensive steps and when taking work off a queue; retry at one layer with jitter and a budget; and reject excess work before bounded queues grow past the useful latency budget.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="bulkheads-timeouts-retries.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Payments gets slow and checkout starts timing out. Walk me through how you stop that from taking down login and search too."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Bound payment concurrency and admission waits so unrelated work retains capacity</li><li>Propagate one end-to-end deadline and include queues, attempts and response overhead</li><li>Request cancellation but keep permits until the protected resource is really released</li><li>Retry only safe transient failures at one layer with jitter, attempt limits and a shared budget</li><li>Use a breaker with bounded probes and an honest, durable fallback</li><li>Measure cancellation lag, rejections and dependency latency to validate isolation</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would bound the damage at payments first. Give it a separate concurrency cap and reject quickly when that cap is full. If blocked calls could exhaust the request workers, use a separate bounded pool or nonblocking I/O, and reserve capacity for unrelated work. A semaphore with thousands of waiting callers is not enough. Next, carry one checkout deadline through admission, connection setup, every attempt and the response. For example, an eight hundred millisecond request cannot spend eight hundred milliseconds again at each dependency. On timeout I request cancellation, but I keep the operation counted until it actually releases its resource. Cancellation is cooperative, and an uncertain charge may already have committed. I retry only a transient, safely repeatable operation, using the same idempotency key for a payment. One layer owns those retries, with jitter, a small attempt count and a shared extra-attempt budget. Persistent failures open a circuit breaker; a bounded probe checks recovery. A payment-pending response is valid only after I durably record work that will be reconciled later. Otherwise I return an honest error. Finally I check rejection rates, active calls, cancellation lag and login latency. Those measurements tell me whether the isolation works under failure.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What happens if the payment client ignores interruption and its socket timeout?</span></p></div></div><div class="sq" data-sq="bulkheads-timeouts-retries.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Your circuit breaker uses one lock, but an old successful call closes it while the recovery probe is still running. How would you fix that?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Identify a logical state-machine race that locking alone does not prevent</li><li>Walk through admission while closed, opening, probing and a late old success</li><li>Tie every admitted call to a state generation and ignore stale or duplicate completion</li><li>Allow only bounded probes and keep remote work outside the state lock</li><li>Bound probe lifetime and classify outcomes without counting local rejection as a dependency failure</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would attach an admission ticket to every call, including the breaker's current generation. One lock makes field updates atomic, but it cannot tell whether a result belongs to the current recovery attempt. Suppose call A starts while the breaker is closed. Other calls fail and open it. After the cool-down, probe P enters half-open. If A now succeeds, an untagged completion can incorrectly close the breaker and release a burst before P finishes. Each state transition therefore creates a new generation. Completion checks that its ticket still matches, and that the ticket has not already been reported. A's stale success is ignored; only P can decide whether this half-open generation closes or reopens. I use the lock for admission and completion, never across the network call. I also bound probe concurrency and lifetime so a lost completion cannot block recovery forever. Finally, I distinguish dependency failures from local bulkhead rejection or caller cancellation. Those local events must not be counted as evidence that the dependency is unhealthy.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you test stale completions and simultaneous probe admission without relying on sleeps?</span></p></div></div><div class="sq" data-sq="bulkheads-timeouts-retries.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"We already cap each request at three attempts. Why do you also want a retry budget and jitter?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>An attempt limit still permits large aggregate load when all originals fail</li><li>Nested layers multiply attempts, for example three layers of three give 27</li><li>Define a shared budget using retries divided by original requests over a window</li><li>Jitter spreads retry timing but does not guarantee a per-second bound</li><li>Preserve idempotency, one deadline and server-requested delays</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Three attempts caps one request, but can still triple traffic when every original fails. With three retrying layers, that becomes up to twenty-seven calls to the bottom service for one user request. I choose one retry owner and also cap aggregate extra attempts. For example, ten retries per hundred original requests over a defined window limits extra load to ten percent in that window. I specify the denominator because ten percent of all attempts is a different policy. Jitter solves another problem: clients that fail together should not all retry together. It randomises a capped backoff delay, but does not guarantee evenly spaced requests or a hard per-second limit. Every retry must still be safe to repeat, fit the remaining deadline and respect any server-requested delay. If those checks fail, I stop retrying and return a fallback or error.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Where would you enforce that budget if the application, SDK and proxy can all retry?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-connection-pool.html" data-problem="connection-pool"><span class="pk">Concurrent systems · medium</span><b>Fair connection pool</b><span class="pst"></span></a><a class="pcard" href="p-semaphore-from-scratch.html" data-problem="semaphore-from-scratch"><span class="pk">Build a primitive · warm-up</span><b>Semaphore from scratch</b><span class="pst"></span></a><a class="pcard" href="p-future-from-scratch.html" data-problem="future-from-scratch"><span class="pk">Build a primitive · hard</span><b>A future from scratch</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="backpressure-and-load-shedding.html"><span>Previous</span><b>Backpressure, bounded queues and load shedding</b></a><a class="next" href="rate-vs-concurrency-limits.html"><span>Next</span><b>Rate limits versus concurrency limits</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#how-one-slow-dependency-takes-down-a-service">How one slow dependency takes down a service</a><a href="#bulkheads-one-compartment-per-risk">Bulkheads: one compartment per risk</a><a href="#timeouts-and-deadlines-that-travel">Timeouts, and deadlines that travel</a><a href="#a-timeout-is-not-a-cancellation">A timeout is not a cancellation</a><a href="#retries-medicine-with-a-maximum-dose">Retries: medicine with a maximum dose</a><a href="#circuit-breakers-stop-calling-what-is-clearly-down">Circuit breakers: stop calling what is clearly down</a><a href="#hedged-requests-with-a-warning-label">Hedged requests, with a warning label</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

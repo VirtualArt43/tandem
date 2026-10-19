@@ -1,0 +1,764 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>optional, pair, tuple, string_view and friends · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-vocabulary-types" data-title="optional, pair, tuple, string_view and friends" data-track="cpp" data-module="cpp-2" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details open><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types" class=here><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m2">Module 02: Modern C++ every day</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 02.6</span><span>27 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>optional, pair, tuple, string_view and friends</h1><p class="lsum">Design explicit results with optional, unpack pairs and tuples, manage view lifetimes, and represent commands with variant.</p><div class="prereq"><span>Before this:</span><a href="cpp-templates-auto.html">Templates, auto and type deduction</a><a href="cpp-lifetime-stack-heap.html">Object lifetime, the stack and the heap</a></div></header><article class="prose" id="article">
+<p class="lead">A concurrent API keeps having to say "maybe": the queue may be empty, the wait may time out, the key may be missing, the queue may be closed. C++ has small vocabulary types for exactly this; combine them with synchronization so callers can check and act in one operation.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of a parcel locker at a railway station. You open your locker and it either holds one parcel or it is empty; there is no third state, and you find out by opening it once. <code>std::optional</code> is that locker, an <a class="term" data-term="optional" href="glossary.html#optional">optional value</a>. A <code>pair</code> or a <code>tuple</code> is a tiffin carrier with two or three stacked boxes that travel together.</p>
+<p>A <a class="term" data-term="string-view" href="glossary.html#string-view">string view</a> is a window onto someone else's notice board. Looking through it is free, but if the owner takes the board down, your window shows a blank wall, or worse, someone else's board. <strong>A view never owns what it shows.</strong></p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><strong>"Maybe" must be one call.</strong> <code>if (!q.empty()) x = q.pop();</code> is two calls, and another thread can take the last item in between. <code>std::optional&lt;T&gt; tryPop()</code> checks and takes inside one critical section, and the empty optional says "nothing there" without a magic value like <code>-1</code>.</li>
+<li><strong>Timeouts and shutdown need a "no value" result.</strong> You can design <code>popFor(timeout)</code> to return an empty optional on timeout, and blocking <code>pop()</code> to return empty once the queue is closed and drained.</li>
+<li><strong><a class="term" data-term="structured-binding" href="glossary.html#structured-binding">Structured bindings</a> unpack compound results.</strong> <code>auto [it, inserted] = cache.try_emplace(key);</code> reports both the entry and whether insertion happened. You must supply the lock; neither the binding nor a standard map synchronizes itself.</li>
+<li><strong>Views across threads need a lifetime contract.</strong> A queued <code>string_view</code> or <code>span</code> can outlive its backing storage. Pass owning types unless you can prove that the storage stays alive and accesses are synchronized.</li>
+</ul>
+</div>
+
+<h2 id="std-optional-a-value-or-nothing">std::optional: a value or nothing</h2>
+<p><code>std::optional&lt;T&gt;</code> (C++17, header <code>&lt;optional&gt;</code>) holds either one <code>T</code> or nothing. The optional stores its <code>T</code> inline, but that <code>T</code>, such as a long <code>std::string</code>, can allocate its own storage. Its exact size is implementation dependent: budget for the payload, an engagement indicator and alignment padding, and measure with <code>sizeof</code> if layout matters.</p>
+<table>
+<thead><tr><th>You write</th><th>It means</th></tr></thead>
+<tbody>
+<tr><td><code>std::optional&lt;int&gt; port;</code> or <code>= std::nullopt</code></td><td>empty</td></tr>
+<tr><td><code>port = 9000;</code> or <code>port.emplace(9000);</code></td><td>now holds a value</td></tr>
+<tr><td><code>if (port)</code> or <code>port.has_value()</code></td><td>is there a value?</td></tr>
+<tr><td><code>*port</code>; <code>opt-&gt;member</code> for an optional of a class type</td><td>access the value; <strong>undefined behavior if empty</strong></td></tr>
+<tr><td><code>port.value()</code></td><td>the value, or throws <code>std::bad_optional_access</code> if empty</td></tr>
+<tr><td><code>port.value_or(8080)</code></td><td>the value, or the fallback</td></tr>
+<tr><td><code>port.reset()</code></td><td>empty again</td></tr>
+</tbody>
+</table>
+<p>The concurrency use is the <code>tryPop</code> shape: one locked call that either takes an element or reports that there was none.</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.1" data-expect="ok"><figcaption><span class="ctitle">tryPop returns std::optional</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;queue&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> TaskQueue {
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_nothrow_move_constructible_v&lt;T&gt;);
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_nothrow_destructible_v&lt;T&gt;);
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">push</span>(T item) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        items_.<span class="f">push</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">tryPop</span>() {              <span class="c">// check and take in one locked step</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (items_.<span class="f">empty</span>()) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;             <span class="c">// "nothing there", said in the type</span>
+        }
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop</span>();
+        <span class="k">return</span> item;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">queue</span>&lt;T&gt; items_;   <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    TaskQueue&lt;<span class="t">std</span>::<span class="t">string</span>&gt; q;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">6</span>; i += <span class="n">1</span>) {
+        q.<span class="f">push</span>(<span class="s">"task "</span> + <span class="t">std</span>::<span class="f">to_string</span>(i));
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> finishedMutex;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; finished;             <span class="c">// guarded by finishedMutex</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; workers;
+    <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; <span class="n">3</span>; w += <span class="n">1</span>) {
+        workers.<span class="f">emplace_back</span>([&amp;q, &amp;finishedMutex, &amp;finished] {
+            <span class="k">while</span> (<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; task = q.<span class="f">tryPop</span>()) {   <span class="c">// stops when the queue is empty</span>
+                <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(finishedMutex);
+                finished.<span class="f">push_back</span>(*task + <span class="s">" done"</span>);
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : workers) {
+        t.<span class="f">join</span>();
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; finished.<span class="f">size</span>() &lt;&lt; <span class="s">" tasks finished\n"</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"queue empty now? "</span> &lt;&lt; (q.<span class="f">tryPop</span>().<span class="f">has_value</span>() ? <span class="s">"no"</span> : <span class="s">"yes"</span>) &lt;&lt; <span class="s">"\n"</span>;
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; port;                        <span class="c">// empty</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"port or default: "</span> &lt;&lt; port.<span class="f">value_or</span>(<span class="n">8080</span>) &lt;&lt; <span class="s">"\n"</span>;
+    port = <span class="n">9000</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"port: "</span> &lt;&lt; *port &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The type constraints make both moves, from the queue and into the returned optional, nonthrowing; removing the old element cannot throw either. Without them, a failed move can change the front element or lose an item after removal. This example preloads every task: an empty <code>tryPop()</code> means "empty now", not "no producer will ever add work". C++20's <code>std::jthread</code> also joins during unwinding if starting a later worker fails; in C++17 use an RAII joining wrapper.</p>
+
+<p>Compare the interface <code>std::queue</code> gives you: <code>empty()</code>, <code>front()</code> and <code>pop()</code>. Even if each of those took a lock internally, using them together is a <a class="term" data-term="check-then-act" href="glossary.html#check-then-act">check then act</a> across three calls:</p>
+
+<figure class="timeline"><figcaption>Three safe calls, one unsafe sequence</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Consumer A</span><span>Consumer B</span><span>The queue</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">holds exactly one task</span></div><div class="tl-row"><span class="t">2</span><span class="cell">q.empty() returns false</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">q.empty() returns false</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">q.front() and q.pop(): takes the task</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">5</span><span class="cell empty"></span><span class="cell bad">q.front() on an empty queue: undefined behavior</span><span class="cell empty"></span></div><div class="tl-note">The decision and the action must happen inside one critical section, so put them in one call.</div></div></figure>
+
+<p>This is why <strong>a concurrent queue needs a combined check-and-take operation</strong>. A locked <code>empty()</code> can still be useful as a snapshot, but its answer is not a reservation. Merge the check and the act into one locked operation, and report "nothing" through the return type.</p>
+
+<div class="box warning">
+<h3>std::optional&lt;bool&gt; tests presence, not truth</h3>
+<p><code>std::optional&lt;bool&gt; ready = false; if (ready) ...</code> takes the branch, because <code>if (ready)</code> asks "is there a value?", and there is one: <code>false</code>. Write <code>ready.value_or(false)</code>, or <code>ready &amp;&amp; *ready</code>. The same trap applies to <code>std::optional&lt;int&gt;</code> holding 0. A related limit: <code>std::optional&lt;T&amp;&gt;</code> is not allowed in C++20 or C++23, so use a plain pointer (null for "nothing") when you mean "maybe a reference".</p>
+</div>
+
+<p><code>value_or(makeDefault())</code> evaluates <code>makeDefault()</code> even when the optional is engaged, and returns a value, not a reference. Constructing the fallback, converting it, or copying or moving <code>T</code> can throw. For a lazy fallback use <code>opt ? *opt : makeDefault()</code>; C++23's <code>and_then</code>, <code>transform</code> and <code>or_else</code> are not C++20 APIs.</p>
+<p>Moving an optional <strong>does not disengage the source</strong>: it still contains a moved-from <code>T</code> until you call <code>reset()</code>. <code>emplace</code> replaces any old value; if construction throws, the optional is empty. Sharing an optional does not make it atomic, and a pointer or <code>std::optional&lt;std::reference_wrapper&lt;T&gt;&gt;</code> still borrows the referenced object's lifetime.</p>
+
+<h2 id="pair-tuple-and-structured-bindings">pair, tuple and structured bindings</h2>
+<p><code>std::pair&lt;A, B&gt;</code> (header <code>&lt;utility&gt;</code>) holds two values (<code>.first</code>, <code>.second</code>); <code>std::tuple</code> (header <code>&lt;tuple&gt;</code>) holds any number, read with <code>std::get&lt;0&gt;(t)</code>. Every element of a <code>std::map&lt;K, V&gt;</code> is a <code>std::pair&lt;const K, V&gt;</code>. Its ordinary single-element <code>insert</code>, <code>emplace</code> and <code>try_emplace</code> overloads return <code>std::pair&lt;iterator, bool&gt;</code>; hinted overloads return an iterator, and range insertion returns nothing.</p>
+<p>Structured bindings (C++17) name the parts directly. <code>auto [a, b] = obj;</code> copies an ordinary pair or tuple lvalue into a hidden object; an rvalue can move or initialize it directly. <code>auto&amp; [a, b] = obj;</code> binds to the original object, and <code>for (const auto&amp; [key, value] : map)</code> avoids copying each entry. They also work with arrays and suitable structs with public data members. Copying a tuple of references or views still leaves aliases to the original data.</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.2" data-expect="ok"><figcaption><span class="ctitle">try_emplace, map loops and tuples, unpacked</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;tuple&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">int</span>&gt; stock{{<span class="s">"apple"</span>, <span class="n">3</span>}};
+
+    <span class="k">auto</span> [it, inserted] = stock.<span class="f">try_emplace</span>(<span class="s">"apple"</span>, <span class="n">10</span>);   <span class="c">// key exists: nothing changes</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="t">std</span>::boolalpha &lt;&lt; it-&gt;first &lt;&lt; <span class="s">" = "</span> &lt;&lt; it-&gt;second &lt;&lt; <span class="s">", inserted "</span> &lt;&lt; inserted &lt;&lt; <span class="s">"\n"</span>;
+
+    <span class="k">auto</span> [it2, inserted2] = stock.<span class="f">try_emplace</span>(<span class="s">"pear"</span>, <span class="n">10</span>);  <span class="c">// key missing: inserted</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; it2-&gt;first &lt;&lt; <span class="s">" = "</span> &lt;&lt; it2-&gt;second &lt;&lt; <span class="s">", inserted "</span> &lt;&lt; inserted2 &lt;&lt; <span class="s">"\n"</span>;
+
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [name, count] : stock) {                <span class="c">// bind to each pair's members</span>
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; name &lt;&lt; <span class="s">": "</span> &lt;&lt; count &lt;&lt; <span class="s">"\n"</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">tuple</span>&lt;<span class="t">int</span>, <span class="t">std</span>::<span class="t">string</span>, <span class="t">double</span>&gt; row{<span class="n">7</span>, <span class="s">"p99 latency"</span>, <span class="n">12.5</span>};
+    <span class="k">auto</span> [id, metric, value] = row;                          <span class="c">// copies the three members</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; id &lt;&lt; <span class="s">" "</span> &lt;&lt; metric &lt;&lt; <span class="s">" "</span> &lt;&lt; value &lt;&lt; <span class="s">" ms\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p><code>try_emplace</code> is the one to remember for concurrent code. Under your lock it does "insert if absent" with a single lookup, and the returned <code>bool</code> tells you whether you created the entry, which is exactly what a registry, a per-key lock table or a single-flight cache needs. It also <strong>does not move from its arguments when the key already exists</strong>, unlike <code>insert</code> and <code>emplace</code>, which may consume your value even when they insert nothing.</p>
+<p>Argument expressions are still evaluated before the call: <code>cache.try_emplace(key, expensiveLoad())</code> runs <code>expensiveLoad()</code> even on a hit. For lazy construction, pass constructor arguments; for a slow single-flight load, coordinate an in-progress result explicitly. Use a named struct instead of a large tuple when field names communicate the contract better.</p>
+
+<h3>Ordering by several fields with std::tie</h3>
+<p>Schedulers order tasks by deadline, and break ties by arrival order so equal deadlines run first in, first out. <code>std::tie</code> builds a tuple of references, and tuples compare lexicographically, which gives you the whole comparison in one line:</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.3"><figcaption><span class="ctitle">A scheduler entry ordered by (due, seq)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;tuple&gt;</span>
+
+<span class="k">struct</span> Entry {
+    <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="t">time_point</span> due;
+    <span class="t">long</span> seq;                         <span class="c">// arrival order, to keep equal deadlines FIFO</span>
+    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task;
+
+    <span class="t">bool</span> <span class="k">operator</span>&gt;(<span class="k">const</span> Entry&amp; other) <span class="k">const</span> {
+        <span class="k">return</span> <span class="t">std</span>::<span class="f">tie</span>(due, seq) &gt; <span class="t">std</span>::<span class="f">tie</span>(other.due, other.seq);
+    }
+};
+<span class="c">// std::priority_queue&lt;Entry, std::vector&lt;Entry&gt;, std::greater&lt;Entry&gt;&gt; runs the earliest first</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>C++20 can generate comparisons with <code>auto operator&lt;=&gt;(const Entry&amp;) const = default;</code>, but this compares every member, and <code>std::function</code> has no ordering. That defaulted operator would be deleted, so it cannot replace the hand-written ordering by <code>due</code> and <code>seq</code>. A real scheduler must also assign <code>seq</code> under synchronization and define what happens before it overflows.</p>
+
+<div class="box note">
+<h3>Structured bindings and lambdas</h3>
+<p>Capturing a structured binding in a lambda, as in <code>auto [host, port] = endpoint(); std::thread t([host, port] { connect(host, port); });</code>, is standard only from C++20. In C++17 mode clang accepts it with the warning "captured structured bindings are a C++20 extension", and older compilers reject it. If you must stay in C++17, copy into plain variables first, or use an init capture: <code>[h = host, p = port]</code>.</p>
+</div>
+
+<h2 id="std-string-view-a-window-not-a-copy">std::string_view: a window, not a copy</h2>
+<p>A <code>std::string_view</code> (C++17, header <code>&lt;string_view&gt;</code>) describes characters with a pointer and a length. It is a useful parameter for synchronous text reading without copying. It never owns the characters or extends their lifetime. Two examples show the danger:</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.4"><figcaption><span class="ctitle">Two views that dangle (bugs)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code><span class="t">std</span>::<span class="t">string_view</span> name = <span class="t">std</span>::<span class="t">string</span>(<span class="s">"temporary"</span>);   <span class="c">// the string dies at the semicolon</span>
+
+<span class="t">std</span>::<span class="t">string_view</span> <span class="f">label</span>() {
+    <span class="t">std</span>::<span class="t">string</span> text = <span class="s">"built here"</span>;
+    <span class="k">return</span> text;                                     <span class="c">// text dies when the function returns</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Both compile and leave a <a class="term" data-term="dangling-reference" href="glossary.html#dangling-reference">dangling reference</a> to characters whose lifetime has ended; reading those characters is undefined behavior. Across threads this can hide because the view is created in one thread and used in another, later.</p>
+<p><strong>A view is not necessarily null-terminated.</strong> <code>view.substr(pos, count)</code> returns another view, and <code>view.data()</code> may point into the middle of a buffer. Pass its length to length-aware APIs, or make an owning <code>std::string</code> and use <code>c_str()</code> when a C API needs a terminator. In contrast, <code>std::string::substr</code> returns a new string, so <code>std::string_view v = text.substr(0, 3);</code> dangles at the semicolon.</p>
+
+<h3>The async logger bug</h3>
+<p>A logger with a background writer thread is an interview design reported at Databricks in the form of an ordered, durable event writer. A small logger can take <code>std::string_view</code> so callers can pass text cheaply. The bug is to store that borrowed view without an ownership contract:</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.5"><figcaption><span class="ctitle">Storing the caller&#x27;s view for later (bug)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code><span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">string_view</span>&gt; lines_;   <span class="c">// guarded by m_; read later by the writer thread</span>
+
+<span class="t">void</span> <span class="f">log</span>(<span class="t">std</span>::<span class="t">string_view</span> message) {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    lines_.<span class="f">push_back</span>(message);         <span class="c">// keeps a pointer into the caller's string</span>
+}
+<span class="c">// caller: logger.log("request " + std::to_string(id) + " served");</span>
+<span class="c">// the temporary dies at the semicolon; the writer may not read it until later</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The fix is a rule: <strong>copy into an owning type at the thread boundary.</strong> The parameter can stay a view; the queue must hold <code>std::string</code>.</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.6" data-expect="ok"><figcaption><span class="ctitle">A logger that owns what it queues</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;string_view&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">class</span> AsyncLogger {
+<span class="k">public</span>:
+    <span class="f">AsyncLogger</span>() : <span class="f">writer_</span>([<span class="k">this</span>] { <span class="f">run</span>(); }) {}
+
+    ~<span class="f">AsyncLogger</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            done_ = <span class="k">true</span>;
+        }
+        cv_.<span class="f">notify_one</span>();
+        writer_.<span class="f">join</span>();                       <span class="c">// drains the queue, then the thread ends</span>
+    }
+
+    <span class="t">void</span> <span class="f">log</span>(<span class="t">std</span>::<span class="t">string_view</span> message) {      <span class="c">// a cheap view for the caller...</span>
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            lines_.<span class="f">emplace_back</span>(message);     <span class="c">// ...copied into an owning std::string right now</span>
+        }
+        cv_.<span class="f">notify_one</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">run</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">std</span>::<span class="t">string</span> line;
+            {
+                <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+                cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> done_ || !lines_.<span class="f">empty</span>(); });
+                <span class="k">if</span> (lines_.<span class="f">empty</span>()) {
+                    <span class="k">return</span>;                   <span class="c">// done, and nothing left to write</span>
+                }
+                line = <span class="t">std</span>::<span class="f">move</span>(lines_.<span class="f">front</span>());
+                lines_.<span class="f">pop_front</span>();
+            }
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"[log] "</span> &lt;&lt; line &lt;&lt; <span class="s">"\n"</span>;   <span class="c">// slow I/O happens outside the lock</span>
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; lines_;   <span class="c">// owned copies; guarded by m_</span>
+    <span class="t">bool</span> done_ = <span class="k">false</span>;               <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">thread</span> writer_;              <span class="c">// declared last, so it starts after everything it uses exists</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    AsyncLogger logger;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+        <span class="t">std</span>::<span class="t">string</span> message = <span class="s">"request "</span> + <span class="t">std</span>::<span class="f">to_string</span>(i) + <span class="s">" served"</span>;
+        logger.<span class="f">log</span>(message);          <span class="c">// message is destroyed at the end of this iteration</span>
+    }
+}   <span class="c">// ~AsyncLogger drains and joins</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Two details worth saying in an interview. The writer thread is the last member, because members are constructed in declaration order and the thread immediately uses the earlier members. The destructor sets <code>done_</code> under the lock, notifies, and joins; the writer returns only when the queue is closed and empty.</p>
+<p>The owner must stop and join all callers of <code>log()</code> before destroying the logger, and destruction must not happen on its writer thread. This teaching example assumes the output sink and synchronization operations succeed; draining to <code>std::cout</code> is not a durability guarantee. A production writer also needs error delivery and backpressure, as in <a href="cpp-exceptions.html">exceptions</a> and <a href="p-durable-log-writer.html">the durable log writer</a>.</p>
+
+<h3>std::span: the same idea for arrays</h3>
+<p><code>std::span&lt;T&gt;</code> (C++20, header <code>&lt;span&gt;</code>) is a <a class="term" data-term="cpp-span" href="glossary.html#cpp-span">span</a>, a view of a contiguous run of elements such as part of a <code>vector</code>. Views shine in parallel code that splits read-only data into chunks: each thread gets a span over its own slice, nothing is copied, and the input data is only read.</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.7" data-expect="ok"><figcaption><span class="ctitle">Each thread sums its own slice</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;span&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">long</span> <span class="f">sum</span>(<span class="t">std</span>::span&lt;<span class="k">const</span> <span class="t">int</span>&gt; chunk) {
+    <span class="k">return</span> <span class="t">std</span>::<span class="f">accumulate</span>(chunk.<span class="f">begin</span>(), chunk.<span class="f">end</span>(), <span class="n">0L</span>);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; <span class="f">data</span>(<span class="n">1000</span>);
+    <span class="t">std</span>::<span class="f">iota</span>(data.<span class="f">begin</span>(), data.<span class="f">end</span>(), <span class="n">1</span>);               <span class="c">// 1, 2, ..., 1000</span>
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> parts = <span class="n">4</span>;
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> size = data.<span class="f">size</span>() / parts;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">long</span>&gt; <span class="f">partial</span>(parts);                     <span class="c">// distinct elements, one writer each</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> p = <span class="n">0</span>; p &lt; parts; p += <span class="n">1</span>) {
+        <span class="t">std</span>::span&lt;<span class="k">const</span> <span class="t">int</span>&gt; <span class="f">chunk</span>(data.<span class="f">data</span>() + p * size, size);   <span class="c">// a view: no copy</span>
+        threads.<span class="f">emplace_back</span>([chunk, &amp;partial, p] { partial[p] = <span class="f">sum</span>(chunk); });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) {
+        t.<span class="f">join</span>();                                         <span class="c">// data must outlive every view of it</span>
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"total = "</span> &lt;&lt; <span class="t">std</span>::<span class="f">accumulate</span>(partial.<span class="f">begin</span>(), partial.<span class="f">end</span>(), <span class="n">0L</span>) &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The vector must outlive every span and keep the viewed elements alive at stable addresses. This sample fixes its size until all joins, and 1,000 divides evenly into four chunks; general partitioning must handle a remainder. <code>span&lt;const T&gt;</code> prevents writes through that view, not through other aliases. A C++17 fallback is a pointer plus a length or an iterator pair, with the same lifetime rules; C++20 span indexing requires an in-range index and has no checked <code>at()</code>.</p>
+
+<h2 id="std-variant-one-of-several-types">std::variant: one of several types</h2>
+<p>A <a class="term" data-term="variant" href="glossary.html#variant">variant</a>, <code>std::variant&lt;A, B, C&gt;</code> (C++17, header <code>&lt;variant&gt;</code>), normally holds one value of one listed type and remembers which. You test with <code>std::holds_alternative&lt;A&gt;(v)</code>, read with <code>std::get&lt;A&gt;(v)</code> (throws <code>std::bad_variant_access</code> on a different active type), or use <code>std::get_if&lt;A&gt;(&amp;v)</code> (a pointer, or null), and dispatch with <code>std::visit</code>. Type-based access requires the type to occur exactly once; otherwise use an index.</p>
+<p>A default-constructed variant constructs its first alternative, which must be default-constructible. Put <code>std::monostate</code> first if you need an explicit empty state. A throwing type change can instead leave it <code>valueless_by_exception()</code>; <code>index()</code> then returns <code>std::variant_npos</code> and <code>std::visit</code> throws <code>std::bad_variant_access</code>. This exceptional state is different from deliberately holding <code>monostate</code>.</p>
+<p>Command queues can use alternatives such as "append", "flush" and "stop"; a future can represent pending, a value or an exception. A visitor must compile for every alternative and, with the deduced-return overload, return the same type and value category for every case. The following single-threaded dispatch demo buffers commands; its stop command deliberately leaves the last line unflushed.</p>
+
+<figure class="code single" data-sample="cpp-vocabulary-types.8" data-expect="ok"><figcaption><span class="ctitle">One queue, three kinds of command</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+<span class="p">#include &lt;variant&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">struct</span> Append { <span class="t">std</span>::<span class="t">string</span> line; };
+<span class="k">struct</span> Flush {};
+<span class="k">struct</span> Stop {};
+<span class="k">using</span> Command = <span class="t">std</span>::<span class="t">variant</span>&lt;Append, Flush, Stop&gt;;
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;Command&gt; inbox{Append{<span class="s">"a"</span>}, Append{<span class="s">"b"</span>}, Flush{}, Append{<span class="s">"c"</span>}, Stop{}};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; buffer;
+    <span class="t">bool</span> running = <span class="k">true</span>;
+    <span class="k">for</span> (<span class="k">const</span> Command&amp; cmd : inbox) {
+        <span class="k">if</span> (!running) {
+            <span class="k">break</span>;
+        }
+        <span class="t">std</span>::<span class="f">visit</span>([&amp;](<span class="k">const</span> <span class="k">auto</span>&amp; c) {
+            <span class="k">using</span> C = <span class="t">std</span>::decay_t&lt;<span class="k">decltype</span>(c)&gt;;
+            <span class="k">if</span> <span class="k">constexpr</span> (<span class="t">std</span>::is_same_v&lt;C, Append&gt;) {
+                buffer.<span class="f">push_back</span>(c.line);
+            } <span class="k">else</span> <span class="k">if</span> <span class="k">constexpr</span> (<span class="t">std</span>::is_same_v&lt;C, Flush&gt;) {
+                <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"flush "</span> &lt;&lt; buffer.<span class="f">size</span>() &lt;&lt; <span class="s">" lines\n"</span>;
+                buffer.<span class="f">clear</span>();
+            } <span class="k">else</span> <span class="k">if</span> <span class="k">constexpr</span> (<span class="t">std</span>::is_same_v&lt;C, Stop&gt;) {
+                running = <span class="k">false</span>;
+            } <span class="k">else</span> {
+                <span class="k">static_assert</span>(<span class="t">std</span>::is_same_v&lt;C, <span class="t">void</span>&gt;, <span class="s">"unhandled command"</span>);
+            }
+        }, cmd);
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"stopped with "</span> &lt;&lt; buffer.<span class="f">size</span>() &lt;&lt; <span class="s">" unflushed\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The final assertion depends on the visitor's template parameter, so C++20 accepts it in a discarded branch. Adding another alternative makes compilation fail until you supply its behavior, rather than silently treating an unknown command as stop.</p>
+
+<p><code>std::any</code> (C++17, header <code>&lt;any&gt;</code>) can be empty or hold a copy-constructible type; value-form <code>std::any_cast</code> throws <code>std::bad_any_cast</code> on a mismatch, while pointer-form casting returns null. Prefer a variant for a known closed set of alternatives. <code>std::expected&lt;T, E&gt;</code> (C++23, not C++20) represents a value or an error; it does not prevent operations on <code>T</code> or <code>E</code> from throwing. <code>std::function</code> and <code>std::reference_wrapper</code> appear in <a href="cpp-lambdas-callables.html">lambdas and callables</a> and <a href="cpp-templates-auto.html">templates</a>.</p>
+
+<div class="box example">
+<h3>Worked example: choosing the pop API for a concurrent queue</h3>
+<p>The interviewer asks for a thread-safe queue that many consumers share. Before writing code, decide the shape of "take an element", because the signature decides whether callers can race.</p>
+<table>
+<thead><tr><th>Signature</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td><code>bool empty();</code> <code>T&amp; front();</code> <code>void pop();</code></td><td>Broken across threads: the check and the take are separate calls, and <code>front()</code> hands out a reference into guarded storage.</td></tr>
+<tr><td><code>T pop()</code> that blocks until an element arrives</td><td>Returns a value on success; needs a separate error channel, such as an exception, for timeout or closure.</td></tr>
+<tr><td><code>bool tryPop(T&amp; out)</code></td><td>Correct, and the classic C++11 shape. The caller must build a <code>T</code> first, and an out-parameter reads worse.</td></tr>
+<tr><td><code>std::optional&lt;T&gt; tryPop()</code></td><td>The modern default: check and take in one call, and "nothing" lives in the type.</td></tr>
+<tr><td><code>std::optional&lt;T&gt; popFor(std::chrono::milliseconds timeout)</code></td><td>Waits for a value until a deadline, then reports absence. Scheduling and lock reacquisition can delay its return beyond that deadline. See <a href="cpp-chrono.html">the chrono lesson</a>.</td></tr>
+<tr><td><code>std::optional&lt;T&gt; pop()</code> that blocks, and returns empty once the queue is closed and drained</td><td>What you want as soon as the queue can be shut down: consumers leave their loop cleanly instead of hanging or needing a <a class="term" data-term="poison-pill" href="glossary.html#poison-pill">poison pill</a>.</td></tr>
+</tbody>
+</table>
+<p>A strong answer picks a contract before picking a type. An optional distinguishes a value from absence, but <strong>cannot distinguish timeout, empty and closed by itself</strong>. If callers need the reason, return a named result with a status, or a <code>std::variant&lt;T, TimedOut, Closed&gt;</code> when its alternatives are distinct. The implementation still supplies atomicity, and allocation or lock failures can still throw.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong><code>*opt</code> without checking.</strong> Dereferencing an empty optional is undefined behavior, not an exception. Check first, or use <code>value()</code> (throws) or <code>value_or()</code>.</li>
+<li><strong><code>if (flag)</code> on a <code>std::optional&lt;bool&gt;</code>.</strong> It tests presence, not truth.</li>
+<li><strong>Keeping a view without its owner.</strong> A queued view needs stable backing storage until the consumer finishes. Copy into <code>std::string</code> or <code>std::vector</code>, or retain an immutable owner explicitly.</li>
+<li><strong>Viewing data that another thread changes.</strong> Reallocation invalidates a view; unsynchronized reads and writes to the same characters are a data race even without reallocation.</li>
+<li><strong><code>auto&amp; [a, b] = shared;</code> under a lock, used after unlocking.</strong> The names refer into the shared object. Copy owning values under the lock; copying a view or reference wrapper is not a deep snapshot.</li>
+<li><strong>An <code>empty()</code> method on a concurrent queue that callers use for decisions.</strong> The answer may be stale before the caller acts on it. Offer <code>tryPop</code> instead; keep <code>size()</code> and <code>empty()</code> for metrics and tests.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>These types show up as API design questions inside a bigger problem: "your <code>pop</code> blocks forever; how does a caller poll?", "how do consumers find out the queue was shut down?", "what does <code>get</code> return for a missing key?", "why does <code>std::stack::pop</code> return void?".</p>
+<blockquote>I'll make every "maybe" explicit in the type. <code>tryPop</code> returns <code>std::optional&lt;T&gt;</code>, so checking and taking happen in one locked call and there is no <code>empty()</code> for a caller to race on. The blocking <code>pop</code> returns an empty optional once the queue is closed and drained, which gives consumers a clean exit without a poison pill.</blockquote>
+<blockquote>The logger takes <code>std::string_view</code> so callers don't pay for a copy they don't need, but it copies into a <code>std::string</code> before the message crosses to the writer thread, because a view doesn't keep the caller's string alive.</blockquote>
+<p>Follow ups to expect: "Why not return <code>-1</code> for empty?" (it collides with real values), "Does optional allocate its payload separately?" (no, though <code>T</code> can allocate), and "Why does <code>std::stack::pop</code> return void?" (separating access from removal avoids a throwing value transfer after removal). Our combined queue operation requires nonthrowing moves and destruction to avoid losing a value on its return path.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li><code>std::optional&lt;T&gt;</code> is the return type of "maybe": <code>tryPop</code>, <code>popFor</code>, a <code>pop</code> on a closed queue, a cache lookup.</li>
+<li>Concurrent APIs merge check and act into one call; <code>empty()</code> followed by <code>pop()</code> is a race even when each call locks.</li>
+<li><code>try_emplace</code> plus a structured binding is insert-if-absent with one lookup, and it never steals your argument when the key exists.</li>
+<li><code>string_view</code> and <code>span</code> never own or extend lifetimes. Across threads, copy into owning types or prove storage lifetime, stability and access ordering.</li>
+<li><code>std::variant</code> is a typed "one of": command queues and future states.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-vocabulary-types"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-vocabulary-types.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?<figure class="code single" data-sample="cpp-vocabulary-types.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><code><span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">bool</span>&gt; ready = <span class="k">false</span>;
+<span class="t">std</span>::<span class="t">cout</span> &lt;&lt; (ready ? <span class="s">"go"</span> : <span class="s">"wait"</span>);</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>wait</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>go</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: an optional cannot convert to bool</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Undefined behavior: the optional holds false</span></button></li></ol><div class="why" hidden><strong>Why.</strong> An optional converts to <code>bool</code> as "has a value". <code>ready</code> holds a value (<code>false</code>), so the condition is true and it prints <code>go</code>. Use <code>ready.value_or(false)</code> to test the stored value.</div></div><div class="mcq" data-id="cpp-vocabulary-types.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A queue wrapper separately locks each <code>empty()</code>, <code>front()</code> and <code>pop()</code>, but retains the <code>std::queue</code> precondition that <code>front()</code> and <code>pop()</code> require a nonempty queue. Two consumers run <code>if (!q.empty()) { auto x = q.front(); q.pop(); }</code> with one element queued. Which statement identifies the bug?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing bad: each method is thread-safe</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both consumers get the same element, and the queue ends correct</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Both see "not empty"; one takes the element, and the other calls <code>front()</code> and <code>pop()</code> on an empty queue, which is undefined behavior</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks, because <code>front()</code> and <code>pop()</code> each lock the same mutex</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each call is atomic on its own, but the sequence is a check-then-act: the state can change between <code>empty()</code> and <code>front()</code>. If both call <code>front()</code> before either pops, they even copy the same element, and the second <code>pop()</code> still runs on an empty queue, which is why "the queue ends correct" is wrong. The cure is one method that checks and takes under one lock, such as <code>std::optional&lt;T&gt; tryPop()</code>. There is no deadlock: each method releases the lock before returning.</div></div><div class="mcq" data-id="cpp-vocabulary-types.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A logger queues a <code>std::string_view</code>. A caller writes <code>logger.log(&quot;user &quot; + name + &quot; logged in&quot;);</code>, where <code>name</code> is a <code>std::string</code>. The writer reads the characters after that statement finishes. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It works: a <code>string_view</code> keeps its string alive</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It works, but it is slower than storing a <code>std::string</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The temporary string is destroyed at the end of the statement, so reading its characters through the view is undefined behavior</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile: a temporary cannot convert to <code>string_view</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> A view never extends a lifetime. The concatenation creates a temporary <code>std::string</code> that dies at the semicolon. Reading its characters later is a lifetime violation, whether its storage was on the heap or inside the string object. Conversion to a view compiles; apparent success is not evidence of safety. Copy into a <code>std::string</code> when you enqueue.</div></div><div class="mcq" data-id="cpp-vocabulary-types.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>std::map&lt;std::string, std::string&gt; m{{&quot;k&quot;, &quot;old&quot;}}; std::string s = &quot;new&quot;;</code>. After <code>auto [it, inserted] = m.try_emplace(&quot;k&quot;, std::move(s));</code>, what is true?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>inserted</code> is true and <code>m[&quot;k&quot;]</code> is <code>&quot;new&quot;</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>inserted</code> is false, <code>m[&quot;k&quot;]</code> is still <code>&quot;old&quot;</code>, and <code>s</code> still holds <code>&quot;new&quot;</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>inserted</code> is false and <code>s</code> is now empty, because it was moved from</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws, because the key already exists</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>try_emplace</code> finds the existing key and performs no insertion, assignment or move from <code>s</code>. <code>std::move(s)</code> is a cast, not a move operation by itself. Argument expressions are still evaluated before the call, but constructing a mapped value is skipped on a hit. Use <code>insert_or_assign</code> if you want to overwrite.</div></div><div class="mcq" data-id="cpp-vocabulary-types.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>std::optional&lt;int&gt; slot;</code> is empty. Which statement is correct?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>*slot</code> throws <code>std::bad_optional_access</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>*slot</code> is undefined behavior, <code>slot.value()</code> throws <code>std::bad_optional_access</code>, and <code>slot.value_or(0)</code> returns 0</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">All three return 0, because the optional is value-initialized</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">All three throw</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>operator*</code> requires an engaged optional; <code>value()</code> checks and throws <code>std::bad_optional_access</code> here. <code>value_or(0)</code> returns 0 for this empty <code>optional&lt;int&gt;</code>. In general <code>value_or</code> can throw while copying, moving or converting values, and a fallback expression is evaluated even when the optional is engaged.</div></div><div class="mcq" data-id="cpp-vocabulary-types.q6" data-a="0,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">A program gives four threads <code>std::span&lt;const int&gt;</code> views into a live <code>std::vector&lt;int&gt; data</code>. Apart from the action in each option, nobody changes the input or resizes either vector, and main reads results after joining. Which are safe? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Each thread writes its result into a distinct <code>partial[i]</code> of a pre-sized <code>std::vector&lt;long&gt;</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Each thread adds its result to one shared <code>long total</code> with <code>total += sum(chunk)</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two chunks overlap, and both threads only read them</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The main thread forces a reallocation with <code>data.reserve(data.capacity() + 1)</code> while the threads are reading</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Distinct <code>long</code> elements can be written independently, and overlapping read-only views are safe. Unsynchronized <code>total += ...</code> on one shared <code>long</code> is a data race. Reallocation invalidates the spans and can end element lifetimes during reads. This is not a blanket ban on every append: an append within spare capacity need not invalidate existing element views.</div></div><div class="mcq" data-id="cpp-vocabulary-types.q7" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>endpoint()</code> returns <code>std::pair&lt;std::string, int&gt;</code> and <code>connect</code> accepts those values. Given <code>auto [host, port] = endpoint(); std::thread t([host, port] { connect(host, port); });</code>, which standard first permits capturing those bindings directly?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">C++11</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">C++17, the standard that introduced structured bindings</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">C++20</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Never: structured bindings cannot be captured</span></button></li></ol><div class="why" hidden><strong>Why.</strong> C++17 introduced structured bindings but did not allow lambdas to capture them. C++20 made it legal. In C++17 mode clang accepts it with a "C++20 extension" warning and older compilers reject it, so write <code>[h = host, p = port]</code> if you must target C++17.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-vocabulary-types.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a thread-safe queue with <code>push(T)</code>, <code>std::optional&lt;T&gt; tryPop()</code>, a blocking <code>std::optional&lt;T&gt; pop()</code>, and <code>close()</code>. After <code>close()</code>, <code>push</code> returns false, and <code>pop()</code> returns the remaining elements and then an empty optional, without ever blocking forever.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-vocabulary-types.10"><figcaption><span class="ctitle">A closable queue</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> ClosableQueue {
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_nothrow_move_constructible_v&lt;T&gt;);
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_nothrow_destructible_v&lt;T&gt;);
+<span class="k">public</span>:
+    <span class="t">bool</span> <span class="f">push</span>(T item) {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            <span class="k">if</span> (closed_) {
+                <span class="k">return</span> <span class="k">false</span>;
+            }
+            items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        }
+        notEmpty_.<span class="f">notify_one</span>();
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">tryPop</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> <span class="f">takeFront</span>();
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">pop</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        notEmpty_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> closed_ || !items_.<span class="f">empty</span>(); });
+        <span class="k">return</span> <span class="f">takeFront</span>();               <span class="c">// empty only when closed and drained</span>
+    }
+
+    <span class="t">void</span> <span class="f">close</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            closed_ = <span class="k">true</span>;
+        }
+        notEmpty_.<span class="f">notify_all</span>();           <span class="c">// every blocked consumer must wake and see it</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">takeFront</span>() {        <span class="c">// caller holds m_</span>
+        <span class="k">if</span> (items_.<span class="f">empty</span>()) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;
+        }
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        <span class="k">return</span> item;
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notEmpty_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;   <span class="c">// guarded by m_</span>
+    <span class="t">bool</span> closed_ = <span class="k">false</span>;   <span class="c">// guarded by m_</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The wait predicate includes <code>closed_</code>, so <code>close()</code> with <code>notify_all</code> wakes every blocked consumer. A consumer loop becomes <code>while (auto item = q.pop()) { handle(*item); }</code>, which drains what was queued and then exits. The type constraints cover both moves on the removal path. Close and join all callers before destroying the queue; <code>close()</code> itself does not wait for them. A by-value <code>push</code> argument is constructed before the function can reject a closed queue.</p></div></div><div class="cq" data-q="cpp-vocabulary-types.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A metrics pipeline sends events to a worker thread. Under load the worker sometimes prints corrupted names. Find the bug.<figure class="code single" data-sample="cpp-vocabulary-types.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="k">struct</span> Event {
+    <span class="t">std</span>::<span class="t">string_view</span> name;
+    <span class="t">long</span> value;
+};
+BlockingQueue&lt;Event&gt; events;   <span class="c">// a correct, thread-safe queue</span>
+
+<span class="t">void</span> <span class="f">record</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; metric, <span class="t">long</span> value) {
+    events.<span class="f">push</span>(Event{metric, value});
+}
+<span class="c">// callers: record("latency." + endpoint, ms);</span></code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><code>Event::name</code> is a <code>std::string_view</code> into the caller's string. The temporary (<code>&quot;latency.&quot; + endpoint</code>) dies at the end of the full expression containing the call, normally the semicolon. If the worker reads the characters afterwards, it accesses objects whose lifetime has ended: undefined behavior, even if a test appears to work. A synchronized queue safely transfers the view but does not keep the backing string alive.</p>
+<p>Fix: make the event own its data, <code>std::string name;</code>, so <code>record</code> copies it before returning. Alternatively retain an immutable shared owner with a clear lifetime contract. Passing a view between threads is valid only when its backing storage remains alive and stable and conflicting accesses are synchronized.</p></div></div><div class="cq" data-q="cpp-vocabulary-types.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain to an interviewer why a concurrent queue should not offer <code>empty()</code>, <code>front()</code> and <code>pop()</code> the way <code>std::queue</code> does, and what you offer instead.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>With a concurrent queue, <code>empty()</code> can become stale before the caller acts: another consumer can take the last element before <code>front()</code>. Returning a reference also lets guarded storage escape the lock. I offer one locked check-and-take operation, <code>std::optional&lt;T&gt; tryPop()</code>, plus a blocking <code>pop()</code> and, if needed, a timed operation. Each method documents what absence means; if timeout and closure need different handling, I return an explicit status. A locked <code>size()</code> or <code>empty()</code> can be exact at an instant during its call, but it is a snapshot, not a reservation for a later operation.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-vocabulary-types.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Design the return types for a queue that supports polling, timeouts and shutdown. Why would you use optional, and where is it not enough?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Use one locked check-and-take operation; optional alone provides no synchronization</li><li>Explain the two-consumer race between empty and front</li><li>Define empty results separately for polling, timeout and closed-and-drained blocking pop</li><li>Use an explicit status or variant when timeout and closure must be distinguished</li><li>Require nonthrowing moves and destruction for the illustrated value-returning pop</li><li>Close under the mutex, wake all consumers, and join users before destruction</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would return an optional from a single check-and-take operation, with the whole decision protected by the queue's mutex. The optional describes the result; it does not supply synchronization. If two consumers separately check that a queue is nonempty, one can remove the last item before the other calls front. Returning a reference also lets guarded storage escape the lock.
+For polling, an empty optional means no item was available at that operation. For blocking pop, I would keep draining accepted items after close and return empty only when closed and drained. A timed operation needs a documented meaning for absence. If the caller must distinguish timeout from closure, optional has too few states, so I would return a named status result or a variant with distinct alternatives.
+I would also constrain this implementation's element type to nonthrowing moves and destruction. Otherwise, extraction or return can fail after changing or removing the queued item. Finally, close changes the predicate under the same mutex and wakes every waiting consumer. The owner joins all users before destroying the queue. That gives callers an explicit result and a lifecycle they can reason about, while unexpected allocation or system failures can still propagate separately.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What would you change if the payload has a move constructor that can throw?</span></p></div></div><div class="sq" data-sq="cpp-vocabulary-types.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Our asynchronous logger sometimes prints corrupted request names. It queues string_view values. What would you check, and how would you fix it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A string_view borrows characters and does not extend their lifetime</li><li>A temporary concatenated string dies at the end of the caller's full expression</li><li>Queue synchronization does not preserve the backing storage</li><li>Copy into string before returning, or retain an immutable owner with a lifetime contract</li><li>Check storage invalidation and conflicting writes independently of lifetime</li><li>Views are safe for joined readers over stable immutable data; data is not necessarily null-terminated</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first check whether the logger owns the characters it queues. A string view only borrows a pointer and length. If a caller passes a concatenated temporary string, that string dies at the end of the statement. A background writer reading later has a dangling view, even when the queue itself is perfectly synchronized.
+My default fix is to keep the view parameter for convenient synchronous access, then copy it into an owning string before log returns. For larger immutable buffers, retaining a shared owner can avoid copying, but the message must carry that ownership contract through consumption.
+I would check mutation separately. Keeping an object alive does not prevent reallocation from invalidating the view, or another thread writing characters while the worker reads them. Views can safely cross threads when storage stays stable and accesses are ordered, as with read-only spans whose owner joins all readers before destruction. Finally, a string view need not end with a null character, so the output path must respect its length rather than treat data as an arbitrary C string.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Would copying a tuple containing string_view fields under a mutex give the worker an independent snapshot?</span></p></div></div><div class="sq" data-sq="cpp-vocabulary-types.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"A worker accepts append, flush and stop commands. Would you use any or variant, and what could go wrong during dispatch?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Choose variant for the closed set of command types, with owning payloads</li><li>Visit requires a valid handler for every alternative and consistent deduced return types</li><li>Type-based access requires a unique type; get throws on the wrong active alternative</li><li>Distinguish an intentional monostate from valueless_by_exception after a throwing type change</li><li>Variant supplies neither queue synchronization nor a shutdown policy</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use a variant because the supported command types form a known, closed set. Append would own its string, while flush and stop could be small marker types. Any would defer type checking to casts and would not express which commands the worker accepts.
+I would dispatch with visit and make every alternative compile. With the deduced-return overload, every branch must return the same type and value category. If I inspect manually, get throws for the wrong active alternative, whereas get-if returns null. Type-based access also requires that type to appear exactly once.
+A variant normally holds one alternative, but a throwing type change can leave it valueless, making visit throw. An intentional monostate is a separate, ordinary alternative. Finally, variant only represents the message: I still need a synchronized queue and a contract for whether stop drains or discards pending work.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you ensure adding a fourth command fails compilation until its behavior is implemented?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-safe-stack.html" data-problem="thread-safe-stack"><span class="pk">Thread-safe structures · warm-up</span><b>Thread-safe stack</b><span class="pst"></span></a><a class="pcard" href="p-connection-pool.html" data-problem="connection-pool"><span class="pk">Concurrent systems · medium</span><b>Fair connection pool</b><span class="pst"></span></a><a class="pcard" href="p-pub-sub-broker.html" data-problem="pub-sub-broker"><span class="pk">Concurrent systems · hard</span><b>In-memory pub-sub broker with offsets</b><span class="pst"></span></a><a class="pcard" href="p-ttl-cache.html" data-problem="ttl-cache"><span class="pk">Thread-safe structures · medium</span><b>TTL cache with a cleaner thread</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-stl-containers.html"><span>Previous</span><b>STL containers, complexity and iterator invalidation</b></a><a class="next" href="cpp-exceptions.html"><span>Next</span><b>Exceptions, noexcept and exception safety</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#std-optional-a-value-or-nothing">std::optional: a value or nothing</a><a href="#pair-tuple-and-structured-bindings">pair, tuple and structured bindings</a><a href="#std-string-view-a-window-not-a-copy">std::string_view: a window, not a copy</a><a href="#std-variant-one-of-several-types">std::variant: one of several types</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

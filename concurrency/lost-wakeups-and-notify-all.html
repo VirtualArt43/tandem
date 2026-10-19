@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lost wakeups, notify versus notifyAll, Mesa versus Hoare · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="lost-wakeups-and-notify-all" data-title="Lost wakeups, notify versus notifyAll, Mesa versus Hoare" data-track="core" data-module="core-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details open><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all" class=here><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m5">Module 05: Waiting and signaling</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.4</span><span>23 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Lost wakeups, notify versus notifyAll, Mesa versus Hoare</h1><p class="lsum">The two hangs where every thread waits and no lock is stuck: a notification that came too early, and one that woke the wrong thread.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">LinkedIn</span></div><div class="prereq"><span>Before this:</span><a href="condition-variables.html">Condition variables and monitors</a><a href="wait-in-a-loop.html">Spurious and stolen wakeups: always wait in a loop</a></div></header><article class="prose" id="article">
+<p class="lead">Some concurrency bugs crash; these just stop. Every thread sits in <code>wait</code>, no lock is held in a cycle, the deadlock detector finds nothing, and the program never moves again. Both causes come down to one fact: a notification is not stored anywhere.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A courier rings your doorbell while you are in the shower, waits a moment, and leaves. When you come out, you sit by the door waiting for the bell, and you will wait all day: the ring already happened. The fix is not to listen harder; it is to <strong>check the doorstep before you sit down</strong>, and to have the courier leave the parcel on the doorstep, not just ring.</p>
+<p>Now a building where the parcel courier and the food delivery share one bell. Ring once, and whoever comes down may be the person expecting food, who sees no food, shrugs and goes back upstairs. The person expecting the parcel never heard a thing. Either ring for everyone, or give each kind of delivery its own bell.</p>
+</div>
+
+<h2 id="lost-wakeup-cause-1-the-state-changed-outside-the-lock">Lost wakeup, cause 1: the state changed outside the lock</h2>
+<p>A condition variable has no memory. If a thread notifies and nobody is waiting yet, the notification does nothing and is gone. That is harmless when waiters check the state before waiting, under the lock, because then a change that happened earlier is seen as state. It becomes a <a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a> when the check and the wait are not protected against the change:</p>
+
+<figure class="timeline"><figcaption>A notification that arrives before the wait</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Waiter</span><span>Setter</span><span>Condition variable</span></div><div class="tl-row"><span class="t">1</span><span class="cell">checks <code>ready</code>: false, so it decides to wait</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">sets <code>ready = true</code>, without taking the waiter&#x27;s lock</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">notifies</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">nobody is waiting: the notification is lost</span></div><div class="tl-row"><span class="t">5</span><span class="cell">calls wait</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">6</span><span class="cell bad">sleeps forever: the change it was waiting for has already happened</span><span class="cell empty"></span><span class="cell empty"></span></div></div></figure>
+
+<p>The window between "decide to wait" and "wait" is tiny, so this bug may run for weeks before it bites. Here it is with the window widened by a sleep, so it bites every time. The two sides show two common forms: in Java the flag is checked outside the lock; in C++ the check is inside the lock and correct, but the setter changes the flag without taking the mutex. A <code>volatile</code> or atomic flag does not help in either case.</p>
+
+<figure class="code pair" data-sample="lost-wakeups-and-notify-all.1" data-expect="deadlock"><figcaption><span class="ctitle">A lost wakeup, on purpose</span><span class="cnote bad">deadlocks on purpose</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">std</span>::<span class="t">mutex</span> m;
+<span class="t">std</span>::<span class="t">condition_variable</span> cv;
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; ready{<span class="k">false</span>};                         <span class="c">// atomic, but changed without the mutex: the bug</span>
+
+<span class="t">void</span> <span class="f">awaitReady</span>() {
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m);
+    <span class="k">while</span> (!ready) {                                    <span class="c">// the check is under the mutex...</span>
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">100</span>));   <span class="c">// demo only: widens the window</span>
+        cv.<span class="f">wait</span>(lock);                                  <span class="c">// ...but the setter never takes the mutex</span>
+    }
+}
+
+<span class="t">void</span> <span class="f">setReady</span>() {
+    ready = <span class="k">true</span>;                                       <span class="c">// no mutex: lands between the check and the wait</span>
+    cv.<span class="f">notify_one</span>();                                    <span class="c">// nobody is waiting yet: this notification is lost</span>
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">waiter</span>([] {
+        <span class="f">awaitReady</span>();
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"waiter: woke up"</span> &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;
+    });
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">20</span>));   <span class="c">// the waiter has checked the flag</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"main: setting ready and notifying"</span> &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;
+    <span class="f">setReady</span>();
+    waiter.<span class="f">join</span>();                                      <span class="c">// hangs: the only notification was missed</span>
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="k">volatile</span> <span class="t">boolean</span> ready = <span class="k">false</span>;             <span class="c">// volatile is not enough</span>
+
+    <span class="k">void</span> <span class="f">awaitReady</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (!ready) {                                   <span class="c">// the bug: checked outside the lock</span>
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">100</span>);                          <span class="c">// demo only: widens the window so the bug shows every time</span>
+            <span class="k">synchronized</span> (lock) {
+                lock.<span class="f">wait</span>();                            <span class="c">// waits for a notify that has already happened</span>
+            }
+        }
+    }
+
+    <span class="k">void</span> <span class="f">setReady</span>() {
+        ready = <span class="k">true</span>;
+        <span class="k">synchronized</span> (lock) {
+            lock.<span class="f">notifyAll</span>();                           <span class="c">// nobody is waiting yet: this notification is lost</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Main</span> m = <span class="k">new</span> <span class="t">Main</span>();
+        <span class="t">Thread</span> waiter = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                m.<span class="f">awaitReady</span>();
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"waiter: woke up"</span>);
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"waiter"</span>);
+        waiter.<span class="f">start</span>();
+        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">20</span>);                               <span class="c">// the waiter has checked the flag and is in its window</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"main: setting ready and notifying"</span>);
+        m.<span class="f">setReady</span>();
+        waiter.<span class="f">join</span>();                                  <span class="c">// hangs: the only notification was missed</span>
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>main: setting ready and notifying</pre></div><div class="runout" hidden></div></figure>
+
+<p>The fix is the rule from <a href="condition-variables.html">condition variables</a>, applied without exception: <strong>check the state and wait under the lock, and change the state under the same lock</strong>. Then the setter cannot run between the waiter's check and its wait, because the waiter holds the lock across both, and <code>wait</code> releases it only as part of going to sleep. The same 100 ms window is now harmless: the setter simply waits for the lock.</p>
+
+<figure class="code pair" data-sample="lost-wakeups-and-notify-all.2" data-expect="ok"><figcaption><span class="ctitle">The same window, now harmless</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">std</span>::<span class="t">mutex</span> m;
+<span class="t">std</span>::<span class="t">condition_variable</span> cv;
+<span class="t">bool</span> ready = <span class="k">false</span>;                                     <span class="c">// guarded by m: no atomic needed</span>
+
+<span class="t">void</span> <span class="f">awaitReady</span>() {
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m);
+    <span class="k">while</span> (!ready) {                                    <span class="c">// check and wait under one mutex</span>
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">100</span>));   <span class="c">// the same demo window</span>
+        cv.<span class="f">wait</span>(lock);
+    }
+}
+
+<span class="t">void</span> <span class="f">setReady</span>() {
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m);           <span class="c">// the setter waits here until the waiter is asleep</span>
+        ready = <span class="k">true</span>;
+    }
+    cv.<span class="f">notify_one</span>();
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">waiter</span>([] {
+        <span class="f">awaitReady</span>();
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"waiter: woke up"</span> &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;
+    });
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">20</span>));
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"main: setting ready and notifying"</span> &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;   <span class="c">// printed before the waiter can wake</span>
+    <span class="f">setReady</span>();
+    waiter.<span class="f">join</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">boolean</span> ready = <span class="k">false</span>;                      <span class="c">// guarded by lock: no volatile needed</span>
+
+    <span class="k">void</span> <span class="f">awaitReady</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (!ready) {                            <span class="c">// check and wait under one lock</span>
+                <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">100</span>);                      <span class="c">// the same demo window: the setter must wait for the lock</span>
+                lock.<span class="f">wait</span>();
+            }
+        }
+    }
+
+    <span class="k">void</span> <span class="f">setReady</span>() {
+        <span class="k">synchronized</span> (lock) {
+            ready = <span class="k">true</span>;                               <span class="c">// the change is made under the same lock</span>
+            lock.<span class="f">notifyAll</span>();
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Main</span> m = <span class="k">new</span> <span class="t">Main</span>();
+        <span class="t">Thread</span> waiter = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                m.<span class="f">awaitReady</span>();
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"waiter: woke up"</span>);
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"waiter"</span>);
+        waiter.<span class="f">start</span>();
+        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">20</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"main: setting ready and notifying"</span>);
+        m.<span class="f">setReady</span>();
+        waiter.<span class="f">join</span>();
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>main: setting ready and notifying
+waiter: woke up</pre></div><div class="runout" hidden></div></figure>
+
+<div class="only only-cpp"><span class="otag">C++</span>
+<p>The C++ trap deserves its own sentence, because it looks so reasonable: <strong>even if the shared variable is a <code>std::atomic</code>, it must be modified while holding the mutex</strong> that the waiter uses, or the modification and the notification can both fall into the gap between the waiter's predicate check and its sleep. The atomic makes the flag itself race free; only the mutex closes the window.</p>
+</div>
+
+<h2 id="lost-wakeup-cause-2-the-signal-came-before-the-wait">Lost wakeup, cause 2: the signal came before the wait</h2>
+<p>The other form has no state at all. A thread starts a worker and then waits "for the worker's notification", while the worker, being fast, notifies before the waiter has started waiting. Nothing records that the event happened, so the waiter sleeps forever. The fix is the same principle: <strong>never wait for a notification, always wait for a state</strong>. Add a <code>done</code> flag, set it under the lock before notifying, and wait in a loop on <code>!done</code>. A late waiter then sees <code>done</code> and does not wait at all.</p>
+<p>This is the real difference between a condition variable and a semaphore. A semaphore remembers: a <code>release</code> with nobody waiting becomes a permit that the next <code>acquire</code> takes. A condition variable forgets: a <code>notify</code> with nobody waiting is gone. That is why condition variables always come with state, and why a one-shot event is often simplest as a latch.</p>
+
+<h2 id="notify-versus-notifyall">notify versus notifyAll</h2>
+<p><code>notify</code> (<code>signal</code>, <code>notify_one</code>) wakes one waiting thread, chosen by the system with no ordering promise. <code>notifyAll</code> (<code>signalAll</code>, <code>notify_all</code>) wakes them all; they then take the lock one at a time and each re-checks its own condition. With waits in loops, <code>notifyAll</code> is always correct, and <a class="term" data-term="notify-all" href="glossary.html#notify-all">a single notify</a> is safe only when two things are both true:</p>
+<ol>
+<li><strong>Uniform waiters</strong>: every thread waiting on that condition variable is waiting for the same predicate and will do the same thing when it wakes.</li>
+<li><strong>One in, one out</strong>: each notification enables at most one waiter to proceed.</li>
+</ol>
+<p>Break the first rule and a notification can land on a thread that cannot use it. The classic case is a buffer where producers ("wait while full") and consumers ("wait while empty") share one wait set, which is what a single Java monitor or a single C++ condition variable gives you:</p>
+
+<figure class="timeline"><figcaption>One wait set, one notify, everyone stuck (one possible run)</figcaption><div class="tl c4"><div class="tl-head"><span class="t">step</span><span>Producer 1</span><span>Producer 2</span><span>Consumer 1</span><span>Consumer 2</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">take: the slot is empty, waits</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">take: the slot is empty, waits</span></div><div class="tl-row"><span class="t">3</span><span class="cell">put x: fills the slot, notify wakes C1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">put y: the slot is full, waits</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">put z: the slot is full, waits</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">takes x, notify wakes C2, another consumer</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">take again: the slot is empty, waits</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">8</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">wakes, finds the slot empty, waits again</span></div><div class="tl-note">! All four threads wait. The one notification that could have freed a producer went to a consumer.</div></div></figure>
+
+<p>Every individual step is correct, the waits even use <code>while</code>, and the program is still stuck. This is a lost wakeup in its multi-thread form: the notification was delivered, to the wrong kind of thread. It happens within milliseconds:</p>
+
+<figure class="code pair" data-sample="lost-wakeups-and-notify-all.3" data-expect="deadlock"><figcaption><span class="ctitle">One wait set and a single notify</span><span class="cnote bad">deadlocks on purpose</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> OneSlot {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">put</span>(<span class="t">int</span> v) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !slot_.<span class="f">has_value</span>(); });   <span class="c">// the loop is right</span>
+        slot_ = v;
+        cv_.<span class="f">notify_one</span>();                                        <span class="c">// the bug: may wake another producer</span>
+    }
+
+    <span class="t">int</span> <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> slot_.<span class="f">has_value</span>(); });
+        <span class="t">int</span> v = *slot_;
+        slot_.<span class="f">reset</span>();
+        cv_.<span class="f">notify_one</span>();                                        <span class="c">// the bug: may wake another consumer</span>
+        <span class="k">return</span> v;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;                                 <span class="c">// one wait set for two different conditions</span>
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; slot_;                                    <span class="c">// guarded by m_</span>
+};
+
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; moved{<span class="n">0</span>};
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; finished{<span class="k">false</span>};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    OneSlot buffer;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">watch</span>([] {                                       <span class="c">// reports when progress stops</span>
+        <span class="t">long</span> last = -<span class="n">1</span>;
+        <span class="k">while</span> (!finished.<span class="f">load</span>()) {
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">300</span>));
+            <span class="t">long</span> now = moved.<span class="f">load</span>();
+            <span class="k">if</span> (now == last) {
+                <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"stuck after "</span> &lt;&lt; now &lt;&lt; <span class="s">" items: all four threads are waiting"</span> &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;
+                <span class="k">return</span>;
+            }
+            last = now;
+        }
+    });
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;] { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">5000000</span>; k += <span class="n">1</span>) buffer.<span class="f">put</span>(k); });
+        threads.<span class="f">emplace_back</span>([&amp;] { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">5000000</span>; k += <span class="n">1</span>) { buffer.<span class="f">take</span>(); moved += <span class="n">1</span>; } });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    finished = <span class="k">true</span>;
+    watch.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"finished without getting stuck (a lucky run)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">Integer</span> slot = <span class="k">null</span>;                       <span class="c">// a buffer with room for one item; guarded by lock</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicLong</span> moved = <span class="k">new</span> <span class="t">AtomicLong</span>();
+
+    <span class="k">void</span> <span class="f">put</span>(<span class="t">int</span> v) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (slot != <span class="k">null</span>) lock.<span class="f">wait</span>();          <span class="c">// the loop is right</span>
+            slot = v;
+            lock.<span class="f">notify</span>();                             <span class="c">// the bug: this may wake another producer</span>
+        }
+    }
+
+    <span class="t">int</span> <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (slot == <span class="k">null</span>) lock.<span class="f">wait</span>();
+            <span class="t">int</span> v = slot;
+            slot = <span class="k">null</span>;
+            lock.<span class="f">notify</span>();                             <span class="c">// the bug: this may wake another consumer</span>
+            <span class="k">return</span> v;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Main</span> buffer = <span class="k">new</span> <span class="t">Main</span>();
+        <span class="t">Thread</span>[] threads = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">4</span>];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+            threads[i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">5_000_000</span>; k += <span class="n">1</span>) buffer.<span class="f">put</span>(k); } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }, <span class="s">"producer-"</span> + i);
+            threads[<span class="n">2</span> + i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">5_000_000</span>; k += <span class="n">1</span>) { buffer.<span class="f">take</span>(); moved.<span class="f">incrementAndGet</span>(); }
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }, <span class="s">"consumer-"</span> + i);
+        }
+        <span class="t">Thread</span> watch = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {              <span class="c">// reports when progress stops</span>
+            <span class="t">long</span> last = -<span class="n">1</span>;
+            <span class="k">while</span> (<span class="k">true</span>) {
+                <span class="k">try</span> { <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">300</span>); } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); <span class="k">return</span>; }
+                <span class="t">long</span> now = moved.<span class="f">get</span>();
+                <span class="k">if</span> (now == last) {
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"stuck after "</span> + now + <span class="s">" items: all four threads are waiting"</span>);
+                    <span class="k">return</span>;
+                }
+                last = now;
+            }
+        }, <span class="s">"watchdog"</span>);
+        watch.<span class="f">setDaemon</span>(<span class="k">true</span>);
+        watch.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"finished without getting stuck (a lucky run)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>stuck after 4 items: all four threads are waiting</pre></div><div class="runout" hidden></div></figure>
+
+<p>Look at the thread dump the site shows for the Java version: four threads in <code>WAITING</code> on the same monitor, and no "Java-level deadlock" reported, because no thread is waiting to <em>acquire</em> a lock someone else holds. Recognizing "everyone is in wait, nobody holds anything" as a missed or misdirected notification is a debugging-round skill.</p>
+
+<p>Two fixes, both standard:</p>
+<ul>
+<li><strong><code>notifyAll</code></strong> (<code>notify_all</code>). Every waiter wakes and re-checks; the right kind proceeds. Simple and always correct with <code>while</code> loops. The cost is a <a class="term" data-term="thundering-herd" href="glossary.html#thundering-herd">thundering herd</a>: with many waiters, each change wakes them all, most go straight back to sleep, and the context switches add up.</li>
+<li><strong>Separate condition variables</strong>, one per predicate: producers wait on "not full", consumers on "not empty". Now each condition has uniform waiters and one change frees one waiter, so a single <code>signal</code> or <code>notify_one</code> is both safe and cheap. In Java this needs <code>ReentrantLock</code> and two <code>Condition</code> objects, since an intrinsic monitor has only one wait set. This is the design in the <a href="p-bounded-blocking-queue.html">bounded blocking queue</a> solution.</li>
+</ul>
+
+<figure class="code pair" data-sample="lost-wakeups-and-notify-all.4" data-expect="ok"><figcaption><span class="ctitle">The one-word fix: wake everyone to re-check</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> OneSlot {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">put</span>(<span class="t">int</span> v) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !slot_.<span class="f">has_value</span>(); });
+        slot_ = v;
+        cv_.<span class="f">notify_all</span>();                              <span class="c">// every waiter re-checks; the right kind proceeds</span>
+    }
+
+    <span class="t">int</span> <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> slot_.<span class="f">has_value</span>(); });
+        <span class="t">int</span> v = *slot_;
+        slot_.<span class="f">reset</span>();
+        cv_.<span class="f">notify_all</span>();
+        <span class="k">return</span> v;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; slot_;                          <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    OneSlot buffer;
+    <span class="t">long</span> sums[<span class="n">2</span>] = {<span class="n">0</span>, <span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;] { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">1</span>; k &lt;= <span class="n">5000</span>; k += <span class="n">1</span>) buffer.<span class="f">put</span>(k); });
+        threads.<span class="f">emplace_back</span>([&amp;, i] { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">5000</span>; k += <span class="n">1</span>) sums[i] += buffer.<span class="f">take</span>(); });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"moved 10000 items, sum "</span> &lt;&lt; sums[<span class="n">0</span>] + sums[<span class="n">1</span>] &lt;&lt; <span class="s">" (expected 25005000)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">Integer</span> slot = <span class="k">null</span>;                       <span class="c">// guarded by lock</span>
+
+    <span class="k">void</span> <span class="f">put</span>(<span class="t">int</span> v) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (slot != <span class="k">null</span>) lock.<span class="f">wait</span>();
+            slot = v;
+            lock.<span class="f">notifyAll</span>();                          <span class="c">// every waiter re-checks; the right kind proceeds</span>
+        }
+    }
+
+    <span class="t">int</span> <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (slot == <span class="k">null</span>) lock.<span class="f">wait</span>();
+            <span class="t">int</span> v = slot;
+            slot = <span class="k">null</span>;
+            lock.<span class="f">notifyAll</span>();
+            <span class="k">return</span> v;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Main</span> buffer = <span class="k">new</span> <span class="t">Main</span>();
+        <span class="t">long</span>[] sums = <span class="k">new</span> <span class="t">long</span>[<span class="n">2</span>];
+        <span class="t">Thread</span>[] threads = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">4</span>];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> id = i;
+            threads[i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">1</span>; k &lt;= <span class="n">5_000</span>; k += <span class="n">1</span>) buffer.<span class="f">put</span>(k); } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }, <span class="s">"producer-"</span> + i);
+            threads[<span class="n">2</span> + i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> { <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">5_000</span>; k += <span class="n">1</span>) sums[id] += buffer.<span class="f">take</span>(); } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }, <span class="s">"consumer-"</span> + i);
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"moved 10000 items, sum "</span> + (sums[<span class="n">0</span>] + sums[<span class="n">1</span>]) + <span class="s">" (expected 25005000)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>moved 10000 items, sum 25005000 (expected 25005000)</pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="mesa-versus-hoare-why-every-wait-is-a-loop">Mesa versus Hoare: why every wait is a loop</h2>
+<p>The behavior in this module, a woken thread that must win the lock again and re-check, is a design choice with a history. In the monitors Tony Hoare described in his 1974 paper, a signal handed the monitor <em>directly</em> to the woken thread. When Butler Lampson and David Redell built monitors into the Mesa language at Xerox PARC (published 1980), they chose the opposite.</p>
+<table>
+<thead><tr><th></th><th><a class="term" data-term="hoare-semantics" href="glossary.html#hoare-semantics">Hoare: signal and wait</a></th><th><a class="term" data-term="mesa-semantics" href="glossary.html#mesa-semantics">Mesa: signal and continue</a></th></tr></thead>
+<tbody>
+<tr><td>After a signal</td><td>The woken thread runs at once, holding the monitor; the signaler waits until it leaves the monitor or waits again</td><td>The signaler keeps the monitor and carries on; the woken thread competes for it later</td></tr>
+<tr><td>Is the condition true when the woken thread runs?</td><td>Guaranteed</td><td>Not guaranteed: it may have changed again</td></tr>
+<tr><td>How to wait</td><td><code>if</code> is enough</td><td>Always a loop</td></tr>
+<tr><td>Cost</td><td>Extra context switches on every signal, and a forced hand off</td><td>Cheap: the signaler is already running</td></tr>
+<tr><td>Broadcast, timeouts, spurious wakeups</td><td>Awkward to fit in</td><td>Natural: they are just more reasons to re-check</td></tr>
+<tr><td>Who uses it</td><td>Textbooks and some teaching systems</td><td>Java, C++, POSIX threads and practically every production library</td></tr>
+</tbody>
+</table>
+<p>Mesa semantics turn a notification into a <strong>hint</strong>: "the state may now be what you want, go and look". That is cheaper and more robust, at the price of the loop. When an interviewer asks "why <code>while</code>?", "because these are Mesa semantics" is the one-line senior answer, followed by the concrete cases the loop covers: stolen wakeups, which Mesa semantics make possible, and spurious wakeups, which the Java, POSIX and C++ specifications explicitly allow.</p>
+
+<h2 id="notify-while-holding-the-lock-or-just-after">Notify while holding the lock, or just after?</h2>
+<p>In Java there is no choice: <code>notify</code>, <code>notifyAll</code>, <code>signal</code> and <code>signalAll</code> all require holding the lock. Since waiters cannot return from <code>wait</code> until the lock is released, it does not even matter whether you notify before or after changing the state, as long as both happen inside the same critical section.</p>
+<p>C++ lets you choose, because <code>notify_one</code> and <code>notify_all</code> do not need the mutex. The state change itself must always be made while holding the mutex; only the notify can move.</p>
+<div class="only only-cpp"><span class="otag">C++</span>
+<figure class="code single" data-sample="lost-wakeups-and-notify-all.6"><figcaption><span class="ctitle">Two correct ways to signal</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="c">// 1. Notify while holding the mutex: always correct.</span>
+<span class="t">void</span> <span class="f">setReadyA</span>() {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m);
+    ready = <span class="k">true</span>;
+    cv.<span class="f">notify_one</span>();      <span class="c">// the woken thread may wake and immediately block on m until we unlock</span>
+}
+
+<span class="c">// 2. Notify just after unlocking: can avoid that extra wake-up and sleep.</span>
+<span class="t">void</span> <span class="f">setReadyB</span>() {
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m);
+        ready = <span class="k">true</span>;     <span class="c">// the change is still made under the mutex</span>
+    }
+    cv.<span class="f">notify_one</span>();      <span class="c">// safe only if no waiter can destroy cv before this call ends</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+</div>
+<ul>
+<li><strong>Notifying under the lock</strong> is always correct. The woken thread may wake only to block on the mutex the notifier still holds (sometimes called "hurry up and wait"), although some implementations move the waiter straight to the mutex's queue to avoid the extra switch.</li>
+<li><strong>Notifying after unlocking</strong> can save that switch, and is common in performance-sensitive code. It has one trap: between the unlock and the notify, the waiter can wake (spuriously, or for another reason), see the condition already true, return, and destroy the object that owns the condition variable. The notify then touches a destroyed object, which is undefined behavior. If the waiter may destroy the condition variable as soon as it sees the condition, notify while holding the mutex. POSIX also says that holding the mutex is required if you need predictable scheduling.</li>
+<li><strong>Never</strong> change the state outside the mutex, atomic or not, as the first demo showed.</li>
+</ul>
+
+<div class="box example">
+<h3>Worked example: the two bugs in a classic broken buffer</h3>
+<p>A debugging round hands you a bounded buffer with one monitor: <code>put</code> does <code>if (full) wait(); add; notify();</code> and <code>take</code> does <code>if (empty) wait(); remove; notify();</code>. It works with one producer and one consumer, and fails with more. Name both bugs, with an interleaving for each, before you touch the code:</p>
+<ol>
+<li><strong><code>if</code> instead of <code>while</code></strong>: two consumers wait, one item arrives, both get woken over time (by a notify each, or by a spurious wakeup), and the second removes from an empty buffer. Fix: <code>while</code>. That was the previous lesson.</li>
+<li><strong><code>notify</code> with mixed waiters</strong>: producers and consumers share the monitor's single wait set, so a consumer's notify can wake another consumer, and the run in the timeline above leaves all four threads waiting. Fix: <code>notifyAll</code>, or move to <code>ReentrantLock</code> with separate <code>notFull</code> and <code>notEmpty</code> conditions and keep a single <code>signal</code>.</li>
+</ol>
+<p>Then say which fix you would ship: separate conditions with <code>signal</code> for a buffer with many waiters, <code>notifyAll</code> when waiters are few and simplicity wins. This pair of bugs is exactly the <a href="p-fix-the-lost-wakeup.html">fix the lost wakeup</a> problem.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Checking the condition outside the lock</strong>, then locking and waiting. The change and its notification can fall in between.</li>
+<li><strong>Changing the state without the waiter's lock</strong>, especially an atomic flag in C++. Atomic is not enough; the mutex closes the window.</li>
+<li><strong>Waiting for a notification instead of a state.</strong> A notify that comes first is lost. Always wait in a loop on a predicate.</li>
+<li><strong>Single <code>notify</code> with mixed waiters.</strong> Producers and consumers, or readers and writers, sharing one wait set need <code>notifyAll</code> or separate conditions.</li>
+<li><strong><code>notify</code> for a broadcast event.</strong> Shutdown, "the gate is open" and "the latch reached zero" concern every waiter; use <code>notifyAll</code>.</li>
+<li><strong>Notifying after unlocking when the waiter can destroy the condition variable</strong> (C++). Notify under the mutex in that case.</li>
+<li><strong>Expecting the deadlock detector to find it.</strong> Lost wakeups leave threads in <code>WAITING</code>, not in a lock cycle. Read the waits, not just the locks.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>These are the follow ups that separate a working bounded queue from a correct one. Rubrik's debugging round has handed candidates C++ producer-consumer code with a critical section bug to find; LinkedIn has run a bounded blocking queue round that allowed only <code>wait</code> and <code>notify</code>; and "notify or notifyAll?" follows almost every monitor you write on a whiteboard.</p>
+<blockquote>A condition variable has no memory, so a notify with nobody waiting is lost. That is harmless as long as waiters check the state under the lock before waiting and the state is only changed under the same lock; then an early change is seen as state. A single notify is only safe when all waiters wait for the same condition and one change lets exactly one of them proceed. With producers and consumers on one monitor, notify can wake the wrong kind and the system stalls with everyone waiting, so I use notifyAll there, or better, separate conditions with signal.</blockquote>
+<blockquote>All of this follows from Mesa semantics: notify is a hint, the signaler keeps the lock, and the woken thread must re-acquire it and re-check. Hoare semantics would hand the lock over directly and make <code>if</code> sufficient, but no mainstream library works that way.</blockquote>
+<p>Follow ups to expect: "Show an interleaving where notify hangs" (the four-thread timeline), "Is notifyAll always safe?" (with <code>while</code>, yes; it only costs wake-ups), "Why not just make the flag volatile?" (visibility is not the problem; the window is), and in C++, "should notify be inside the lock?"</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>Interrupts do not lose notifications in Java.</strong> The language specification guarantees that if a thread in the wait set is notified, either some waiter returns normally or all of them exit with <code>InterruptedException</code>; and <code>Condition.await</code> implementations that favor the interrupt must pass the signal on to another waiter. You can rely on it, but you still must re-check state, since the waiter that consumed the signal may not be the one you expected.</li>
+<li><strong>Counting notifications is a design smell.</strong> If correctness depends on "N notifies wake N threads", it will break under spurious and stolen wakeups. Put the count in the state (permits, items, a generation number) and let every waiter check it.</li>
+<li><strong>Generation counters fix reusable barriers.</strong> When a condition becomes true and then false again quickly (a barrier that resets, a flag toggled back), a slow waiter may wake to find it false and wait again, missing its round. Waiting for "generation changed" instead of "flag is true" makes each round's release permanent for that round's waiters; you will use it in <a href="build-rw-lock-and-barrier.html">the reusable barrier</a>.</li>
+<li><strong>The platform closes its own window the same way.</strong> <code>wait</code> must release the mutex and join the wait set as one step, and POSIX requires it: a signal sent by a thread that took the mutex after the waiter released it must behave as if the waiter were already asleep. On Linux this rests on the <a class="term" data-term="futex" href="glossary.html#futex">futex</a> contract: the kernel puts a thread to sleep only if a memory word still holds the value the caller expects, checking and sleeping as one step. C++20 <code>std::atomic&lt;T&gt;::wait(old)</code> exposes that contract directly, so a store followed by <code>notify_one</code> cannot be missed by a waiter that saw <code>old</code> (though a value that changes and changes back can be, which is again why generation counters exist). Java's <code>LockSupport.unpark</code> leaves one permit that a later <code>park</code> consumes at once. These primitives remember a little; a bare condition variable remembers nothing, so the state has to do it.</li>
+<li><strong>Herds versus precision.</strong> notifyAll costs O(waiters) wake-ups per change. With dozens of waiters on a hot structure, separate conditions (or one condition per waiting thread, as in a FIFO lock) turn that into O(1). Measure before optimizing; with three waiters it does not matter.</li>
+</ul>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Notifications are not stored. A notify with no waiter is lost, so waiters must check state, under the lock, before waiting, and the state must change under the same lock. In C++ that holds even for atomic variables.</li>
+<li>Never wait for a notification; wait in a loop for a state. A semaphore remembers releases; a condition variable does not.</li>
+<li>A single notify is safe only with uniform waiters and one-in, one-out. Otherwise use notifyAll, or separate condition variables with a single signal.</li>
+<li>Mesa semantics (signal and continue) make notify a hint, which is why every wait is a loop. Hoare semantics would hand off the lock directly.</li>
+<li>In C++, notify under the mutex is always correct; notifying after unlocking is an optimization that is unsafe if the waiter may destroy the condition variable.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="lost-wakeups-and-notify-all"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="lost-wakeups-and-notify-all.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The waiter runs <code>if (!ready) { lock; wait; unlock }</code>. The setter runs <code>ready = true; lock; notifyAll; unlock</code>. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing bad: the setter always notifies after setting the flag</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The waiter can check <code>ready</code>, then the setter sets it and notifies before the waiter waits, and the waiter sleeps forever</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The waiter wakes up twice</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The setter deadlocks on the lock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The check happens outside the lock, so the setter's change and notification can both land between the check and the wait; the notify finds nobody waiting and is lost. Checking and waiting in a loop under the lock, with the setter changing the flag under the same lock, closes the window.</div></div><div class="mcq" data-id="lost-wakeups-and-notify-all.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Nobody is waiting. Thread A calls <code>notify</code> on a condition variable; thread B calls <code>release</code> on a semaphore. Later, thread C waits on the condition variable and thread D acquires the semaphore. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Both C and D return at once</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both C and D block</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">C blocks (the notify was lost), D returns at once (the release was remembered as a permit)</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">C returns at once, D blocks</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A condition variable has no memory, which is why it must always be paired with state that the waiter checks. A semaphore's count is its memory. Waiting on a condition variable for a notification that already happened is the lost wakeup.</div></div><div class="mcq" data-id="lost-wakeups-and-notify-all.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Producers wait "while full" and consumers wait "while empty" on one Java monitor (or one <code>std::condition_variable</code>), and both use a single <code>notify</code> (<code>notify_one</code>). The waits are in <code>while</code> loops. What can happen with two producers and two consumers on a one-slot buffer?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: the <code>while</code> loops make it correct</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">An item is lost</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A notify can wake a thread of the wrong kind, which re-checks and waits again, until all four threads are waiting</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Two producers write the slot at the same time</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The loops make each wakeup safe, but a single notify that lands on a thread that cannot proceed is wasted, and the thread that could proceed is never woken. Use <code>notifyAll</code>, or separate conditions so each signal reaches the right kind of waiter. The lock still prevents two writers in the slot.</div></div><div class="mcq" data-id="lost-wakeups-and-notify-all.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">When is a single <code>notify</code> (<code>signal</code>, <code>notify_one</code>) instead of <code>notifyAll</code> safe?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Whenever there are fewer than two waiters</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When all waiters on that condition wait for the same predicate and each state change lets at most one of them proceed</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Whenever the waits are in <code>while</code> loops</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Whenever the lock is fair</span></button></li></ol><div class="why" hidden><strong>Why.</strong> These are the uniform waiters and one-in, one-out conditions. The <code>while</code> loop protects against wakeups with a false condition, but it cannot create a notification for the thread that was never woken. The number of waiters can change at any moment, so "fewer than two" is not a rule you can rely on.</div></div><div class="mcq" data-id="lost-wakeups-and-notify-all.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Under Mesa semantics, which is true when a notified thread returns from <code>wait</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It holds the lock and the condition it waited for is guaranteed true</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It holds the lock again, but the condition may have become false since the notify</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not hold the lock and must take it explicitly</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The signaling thread is now waiting for it to finish</span></button></li></ol><div class="why" hidden><strong>Why.</strong> With signal and continue, the signaler keeps running and the woken thread re-acquires the lock later; others may run in between. Guaranteed truth and a waiting signaler describe Hoare semantics, which mainstream libraries do not use. In both models <code>wait</code> returns with the lock held.</div></div><div class="mcq" data-id="lost-wakeups-and-notify-all.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Inside one <code>synchronized (lock)</code> block, a Java setter calls <code>lock.notifyAll()</code> and then sets <code>ready = true</code>. Is the order a bug?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Yes: waiters wake before the flag is set and go back to sleep forever</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">No: woken waiters cannot return from <code>wait</code> until the setter leaves the block, and by then the flag is set</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Yes: <code>notifyAll</code> must always be the last statement in a synchronized block</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No, but only because the flag is a boolean</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A woken thread must re-acquire the monitor before <code>wait</code> returns, which happens only after the setter exits the synchronized block. Both actions are therefore visible together. Setting the state first reads more naturally, and that is the convention, but inside one critical section the order does not change behavior.</div></div><div class="mcq" data-id="lost-wakeups-and-notify-all.q7" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span><code>std::atomic&lt;bool&gt; ready</code> is checked by a waiter inside <code>cv.wait(lock, [&amp;] { return ready.load(); })</code>. The setter runs <code>ready = true; cv.notify_one();</code> without locking the mutex. What is wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: <code>ready</code> is atomic, so the waiter will see it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>notify_one</code> must be called while holding the mutex, or it does nothing</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The store and the notify can both happen after the waiter's predicate check and before it blocks, so the notification is lost and the waiter may sleep forever</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is a data race on <code>ready</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Atomicity prevents the data race but not the lost wakeup. The waiter holds the mutex between its check and the moment <code>wait</code> blocks; a setter that takes the same mutex to change the flag cannot fall into that gap. Notifying after unlocking is fine; changing the state without the mutex is not.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="lost-wakeups-and-notify-all.c1" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A bounded buffer uses one monitor: <code>put</code> does <code>if (count == capacity) wait(); add; notify();</code> and <code>take</code> does <code>if (count == 0) wait(); remove; notify();</code>. With 3 producers and 3 consumers it sometimes throws and sometimes hangs. Explain both failures with interleavings, and fix it.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>The exception</strong> comes from <code>if</code>. Consumer C1 waits on an empty buffer. A producer adds one item and its notify wakes C1, but C1 must still re-acquire the monitor, and before it does, consumer C3 arrives at <code>take</code>, finds the item and removes it. C1 then returns from <code>wait</code> and, because <code>if</code> does not re-check, removes from an empty buffer and throws. A second route needs no third consumer: C1 takes the item and its own notify wakes C2, another waiting consumer, which also returns from <code>wait</code> without re-checking. A spurious wakeup does the same.</p>
+<p><strong>The hang</strong> comes from the single <code>notify</code> with mixed waiters: producers waiting on "full" and consumers waiting on "empty" share the monitor's one wait set, so a notify can reach a thread of the wrong kind. It shows most clearly once <code>if</code> has been fixed to <code>while</code>, which is why fixing only the <code>if</code> is not enough. With capacity 1: consumers C1 and C2 find the buffer empty and wait; P1 adds an item and its notify wakes C1; P1 and P2 then find the buffer full and wait; C1 takes the item and its notify wakes C2 instead of a producer; C1 loops, finds the buffer empty and waits; C2 re-checks, finds it empty and waits. Every thread now waits and no notification is coming. With the original <code>if</code>, the same misdirected notify makes C2 remove from an empty buffer instead, which is the exception; and a worker killed by that exception can leave the remaining threads waiting forever, a second route to the hang.</p>
+<p><strong>Fix</strong>: replace <code>if</code> with <code>while</code> in both methods, and either use <code>notifyAll</code> (simple, correct, wakes everyone) or switch to <code>ReentrantLock</code> with two conditions, <code>notFull</code> for producers and <code>notEmpty</code> for consumers, and <code>signal</code> the right one after each change: <code>put</code> signals <code>notEmpty</code>, <code>take</code> signals <code>notFull</code>. With separate conditions each wait set has uniform waiters and each change frees one waiter, so <code>signal</code> is safe and avoids the thundering herd.</p></div></div><div class="cq" data-q="lost-wakeups-and-notify-all.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain the difference between Mesa and Hoare monitor semantics, and why every mainstream library chose Mesa.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Under Hoare semantics, from Hoare's 1974 monitors paper, a signal immediately transfers the monitor to the woken thread, which runs right away with the condition guaranteed true; the signaler is suspended until the woken thread leaves the monitor or waits again. Waiting can therefore use <code>if</code>. Under Mesa semantics, from Lampson and Redell's work on the Mesa language at Xerox PARC, the signaler keeps the monitor and continues; the woken thread is merely made runnable and must re-acquire the monitor later, by which time other threads may have changed the state. A signal is a hint, and every wait must be a loop.</p>
+<p>Libraries chose Mesa because it is cheaper and more robust. A Hoare signal forces an immediate hand off, costing extra context switches on every signal and constraining the scheduler, while under Mesa the already running signaler simply continues. Mesa also accommodates broadcast (<code>notifyAll</code>), timed waits and spurious wakeups naturally, since each is just another reason to re-check, and it tolerates extra notifications from anywhere in the program. Java, POSIX threads and C++ all have Mesa semantics, which is the root reason for <code>while</code> around every <code>wait</code>.</p></div></div><div class="cq" data-q="lost-wakeups-and-notify-all.c3" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a one-shot <code>Completion</code> with <code>complete()</code> and <code>await()</code>, where the waiting thread may destroy the <code>Completion</code> object as soon as <code>await()</code> returns. In C++, where must the notify go, and why? What is different in Java?</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="lost-wakeups-and-notify-all.5"><figcaption><span class="ctitle">A completion that the waiter may destroy</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> Completion {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">complete</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        done_ = <span class="k">true</span>;
+        cv_.<span class="f">notify_all</span>();                          <span class="c">// under the mutex: the waiter cannot return, and destroy</span>
+    }                                              <span class="c">// this object, until we release m_ after notifying</span>
+
+    <span class="t">void</span> <span class="f">await</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> done_; });
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">bool</span> done_ = <span class="k">false</span>;                            <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">class</span> <span class="t">Completion</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">boolean</span> done = <span class="k">false</span>;                  <span class="c">// guarded by lock</span>
+
+    <span class="k">void</span> <span class="f">complete</span>() {
+        <span class="k">synchronized</span> (lock) {
+            done = <span class="k">true</span>;
+            lock.<span class="f">notifyAll</span>();                      <span class="c">// Java requires holding the monitor anyway</span>
+        }
+    }
+
+    <span class="k">void</span> <span class="f">await</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">synchronized</span> (lock) {
+            <span class="k">while</span> (!done) {
+                lock.<span class="f">wait</span>();
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>In C++ the notify must happen while holding the mutex. If <code>complete()</code> set <code>done_</code>, unlocked, and only then notified, the waiter could wake in between (spuriously, or because it was just arriving), see <code>done_</code> true, return, and destroy the <code>Completion</code>, so the notify would run on a destroyed condition variable: undefined behavior. Under the mutex, the waiter cannot get past its wait until the notifier has released the mutex, which happens after the notify. In Java the question does not arise in the same way: you must hold the monitor to notify, and the garbage collector does not free the object while <code>complete()</code> still references it. In both languages the waiter waits for the <code>done</code> state in a loop, so a <code>complete()</code> that happens before <code>await()</code> is never missed.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="lost-wakeups-and-notify-all.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Walk me through how a thread can sleep forever on a condition variable when the flag it is waiting for is already true. Would making the flag atomic fix it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A condition variable has no memory: a notify with no thread waiting is simply lost</li><li>The interleaving: the waiter checks the flag and sees false, the setter sets it and notifies, and only then does the waiter go to sleep</li><li>An atomic or <code>volatile</code> flag fixes visibility, not the gap between the check and the sleep</li><li>The fix: check the flag in a loop and wait under the mutex, and change the flag under the same mutex</li><li>Why that works: <code>wait</code> releases the mutex and starts sleeping as one step, so the setter cannot land in the gap</li><li>In C++ the notify call may move after the unlock, but the store to the flag may not</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Because a condition variable has no memory. A notify with nobody waiting is simply dropped. Picture the waiter checking <code>ready</code> and seeing false. Before it actually calls <code>wait</code>, the setter sets <code>ready</code> to true and notifies. Nobody is asleep yet, so that notify does nothing. Then the waiter goes to sleep, waiting for a change that has already happened, and nothing will ever wake it. Making the flag atomic does not help. That fixes visibility, but the bug is the gap between the check and the sleep, and the setter can still land in it. The fix is one rule. The waiter checks the flag in a loop while holding the mutex, and the setter changes the flag while holding the same mutex. Now the setter cannot run in the gap, because <code>wait</code> releases the mutex and goes to sleep as one step. And if the setter got there first, the waiter just sees true and never waits. In C++ the notify call itself can sit after the unlock, but the store must be under the mutex, even for a <code>std::atomic</code>.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Is it safe in C++ to call <code>notify_one</code> after releasing the mutex?</span></p></div></div><div class="sq" data-sq="lost-wakeups-and-notify-all.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Here is a symptom: a service stops making progress. The thread dump shows every worker in <code>WAITING</code>, the CPU is idle, and the deadlock detector reports nothing. What do you suspect, and how do you track it down?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>No lock cycle: the threads are waiting on a condition, not blocked acquiring a lock, so suspect a missed or misdirected notification</li><li>Check every wait: the condition is checked in a loop, under the lock, before waiting</li><li>Check every state change: it is made under the same lock the waiters use, atomic or not</li><li>Check every single notify: do different kinds of waiters, such as producers and consumers, share one condition</li><li>The fix: wait for state, never for a notification, and use notifyAll or one condition per predicate</li><li>Confirm it with a stress test that joins with a timeout, and a dump showing which condition each thread waits on</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would suspect a missed or misdirected notification, not a deadlock. A deadlock detector looks for threads blocked acquiring locks in a cycle. Here nobody is acquiring anything. Every thread is sitting in <code>wait</code>, so the bug is in the signaling, not the locking. I would go through three checks. First, every wait. Is the condition checked in a <code>while</code> loop, under the lock, before waiting? A check outside the lock lets the notify arrive early and be lost. Second, every state change. Is it made under the same lock the waiters use? In C++ that applies even to an atomic flag. Third, every single <code>notify</code>. Do different kinds of waiters share one condition? The classic case is producers and consumers on one monitor. A consumer's notify wakes another consumer, which re-checks and waits again, and soon everyone is waiting with nobody left to notify. The fix is to wait for state, never for a notification, and to use <code>notifyAll</code> or one condition per predicate. To confirm it, I would reproduce it under a stress test with join timeouts and read which condition each thread is waiting on.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why did it run fine for weeks before it hung?</span></p></div></div><div class="sq" data-sq="lost-wakeups-and-notify-all.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"<code>notify</code> or <code>notifyAll</code>: which do you reach for, and when is a single notify actually safe?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li><code>notifyAll</code> is always correct when every wait is a loop; its cost is extra wakeups</li><li>A single notify needs uniform waiters: one predicate, and the same action on waking</li><li>It also needs one in, one out: each change lets at most one waiter proceed</li><li>Producers and consumers on one monitor break the first rule, and a single notify can stall everyone</li><li>Best of both: one condition per predicate, so a single <code>signal</code> is safe and cheap</li><li>Events that concern every waiter, such as shutdown, always get <code>notifyAll</code></li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">My default is <code>notifyAll</code>, because with waits in loops it is always correct. Its only cost is waking threads that go straight back to sleep. A single notify is safe only when two things hold. Every waiter on that condition waits for the same thing and does the same thing when it wakes. And each change lets at most one of them proceed. Producers and consumers sharing one monitor break the first rule. A consumer's notify can land on another consumer, which re-checks and sleeps again, and the producer that could have moved never hears it. So when I want the cheap single wakeup, I split the waiting into two conditions, not full for producers and not empty for consumers. Each condition then has one kind of waiter, and <code>signal</code> is safe and cheap. That is how <code>ArrayBlockingQueue</code> is built. The one exception is an event that concerns everyone, like shutdown, which always gets <code>signalAll</code>.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">With fifty waiters on one condition, what does <code>notifyAll</code> actually cost you?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-fix-the-lost-wakeup.html" data-problem="fix-the-lost-wakeup"><span class="pk">Bug hunts · medium</span><b>Fix the job queue that stalls</b><span class="pst"></span></a><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="wait-in-a-loop.html"><span>Previous</span><b>Spurious and stolen wakeups: always wait in a loop</b></a><a class="next" href="producer-consumer.html"><span>Next</span><b>Producer and consumer with a bounded buffer</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#lost-wakeup-cause-1-the-state-changed-outside-the-lock">Lost wakeup, cause 1: the state changed outside the lock</a><a href="#lost-wakeup-cause-2-the-signal-came-before-the-wait">Lost wakeup, cause 2: the signal came before the wait</a><a href="#notify-versus-notifyall">notify versus notifyAll</a><a href="#mesa-versus-hoare-why-every-wait-is-a-loop">Mesa versus Hoare: why every wait is a loop</a><a href="#notify-while-holding-the-lock-or-just-after">Notify while holding the lock, or just after?</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

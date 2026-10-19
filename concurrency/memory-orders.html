@@ -1,0 +1,875 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>C++ memory orders: seq_cst, acquire, release and relaxed · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="memory-orders" data-title="C++ memory orders: seq_cst, acquire, release and relaxed" data-track="core" data-module="core-6" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details open><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders" class=here><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m6">Module 06: The memory model</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 06.5</span><span>26 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>C++ memory orders: seq_cst, acquire, release and relaxed</h1><p class="lsum">The C++ memory orders you will actually use, what each one buys, how Java expresses the same ideas, and how interviewers test them.</p><div class="prereq"><span>Before this:</span><a href="happens-before.html">Happens-before and synchronizes-with</a><a href="volatile-and-atomic.html">volatile in Java, std::atomic in C++</a></div></header><article class="prose" id="article">
+<p class="lead">Every <code>std::atomic</code> operation takes an optional memory order. The default is the safest and usually fast enough; the weaker ones exist for hot paths and for building synchronizers. Interviewers use them to separate candidates who memorized the words "acquire" and "release" from candidates who can say exactly what each one buys, and what it does not.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of an office mailroom. <strong>Release</strong> is sealing an envelope with everything you prepared inside and dropping it in the outgoing tray. <strong>Acquire</strong> is the recipient taking that envelope from the tray and only then reading its contents: whatever you put in before sealing, they will find. <strong>Relaxed</strong> is a tally clicker at the door: every click is counted exactly, but the clicker says nothing about anything else in the building. <strong>Sequentially consistent</strong> is a single announcement board that everyone reads in the same order.</p>
+<p>Java has the same ideas under different names (volatile, and <code>VarHandle</code> modes). If you code in Java, read this lesson for the vocabulary and the mapping: the words acquire, release and sequential consistency are how memory model questions are discussed in any language.</p>
+</div>
+
+<h2 id="six-orders-and-the-three-you-will-use">Six orders, and the three you will use</h2>
+<p>A <a class="term" data-term="memory-order" href="glossary.html#memory-order">memory order</a> tells the compiler and CPU how other memory operations may be reordered around an atomic operation. C++ has six:</p>
+<table>
+<thead><tr><th>Order</th><th>Used on</th><th>What it adds beyond atomicity</th></tr></thead>
+<tbody>
+<tr><td><code>memory_order_relaxed</code></td><td>any operation</td><td>Nothing: no ordering of other memory, no synchronization</td></tr>
+<tr><td><code>memory_order_consume</code></td><td>loads</td><td>Ordering only for data that depends on the loaded value. Discouraged; compilers treat it as acquire</td></tr>
+<tr><td><code>memory_order_acquire</code></td><td>loads, read-modify-writes</td><td>Later reads and writes stay after it; pairs with a release</td></tr>
+<tr><td><code>memory_order_release</code></td><td>stores, read-modify-writes</td><td>Earlier reads and writes stay before it; pairs with an acquire</td></tr>
+<tr><td><code>memory_order_acq_rel</code></td><td>read-modify-writes</td><td>Both of the above, for an operation that reads and writes</td></tr>
+<tr><td><code>memory_order_seq_cst</code></td><td>any operation (the default)</td><td>Acquire and release, plus one total order of all seq_cst operations that every thread agrees on</td></tr>
+</tbody>
+</table>
+<p>In practice: <strong>seq_cst by default, acquire and release for hand-offs, relaxed for counters</strong>. Passing an order that does not fit the operation, such as <code>store(v, std::memory_order_acquire)</code>, is undefined behavior; clang warns about it.</p>
+
+<h2 id="seq-cst-the-default">seq_cst: the default</h2>
+<p>A sequentially consistent operation is an acquire (if it reads) and a release (if it writes), and on top of that all seq_cst operations in the program fall into a single total order consistent with each thread's program order. That extra total order is what forbids the <a class="term" data-term="store-buffering" href="glossary.html#store-buffering">store buffering</a> outcome from <a href="reordering.html">reordering</a>: with seq_cst on all four operations, at least one thread must see the other's write. It is also what makes a race free program that uses only seq_cst atomics and mutexes <a class="term" data-term="sequential-consistency" href="glossary.html#sequential-consistency">sequentially consistent</a>, so plain interleaving reasoning works.</p>
+<p>What does it cost? Less than its reputation. On x86, every load is an ordinary <code>mov</code> whatever the order; only a seq_cst <em>store</em> costs extra (compilers emit <code>xchg</code>, or <code>mov</code> followed by <code>mfence</code>; either way the core waits for its store buffer to drain). On ARM, seq_cst loads and stores are <code>ldar</code> and <code>stlr</code>. The weaker orders also give the <em>compiler</em> more freedom, which matters in tight loops. The rule senior engineers follow: <strong>keep the default unless you can name the edge you need and you have measured a reason</strong>.</p>
+
+<h2 id="acquire-and-release-message-passing-done-right">Acquire and release: message passing done right</h2>
+<p><a class="term" data-term="acquire-release" href="glossary.html#acquire-release">Acquire and release</a> are one-way barriers that work in pairs:</p>
+<ul>
+<li>A <strong>release</strong> store: no read or write that comes before it in program order may be moved after it. Everything you wrote before it is "sealed in the envelope".</li>
+<li>An <strong>acquire</strong> load: no read or write that comes after it may be moved before it. You open the envelope before reading what is inside.</li>
+<li>When an acquire load reads the value written by a release store (on the same atomic), the release <strong>synchronizes with</strong> the acquire, and everything before the release happens-before everything after the acquire.</li>
+</ul>
+
+<figure class="code pair" data-sample="memory-orders.1"><figcaption><span class="ctitle">Message passing with release and acquire</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+
+<span class="k">class</span> Mailbox {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">send</span>(<span class="t">int</span> value) {                                <span class="c">// writer thread</span>
+        payload_ = value;
+        ready_.<span class="f">store</span>(<span class="k">true</span>, <span class="t">std</span>::memory_order_release);    <span class="c">// seal the envelope</span>
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; <span class="f">try_receive</span>() {                    <span class="c">// reader thread</span>
+        <span class="k">if</span> (ready_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire)) {     <span class="c">// open it</span>
+            <span class="k">return</span> payload_;                              <span class="c">// guaranteed to see value</span>
+        }
+        <span class="k">return</span> <span class="t">std</span>::nullopt;
+    }
+
+<span class="k">private</span>:
+    <span class="t">int</span> payload_ = <span class="n">0</span>;                                     <span class="c">// plain data</span>
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; ready_{<span class="k">false</span>};
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="k">import</span> java.lang.invoke.<span class="t">MethodHandles</span>;
+<span class="k">import</span> java.lang.invoke.<span class="t">VarHandle</span>;
+
+<span class="k">class</span> <span class="t">Mailbox</span> {
+    <span class="k">private</span> <span class="t">int</span> payload;                                  <span class="c">// plain data</span>
+    <span class="k">private</span> <span class="t">boolean</span> ready;                                <span class="c">// accessed only through READY</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">VarHandle</span> READY;
+
+    <span class="k">static</span> {
+        <span class="k">try</span> {
+            READY = <span class="t">MethodHandles</span>.<span class="f">lookup</span>().<span class="f">findVarHandle</span>(<span class="t">Mailbox</span>.<span class="k">class</span>, <span class="s">"ready"</span>, <span class="t">boolean</span>.<span class="k">class</span>);
+        } <span class="k">catch</span> (<span class="t">ReflectiveOperationException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ExceptionInInitializerError</span>(e);
+        }
+    }
+
+    <span class="k">void</span> <span class="f">send</span>(<span class="t">int</span> value) {                                <span class="c">// writer thread</span>
+        payload = value;
+        READY.<span class="f">setRelease</span>(<span class="k">this</span>, <span class="k">true</span>);                     <span class="c">// seal the envelope</span>
+    }
+
+    <span class="t">Integer</span> <span class="f">tryReceive</span>() {                                <span class="c">// reader thread</span>
+        <span class="k">if</span> ((<span class="t">boolean</span>) READY.<span class="f">getAcquire</span>(<span class="k">this</span>)) {           <span class="c">// open it</span>
+            <span class="k">return</span> payload;                               <span class="c">// guaranteed to see value</span>
+        }
+        <span class="k">return</span> <span class="k">null</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>What release and acquire allow and forbid</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Writer</span><span>Reader</span></div><div class="tl-row"><span class="t">1</span><span class="cell">payload = 42</span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">2</span><span class="cell risk">may not move below the release store</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">ready.store(true, release)</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">ready.load(acquire) reads true: synchronizes with the store</span></div><div class="tl-row risk"><span class="t">5</span><span class="cell empty"></span><span class="cell risk">may not move above the acquire load</span></div><div class="tl-row good"><span class="t">6</span><span class="cell empty"></span><span class="cell good">reads payload: guaranteed 42</span></div><div class="tl-note">Writes above the release travel with it; reads below the acquire see them</div></div></figure>
+
+<p>In Java you would normally just make <code>ready</code> volatile, which is stronger (it behaves like seq_cst); the only extra cost is on the store, a full fence on x86, which matters only on a hot path. The <code>VarHandle</code> version shows the exact equivalent. Note what happens if either side is weakened: a relaxed store or a relaxed load breaks the pair, and the reader can see <code>ready == true</code> with an old <code>payload</code>.</p>
+<p>You have used this pair all along without naming it: <strong>locking a mutex is an acquire operation and unlocking it is a release</strong>, which is why everything written inside one critical section is visible in the next one. A hand-written spinlock spells it out: <code>exchange(true, std::memory_order_acquire)</code> to take the lock, <code>store(false, std::memory_order_release)</code> to give it back.</p>
+
+<h2 id="what-acquire-and-release-do-not-give-you">What acquire and release do not give you</h2>
+<p>Because the barriers are one-way, a release store followed by an acquire load <em>to a different variable</em> may still be reordered: the store's barrier only holds back earlier operations, and the load's barrier only holds back later ones. So the store buffering test is <strong>not</strong> fixed by acquire and release:</p>
+
+<figure class="code pair" data-sample="memory-orders.2"><figcaption><span class="ctitle">Store buffering with release and acquire: still broken</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="c">// shared: std::atomic&lt;int&gt; x{0}, y{0};</span>
+<span class="c">// Thread A                                   // Thread B</span>
+x.<span class="f">store</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_release);        y.<span class="f">store</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_release);
+r1 = y.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire);       r2 = x.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire);
+<span class="c">// r1 == 0 and r2 == 0 is allowed. seq_cst on all four operations forbids it.</span></code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="c">// shared: int x, y; accessed through VarHandles X and Y</span>
+<span class="c">// Thread A                                   // Thread B</span>
+X.<span class="f">setRelease</span>(<span class="k">this</span>, <span class="n">1</span>);                        Y.<span class="f">setRelease</span>(<span class="k">this</span>, <span class="n">1</span>);
+r1 = (<span class="t">int</span>) Y.<span class="f">getAcquire</span>(<span class="k">this</span>);                r2 = (<span class="t">int</span>) X.<span class="f">getAcquire</span>(<span class="k">this</span>);
+<span class="c">// r1 == 0 and r2 == 0 is allowed. volatile accesses (seq_cst) forbid it.</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>On x86 this really happens, because release stores and acquire loads compile to plain <code>mov</code> instructions and the <a class="term" data-term="store-buffer" href="glossary.html#store-buffer">store buffer</a> does the rest. The ARM architecture allows it too (an <code>stlr</code> followed by an <code>ldapr</code> to another address may be reordered), although the Apple chips this site runs on did not show it in our tests; that proves nothing about the language rules. Whenever correctness depends on "I wrote mine, now let me check yours", as in Dekker or Peterson style mutual exclusion, you need seq_cst (or a seq_cst fence between the store and the load).</p>
+<p>The second thing acquire and release do not give you is <strong>one order that every thread agrees on</strong>. Let thread A store <code>x = 1</code> and thread B store <code>y = 1</code> with release, while two readers load both variables with acquire, in opposite orders. C++ allows reader 1 to see <code>x == 1, y == 0</code> while reader 2 sees <code>y == 1, x == 0</code>: they disagree about which write came first. This test is called IRIW (independent reads of independent writes; see <a href="reordering.html">reordering</a>). x86 and ARMv8 hardware never show it, IBM POWER can, and seq_cst on all six operations forbids it everywhere.</p>
+
+<h2 id="relaxed-atomic-and-nothing-else">relaxed: atomic, and nothing else</h2>
+<p>A <a class="term" data-term="relaxed-atomic" href="glossary.html#relaxed-atomic">relaxed</a> operation still guarantees three things: it is indivisible (no torn values, no lost increments for read-modify-writes), it is never a data race, and all threads agree on a single order of writes to <em>that one variable</em> (once a thread has seen a value, it never later sees an older one). It does not order any other memory, and on its own it never synchronizes with anything (only a fence next to it can make it carry an edge, as you will see below).</p>
+<p>That is exactly right for:</p>
+<ul>
+<li><strong>Counters and statistics</strong> that are read after a <code>join</code> (the join provides the ordering) or that only need to be approximately current, like a metrics gauge.</li>
+<li><strong>Unique ids:</strong> <code>next_id.fetch_add(1, std::memory_order_relaxed)</code> gives every caller a distinct number; nothing else has to be ordered.</li>
+<li><strong>Your own index</strong> in a single-writer structure, such as the producer reading its own tail in the ring buffer below.</li>
+<li><strong>Reference count increments:</strong> gaining a reference publishes nothing.</li>
+</ul>
+
+<figure class="code pair" data-sample="memory-orders.3" data-expect="ok"><figcaption><span class="ctitle">A relaxed counter, read after join</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; events{<span class="n">0</span>};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; workers;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+        workers.<span class="f">emplace_back</span>([] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">250000</span>; i += <span class="n">1</span>) {
+                events.<span class="f">fetch_add</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_relaxed);   <span class="c">// only the count matters</span>
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; w : workers) w.<span class="f">join</span>();                            <span class="c">// join orders everything</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"events = "</span> &lt;&lt; events.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed) &lt;&lt; <span class="s">" (expected 1000000)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">LongAdder</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">LongAdder</span> events = <span class="k">new</span> <span class="t">LongAdder</span>();   <span class="c">// Java has no relaxed add; this is the tool</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span>[] workers = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">4</span>];
+        <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; workers.length; t += <span class="n">1</span>) {
+            workers[t] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">250_000</span>; i += <span class="n">1</span>) {
+                    events.<span class="f">increment</span>();                 <span class="c">// spread over cells: little contention</span>
+                }
+            }, <span class="s">"worker-"</span> + t);
+            workers[t].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> w : workers) w.<span class="f">join</span>();              <span class="c">// join orders everything</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"events = "</span> + events.<span class="f">sum</span>() + <span class="s">" (expected 1000000)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>events = 1000000 (expected 1000000)</pre></div><div class="runout" hidden></div></figure>
+
+<p>Java has no relaxed add: every <code>AtomicLong</code> add has volatile semantics, and the weakest <code>VarHandle</code> adds are <code>getAndAddAcquire</code> and <code>getAndAddRelease</code>. (The one plain-mode read-modify-write is <code>weakCompareAndSetPlain</code>, a CAS that may fail spuriously.) For a hot counter the Java answer is <code>LongAdder</code>, which removes the contention instead of the ordering. The closest Java mode to relaxed is <code>VarHandle</code> opaque access (<code>getOpaque</code>, <code>setOpaque</code>).</p>
+
+<h2 id="acq-rel-for-operations-that-read-and-write">acq_rel: for operations that read and write</h2>
+<p>A read-modify-write such as <code>fetch_sub</code>, <code>exchange</code> or a compare-exchange both reads and writes. <code>memory_order_acq_rel</code> makes its read an acquire and its write a release. The textbook case is a reference count:</p>
+
+<figure class="code pair" data-sample="memory-orders.4"><figcaption><span class="ctitle">A reference count: relaxed to gain, acq_rel to drop</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="p">#include &lt;atomic&gt;</span>
+
+<span class="k">class</span> RefCount {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">retain</span>() {
+        count_.<span class="f">fetch_add</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_relaxed);   <span class="c">// gaining a reference publishes nothing</span>
+    }
+
+    <span class="c">// True for the caller that dropped the last reference: it destroys the object.</span>
+    <span class="t">bool</span> <span class="f">release</span>() {
+        <span class="c">// release half: my writes to the object happen-before the final owner's cleanup</span>
+        <span class="c">// acquire half: the final owner sees every other owner's writes before destroying</span>
+        <span class="k">return</span> count_.<span class="f">fetch_sub</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_acq_rel) == <span class="n">1</span>;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; count_{<span class="n">1</span>};
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="k">class</span> <span class="t">RefCount</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicInteger</span> count = <span class="k">new</span> <span class="t">AtomicInteger</span>(<span class="n">1</span>);
+
+    <span class="k">void</span> <span class="f">retain</span>() {
+        count.<span class="f">incrementAndGet</span>();          <span class="c">// volatile semantics: stronger than needed, always correct</span>
+    }
+
+    <span class="c">// True for the caller that dropped the last reference: it frees the resource.</span>
+    <span class="t">boolean</span> <span class="f">release</span>() {
+        <span class="k">return</span> count.<span class="f">decrementAndGet</span>() == <span class="n">0</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Why each half matters: every owner may have written to the shared object before letting go, and the last owner is about to destroy it. The release on each decrement and the acquire on the final one connect all of those writes to the destruction, through the chain of read-modify-writes on the same counter. (Library implementations often use a release decrement plus an acquire fence only when the count hits zero, which is the same idea, slightly cheaper.)</p>
+<p>Compare-exchange takes two orders: one for success and one for failure. <code>head.compare_exchange_weak(expected, node, std::memory_order_release, std::memory_order_relaxed)</code> publishes a new node only when the CAS succeeds; a failed attempt just reloads <code>expected</code>. The failure order applies to that reload, so it may not be release or acq_rel. If you pass only one order, the failure order is derived from it: <code>acq_rel</code> becomes <code>acquire</code> and <code>release</code> becomes <code>relaxed</code>. You will use exactly this in the <a href="lock-free-stack-and-aba.html">lock-free stack</a>.</p>
+
+<h2 id="consume-and-why-it-is-discouraged">consume, and why it is discouraged</h2>
+<p><code>memory_order_consume</code> was meant to be a cheaper acquire for pointer publishing: order only the reads that depend on the loaded pointer (like <code>p-&gt;field</code>), which ARM and POWER hardware already orders for free. The trouble is that compilers optimize away dependencies all the time (replacing <code>p-&gt;field</code> with a value they can prove, for example), and no compiler found a practical way to track them. Every major compiler simply treats consume as acquire, and C++17 formally discouraged its use. If you see it in an interview, say that, and use acquire.</p>
+
+<h2 id="fences">Fences</h2>
+<p>A <a class="term" data-term="memory-fence" href="glossary.html#memory-fence">memory fence</a>, <code>std::atomic_thread_fence(order)</code> in C++, is ordering without an atomic operation attached. A release fence followed by a relaxed store behaves like a release store; a relaxed load followed by an acquire fence behaves like an acquire load. The useful trick: poll with cheap relaxed loads, and pay for one acquire fence only after the loop exits.</p>
+
+<figure class="code pair" data-sample="memory-orders.5"><figcaption><span class="ctitle">Relaxed polling, one fence after the loop</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;atomic&gt;</span>
+
+<span class="k">class</span> FencedMailbox {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">send</span>(<span class="t">int</span> value) {
+        payload_ = value;
+        <span class="t">std</span>::<span class="f">atomic_thread_fence</span>(<span class="t">std</span>::memory_order_release);   <span class="c">// everything above stays above...</span>
+        ready_.<span class="f">store</span>(<span class="k">true</span>, <span class="t">std</span>::memory_order_relaxed);         <span class="c">// ...this relaxed store</span>
+    }
+
+    <span class="t">int</span> <span class="f">receive</span>() {
+        <span class="k">while</span> (!ready_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed)) {      <span class="c">// cheap polling</span>
+        }
+        <span class="t">std</span>::<span class="f">atomic_thread_fence</span>(<span class="t">std</span>::memory_order_acquire);   <span class="c">// one acquire, after the loop</span>
+        <span class="k">return</span> payload_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">int</span> payload_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; ready_{<span class="k">false</span>};
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="k">import</span> java.lang.invoke.<span class="t">MethodHandles</span>;
+<span class="k">import</span> java.lang.invoke.<span class="t">VarHandle</span>;
+
+<span class="k">class</span> <span class="t">FencedMailbox</span> {
+    <span class="k">private</span> <span class="t">int</span> payload;                                   <span class="c">// plain data</span>
+    <span class="k">private</span> <span class="t">boolean</span> ready;                                 <span class="c">// accessed only through READY</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">VarHandle</span> READY;
+
+    <span class="k">static</span> {
+        <span class="k">try</span> {
+            READY = <span class="t">MethodHandles</span>.<span class="f">lookup</span>().<span class="f">findVarHandle</span>(<span class="t">FencedMailbox</span>.<span class="k">class</span>, <span class="s">"ready"</span>, <span class="t">boolean</span>.<span class="k">class</span>);
+        } <span class="k">catch</span> (<span class="t">ReflectiveOperationException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ExceptionInInitializerError</span>(e);
+        }
+    }
+
+    <span class="k">void</span> <span class="f">send</span>(<span class="t">int</span> value) {
+        payload = value;
+        <span class="t">VarHandle</span>.<span class="f">releaseFence</span>();                          <span class="c">// everything above stays above...</span>
+        READY.<span class="f">setOpaque</span>(<span class="k">this</span>, <span class="k">true</span>);                       <span class="c">// ...this opaque (relaxed) write</span>
+    }
+
+    <span class="t">int</span> <span class="f">receive</span>() {
+        <span class="k">while</span> (!(<span class="t">boolean</span>) READY.<span class="f">getOpaque</span>(<span class="k">this</span>)) {         <span class="c">// cheap polling</span>
+            <span class="t">Thread</span>.<span class="f">onSpinWait</span>();
+        }
+        <span class="t">VarHandle</span>.<span class="f">acquireFence</span>();                          <span class="c">// one acquire, after the loop</span>
+        <span class="k">return</span> payload;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>A seq_cst fence between the store and the load in each thread also fixes store buffering, even with relaxed operations. <code>std::atomic_signal_fence</code> orders only against a signal handler on the same thread, so it constrains the compiler and emits no CPU instruction. In application code fences are rare; you meet them inside libraries, lock implementations and lock-free queues.</p>
+
+<h2 id="how-java-maps">How Java maps</h2>
+<table>
+<thead><tr><th>C++</th><th>Java</th></tr></thead>
+<tbody>
+<tr><td>Non-atomic access</td><td>Plain field access (but a race in Java is weak, not undefined behavior)</td></tr>
+<tr><td><code>relaxed</code> load and store</td><td><code>VarHandle</code> <code>getOpaque</code> and <code>setOpaque</code>, roughly</td></tr>
+<tr><td><code>acquire</code> load, <code>release</code> store</td><td><code>getAcquire</code>, <code>setRelease</code> (on <code>VarHandle</code> and on <code>AtomicXxx</code>); <code>lazySet</code> is the old name for <code>setRelease</code></td></tr>
+<tr><td><code>seq_cst</code> load and store</td><td>A volatile read and write; <code>AtomicXxx.get</code> and <code>set</code>; <code>getVolatile</code> and <code>setVolatile</code></td></tr>
+<tr><td><code>seq_cst</code> read-modify-write</td><td><code>incrementAndGet</code>, <code>getAndAdd</code>, <code>compareAndSet</code> on the atomic classes</td></tr>
+<tr><td>Acquire or release read-modify-write</td><td><code>VarHandle</code> <code>getAndAddAcquire</code>, <code>getAndAddRelease</code>, <code>compareAndExchangeAcquire</code>, <code>weakCompareAndSetRelease</code> and friends</td></tr>
+<tr><td>Relaxed compare-exchange</td><td><code>weakCompareAndSetPlain</code></td></tr>
+<tr><td><code>atomic_thread_fence</code></td><td><code>VarHandle.fullFence()</code>, <code>acquireFence()</code>, <code>releaseFence()</code></td></tr>
+<tr><td><code>consume</code></td><td>No equivalent</td></tr>
+</tbody>
+</table>
+<p>The one sentence to remember: <strong>Java volatile behaves like C++ seq_cst</strong>, and <code>setRelease</code> with <code>getAcquire</code> is C++ release and acquire.</p>
+
+<div class="box example">
+<h3>Worked example: a single producer, single consumer ring buffer</h3>
+<p>With exactly one producer thread and one consumer thread, a bounded queue needs no lock. The producer is the only writer of <code>tail</code> and the consumer the only writer of <code>head</code>, so each index has a single writer. Every slot is a little message passing problem: the producer fills it and then publishes it by advancing <code>tail</code>; the consumer reads it and then hands it back by advancing <code>head</code>.</p>
+
+<figure class="code pair" data-sample="memory-orders.6" data-expect="ok"><figcaption><span class="ctitle">Lock-free SPSC ring buffer with acquire and release</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61</span><code><span class="p">#include &lt;array&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="c">// Exactly one producer thread and one consumer thread.</span>
+<span class="k">template</span> &lt;<span class="k">class</span> T, <span class="t">std</span>::<span class="t">size_t</span> N&gt;
+<span class="k">class</span> SpscRing {
+<span class="k">public</span>:
+    <span class="t">bool</span> <span class="f">try_push</span>(<span class="k">const</span> T&amp; value) {
+        <span class="t">std</span>::<span class="t">size_t</span> tail = tail_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed);   <span class="c">// only the producer writes tail</span>
+        <span class="k">if</span> (tail - head_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire) == N) {
+            <span class="k">return</span> <span class="k">false</span>;                                           <span class="c">// full</span>
+        }
+        slots_[tail % N] = value;                                   <span class="c">// fill the slot...</span>
+        tail_.<span class="f">store</span>(tail + <span class="n">1</span>, <span class="t">std</span>::memory_order_release);           <span class="c">// ...then publish it</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">try_pop</span>() {
+        <span class="t">std</span>::<span class="t">size_t</span> head = head_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed);   <span class="c">// only the consumer writes head</span>
+        <span class="k">if</span> (head == tail_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire)) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;                                    <span class="c">// empty</span>
+        }
+        T value = slots_[head % N];                                 <span class="c">// read the slot...</span>
+        head_.<span class="f">store</span>(head + <span class="n">1</span>, <span class="t">std</span>::memory_order_release);           <span class="c">// ...then hand it back</span>
+        <span class="k">return</span> value;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">array</span>&lt;T, N&gt; slots_{};
+    <span class="k">alignas</span>(<span class="n">64</span>) <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt; head_{<span class="n">0</span>};                  <span class="c">// next slot to read</span>
+    <span class="k">alignas</span>(<span class="n">64</span>) <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt; tail_{<span class="n">0</span>};                  <span class="c">// next slot to write</span>
+};
+
+SpscRing&lt;<span class="t">long</span>, <span class="n">1024</span>&gt; ring;                                          <span class="c">// static storage, shared by both threads</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">constexpr</span> <span class="t">long</span> kCount = <span class="n">200000</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">producer</span>([] {
+        <span class="k">for</span> (<span class="t">long</span> i = <span class="n">1</span>; i &lt;= kCount; i += <span class="n">1</span>) {
+            <span class="k">while</span> (!ring.<span class="f">try_push</span>(i)) { <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>(); }   <span class="c">// full: let the consumer run</span>
+        }
+    });
+    <span class="t">long</span> expected = <span class="n">1</span>, sum = <span class="n">0</span>;
+    <span class="t">bool</span> in_order = <span class="k">true</span>;
+    <span class="k">while</span> (expected &lt;= kCount) {
+        <span class="k">if</span> (<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">long</span>&gt; v = ring.<span class="f">try_pop</span>()) {
+            in_order = in_order &amp;&amp; *v == expected;
+            sum += *v;
+            expected += <span class="n">1</span>;
+        } <span class="k">else</span> {
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>();                                 <span class="c">// empty: let the producer run</span>
+        }
+    }
+    producer.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"received "</span> &lt;&lt; kCount &lt;&lt; <span class="s">" values, in order: "</span> &lt;&lt; <span class="t">std</span>::boolalpha &lt;&lt; in_order
+              &lt;&lt; <span class="s">", sum "</span> &lt;&lt; sum &lt;&lt; <span class="s">" (expected "</span> &lt;&lt; kCount * (kCount + <span class="n">1</span>) / <span class="n">2</span> &lt;&lt; <span class="s">")\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</span><code><span class="k">import</span> java.util.<span class="t">OptionalLong</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="c">// Exactly one producer thread and one consumer thread.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">SpscRing</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">long</span>[] slots;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> head = <span class="k">new</span> <span class="t">AtomicLong</span>();    <span class="c">// next slot to read</span>
+        <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> tail = <span class="k">new</span> <span class="t">AtomicLong</span>();    <span class="c">// next slot to write</span>
+
+        <span class="t">SpscRing</span>(<span class="t">int</span> capacity) { slots = <span class="k">new</span> <span class="t">long</span>[capacity]; }
+
+        <span class="t">boolean</span> <span class="f">tryPush</span>(<span class="t">long</span> value) {
+            <span class="t">long</span> t = tail.<span class="f">getPlain</span>();                          <span class="c">// only the producer writes tail</span>
+            <span class="k">if</span> (t - head.<span class="f">getAcquire</span>() == slots.length) <span class="k">return</span> <span class="k">false</span>;    <span class="c">// full</span>
+            slots[(<span class="t">int</span>) (t % slots.length)] = value;           <span class="c">// fill the slot...</span>
+            tail.<span class="f">setRelease</span>(t + <span class="n">1</span>);                            <span class="c">// ...then publish it</span>
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+
+        <span class="t">OptionalLong</span> <span class="f">tryPop</span>() {
+            <span class="t">long</span> h = head.<span class="f">getPlain</span>();                          <span class="c">// only the consumer writes head</span>
+            <span class="k">if</span> (h == tail.<span class="f">getAcquire</span>()) <span class="k">return</span> <span class="t">OptionalLong</span>.<span class="f">empty</span>();     <span class="c">// empty</span>
+            <span class="t">long</span> value = slots[(<span class="t">int</span>) (h % slots.length)];      <span class="c">// read the slot...</span>
+            head.<span class="f">setRelease</span>(h + <span class="n">1</span>);                            <span class="c">// ...then hand it back</span>
+            <span class="k">return</span> <span class="t">OptionalLong</span>.<span class="f">of</span>(value);
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">final</span> <span class="t">long</span> count = <span class="n">200_000</span>;
+        <span class="t">SpscRing</span> ring = <span class="k">new</span> <span class="t">SpscRing</span>(<span class="n">1024</span>);
+        <span class="t">Thread</span> producer = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">for</span> (<span class="t">long</span> i = <span class="n">1</span>; i &lt;= count; i += <span class="n">1</span>) {
+                <span class="k">while</span> (!ring.<span class="f">tryPush</span>(i)) <span class="t">Thread</span>.<span class="f">onSpinWait</span>();  <span class="c">// full: wait for the consumer</span>
+            }
+        }, <span class="s">"producer"</span>);
+        producer.<span class="f">start</span>();
+        <span class="t">long</span> expected = <span class="n">1</span>, sum = <span class="n">0</span>;
+        <span class="t">boolean</span> inOrder = <span class="k">true</span>;
+        <span class="k">while</span> (expected &lt;= count) {
+            <span class="t">OptionalLong</span> v = ring.<span class="f">tryPop</span>();
+            <span class="k">if</span> (v.<span class="f">isPresent</span>()) {
+                inOrder &amp;= v.<span class="f">getAsLong</span>() == expected;
+                sum += v.<span class="f">getAsLong</span>();
+                expected += <span class="n">1</span>;
+            } <span class="k">else</span> {
+                <span class="t">Thread</span>.<span class="f">onSpinWait</span>();                           <span class="c">// empty: wait for the producer</span>
+            }
+        }
+        producer.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"received "</span> + count + <span class="s">" values, in order: "</span> + inOrder
+                + <span class="s">", sum "</span> + sum + <span class="s">" (expected "</span> + count * (count + <span class="n">1</span>) / <span class="n">2</span> + <span class="s">")"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>received 200000 values, in order: true, sum 20000100000 (expected 20000100000)</pre></div><div class="runout" hidden></div></figure>
+<p>Each order, and why it is the weakest correct one:</p>
+<ol>
+<li><strong>Producer reads its own <code>tail</code>: relaxed.</strong> Only this thread writes it, so it always sees its own last value.</li>
+<li><strong>Producer reads <code>head</code>: acquire.</strong> Pairs with the consumer's release on <code>head</code>, so the consumer's read of a slot happens-before the producer overwrites that slot.</li>
+<li><strong>Producer writes the slot, then stores <code>tail</code> with release.</strong> The slot write cannot move below the release, so the slot is full before it is published.</li>
+<li><strong>Consumer reads <code>tail</code>: acquire.</strong> Pairs with that release: the consumer sees the slot's contents.</li>
+<li><strong>Consumer reads the slot, then stores <code>head</code> with release.</strong> The read cannot move below it, so the slot is not handed back while still being read.</li>
+</ol>
+<p><strong>Try breaking it.</strong> In the C++ version, change the <code>acquire</code> on <code>tail_</code> in <code>try_pop</code> to <code>relaxed</code> and run: ThreadSanitizer reports a data race on the slot. Compiled normally with optimization, the broken ring will usually still print the right answer: in our tests on an Apple M4 it never failed in dozens of runs. That is luck, not correctness. ARM allows the CPU to perform the slot load before the load of <code>tail</code> when nothing orders the two loads, and then the consumer reads a slot the producer has not filled yet; a different chip, compiler or load can expose it. (A quiet sanitizer is evidence, not proof: ThreadSanitizer only reports races between accesses it actually saw in that run, within its limited history, so run a racy test many times before you trust silence.)</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>A relaxed "ready" flag.</strong> Relaxed orders nothing else, so the reader can see the flag and stale data. A flag that publishes data needs release on the store and acquire on the load.</li>
+<li><strong>Weakening only one side.</strong> Release with a relaxed load, or a relaxed store with an acquire load, does not synchronize. The pair must match on the same atomic variable.</li>
+<li><strong>Expecting acquire and release to fix store buffering.</strong> They do not order a store before a later load. Use seq_cst, or a seq_cst fence.</li>
+<li><strong>Invalid orders.</strong> <code>store</code> with acquire or acq_rel, <code>load</code> with release or acq_rel: undefined behavior. Clang warns; treat the warning as an error.</li>
+<li><strong>"Relaxed is faster on x86."</strong> For loads it is identical; for stores only seq_cst costs extra. The real gain from weaker orders is often compiler freedom, so measure before and after.</li>
+<li><strong>Using <code>consume</code>.</strong> It is treated as acquire everywhere and discouraged by the standard.</li>
+<li><strong>Weakening orders in code that is not on a measured hot path.</strong> The cost is subtle bugs that tests rarely catch; the benefit is often nothing.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>In application-level interviews, memory orders come up as follow ups to lock-free code: a compare-and-swap stack after a locked stack (Rubrik has asked for exactly that progression), or a single producer, single consumer ring buffer after the bounded blocking queue. Systems and C++ heavy roles may ask about them directly. The questions that come up:</p>
+<ul>
+<li>"What do acquire and release mean? Give an example." Message passing: the data, the release store of the flag, the acquire load, the guaranteed read.</li>
+<li>"Why is seq_cst the default? When would you relax it?" Safety and simple reasoning; relax only on measured hot paths with a named edge: counters, single-writer indices, reference count increments.</li>
+<li>"Which orders does this SPSC ring buffer need?" The five lines of the worked example above.</li>
+<li>"Does acquire and release prevent the store buffering outcome?" No; explain why, and how seq_cst does.</li>
+<li>"What does relaxed still guarantee?" Atomicity, no data race, and a single order of writes to that variable.</li>
+<li>"Why is consume discouraged?" Compilers cannot preserve dependencies, so they promote it to acquire.</li>
+<li>Java versions: "What is <code>lazySet</code> for?" A release store: cheaper than a volatile write when no later load needs to be ordered after it, which is why queues use it to publish slots.</li>
+</ul>
+<blockquote>I default to sequential consistency because it is easy to reason about and on x86 it only costs on stores. When I weaken it, I name the edge: here the producer publishes the slot with a release store on tail, and the consumer reads tail with an acquire load, so the slot write happens-before the slot read. Indices that only one thread writes can be read relaxed by that thread. I would not use relaxed for anything that publishes data, and acquire and release would not be enough if each thread had to see the other's write, as in Peterson's lock; that needs seq_cst.</blockquote>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>What each order compiles to.</strong> These are what clang emits for a <code>std::atomic&lt;long&gt;</code> on the two architectures you will meet (checked on this site's toolchain):</p>
+<table>
+<thead><tr><th>Operation</th><th>x86-64</th><th>ARMv8 (Apple M series)</th></tr></thead>
+<tbody>
+<tr><td>load relaxed, acquire, seq_cst</td><td><code>mov</code>, <code>mov</code>, <code>mov</code></td><td><code>ldr</code>, <code>ldapr</code>, <code>ldar</code></td></tr>
+<tr><td>store relaxed, release, seq_cst</td><td><code>mov</code>, <code>mov</code>, <code>xchg</code></td><td><code>str</code>, <code>stlr</code>, <code>stlr</code></td></tr>
+<tr><td>fetch_add relaxed, acq_rel or seq_cst</td><td><code>lock xadd</code> for all (<code>lock add</code> or <code>lock inc</code> when the result is unused)</td><td><code>ldadd</code>, <code>ldaddal</code>, <code>ldaddal</code></td></tr>
+<tr><td>fence acquire, release, seq_cst</td><td>no instruction, no instruction, <code>mfence</code></td><td><code>dmb ishld</code>, <code>dmb ish</code>, <code>dmb ish</code></td></tr>
+</tbody>
+</table>
+<p>Two things stand out. On x86 the only difference between release and seq_cst is the store, which is why the store buffering outcome is the one place x86 programs see weak ordering. On ARM, acquire uses <code>ldapr</code> while seq_cst uses <code>ldar</code>: <code>ldar</code> is guaranteed not to be reordered with an earlier <code>stlr</code>, which is exactly the store-then-load ordering that seq_cst adds.</p>
+<p><strong>Out of thin air.</strong> Relaxed atomics in theory allow a value to justify itself in a cycle (each thread reads the other's write of a value that only exists because it was read). No real hardware or compiler produces it, and the standard says implementations should not, but it is why formal reasoning about relaxed code is hard. Keep relaxed to counters and single-writer patterns where the question never arises.</p>
+<p><strong>The cost that matters.</strong> The instruction differences are a few nanoseconds; a contended cache line costs far more, an order of magnitude or two. Choosing a weaker order rarely rescues a design that has many threads writing one variable; changing the design (per-thread counters, batching) does. See <a href="caches-and-false-sharing.html">caches and false sharing</a>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Use seq_cst by default; it is the only order that gives one global order of atomic operations.</li>
+<li>Release store plus acquire load of the value it wrote creates a happens-before edge: the tool for publishing data. Both sides must use them.</li>
+<li>Acquire and release do not fix store buffering; seq_cst (or a seq_cst fence) does.</li>
+<li>Relaxed is atomic and race free but orders nothing else: right for counters, ids and a thread's own index.</li>
+<li>acq_rel is for read-modify-writes that both receive and publish, like the last reference count decrement. Avoid consume.</li>
+<li>Java volatile is like seq_cst; <code>setRelease</code> and <code>getAcquire</code> are release and acquire; Java has no relaxed add, so hot counters use <code>LongAdder</code>.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="memory-orders"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="memory-orders.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The writer runs <code>data = 42; ready.store(true, release);</code> (Java: <code>READY.setRelease(this, true)</code>). The reader runs <code>if (ready.load(acquire)) print(data);</code> (Java: <code>getAcquire</code>). <code>data</code> is a plain variable. What can the reader print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">42, 0, or nothing</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">42 or nothing</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only 42</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only nothing</span></button></li></ol><div class="why" hidden><strong>Why.</strong> If the acquire load reads true, it read the value written by the release store, so the release synchronizes with it and <code>data = 42</code> happens-before the read of <code>data</code>. If it reads false, nothing is printed. 0 would require the pair to be broken.</div></div><div class="mcq" data-id="memory-orders.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Same program, but the reader loads <code>ready</code> with relaxed ordering (Java: <code>getOpaque</code>); the writer still uses release. What can the reader print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">42 or nothing, because the writer used release</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">42, 0, or nothing</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only 42</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The program does not compile</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Synchronizes-with needs a release on the writer and an acquire on the reader. With a relaxed load, the reader's read of <code>data</code> may be performed before its read of <code>ready</code>, so it can see the flag and old data. In C++ the unordered access to <code>data</code> is also a data race.</div></div><div class="mcq" data-id="memory-orders.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the store buffering test, A runs <code>x.store(1, release); r1 = y.load(acquire);</code> and B runs <code>y.store(1, release); r2 = x.load(acquire);</code> (Java: <code>setRelease</code> and <code>getAcquire</code>). Can r1 == 0 and r2 == 0?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No, acquire and release forbid all reordering</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: a release store followed by an acquire load to another variable may be reordered</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only on ARM, never on x86</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only if the variables are not atomic</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Release only holds back earlier operations and acquire only holds back later ones, so neither stops a load from passing an earlier store. On x86 both compile to plain moves and the store buffer produces exactly this outcome. seq_cst on all four operations, or a seq_cst fence between each store and load, forbids it.</div></div><div class="mcq" data-id="memory-orders.q4" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">What does a relaxed atomic operation still guarantee? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The operation is indivisible: no torn values, and <code>fetch_add</code> never loses an increment</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Accessing the variable this way is never a data race</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">All threads agree on one order of the writes to that particular variable</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Writes to other variables made before it are visible to a thread that reads its value</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">It synchronizes with an acquire load of the same variable</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Relaxed keeps atomicity, race freedom and per-variable coherence (a single modification order). It gives no ordering of other memory, and on its own it never synchronizes with anything, so it cannot publish data. (A release fence placed before a relaxed store can carry an edge, but then the fence does the synchronizing, not the relaxed operation.)</div></div><div class="mcq" data-id="memory-orders.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Eight threads increment a statistics counter in a hot loop, and the main thread reads the total only after joining all of them. Which order is enough for the increments (C++), or which tool fits best (Java)?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">seq_cst, because the total must be exact</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">acq_rel, because each increment both reads and writes</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">relaxed in C++ (or <code>LongAdder</code> in Java): atomicity keeps the count exact and the joins provide the ordering</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No atomic at all, because the joins make it safe</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Exactness comes from the atomic read-modify-write, not from ordering; the join gives main a happens-before edge to every increment. A plain non-atomic variable would lose increments while the threads run. Java has no relaxed add, so <code>LongAdder</code> (which also removes contention) is the idiomatic choice.</div></div><div class="mcq" data-id="memory-orders.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why is <code>memory_order_consume</code> discouraged?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is slower than seq_cst on every platform</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Compilers cannot practically preserve the data dependencies it relies on, so they all implement it as acquire</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It was removed in C++11</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It only works on x86</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Consume orders only reads that depend on the loaded value, which ARM and POWER give for free. But optimizers routinely break or replace dependencies, so no mainstream compiler implements consume as specified; they promote it to acquire, and C++17 discouraged its use.</div></div><div class="mcq" data-id="memory-orders.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Which Java operation corresponds to a C++ release store?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A plain field write</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>setRelease</code> on a <code>VarHandle</code> or an atomic class (its older name is <code>lazySet</code>)</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A volatile write, and only a volatile write</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>VarHandle.fullFence()</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>setRelease</code> (and <code>lazySet</code>, which is documented with the same memory effects) keeps earlier accesses before the store without the full fence a volatile write needs. A volatile write is stronger: it behaves like a seq_cst store. A plain write has no ordering at all.</div></div><div class="mcq" data-id="memory-orders.q8" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>A reader polls <code>while (!ready.load(std::memory_order_relaxed)) {}</code> and then reads plain <code>data</code>. The writer did <code>data = 42; ready.store(true, std::memory_order_release);</code>. Where must the reader add a fence so it is guaranteed to see 42?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>std::atomic_thread_fence(std::memory_order_acquire)</code> before the loop</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>std::atomic_thread_fence(std::memory_order_acquire)</code> after the loop, before reading <code>data</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::atomic_thread_fence(std::memory_order_release)</code> after the loop</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No fence is needed, because the writer used release</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A relaxed load that reads the released value, followed by an acquire fence, synchronizes with the release store. The fence must come after the load that saw <code>true</code> and before the reads it protects. A fence before the loop orders nothing useful, and without any acquire the pair is broken.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="memory-orders.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">You are given a single producer, single consumer ring buffer with indices <code>head</code> (written only by the consumer) and <code>tail</code> (written only by the producer). Write <code>push</code> and <code>pop</code> with the weakest correct memory orders in your language, and justify each one in a sentence.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="memory-orders.7"><figcaption><span class="ctitle">SPSC push and pop with justified orders</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code><span class="p">#include &lt;array&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> T, <span class="t">std</span>::<span class="t">size_t</span> N&gt;
+<span class="k">class</span> SpscRing {
+<span class="k">public</span>:
+    <span class="t">bool</span> <span class="f">push</span>(<span class="k">const</span> T&amp; value) {
+        <span class="t">std</span>::<span class="t">size_t</span> t = tail_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed);   <span class="c">// own index</span>
+        <span class="k">if</span> (t - head_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire) == N) {    <span class="c">// acquire: freed slots are really free</span>
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        slots_[t % N] = value;
+        tail_.<span class="f">store</span>(t + <span class="n">1</span>, <span class="t">std</span>::memory_order_release);           <span class="c">// release: publish the filled slot</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">pop</span>() {
+        <span class="t">std</span>::<span class="t">size_t</span> h = head_.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed);   <span class="c">// own index</span>
+        <span class="k">if</span> (h == tail_.<span class="f">load</span>(<span class="t">std</span>::memory_order_acquire)) {        <span class="c">// acquire: see the slot's contents</span>
+            <span class="k">return</span> <span class="t">std</span>::nullopt;
+        }
+        T value = slots_[h % N];
+        head_.<span class="f">store</span>(h + <span class="n">1</span>, <span class="t">std</span>::memory_order_release);           <span class="c">// release: done reading this slot</span>
+        <span class="k">return</span> value;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">array</span>&lt;T, N&gt; slots_{};
+    <span class="k">alignas</span>(<span class="n">64</span>) <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt; head_{<span class="n">0</span>};
+    <span class="k">alignas</span>(<span class="n">64</span>) <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt; tail_{<span class="n">0</span>};
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="k">import</span> java.util.<span class="t">OptionalLong</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="k">class</span> <span class="t">SpscRing</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">long</span>[] slots;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> head = <span class="k">new</span> <span class="t">AtomicLong</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> tail = <span class="k">new</span> <span class="t">AtomicLong</span>();
+
+    <span class="t">SpscRing</span>(<span class="t">int</span> capacity) { slots = <span class="k">new</span> <span class="t">long</span>[capacity]; }
+
+    <span class="t">boolean</span> <span class="f">push</span>(<span class="t">long</span> value) {
+        <span class="t">long</span> t = tail.<span class="f">getPlain</span>();                         <span class="c">// own index: no ordering needed</span>
+        <span class="k">if</span> (t - head.<span class="f">getAcquire</span>() == slots.length) {      <span class="c">// acquire: consumer finished reading freed slots</span>
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        slots[(<span class="t">int</span>) (t % slots.length)] = value;
+        tail.<span class="f">setRelease</span>(t + <span class="n">1</span>);                           <span class="c">// release: slot write before publication</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">OptionalLong</span> <span class="f">pop</span>() {
+        <span class="t">long</span> h = head.<span class="f">getPlain</span>();                         <span class="c">// own index</span>
+        <span class="k">if</span> (h == tail.<span class="f">getAcquire</span>()) {                     <span class="c">// acquire: see the producer's slot write</span>
+            <span class="k">return</span> <span class="t">OptionalLong</span>.<span class="f">empty</span>();
+        }
+        <span class="t">long</span> value = slots[(<span class="t">int</span>) (h % slots.length)];
+        head.<span class="f">setRelease</span>(h + <span class="n">1</span>);                           <span class="c">// release: slot read before handing it back</span>
+        <span class="k">return</span> <span class="t">OptionalLong</span>.<span class="f">of</span>(value);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Justification: each thread reads its own index relaxed because it is the only writer. The producer's release on <code>tail</code> pairs with the consumer's acquire on <code>tail</code>, so the slot write happens-before the slot read. The consumer's release on <code>head</code> pairs with the producer's acquire on <code>head</code>, so the slot read happens-before the producer reuses the slot. Anything weaker breaks one of those two edges; anything stronger is correct but unnecessary. In C++ the two indices are aligned apart so the producer and consumer do not fight over one cache line: 64 bytes is the line size on x86, but Apple M chips use 128 byte lines, so a portable version uses <code>alignas(128)</code>.</p></div></div><div class="cq" data-q="memory-orders.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "Why does std::atomic default to seq_cst? Give me two cases where you would weaken it and one where you must not." Answer as you would out loud.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>seq_cst is the default because it is the only order under which a race free program behaves as a simple interleaving: every seq_cst operation is part of one global order that all threads agree on, so I can reason about the code like single-threaded steps taken in turns. Its cost is modest: on x86 only seq_cst stores cost extra, an xchg instead of a mov, and on ARM it is ldar and stlr.</p>
+<p>I would weaken it in two common places. A statistics counter that is read after joining the workers can use relaxed fetch_add: atomicity keeps it exact and the join provides the ordering. And a single producer, single consumer queue can use release on the index store that publishes a slot and acquire on the load that consumes it, with relaxed reads of each thread's own index. I must not weaken it when each thread has to see the other's write, the store buffering shape, as in Dekker's or Peterson's lock or "set my flag, then check yours": release and acquire allow both threads to read the old value, so that needs seq_cst on all four operations or a seq_cst fence between the store and the load. And I would only weaken anything after measuring, because the bugs are rare and hardware dependent.</p></div></div><div class="cq" data-q="memory-orders.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain acquire and release to an interviewer with a concrete example, and then say precisely what they do not guarantee.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Release and acquire are a pair of one-way barriers used to hand data from one thread to another. The writer prepares data with ordinary writes and then stores a flag with release: no earlier read or write may be moved after that store. The reader loads the flag with acquire: no later read or write may be moved before that load. If the acquire load reads the value the release store wrote, the store synchronizes with the load, so everything the writer did before the store happens-before everything the reader does after the load. For example, the writer fills a config object and stores ready = true with release; a reader that loads ready == true with acquire is guaranteed to see the filled object. In Java that is a volatile flag, or setRelease and getAcquire.</p>
+<p>What they do not guarantee: they do not order a release store with a later acquire load in the same thread, so in the store buffering test both threads can still read 0; they give no single global order of operations, so two readers can disagree about the order of two independent writes on some hardware; and they only work as a pair on the same variable, with the reader actually reading the released value. A relaxed load on the reader's side, or a release on a different variable, gives no edge.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="memory-orders.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Walk me through the C++ memory orders you actually use. What does each one buy you, and how do you decide which one to put on an atomic?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>seq_cst is the default: acquire and release, plus one total order of seq_cst operations that every thread agrees on</li><li>A release store and an acquire load that reads its value form a happens-before edge: the tool for publishing data</li><li>Relaxed keeps the operation atomic and keeps one order of writes to that variable, but orders nothing else: counters, ids, a thread's own index</li><li>acq_rel is for read-modify-writes that both receive and publish, such as the last reference count decrement</li><li>Acquire and release do not stop a store from passing a later load, so "set my flag, then check yours" needs seq_cst</li><li>Weaken the default only on a measured hot path, naming the exact edge you need</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I use four of the six, and I start from the default. seq_cst gives acquire and release, plus one total order of all seq_cst operations that every thread agrees on, so I can reason about the code as a simple interleaving. When one thread hands data to another, a pair is enough: the writer fills the data and stores a flag with release, and the reader loads the flag with acquire. If the load sees the stored value, everything before the store happens before everything after the load. Relaxed keeps the operation atomic and keeps one order of writes to that one variable, but it orders nothing else, so it fits a counter read after a join, a unique id, or a thread reading its own index. acq_rel is for a read-modify-write that both receives and publishes, like the final reference count decrement. The trap is that acquire and release do not stop a store from passing a later load, so anything shaped like "I set my flag, then I check yours" needs seq_cst. And I weaken the default only on a measured hot path, where I can name the edge.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Which order would you put on each index load and store in a single producer, single consumer ring buffer?</span></p></div></div><div class="sq" data-sq="memory-orders.s2" data-seconds="85"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 85 s</span></div><div class="qtext">"Here is a symptom: a lock-free queue passes every test on our x86 laptops, but on the ARM build servers a consumer very occasionally reads an old value from a slot. The producer writes the slot and then stores the tail index with <code>memory_order_relaxed</code>. What is going on, and how do you fix it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>The relaxed tail store publishes nothing: there is no edge from the slot write to the consumer's slot read</li><li>ARM may reorder accesses to different addresses, and so may the compiler; x86 keeps stores in order and loads in order, which hid the bug</li><li>In C++ it is a data race on the slot, so the code was broken on every platform, tests or not</li><li>Fix: release on the producer's tail store, acquire on the consumer's tail load</li><li>The head index needs the same pair in the other direction, so a slot is not reused while it is still being read</li><li>Prove it with ThreadSanitizer and a stress run on ARM, not a green x86 run</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The tail index is the flag that publishes the slot, and a relaxed store publishes nothing. Relaxed keeps the index itself atomic, but it does not keep the slot write before it, so on ARM the consumer can see the new tail and still read the old slot. ARM may reorder accesses to different addresses when nothing orders them, and the compiler may too. On x86 the hardware keeps stores in order with each other and loads in order with each other, so the bug hid there, but it was always a bug: in C++ it is a data race on the slot, which is undefined behaviour. The fix is a matched pair. The producer stores tail with release after filling the slot, and the consumer loads tail with acquire before reading it. The same reasoning runs the other way: the consumer stores head with release after reading the slot, and the producer loads head with acquire before reusing it. Then I would prove it with ThreadSanitizer, which sees the missing edge on any machine, and a long stress run on the ARM servers.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why not just make every operation seq_cst and stop worrying?</span></p></div></div><div class="sq" data-sq="memory-orders.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Why can a reference count increment be relaxed, while the decrement needs acquire and release?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Gaining a reference publishes nothing: the caller already holds one, so only exactness matters, and relaxed keeps the count exact</li><li>Each owner may have written to the object; the release half of its decrement keeps those writes before the decrement</li><li>The owner that takes the count to zero needs the acquire half to see every other owner's writes before it destroys the object</li><li>The decrements are read-modify-writes on one variable, so they form a chain that carries each release to the final acquire</li><li>Libraries often use a release decrement plus an acquire fence only on the path that reaches zero</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Because the increment publishes nothing and the decrement publishes everything. To increment, I must already hold a reference, so the object is already safely visible to me. All that matters is that the count stays exact, and relaxed atomicity gives me that. The decrement is different. Every owner may have written to the object before letting go, and the last owner is about to destroy it. The release half of each decrement keeps that owner's writes before its decrement. The acquire half of the final decrement, the one that sees the count reach zero, makes all of those writes visible before the destructor runs. It works across many owners because the decrements are read-modify-writes on one variable, so they form a chain that carries each release forward to the final acquire. Libraries often save a little by using a release decrement and an acquire fence only on the path that hits zero. Without the acquire, the destructor could run before another owner's last writes are visible to it.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How does <code>std::shared_ptr</code> use this, and is one <code>shared_ptr</code> object safe to read and reassign from two threads?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-lock-free-stack.html" data-problem="lock-free-stack"><span class="pk">Build a primitive · senior</span><b>A lock-free stack</b><span class="pst"></span></a><a class="pcard" href="p-ring-buffer-queue.html" data-problem="ring-buffer-queue"><span class="pk">Thread-safe structures · medium</span><b>Ring buffer blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="volatile-and-atomic.html"><span>Previous</span><b>volatile in Java, std::atomic in C++</b></a><a class="next" href="safe-publication.html"><span>Next</span><b>Safe publication, immutability and final fields</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#six-orders-and-the-three-you-will-use">Six orders, and the three you will use</a><a href="#seq-cst-the-default">seq_cst: the default</a><a href="#acquire-and-release-message-passing-done-right">Acquire and release: message passing done right</a><a href="#what-acquire-and-release-do-not-give-you">What acquire and release do not give you</a><a href="#relaxed-atomic-and-nothing-else">relaxed: atomic, and nothing else</a><a href="#acq-rel-for-operations-that-read-and-write">acq_rel: for operations that read and write</a><a href="#consume-and-why-it-is-discouraged">consume, and why it is discouraged</a><a href="#fences">Fences</a><a href="#how-java-maps">How Java maps</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

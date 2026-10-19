@@ -1,0 +1,515 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Distributed locks, leases and fencing tokens · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="distributed-locks-and-fencing" data-title="Distributed locks, leases and fencing tokens" data-track="core" data-module="core-16" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details open><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing" class=here><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m16">Module 16: Concurrency across machines</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 16.4</span><span>27 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Distributed locks, leases and fencing tokens</h1><p class="lsum">Understand expired leases, reject stale writes with fencing tokens, and choose between coordination services and database constraints.</p><div class="asked"><span>Asked at</span><span class="co">Amazon</span><span class="co">Bloomberg</span></div><div class="prereq"><span>Before this:</span><a href="optimistic-vs-pessimistic.html">Optimistic versus pessimistic concurrency control</a><a href="idempotency-and-exactly-once.html">Idempotency, retries and exactly-once effects</a><a href="mutex-basics.html">Mutexes and RAII guards</a></div></header><article class="prose" id="article">
+<p class="lead">A local mutex stays locked when its owner pauses. A lease across machines can expire during that pause, letting a replacement start while the old worker still believes it owns the resource. Correctness depends on what the resource accepts when that worker resumes.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A hotel room key card stops working at checkout time. That is a <strong>lease</strong>: access that expires on its own, so a guest who vanishes does not keep the room forever. But suppose a guest oversleeps past checkout and the room is given to someone new. The old guest wakes up, still holding a card, and walks to the door.</p>
+<p>Imagine the door tracks a card issue number: once it has seen card 34, it refuses card 33. The door, not the guest, decides. That issue number is a <a class="term" data-term="fencing-token" href="glossary.html#fencing-token">fencing token</a>, and the idea that <strong>the protected resource must reject stale holders</strong> is the heart of this lesson.</p>
+</div>
+
+<h2 id="what-breaks-when-the-lock-lives-on-another-machine">What breaks when the lock lives on another machine</h2>
+<p>A <a class="term" data-term="distributed-lock" href="glossary.html#distributed-lock">distributed lock</a> is a lock held in a separate service (Redis, ZooKeeper, etcd, a database row) so that processes on different machines can exclude each other. Remote coordination must handle these failures independently of the protected resource:</p>
+<ul>
+<li><strong>The holder can die while holding it.</strong> A crashed client never releases its remote lock. Recovery needs a lease, session expiry or another safe revocation protocol.</li>
+<li><strong>The holder can pause without knowing.</strong> A stop-the-world garbage collection, a virtual machine being migrated, heavy swapping or a laptop lid closing can freeze a process for seconds. When it resumes, it carries on from the next line of code.</li>
+<li><strong>Messages can be delayed.</strong> A write sent while you held the lock can sit in a network buffer and arrive after you lost it.</li>
+<li><strong>Clocks disagree.</strong> "Expires in 10 seconds" is measured by two machines, whose clocks run at slightly different rates and can be stepped by time synchronization.</li>
+</ul>
+<p>A linearizable lock service can grant only one valid lease at a time. It cannot force a paused client to stop executing when that lease expires. <strong>One valid owner does not imply one active worker.</strong> Local threads can pause or die too, but a normal <code>std::mutex</code> is not automatically reassigned while its owner is paused.</p>
+
+<h2 id="leases-locks-that-expire">Leases: locks that expire</h2>
+<p>A <a class="term" data-term="lease" href="glossary.html#lease">lease</a> is a lock with a time limit. The holder must renew it (a heartbeat, for example every third of the lease time) to keep it; if the holder dies, renewals stop, the lease expires, and someone else can take over. Expiry lets a replacement take over after a crashed holder. A paused holder creates the same takeover opportunity without actually stopping the old program.</p>
+<figure class="timeline"><figcaption>The paused holder</figcaption><div class="tl c4"><div class="tl-head"><span class="t">step</span><span>Client 1</span><span>Lock service</span><span>Client 2</span><span>Storage</span></div><div class="tl-row"><span class="t">1</span><span class="cell">acquires the lock, lease 10 s</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">2</span><span class="cell risk">stop-the-world GC pause begins</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">no renewal: lease expires at 10 s</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">acquires the lock</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">writes its data</span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell good">has client 2&#x27;s data</span></div><div class="tl-row"><span class="t">7</span><span class="cell">GC pause ends: still believes it holds the lock</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">8</span><span class="cell">writes its data</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">9</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">client 1 overwrites client 2: corrupted</span></div><div class="tl-note">Expiry permits takeover; it does not cancel the old worker or its queued writes.</div></div></figure>
+<p>The obvious patch, "check that my lease is still valid right before writing", does not work. It is a check-then-act with a gap, and the pause can land in the gap: the check passes, the process freezes, and the write happens much later. A holder should stop starting work before its local deadline: time from before sending the acquire request, subtract acquisition latency and a safety margin, and use a monotonic clock with suitable drift and suspend behaviour. This reduces stale requests but cannot retract a write already in flight.</p>
+
+<h2 id="fencing-tokens-let-the-resource-say-no">Fencing tokens: let the resource say no</h2>
+<p>The fix moves the decision to the resource. Each successful ownership grant for that resource gets a strictly increasing token, and the holder includes it with every write. The resource atomically compares the token, records its maximum and applies the effect; it rejects smaller tokens. The token counter and the resource's accepted maximum must survive failover, and every write path must enforce the check.</p>
+
+<figure class="code pair" data-sample="distributed-locks-and-fencing.1" data-expect="ok"><figcaption><span class="ctitle">A stale holder, fenced off by its token</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;latch&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="c">// A lock service that grants leases. Its clock is fake, so the demo is deterministic.</span>
+<span class="k">class</span> LockService {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">advanceClock</span>(<span class="t">long</span> <span class="t">seconds</span>) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        now_ += <span class="t">seconds</span>;
+    }
+
+    <span class="c">// Returns a fencing token, or -1 while someone else holds an unexpired lease.</span>
+    <span class="t">long</span> <span class="f">tryAcquire</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; client, <span class="t">long</span> leaseSeconds) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (!holder_.<span class="f">empty</span>() &amp;&amp; now_ &lt; leaseEnds_) {
+            <span class="k">return</span> -<span class="n">1</span>;
+        }
+        holder_ = client;
+        leaseEnds_ = now_ + leaseSeconds;
+        <span class="t">long</span> token = nextToken_;
+        nextToken_ += <span class="n">1</span>;                          <span class="c">// every grant gets a larger number</span>
+        <span class="k">return</span> token;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">long</span> now_ = <span class="n">0</span>;                                <span class="c">// seconds on the lock service's clock</span>
+    <span class="t">std</span>::<span class="t">string</span> holder_;
+    <span class="t">long</span> leaseEnds_ = <span class="n">0</span>;
+    <span class="t">long</span> nextToken_ = <span class="n">33</span>;
+};
+
+<span class="c">// The protected resource checks tokens: it remembers the largest one it has accepted.</span>
+<span class="k">class</span> Storage {
+<span class="k">public</span>:
+    <span class="t">bool</span> <span class="f">write</span>(<span class="t">std</span>::<span class="t">string</span> data, <span class="t">long</span> token) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (token &lt;= <span class="n">0</span> || token &lt; highestToken_) {
+            <span class="k">return</span> <span class="k">false</span>;                         <span class="c">// an older holder: fenced off</span>
+        }
+        highestToken_ = token;
+        content_.<span class="f">swap</span>(data);                      <span class="c">// no allocation after accepting the token</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">string</span> <span class="f">read</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> content_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">long</span> highestToken_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">string</span> content_;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    LockService locks;
+    Storage storage;
+    <span class="t">std</span>::<span class="t">latch</span> <span class="f">frozen</span>(<span class="n">1</span>);                         <span class="c">// client-1 has its token and stalls (C++20)</span>
+    <span class="t">std</span>::<span class="t">latch</span> <span class="f">thawed</span>(<span class="n">1</span>);                         <span class="c">// the stall ends</span>
+
+    <span class="t">bool</span> staleAccepted = <span class="k">false</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">client1</span>([&amp;] {
+        <span class="t">long</span> token = locks.<span class="f">tryAcquire</span>(<span class="s">"client-1"</span>, <span class="n">10</span>);
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"client-1 acquires the lease, token "</span> &lt;&lt; token &lt;&lt; <span class="s">"\n"</span>;
+        frozen.<span class="f">count_down</span>();
+        thawed.<span class="f">wait</span>();                            <span class="c">// stands in for a long pause</span>
+        <span class="t">bool</span> ok = storage.<span class="f">write</span>(<span class="s">"written by client-1"</span>, token);
+        staleAccepted = ok;   <span class="c">// it still thinks it holds the lock</span>
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"client-1 writes with token "</span> &lt;&lt; token &lt;&lt; <span class="s">": "</span> &lt;&lt; (ok ? <span class="s">"accepted"</span> : <span class="s">"rejected, stale token"</span>) &lt;&lt; <span class="s">"\n"</span>;
+    });
+    frozen.<span class="f">wait</span>();
+
+    locks.<span class="f">advanceClock</span>(<span class="n">15</span>);                       <span class="c">// client-1 stays frozen past its 10 second lease</span>
+    <span class="t">long</span> token2 = locks.<span class="f">tryAcquire</span>(<span class="s">"client-2"</span>, <span class="n">10</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"client-2 acquires the lease, token "</span> &lt;&lt; token2 &lt;&lt; <span class="s">"\n"</span>;
+    <span class="t">bool</span> ok2 = storage.<span class="f">write</span>(<span class="s">"written by client-2"</span>, token2);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"client-2 writes with token "</span> &lt;&lt; token2 &lt;&lt; <span class="s">": "</span> &lt;&lt; (ok2 ? <span class="s">"accepted"</span> : <span class="s">"rejected"</span>) &lt;&lt; <span class="s">"\n"</span>;
+
+    thawed.<span class="f">count_down</span>();
+    client1.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"final content: "</span> &lt;&lt; storage.<span class="f">read</span>() &lt;&lt; <span class="s">"\n"</span>;
+    <span class="k">if</span> (staleAccepted || !ok2 || storage.<span class="f">read</span>() != <span class="s">"written by client-2"</span>) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"fencing failed"</span>);
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85</span><code><span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicBoolean</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="c">// A lock service that grants leases. Its clock is fake, so the demo is deterministic.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">LockService</span> {
+        <span class="k">private</span> <span class="t">long</span> now = <span class="n">0</span>;                     <span class="c">// seconds on the lock service's clock</span>
+        <span class="k">private</span> <span class="t">String</span> holder = <span class="k">null</span>;
+        <span class="k">private</span> <span class="t">long</span> leaseEnds = <span class="n">0</span>;
+        <span class="k">private</span> <span class="t">long</span> nextToken = <span class="n">33</span>;
+
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">advanceClock</span>(<span class="t">long</span> seconds) {
+            now += seconds;
+        }
+
+        <span class="c">// Returns a fencing token, or -1 while someone else holds an unexpired lease.</span>
+        <span class="k">synchronized</span> <span class="t">long</span> <span class="f">tryAcquire</span>(<span class="t">String</span> client, <span class="t">long</span> leaseSeconds) {
+            <span class="k">if</span> (holder != <span class="k">null</span> &amp;&amp; now &lt; leaseEnds) {
+                <span class="k">return</span> -<span class="n">1</span>;
+            }
+            holder = client;
+            leaseEnds = now + leaseSeconds;
+            <span class="t">long</span> token = nextToken;
+            nextToken += <span class="n">1</span>;                       <span class="c">// every grant gets a larger number</span>
+            <span class="k">return</span> token;
+        }
+    }
+
+    <span class="c">// The protected resource checks tokens: it remembers the largest one it has accepted.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Storage</span> {
+        <span class="k">private</span> <span class="t">long</span> highestToken = <span class="n">0</span>;
+        <span class="k">private</span> <span class="t">String</span> content = <span class="s">""</span>;
+
+        <span class="k">synchronized</span> <span class="t">boolean</span> <span class="f">write</span>(<span class="t">String</span> data, <span class="t">long</span> token) {
+            <span class="k">if</span> (token &lt;= <span class="n">0</span> || token &lt; highestToken) {
+                <span class="k">return</span> <span class="k">false</span>;                     <span class="c">// an older holder: fenced off</span>
+            }
+            highestToken = token;
+            content = data;
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+
+        <span class="k">synchronized</span> <span class="t">String</span> <span class="f">read</span>() {
+            <span class="k">return</span> content;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">LockService</span> locks = <span class="k">new</span> <span class="t">LockService</span>();
+        <span class="t">Storage</span> storage = <span class="k">new</span> <span class="t">Storage</span>();
+        <span class="t">CountDownLatch</span> frozen = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);   <span class="c">// client-1 has its token and stalls</span>
+        <span class="t">CountDownLatch</span> thawed = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);   <span class="c">// the stall ends</span>
+
+        <span class="t">AtomicBoolean</span> staleAccepted = <span class="k">new</span> <span class="t">AtomicBoolean</span>();
+        <span class="t">Thread</span> client1 = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="t">long</span> token = locks.<span class="f">tryAcquire</span>(<span class="s">"client-1"</span>, <span class="n">10</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"client-1 acquires the lease, token "</span> + token);
+            frozen.<span class="f">countDown</span>();
+            <span class="k">try</span> {
+                thawed.<span class="f">await</span>();                   <span class="c">// stands in for a long GC pause</span>
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                <span class="k">return</span>;
+            }
+            <span class="t">boolean</span> ok = storage.<span class="f">write</span>(<span class="s">"written by client-1"</span>, token);
+            staleAccepted.<span class="f">set</span>(ok);   <span class="c">// it still thinks it holds the lock</span>
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"client-1 writes with token "</span> + token + <span class="s">": "</span> + (ok ? <span class="s">"accepted"</span> : <span class="s">"rejected, stale token"</span>));
+        }, <span class="s">"client-1"</span>);
+        client1.<span class="f">start</span>();
+        frozen.<span class="f">await</span>();
+
+        locks.<span class="f">advanceClock</span>(<span class="n">15</span>);                   <span class="c">// client-1 stays frozen past its 10 second lease</span>
+        <span class="t">long</span> token2 = locks.<span class="f">tryAcquire</span>(<span class="s">"client-2"</span>, <span class="n">10</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"client-2 acquires the lease, token "</span> + token2);
+        <span class="t">boolean</span> ok2 = storage.<span class="f">write</span>(<span class="s">"written by client-2"</span>, token2);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"client-2 writes with token "</span> + token2 + <span class="s">": "</span> + (ok2 ? <span class="s">"accepted"</span> : <span class="s">"rejected"</span>));
+
+        thawed.<span class="f">countDown</span>();
+        client1.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"final content: "</span> + storage.<span class="f">read</span>());
+        <span class="k">if</span> (staleAccepted.<span class="f">get</span>() || !ok2 || !storage.<span class="f">read</span>().<span class="f">equals</span>(<span class="s">"written by client-2"</span>)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"fencing failed"</span>);
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>client-1 acquires the lease, token 33
+client-2 acquires the lease, token 34
+client-2 writes with token 34: accepted
+client-1 writes with token 33: rejected, stale token
+final content: written by client-2</pre></div><div class="runout" hidden></div></figure>
+<p>The latches force the bad interleaving without sleeps. Real pauses can come from garbage collection, scheduling or suspension in either language; this in-memory simulation has no persistent token state and assumes small positive durations and no counter overflow. In C++17, where <code>std::latch</code> does not exist, a <code>std::promise&lt;void&gt;</code> and its future do the same one-shot handoff.</p>
+<p>In a database, a single-row conditional write can implement the check: <code>UPDATE reports SET body = $1, fence = $2 WHERE id = 7 AND fence &lt;= $2</code>. Initialize <code>fence</code> to a non-null value and accept only valid positive tokens; zero updated rows means either the row is absent or the predicate rejected it. A read-check-write sequence in separate requests would reintroduce the race.</p>
+<p><strong>Fencing orders ownership generations; it does not check time.</strong> If token 34 was granted but storage has only seen 32, a delayed write with 33 can still succeed. The replacement should install 34 at the resource before reading state on which its work depends, or use a resource transaction that checks current ownership. Once 34 is installed, 33 cannot overwrite it. If several rows form one invariant, guard their changes together in a transaction; separate per-row checks do not provide that atomicity.</p>
+<p>Equal tokens are allowed here so a holder can issue several writes. They do not deduplicate retries or order writes within one holder: use operation ids and, where necessary, per-operation sequence or version checks. Tokens also are not authentication; callers must not be able to invent an arbitrarily high token.</p>
+<p>Token allocation must follow the grant order and never reuse an older generation. A ZooKeeper lock node's creation transaction id (<code>czxid</code>) or an etcd lock key's creation revision can supply that order. An ordinary znode data version resets on recreation, and an unrelated database sequence call can be reordered with acquisition, so neither is automatically safe. Restoring an old snapshot or exhausting a counter also requires a coordinated new epoch before writes resume.</p>
+<p>If a resource cannot reject stale operations, an external lease cannot provide this protection for it. Idempotency can suppress duplicates of the <em>same</em> operation, but does not prevent an old holder from submitting a different, stale update. Use a conditional downstream API, a durable dispatcher that enforces ownership, or explicitly accept that limitation.</p>
+<h2 id="redis-set-nx-px-and-the-redlock-debate">Redis SET NX PX, and the Redlock debate</h2>
+<p>A basic single-instance Redis lease starts with one command:</p>
+<figure class="code single" data-sample="distributed-locks-and-fencing.2"><figcaption><span class="ctitle">A single-instance Redis lock</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</span><code>SET lock:invoice-run 7f3c9a1e NX PX 30000
+/* NX: only if the key does not exist. PX 30000: expire after 30 s.
+   The short value shown is illustrative: generate a fresh high-entropy random value per acquisition.
+   It is an ownership token, not a fencing token. */
+
+/* Release: delete only if the value is still mine. A Lua script runs atomically on the server. */
+EVAL "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end" 1 lock:invoice-run 7f3c9a1e</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Both details matter. Without expiry or another recovery mechanism, a crashed client can hold the lock forever. Without the compare-and-delete, a client whose lease expired can <code>DEL</code> a lock that now belongs to someone else, a check-then-act bug in the release path. But a single Redis node is a single point of failure, and if it fails over to a replica that had not yet received the <code>SET</code> (replication is asynchronous), the lock silently vanishes and a second client acquires it.</p>
+<p><strong>Redlock</strong>, proposed by Redis's author, runs the same <code>SET NX PX</code> on N independent Redis masters (typically 5). A client holds the lock if it acquired it on a majority within less time than the lease; its usable time is the lease minus the time spent acquiring minus an allowance for clock drift.</p>
+<p>In 2016 Martin Kleppmann published "How to do distributed locking", a critique with two main points. First, Redlock does not produce fencing tokens (the random values do not increase), so it cannot protect a resource from a paused holder, which is the failure that matters. Second, he argues that its timing assumptions fail under sufficiently delayed messages, pauses and clock changes. Salvatore Sanfilippo's reply disputes the need for bounded network delays and pauses in the lock algorithm, while assuming bounded relative clock-rate error and correct validity checks. Neither argument makes a lease cancel a stale external write. You do not need to pick a winner in an interview. Read the <a href="https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html">critique</a>, <a href="https://antirez.com/news/101">response</a> and <a href="https://redis.io/docs/latest/develop/clients/patterns/distributed-locks/">Redis locking guidance</a>. For a design, state your failure model and what the resource enforces:</p>
+<table>
+<thead><tr><th>Why you want the lock</th><th>What a double holder costs</th><th>What to use</th></tr></thead>
+<tbody>
+<tr><td>Efficiency: avoid two nodes doing the same work (rebuilding a cache, sending a digest)</td><td>Some wasted work, perhaps a duplicate that is harmless</td><td>A single Redis <code>SET NX PX</code> lock is fine</td></tr>
+<tr><td>Correctness: two holders would corrupt data or double charge</td><td>Real damage</td><td>A consensus-backed lock service (ZooKeeper, etcd) <em>plus</em> fencing tokens checked by the resource, or better, no lock at all</td></tr>
+</tbody>
+</table>
+
+<h2 id="zookeeper-and-etcd-sessions-ephemeral-nodes-and-leases">ZooKeeper and etcd: sessions, ephemeral nodes and leases</h2>
+<p>ZooKeeper uses Zab for ordered replicated updates, and etcd uses Raft. Under their quorum and durability assumptions, ordinary leader failover preserves committed coordination state; losing a quorum sacrifices progress rather than granting conflicting ownership. This does not make every read linearizable: ZooKeeper reads can be stale, and etcd offers explicitly stale serializable reads as an alternative to its default linearizable reads. Both systems tie locks to client liveness. See the <a href="https://etcd.io/docs/v3.6/learning/api_guarantees/">etcd API guarantees</a>.</p>
+<p><strong>ZooKeeper</strong> clients hold a session, kept alive by heartbeats. An <a class="term" data-term="ephemeral-node" href="glossary.html#ephemeral-node">ephemeral node</a> lives only as long as the session that created it: if the client dies or is partitioned away long enough for the session to expire, ZooKeeper deletes the node. A sequential node gets a counter suffix allocated under its parent. The recipe assumes that parent is retained and the finite counter does not wrap; production use must handle namespace recreation and counter exhaustion. Together they make the standard lock recipe:</p>
+<figure class="code single" data-sample="distributed-locks-and-fencing.3"><figcaption><span class="ctitle">The ZooKeeper lock recipe</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code>1. create /locks/invoice-run/&lt;guid&gt;-lock- as EPHEMERAL_SEQUENTIAL; retain its sequence suffix
+2. list the children of /locks/invoice-run
+3. if your own node still exists and has the lowest suffix, you hold the lock
+4. call exists with a watch on your immediate predecessor; if absent, repeat step 2
+   otherwise wait for its deletion notification, then repeat step 2
+5. to release, delete your node; if your session expires, ZooKeeper deletes it for you</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The predecessor may disappear between listing and watch registration, so the existence check and watch must be one ZooKeeper operation. If creation succeeds but its reply is lost, find your GUID among the children before retrying creation. Watches are one-shot notifications to re-check state. See the <a href="https://zookeeper.apache.org/doc/r3.9.2/recipes.html">ZooKeeper lock recipe</a>.</p>
+<p>Watching only your predecessor, instead of the lock holder, means a normal release wakes its successor rather than all waiters: the <a class="term" data-term="thundering-herd" href="glossary.html#thundering-herd">thundering herd</a> avoided by design. <a class="term" data-term="leader-election" href="glossary.html#leader-election">leader election</a> is the same recipe: the lowest node is the leader. In Java, Apache Curator provides <code>InterProcessMutex</code> and <code>LeaderLatch</code>. For the mutex, <code>acquire(long time, TimeUnit unit)</code> returns a boolean and can throw <code>Exception</code>; only a successful acquisition requires a matching <code>release()</code> by the owning thread. See its <a href="https://curator.apache.org/apidocs/org/apache/curator/framework/recipes/locks/InterProcessMutex.html">API contract</a>; in C++ you would use ZooKeeper's C client with the <code>ZOO_EPHEMERAL | ZOO_SEQUENCE</code> flags.</p>
+<p><strong>etcd</strong> uses leases directly: you grant a lease with a time to live, attach keys to it, and keep it alive; when it expires, its keys are deleted. A modifying transaction advances the store revision; multiple key changes in one transaction share that revision. In the lock queue, the ownership key's creation revision supplies a fencing token. For data stored in etcd, a transaction can compare that key's creation revision while writing the data; a separate check followed by an external write is not atomic.</p>
+<p>Consensus fixes lost locks on failover. It does not fix the paused holder: <strong>a session expires on the server, and a frozen or partitioned client does not learn about it until it talks to the cluster again</strong>. Even with ZooKeeper or etcd, writes to the protected resource need fencing.</p>
+
+<h2 id="design-so-that-a-brief-double-leader-is-survivable">Design so that a brief double leader is survivable</h2>
+<p>Assume stale work can overlap replacement work, without inventing a bound on how long or how often, and make the effects safe:</p>
+<ul>
+<li><strong>Fence every write the holder makes</strong>, with a token or an epoch the resource checks.</li>
+<li><strong>Make each action idempotent</strong>: a nightly invoice run inserts invoices under a unique key <code>(customer_id, period)</code>, so a second leader's inserts fail harmlessly.</li>
+<li><strong>Make writes conditional</strong> on the state the leader read (version checks), so decisions based on an older version cannot overwrite a newer version. A version check alone does not prove current lease ownership.</li>
+<li><strong>Stop early</strong>: renew with enough headroom, for example at a third of the lease, and stop starting work before your local deadline. Renewal must atomically check the current ownership token before extending expiry.</li>
+<li><strong>Keep leader work small and resumable</strong>, so the next leader can pick up from durable state instead of trusting the old one's memory.</li>
+</ul>
+
+<h2 id="prefer-no-lock-at-all">Prefer no lock at all</h2>
+<p>Before reaching for a lock service, ask what the lock protects. Usually the answer is "a row" or "a key", and something cheaper already gives you exclusion:</p>
+<ol>
+<li><strong>A single owner by construction.</strong> Partition the work so that one consumer owns each key (the next lesson, <a href="ordering-by-ownership.html">ordering by ownership</a>). Ownership changes still need fencing or idempotent, conditional effects; a hot partition can still contend.</li>
+<li><strong>Let the database arbitrate.</strong> A conditional update or a unique constraint often enforces the invariant directly. A <code>FOR UPDATE SKIP LOCKED</code> claim holds a row lock only until transaction end: commit an owner, expiry and increasing attempt number, then check that attempt on every later database effect. See <a href="optimistic-vs-pessimistic.html">optimistic versus pessimistic</a>.</li>
+<li><strong>A lease from a consensus store, plus fencing</strong>, for coarse coordination such as "one active scheduler".</li>
+<li><strong>A Redis lock</strong>, only where a duplicate costs efficiency, not correctness.</li>
+</ol>
+<p><strong>The best distributed lock is the one your design does not need.</strong></p>
+
+<div class="box example">
+<h3>Worked example: one node sends the nightly invoices</h3>
+<p>Three scheduler nodes run; invoices must go out once a night.</p>
+<p><strong>First attempt</strong>: each node tries <code>SET lock:invoices &lt;unique-value&gt; NX PX 600000</code> at midnight; the winner runs the job. Failure: the job takes longer than 10 minutes, the lock expires, a second node starts, and customers get two invoices. Raising the TTL only moves the problem.</p>
+<p><strong>Better</strong>: make the job safe to run twice. Insert invoices under a unique constraint on <code>(customer_id, period)</code> and enqueue their emails in the same transaction. A dispatcher uses a stable invoice id as the provider's idempotency key. A conditional database claim alone cannot make an email exactly once: marking before sending risks loss on a crash, and marking after sending risks duplicates. If the provider cannot deduplicate, choose and document that tradeoff. Once the effects are safe, the scheduler lock is only an efficiency hint.</p>
+<p><strong>Best</strong>: skip the lock. A row per night in a <code>job_runs</code> table with a unique <code>run_date</code>; the node whose <code>INSERT</code> succeeds owns tonight's run, records progress per customer, and a replacement atomically claims an expired run by increasing its attempt number. Each subsequent database transaction locks the job row, checks the current attempt, and commits its progress and outbox effects together; a stale runner cannot pass after takeover commits. External effects still need the downstream idempotency just described.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>No recovery mechanism.</strong> A crashed holder can block everyone indefinitely without expiry, session recovery or safe revocation.</li>
+<li><strong>Releasing with a plain <code>DEL</code>.</strong> After your lease expired, the key may be someone else's lock. Compare and delete atomically.</li>
+<li><strong>Checking "do I still hold it?" before writing, and calling that safe.</strong> A pause between the check and the write defeats it. Fence at the resource.</li>
+<li><strong>A lease shorter than the work, with no renewal.</strong> The lock expires mid-job by design.</li>
+<li><strong>Measuring the lease with the wall clock.</strong> Time synchronization can step it. Use a monotonic clock and a safety margin.</li>
+<li><strong>Treating ZooKeeper or etcd as a cure.</strong> They stop lost locks, not paused holders.</li>
+<li><strong>Using a distributed lock where a database constraint would do.</strong> More moving parts, weaker guarantees.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Candidate reports in the research include an Amazon SDE2 locker design with distributed-locking follow ups and a Bloomberg backup-job coordinator with a lock registry and pessimistic versus optimistic locking. Be ready to explain what happens when a worker pauses during a lease, and which system actually rejects its stale write.</p>
+<blockquote>An expiring lock can leave two workers acting as owners, because the old holder can pause past its lease without knowing. So I would make it a lease, renew it, stop early, and, for anything where a double holder causes damage, have the lock service hand out a fencing token that the storage checks, rejecting writes with an older token.</blockquote>
+<blockquote>Before adding a lock service I would try to design the lock away: give each key a single owner by partitioning, or let the database arbitrate with a conditional update or a unique constraint. I would keep a Redis lock for efficiency only, where a duplicate run wastes work but corrupts nothing.</blockquote>
+<p>Follow ups to expect: "What happens if the lock holder has a long GC pause?", "Why not just check the lease before writing?", "Is Redlock safe?", "How does ZooKeeper's lock recipe avoid waking everyone?", and "What if the resource cannot check a token?" (deduplicate repeated operations where possible, but do not claim that this rejects every stale update).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>This idea is older than Redis.</strong> Google's <a href="https://research.google.com/archive/chubby-osdi06.pdf">Chubby lock service paper</a> (Burrows, 2006) describes "sequencers": a holder can ask for an opaque token describing its lock and generation, pass it to the servers it talks to, and those servers check it. That is a fencing token. Chubby also delays re-granting a lock whose holder vanished, to let stale messages drain, the same instinct as a lease safety margin.</p>
+<p><strong>Clock discipline helps validity checks, not external write atomicity.</strong> Lease intervals can use elapsed time without synchronized clock origins, provided rate error and suspend behaviour fit the safety margin. A monotonic clock avoids backwards wall-clock adjustments but does not prove bounded drift or timely scheduling. A delayed write still needs resource-side fencing; increasing the TTL trades slower recovery for fewer avoidable takeovers.</p>
+<p><strong>Fencing generalizes to epochs within a protocol.</strong> Raft terms help peers reject stale leaders, and Kafka producer epochs let brokers reject an older producer. Neither automatically fences an external database or email service: that destination needs its own enforced ownership or idempotency contract. A number in a message becomes a fence only when every relevant receiver checks it.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>One valid lease can coexist with an old worker still acting; expiry does not cancel remote work.</li>
+<li>Leases and session expiry enable recovery after a failed holder, at the cost of possible stale work.</li>
+<li>Fencing tokens let the resource reject a stale holder's writes; the resource must take part.</li>
+<li>Redis <code>SET NX PX</code> with compare-and-delete is fine for efficiency; for correctness use a consensus store plus fencing.</li>
+<li>Design so a brief double leader is harmless, and prefer no lock: single ownership or database arbitration.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="distributed-locks-and-fencing"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="distributed-locks-and-fencing.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why use lease or session expiry when a remote lock must recover automatically from a crashed holder?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because leases are faster to acquire</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Because the holder can crash or be cut off, and a lock that only its holder can release would then be held forever</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because expiry stops the old worker from issuing any further writes</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because expiry removes the need for fencing tokens</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A dead client cannot release its lock, so expiry is one mechanism for automatic recovery; other safe revocation protocols are possible. Expiry does not inherently make acquisition faster. The price is the opposite problem: a holder that is merely paused can outlive its lease while still believing it holds the lock, which is why leases do not remove the need for fencing.</div></div><div class="mcq" data-id="distributed-locks-and-fencing.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A worker calls a correct, thread-safe application helper <code>lease.isValid()</code> immediately before every write to storage. Why is this still unsafe?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>isValid()</code> is not thread-safe</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The process can pause between the check and the write, so the write can land after the lease expired and a new holder started</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A thread-safe lease check automatically extends the lease until the write completes</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is safe; checking before each write is the standard fix</span></button></li></ol><div class="why" hidden><strong>Why.</strong> It is a check-then-act with a gap, and a garbage collection pause or a scheduling stall can sit in that gap for seconds. A correct client-side check is still separated from the write. The helper need not be racy, and checking it does not renew anything. The resource must atomically enforce ownership or token ordering with the write.</div></div><div class="mcq" data-id="distributed-locks-and-fencing.q3" data-a="1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">The demo storage has accepted token 34. Consider each candidate write independently from that state, with genuine tokens, no other writes and the shown rule permitting equal tokens. Which does it accept? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A write with token 33</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A write with token 34</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A write with token 35</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A write with no token, from the client that holds the lease right now</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The rule is "reject anything older than the newest token seen". The current holder may write several times with 34, and a newer holder's 35 is accepted and raises the bar. A write with no token cannot be checked, so a fenced resource must refuse it, otherwise a stale client could simply leave the token out.</div></div><div class="mcq" data-id="distributed-locks-and-fencing.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A client acquires a Redis lock with <code>SET lock:x &lt;random&gt; NX PX 30000</code>, works for 40 seconds, then releases it with <code>DEL lock:x</code>. What can go wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing, because the lock had a random value</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The <code>DEL</code> fails because the key has expired, and the client crashes</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The lease expired at 30 seconds, another client may now hold <code>lock:x</code>, and the <code>DEL</code> deletes that client's lock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Redis refuses to <code>DEL</code> a key that was set with <code>NX</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Two bugs combine: the work outlived the lease, so another client could take over during the remaining 10 seconds, and the release may delete a lock it no longer owns. Releasing must compare the stored value with your random value and delete only on a match, atomically, which is why a Lua script is used. Renewal reduces unnecessary expiry but cannot bound all pauses; fencing or equivalent conditional effects must still enforce correctness. <code>DEL</code> on an absent key returns zero, and <code>NX</code> does not restrict later deletes.</div></div><div class="mcq" data-id="distributed-locks-and-fencing.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which statement fairly summarizes Martin Kleppmann's critique of Redlock?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Redlock is slow because it contacts several Redis nodes</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Redlock fails whenever a single Redis node is down</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Redlock produces no fencing tokens, so it cannot stop a paused holder from writing, and its safety depends on assumptions about delays, pauses and clock drift</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Redlock is unsafe because Redis does not support expiring keys</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Redlock tolerates a minority of failed nodes, and Redis keys do expire. The critique is about correctness under pauses and clock problems: without a token that only grows, the resource cannot tell a stale holder from the current one.</div></div><div class="mcq" data-id="distributed-locks-and-fencing.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the ZooKeeper lock recipe, each waiting client watches only the node with the next lower sequence number, not the current holder's node. Why?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Watching the holder's node is not allowed by ZooKeeper</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">So that a release wakes one waiter instead of all of them, avoiding a thundering herd</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">So that the lock is reentrant</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because sequence numbers can repeat</span></button></li></ol><div class="why" hidden><strong>Why.</strong> If every waiter watched the holder, each release would wake all of them to re-read the children, and all but one would go back to waiting. Watching your predecessor forms a queue: a normal release notifies its successor. Watching the holder is allowed but wasteful; this choice does not provide reentrancy or solve counter reuse.</div></div><div class="mcq" data-id="distributed-locks-and-fencing.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In a fresh demo <code>Storage</code>, call <code>write(&quot;old&quot;, 33)</code>, <code>write(&quot;new&quot;, 34)</code>, then <code>write(&quot;late&quot;, 33)</code>, in that order. What acceptance results and final content do you get?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">rejected, accepted, rejected; final content is new</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">accepted, accepted, rejected; final content is new</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">accepted, accepted, accepted; final content is late</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">accepted, rejected, accepted; final content is late</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Storage starts with maximum token 0. It accepts 33, then accepts 34 and raises its maximum, then rejects 33. Granting a newer lease elsewhere does not update this storage automatically: rejection begins when storage observes the newer generation. Requiring tokens to equal the current maximum would incorrectly reject every new holder.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="distributed-locks-and-fencing.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A nightly job must run on exactly one of three scheduler nodes, and running it twice would email customers twice. Design it.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>I would separate invoice creation, job ownership and email delivery. A unique <code>(customer_id, period)</code> key prevents duplicate invoices, and the same transaction inserts an email outbox row with a stable operation id. A dispatcher sends that id to a provider that durably deduplicates it through our retry horizon, then records completion. A conditional claim by itself cannot guarantee one email: marking before sending can lose it, and marking afterwards can repeat it. Without provider deduplication, I would state that limitation rather than promise exactly once.</p>
+<p>For scheduling, use one <code>job_runs</code> row per date with a lease and increasing attempt. A takeover atomically increments the attempt. Every progress or outbox transaction locks that job row, verifies its attempt still matches, then writes and commits, so takeover and effects serialize. Recover from durable per-customer progress; a paused worker is rejected when it resumes. If coordination moves to etcd or ZooKeeper, the database still needs to enforce its fencing generation.</p></div></div><div class="cq" data-q="distributed-locks-and-fencing.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">Find the bugs in this lock usage and fix them.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><ol>
+<li><strong>The value is not unique.</strong> Every client writes "1", so a client cannot tell its own lock from another's. Use a random value per acquisition.</li>
+<li><strong>The release is a blind delete.</strong> After a 20 second build the 5 second lease has expired and another client holds the lock; <code>delete</code> removes their lock. Release with an atomic compare-and-delete (the Lua script) on the random value.</li>
+<li><strong>The lease is shorter than the work, with no renewal.</strong> Renew with an atomic ownership check, leave safety headroom, and stop starting work if renewal fails. A background thread can pause too, so renewal does not replace fencing.</li>
+<li><strong>The write is not fenced.</strong> A paused client can still overwrite a newer report. Obtain a token that only grows (atomically ordered with ownership grants and durable across failover), pass it to <code>storage.put</code>, and have storage reject smaller tokens; or make the write conditional on a version.</li>
+<li><strong>No failure path.</strong> If <code>buildReport</code> throws, waiters must wait for expiry. Release with compare-and-delete in Java <code>finally</code> or a C++ RAII guard whose cleanup does not throw.</li>
+</ol></div></div><div class="cq" data-q="distributed-locks-and-fencing.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">In two minutes: is Redlock safe, and what would you use instead?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Redlock acquires a Redis lock on a majority of independent Redis masters within the lease time, which can tolerate a minority of unavailable masters. Kleppmann's critique makes two points: Redlock hands out random values rather than increasing fencing tokens, so the protected resource cannot reject a client that paused past its lease, and Kleppmann argues that timing failures can violate its safety assumptions; Sanfilippo disputes parts of that timing model. I would state the assumptions and still require the resource to reject stale effects. My practical answer: if the lock exists for efficiency, avoiding duplicate work that is harmless, a single Redis <code>SET NX PX</code> lock with compare-and-delete release is enough and Redlock adds little. If it exists for correctness, I would not rely on any lock alone: I would use ZooKeeper or etcd for the lease and pass a fencing token, the lock node's creation zxid or lock key's creation revision, to the resource, which rejects older tokens. And first I would try to avoid the lock entirely, with a single owner per partition or a database conditional write.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="distributed-locks-and-fencing.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"A worker checks its lease before every write, but an old report still overwrites a new one. Walk me through the failure and the fix."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A worker can pause after checking its lease, or its write can be delayed in transit</li><li>Expiry permits a replacement without stopping the old worker</li><li>Grants carry increasing tokens and storage atomically checks the token with the write</li><li>After storage accepts 34, it rejects 33; granting 34 elsewhere alone does not update storage</li><li>Token and accepted-generation state must survive failover and every write path must enforce them</li><li>Equal-token retries and multiple writes need separate idempotency or operation ordering</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would fence writes at storage, because checking a lease in the worker leaves a gap before the effect. Worker A checks its lease and pauses. The lease expires, worker B takes over and writes a new report, and then A resumes and overwrites it. A delayed network request can cause the same failure even without a process pause. I would give each ownership grant an increasing token and include it in every write. Storage checks that token, updates its accepted generation and changes the report atomically. Once it has accepted token 34, it rejects A's token 33. There is an important boundary: merely granting 34 at the lock service does not update storage. If storage has only seen 32, it can still accept 33. B should install its generation before reading the state used to compute its report, or use an ownership check in the resource's transaction. The token allocator and storage's accepted generation must survive failover without going backwards, and every write path must enforce the check. Finally, fencing does not deduplicate two writes with the same token or order a holder's own operations. I would use operation ids or version checks for those requirements, and test both stale writes and delayed duplicate writes.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Would rejecting equal tokens as well as smaller ones solve duplicate writes?</span></p></div></div><div class="sq" data-sq="distributed-locks-and-fencing.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Three schedulers send nightly invoices. Would you use Redis, ZooKeeper, or the database to make this safe?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Start with the invariant and use database uniqueness for one invoice per customer and period</li><li>Commit invoice creation and email publication intent in one transaction</li><li>A database claim alone cannot make an external email exactly once; downstream deduplication or an explicit tradeoff is required</li><li>Recover job ownership with an expiry and increasing attempt, checked transactionally with every effect</li><li>Redis can reduce harmless duplicate work; consensus coordination still needs resource enforcement</li><li>Describe deterministic crash, takeover and lost-acknowledgement tests</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would start with database invariants, since the invoices already live there. A unique customer and billing-period key prevents duplicate invoice records. The transaction that creates the invoice also inserts an email outbox row with a stable operation id. Sending the email is a separate boundary. Marking it sent before calling the provider can lose an email after a crash; marking it afterwards can duplicate an email after a lost reply. I need provider deduplication with that operation id, or an explicit decision to tolerate loss or duplication. For scheduler recovery, I would keep a job row with an expiry and an increasing attempt number. A replacement claims an expired run atomically. Each transaction that records progress or queues emails locks that job row and verifies the current attempt, so a resumed old worker cannot commit new effects after takeover. A Redis lease can reduce duplicate computation once those effects are safe. ZooKeeper or etcd can provide stronger coordination state, but neither automatically fences the database or email provider. I would test a paused worker across takeover, a crash after invoice commit, and a provider success whose acknowledgement is lost. That tells us which guarantees we actually have, rather than assuming that one scheduler means one effect.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you recover a pending email if the provider has no idempotency support?</span></p></div></div></section>
+
+<p>The practice problems drill expiry and conditional state transitions with an injectable clock. Their in-memory tests do not establish distributed failover guarantees.</p>
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-seat-booking.html" data-problem="seat-booking"><span class="pk">Thread-safe designs · hard</span><b>Seat booking with expiring holds</b><span class="pst"></span></a><a class="pcard" href="p-inventory-reservations.html" data-problem="inventory-reservations"><span class="pk">Thread-safe designs · hard</span><b>Inventory reservations</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="idempotency-and-exactly-once.html"><span>Previous</span><b>Idempotency, retries and exactly-once effects</b></a><a class="next" href="ordering-by-ownership.html"><span>Next</span><b>Ordering by ownership: partitions and single writers</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#what-breaks-when-the-lock-lives-on-another-machine">What breaks when the lock lives on another machine</a><a href="#leases-locks-that-expire">Leases: locks that expire</a><a href="#fencing-tokens-let-the-resource-say-no">Fencing tokens: let the resource say no</a><a href="#redis-set-nx-px-and-the-redlock-debate">Redis SET NX PX, and the Redlock debate</a><a href="#zookeeper-and-etcd-sessions-ephemeral-nodes-and-leases">ZooKeeper and etcd: sessions, ephemeral nodes and leases</a><a href="#design-so-that-a-brief-double-leader-is-survivable">Design so that a brief double leader is survivable</a><a href="#prefer-no-lock-at-all">Prefer no lock at all</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

@@ -1,0 +1,1339 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Design cases: seats, flash sales, schedulers and counters · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="design-cases" data-title="Design cases: seats, flash sales, schedulers and counters" data-track="core" data-module="core-16" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details open><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases" class=here><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m16">Module 16: Concurrency across machines</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 16.6</span><span>44 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Design cases: seats, flash sales, schedulers and counters</h1><p class="lsum">Work through seats, hotel nights, flash sales, schedulers, counters, leaderboards, caches and auctions, including concurrency invariants, retries and recovery.</p><div class="asked"><span>Asked at</span><span class="co">Meta</span><span class="co">Amazon</span><span class="co">Rippling</span><span class="co">Flipkart</span><span class="co">Uber</span><span class="co">Rubrik</span><span class="co">Salesforce</span><span class="co">Swiggy</span><span class="co">Confluent</span><span class="co">LinkedIn</span></div><div class="prereq"><span>Before this:</span><a href="optimistic-vs-pessimistic.html">Optimistic versus pessimistic concurrency control</a><a href="idempotency-and-exactly-once.html">Idempotency, retries and exactly-once effects</a><a href="distributed-locks-and-fencing.html">Distributed locks, leases and fencing tokens</a><a href="ordering-by-ownership.html">Ordering by ownership: partitions and single writers</a></div></header><article class="prose" id="article">
+<p class="lead">Design rounds rarely say "concurrency". They say "two people tap Book on the same seat", "the sale opens at noon", "run this once a night", "count likes on a post that goes viral". This lesson works the cases that keep coming up, end to end, with the tools from this module.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A theatre box office has a paper seat map. When you point at seat A12, the clerk pencils your name in and says "it's yours for ten minutes while you fetch your wallet". If you are back in time, the pencil becomes ink. If not, the pencil mark simply stops counting, and the next person can have the seat. Two clerks must never ink the same seat, so there is one map and one pencil per seat.</p>
+<p>Every case below extends that picture: <strong>many requests change shared state, and one place decides which transitions are valid</strong>. A seat needs a hold, a counter needs an indivisible update, and a leaderboard needs its scores and ordering to agree.</p>
+</div>
+
+<h2 id="one-method-for-every-case">One method for every case</h2>
+<ol>
+<li><strong>Name the scarce resource and the invariant.</strong> "A seat is sold at most once." "Stock never goes below zero." "A job's effect happens once." Say it out loud; everything else serves it.</li>
+<li><strong>Find the contention point and its rate.</strong> Which row or key do concurrent requests fight over, and how many times a second? Measure skew: even one seat can attract thousands of contenders at release time.</li>
+<li><strong>Choose one arbiter.</strong> A conditional write or constraint in the database, an atomic operation in a store such as Redis, or a single owner per key. Never "check here, write there".</li>
+<li><strong>Cover time and failure.</strong> Holds with expiry for human think time, idempotency keys for retries, leases and fencing for workers, reconciliation for anything that crosses systems.</li>
+<li><strong>Scale the hot spot.</strong> Split it, batch it, queue in front of it, or admit fewer people to it.</li>
+</ol>
+<p>Every case has a shared invariant, whether allocation, uniqueness or agreement between structures, and <strong>the interviewer wants the race named, reproduced and closed atomically</strong>. In the SQL below, <code>:name</code> marks a bound parameter.</p>
+
+<h2 id="case-1-seat-booking-with-holds-and-expiry">Case 1: Seat booking with holds and expiry</h2>
+<p><strong>Invariant</strong>: a seat is sold to at most one person; a hold lasts ten minutes; only the holder can buy, and only while the hold is live. <strong>Contention</strong>: per seat, with potentially extreme contention for popular seats.</p>
+<figure class="code single" data-sample="design-cases.6"><figcaption><span class="ctitle">Hold, confirm, and the backstop (Postgres)</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code>/* hold one seat; rows already exist under PRIMARY KEY (show_id, seat_id) */
+BEGIN;
+SELECT seat_id FROM seats WHERE show_id = :show AND seat_id = :seat FOR UPDATE;
+UPDATE seats
+   SET status = 'held', held_by = :user, hold_id = :hold,
+       hold_expires_at = clock_timestamp() + interval '10 minutes'
+ WHERE show_id = :show AND seat_id = :seat
+   AND (status = 'free' OR (status = 'held' AND hold_expires_at &lt;= clock_timestamp()));
+/* 1 row: the new hold is yours. 0 rows: inspect the existing result for a retry */
+COMMIT;
+
+/* a group of seats, all or nothing */
+BEGIN;
+SELECT seat_id FROM seats
+ WHERE show_id = :show AND seat_id IN ('A1', 'A2', 'A3')
+ ORDER BY seat_id FOR UPDATE;
+UPDATE seats
+   SET status = 'held', held_by = :user, hold_id = :hold,
+       hold_expires_at = clock_timestamp() + interval '10 minutes'
+ WHERE show_id = :show AND seat_id IN ('A1', 'A2', 'A3')
+   AND (status = 'free' OR (status = 'held' AND hold_expires_at &lt;= clock_timestamp()));
+/* application branch: exactly 3 rows means COMMIT; otherwise ROLLBACK */
+
+/* confirm the same hold generation, with time checked after taking the lock */
+BEGIN;
+SELECT seat_id FROM seats WHERE show_id = :show AND seat_id = :seat FOR UPDATE;
+UPDATE seats SET status = 'sold', order_id = :order
+ WHERE show_id = :show AND seat_id = :seat
+   AND status = 'held' AND held_by = :user AND hold_id = :hold
+   AND hold_expires_at &gt; clock_timestamp();
+/* on 1 row, insert the ticket and capture-outbox entry in THIS transaction, then COMMIT.
+   On 0 rows, resolve a retry by order id, or ROLLBACK and report a lost hold. */
+
+/* schema backstop: a seat cannot have two current tickets */
+CREATE UNIQUE INDEX one_ticket_per_seat ON tickets (show_id, seat_id);</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong>Expiry is lazy.</strong> A lapsed hold is free in the condition, so a failed sweeper cannot strand seats. These are transaction templates: the application must branch on affected rows, never commit a partial group, and lock all group confirmations in the same immutable seat order too. Every path touching several rows must follow that order; other resources can still introduce deadlocks, so retry aborted transactions.</p>
+<p>Read time after acquiring the seat locks. PostgreSQL's <code>now()</code> is fixed at transaction start, whereas <code>clock_timestamp()</code> reads current wall time; a transaction that waited for a lock must not confirm using its old start time. Define expiry at the locked decision, not at the later response or commit. Use one database clock and account for clock adjustments; no transaction stays open during user think time. See <a href="https://www.postgresql.org/docs/current/functions-datetime.html">PostgreSQL's time-function semantics</a>.</p>
+<p><strong>A hold needs an identity, not just a user.</strong> A delayed confirm from the same user's old checkout must not consume their new hold. Use a fresh <code>hold_id</code> for each acquisition and reuse that id only for retries of that acquisition. On a duplicate Hold, return its recorded result without extending expiry; a row read-back counts as current success only when user, hold id, held status and live expiry all match. Retain completed operation results so a retry after a successful confirm returns the same order instead of incorrectly voiding its payment.</p>
+<p>The subtle failure is the hold that lapses while the payment is in flight:</p>
+<figure class="timeline"><figcaption>A hold that lapses during payment</figcaption><div class="tl c4"><div class="tl-head"><span class="t">step</span><span>User A</span><span>Payment provider</span><span>Seat A12</span><span>User B</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">held by A until 12:10</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell">12:09: starts paying</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">slow: a bank check takes 90 s</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">12:10: the hold lapses (nothing changes, time just passes)</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">12:10:30: holds A12, because an expired hold is free</span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell">12:10:40: A&#x27;s charge succeeds</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell">confirm checks A, the original hold id and live expiry: 0 rows</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Without that condition, A12 is sold twice. With it, A&#x27;s money is returned and A is told the seat was lost.</div></div></figure>
+<p>The safe order is: <strong>authorize</strong> the payment (reserve the money), <strong>confirm</strong> the seat with the conditional update, then <strong>capture</strong>; if the confirm changes 0 rows and the recorded result shows no prior success, void the authorization. Use operation-specific payment idempotency keys, such as hold id plus authorize or capture, and record the booking result atomically with the ticket and an outbox entry for capture. On an unknown confirmation outcome, look up that result before voiding or retrying. A crash after booking but before capture is recovered by retrying the durable outbox operation. A terminal capture failure requires an explicit cancellation or refund policy; reconcile provider status before releasing a seat whose charge may have succeeded. A bounded checkout extension can reduce expiry races without hiding them.</p>
+<p>For a hot release, add a virtual waiting room that admits users at the rate the seat map can absorb, serve the seat map from a cache (it may show a seat as free a second too long, and the conditional update corrects that), and keep the write path per seat. A Redis <code>SET seat:show9:A12 :token NX PX 600000</code> can be an admission aid. A unique ticket constraint prevents duplicate sales, but alone does not enforce the current holder's rights after Redis expiry or failover: keep authoritative hold identity and confirmation together in the database, or specify a storage-enforced fencing protocol.</p>
+<p>In a low level design round, the same state machine lives in memory. A per-key atomic update is enough:</p>
+<figure class="code pair" data-sample="design-cases.1"><figcaption><span class="ctitle">Holds with expiry, in memory</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</span><code><span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;limits&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">class</span> SeatHolds {
+<span class="k">public</span>:
+    <span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">long</span> <span class="t">long</span>()&gt;;                   <span class="c">// milliseconds, injectable for tests</span>
+
+    <span class="k">explicit</span> <span class="f">SeatHolds</span>(Clock clockMs) : <span class="f">clockMs_</span>(<span class="t">std</span>::<span class="f">move</span>(clockMs)) {}
+
+    <span class="t">bool</span> <span class="f">hold</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; seatId, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; user, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; holdId, <span class="t">long</span> <span class="t">long</span> ttlMs) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);                   <span class="c">// one lock: simple and correct; stripe it later</span>
+        <span class="t">long</span> <span class="t">long</span> now = <span class="f">clockMs_</span>();
+        <span class="k">if</span> (ttlMs &lt;= <span class="n">0</span> || now &gt; <span class="t">std</span>::numeric_limits&lt;<span class="t">long</span> <span class="t">long</span>&gt;::<span class="f">max</span>() - ttlMs) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid TTL or deadline overflow"</span>);
+        }
+        <span class="k">auto</span> it = seats_.<span class="f">find</span>(seatId);
+        <span class="k">if</span> (it != seats_.<span class="f">end</span>() &amp;&amp; !<span class="f">isFree</span>(it-&gt;second, now)) {
+            <span class="k">return</span> <span class="k">false</span>;                                       <span class="c">// sold, or held by someone and not expired</span>
+        }
+        seats_[seatId] = Seat{<span class="k">false</span>, user, holdId, now + ttlMs};
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">bool</span> <span class="f">confirm</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; seatId, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; user, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; holdId) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="t">long</span> <span class="t">long</span> now = <span class="f">clockMs_</span>();
+        <span class="k">auto</span> it = seats_.<span class="f">find</span>(seatId);
+        <span class="k">if</span> (it == seats_.<span class="f">end</span>() || it-&gt;second.sold || it-&gt;second.user != user || it-&gt;second.holdId != holdId || it-&gt;second.expiresAtMs &lt;= now) {
+            <span class="k">return</span> <span class="k">false</span>;                                       <span class="c">// no hold, someone else's, or expired</span>
+        }
+        it-&gt;second.sold = <span class="k">true</span>;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+<span class="k">private</span>:
+    <span class="k">struct</span> Seat {
+        <span class="t">bool</span> sold;
+        <span class="t">std</span>::<span class="t">string</span> user;
+        <span class="t">std</span>::<span class="t">string</span> holdId;
+        <span class="t">long</span> <span class="t">long</span> expiresAtMs;
+    };
+
+    <span class="c">// Free if the last hold lapsed. An expired hold needs no cleanup to be free.</span>
+    <span class="k">static</span> <span class="t">bool</span> <span class="f">isFree</span>(<span class="k">const</span> Seat&amp; s, <span class="t">long</span> <span class="t">long</span> now) {
+        <span class="k">return</span> !s.sold &amp;&amp; s.expiresAtMs &lt;= now;
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, Seat&gt; seats_;               <span class="c">// guarded by m_</span>
+    Clock clockMs_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ConcurrentHashMap</span>;
+<span class="k">import</span> java.util.function.<span class="t">LongSupplier</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">SeatHolds</span> {
+    <span class="k">record</span> <span class="t">Seat</span>(<span class="t">boolean</span> sold, <span class="t">String</span> user, <span class="t">String</span> holdId, <span class="t">long</span> expiresAtMs) {}
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ConcurrentHashMap</span>&lt;<span class="t">String</span>, <span class="t">Seat</span>&gt; seats = <span class="k">new</span> <span class="t">ConcurrentHashMap</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">LongSupplier</span> clockMs;                     <span class="c">// injectable, so tests control time</span>
+
+    <span class="t">SeatHolds</span>(<span class="t">LongSupplier</span> clockMs) {
+        <span class="k">this</span>.clockMs = clockMs;
+    }
+
+    <span class="c">// compute runs the whole check-and-set atomically for this one seat.</span>
+    <span class="t">boolean</span> <span class="f">hold</span>(<span class="t">String</span> seatId, <span class="t">String</span> user, <span class="t">String</span> holdId, <span class="t">long</span> ttlMs) {
+        <span class="k">if</span> (ttlMs &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"positive TTL required"</span>);
+        <span class="t">boolean</span>[] accepted = {<span class="k">false</span>};
+        seats.<span class="f">compute</span>(seatId, (id, cur) -&gt; {
+            <span class="t">long</span> now = clockMs.<span class="f">getAsLong</span>();                 <span class="c">// inside the atomic operation</span>
+            <span class="k">if</span> (!<span class="f">isFree</span>(cur, now)) <span class="k">return</span> cur;
+            <span class="t">Seat</span> mine = <span class="k">new</span> <span class="t">Seat</span>(<span class="k">false</span>, user, holdId, <span class="t">Math</span>.<span class="f">addExact</span>(now, ttlMs));
+            accepted[<span class="n">0</span>] = <span class="k">true</span>;
+            <span class="k">return</span> mine;
+        });
+        <span class="k">return</span> accepted[<span class="n">0</span>];
+    }
+
+    <span class="t">boolean</span> <span class="f">confirm</span>(<span class="t">String</span> seatId, <span class="t">String</span> user, <span class="t">String</span> holdId) {
+        <span class="t">Seat</span> sold = <span class="k">new</span> <span class="t">Seat</span>(<span class="k">true</span>, user, holdId, <span class="t">Long</span>.MAX_VALUE);
+        <span class="k">return</span> seats.<span class="f">computeIfPresent</span>(seatId, (id, cur) -&gt;
+                !cur.<span class="f">sold</span>() &amp;&amp; cur.<span class="f">user</span>().<span class="f">equals</span>(user) &amp;&amp; cur.<span class="f">holdId</span>().<span class="f">equals</span>(holdId)
+                &amp;&amp; cur.<span class="f">expiresAtMs</span>() &gt; clockMs.<span class="f">getAsLong</span>() ? sold : cur) == sold;
+    }
+
+    <span class="c">// Free if nobody ever held it, or the last hold lapsed. An expired hold needs no cleanup to be free.</span>
+    <span class="k">private</span> <span class="k">static</span> <span class="t">boolean</span> <span class="f">isFree</span>(<span class="t">Seat</span> cur, <span class="t">long</span> now) {
+        <span class="k">return</span> cur == <span class="k">null</span> || (!cur.<span class="f">sold</span>() &amp;&amp; cur.<span class="f">expiresAtMs</span>() &lt;= now);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Use a thread-safe, nondecreasing clock measuring milliseconds from a process-local origin, backed by <code>System.nanoTime()</code> or <code>std::chrono::steady_clock</code>, and non-null ids. It must be quick and must not re-enter this object. These fragments implement single acquisitions; API retry-result storage is an additional layer. Injecting time lets you test the expiry boundary and an old hold id after reacquisition without sleeping. The practice problem adds release, group holds and a stress harness.</p>
+
+<h3>The date-range variant: hotel nights</h3>
+<p>Booking a hotel room for three nights is the seat problem across several rows, and it appears repeatedly in Rippling reports. "Check that every night has a room, then insert the booking" is write skew: two bookings can each see a free room on every night and both insert. Keep one inventory row per hotel, room type and night, and reserve all the nights in one transaction:</p>
+<figure class="code single" data-sample="design-cases.7"><figcaption><span class="ctitle">Reserve every night or none</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code>BEGIN;
+SELECT night FROM room_nights
+ WHERE hotel_id = :h AND room_type = :t AND night &gt;= :checkin AND night &lt; :checkout
+ ORDER BY night
+ FOR UPDATE;                                  /* every path locks pre-existing night rows in this same order */
+UPDATE room_nights SET reserved = reserved + 1
+ WHERE hotel_id = :h AND room_type = :t AND night &gt;= :checkin AND night &lt; :checkout
+   AND reserved &lt; total;
+/* branch: if rows changed differs from the number of nights, ROLLBACK and stop here */
+INSERT INTO reservations (id, hotel_id, room_type, checkin, checkout, guest_id)
+VALUES (:reservationId, :h, :t, :checkin, :checkout, :guest);   /* the id doubles as the idempotency key */
+COMMIT;
+/* backstop on the table: CHECK (reserved &lt;= total) */</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Pre-create every inventory night under a unique <code>(hotel_id, room_type, night)</code> key and reject empty date ranges; a missing row is not spare capacity. Aggregate room-type capacity assumes rooms are interchangeable: if the guest must keep one physical room for the entire stay, allocate a consistent room id across nights or explicitly support room reassignment. The follow ups are the module in miniature: a duplicate submit (the reservation id under a primary key), a user who leaves checkout (a hold with expiry), and rooms also sold through other channels (one authoritative inventory allocator or disjoint channel quotas for strict no-oversell; reconciliation alone only detects an overbooking afterwards).</p>
+
+<h2 id="case-2-flash-sale-inventory">Case 2: Flash sale inventory</h2>
+<p><strong>Invariant</strong>: never sell more than the stock (no oversell), and do not strand stock in abandoned carts (no undersell). <strong>Contention</strong>: extreme, all on one item, all in the first seconds.</p>
+<p>The correct single-row answer is the conditional decrement from <a href="optimistic-vs-pessimistic.html">the optimistic and pessimistic lesson</a>: <code>UPDATE items SET stock = stock - 1 WHERE id = :item AND stock &gt; 0</code>, then check the row count. Its limit is physics: every buyer queues for one row lock. As an order of magnitude, if a purchase transaction holds that lock for about a millisecond, the row tops out near a thousand purchases a second, however many servers you add.</p>
+<p>The ways past one row:</p>
+<ul>
+<li><strong>Split the stock</strong> into K rows (or K counters) and let each buyer try a random one, moving on when it is empty. With balanced requests and available stock, each row sees roughly 1/K of the traffic; empty-bucket retries and skew change that.</li>
+<li><strong>Gate in front</strong>: an atomic counter in memory or in Redis (a Lua script that checks and decrements) admits at most the allocated units before refill, rejecting excess work without touching the order database. A gate bounds demand; it does not increase that database row's write capacity. Retries must reuse a reservation token instead of consuming another permit. Orders are then created asynchronously with idempotency keys and reconciled with the database, because the gate and the database cannot commit together.</li>
+<li><strong>One row per unit</strong>, claimed with <code>FOR UPDATE SKIP LOCKED</code>, so buyers grab different units instead of queueing on one counter. Skipping locked rows reduces waiting, but no returned row can mean every available unit is temporarily locked, not permanently sold out; retry or report temporary unavailability.</li>
+<li><strong>Admit fewer</strong>: a waiting room, and a per-user limit enforced by a unique <code>(user_id, sale_id)</code> key.</li>
+</ul>
+<p>Here is the split stock in memory. Each bucket is an atomic counter decremented only while positive, so no bucket ever goes below zero, and a buyer reports "sold out" only after seeing every bucket empty, which is final because stock never grows during the sale.</p>
+
+<figure class="code pair" data-sample="design-cases.2" data-expect="ok"><figcaption><span class="ctitle">Sharded stock: exactly the stock is sold, never more</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;latch&gt;</span>
+<span class="p">#include &lt;random&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// Stock split across buckets, so buyers spread out instead of all fighting over one counter.</span>
+<span class="k">class</span> ShardedStock {
+<span class="k">public</span>:
+    <span class="f">ShardedStock</span>(<span class="t">int</span> units, <span class="t">int</span> shards) : <span class="f">buckets_</span>(shards) {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; shards; i += <span class="n">1</span>) {
+            buckets_[i].left.<span class="f">store</span>(units / shards + (i &lt; units % shards ? <span class="n">1</span> : <span class="n">0</span>));
+        }
+    }
+
+    <span class="c">// Takes one unit from any bucket that has stock. Returns false only when every bucket is empty.</span>
+    <span class="t">bool</span> <span class="f">tryTake</span>() {
+        <span class="k">thread_local</span> <span class="t">std</span>::mt19937 rng{<span class="t">std</span>::random_device{}()};
+        <span class="t">std</span>::<span class="t">size_t</span> n = buckets_.<span class="f">size</span>();
+        <span class="t">std</span>::<span class="t">size_t</span> start = <span class="t">std</span>::uniform_int_distribution&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt;(<span class="n">0</span>, n - <span class="n">1</span>)(rng);
+        <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> k = <span class="n">0</span>; k &lt; n; k += <span class="n">1</span>) {
+            <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt;&amp; left = buckets_[(start + k) % n].left;
+            <span class="t">int</span> seen = left.<span class="f">load</span>();
+            <span class="k">while</span> (seen &gt; <span class="n">0</span>) {                                      <span class="c">// decrement only if still positive</span>
+                <span class="k">if</span> (left.<span class="f">compare_exchange_weak</span>(seen, seen - <span class="n">1</span>)) {   <span class="c">// on failure, seen is reloaded</span>
+                    <span class="k">return</span> <span class="k">true</span>;
+                }
+            }
+        }
+        <span class="k">return</span> <span class="k">false</span>;                                               <span class="c">// stock never grows, so every bucket is empty</span>
+    }
+
+    <span class="t">int</span> <span class="f">remaining</span>() <span class="k">const</span> {
+        <span class="t">int</span> sum = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; b : buckets_) {
+            sum += b.left.<span class="f">load</span>();
+        }
+        <span class="k">return</span> sum;
+    }
+
+<span class="k">private</span>:
+    <span class="k">struct</span> <span class="k">alignas</span>(<span class="n">64</span>) Bucket {                                     <span class="c">// illustrative spacing, not a portable cache-line size</span>
+        <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; left{<span class="n">0</span>};
+    };
+    <span class="t">std</span>::<span class="t">vector</span>&lt;Bucket&gt; buckets_;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    ShardedStock <span class="f">stock</span>(<span class="n">1000</span>, <span class="n">4</span>);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; sold{<span class="n">0</span>}, turnedAway{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">latch</span> <span class="f">saleOpens</span>(<span class="n">1</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; buyers;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">8</span>; t += <span class="n">1</span>) {
+        buyers.<span class="f">emplace_back</span>([&amp;] {
+            saleOpens.<span class="f">wait</span>();                                       <span class="c">// everyone rushes in at noon</span>
+            <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">300</span>; k += <span class="n">1</span>) {
+                <span class="k">if</span> (stock.<span class="f">tryTake</span>()) {
+                    sold.<span class="f">fetch_add</span>(<span class="n">1</span>);
+                } <span class="k">else</span> {
+                    turnedAway.<span class="f">fetch_add</span>(<span class="n">1</span>);
+                }
+            }
+        });
+    }
+    saleOpens.<span class="f">count_down</span>();
+    <span class="k">for</span> (<span class="k">auto</span>&amp; b : buyers) {
+        b.<span class="f">join</span>();
+    }
+    <span class="k">if</span> (sold.<span class="f">load</span>() != <span class="n">1000</span> || turnedAway.<span class="f">load</span>() != <span class="n">1400</span> || stock.<span class="f">remaining</span>() != <span class="n">0</span>) <span class="k">return</span> <span class="n">1</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"attempts: 2400, sold: "</span> &lt;&lt; sold.<span class="f">load</span>() &lt;&lt; <span class="s">", turned away: "</span> &lt;&lt; turnedAway.<span class="f">load</span>() &lt;&lt; <span class="s">"\n"</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"units left: "</span> &lt;&lt; stock.<span class="f">remaining</span>() &lt;&lt; <span class="s">" (never negative, never oversold)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ThreadLocalRandom</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicIntegerArray</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="c">// Stock split across buckets, so buyers spread out instead of all fighting over one counter.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">ShardedStock</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicIntegerArray</span> buckets;
+
+        <span class="t">ShardedStock</span>(<span class="t">int</span> units, <span class="t">int</span> shards) {
+            buckets = <span class="k">new</span> <span class="t">AtomicIntegerArray</span>(shards);
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; shards; i += <span class="n">1</span>) {
+                buckets.<span class="f">set</span>(i, units / shards + (i &lt; units % shards ? <span class="n">1</span> : <span class="n">0</span>));
+            }
+        }
+
+        <span class="c">// Takes one unit from any bucket that has stock. Returns false only when every bucket is empty.</span>
+        <span class="t">boolean</span> <span class="f">tryTake</span>() {
+            <span class="t">int</span> n = buckets.<span class="f">length</span>();
+            <span class="t">int</span> start = <span class="t">ThreadLocalRandom</span>.<span class="f">current</span>().<span class="f">nextInt</span>(n);    <span class="c">// spread buyers over the buckets</span>
+            <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; n; k += <span class="n">1</span>) {
+                <span class="t">int</span> i = (start + k) % n;
+                <span class="t">int</span> left = buckets.<span class="f">get</span>(i);
+                <span class="k">while</span> (left &gt; <span class="n">0</span>) {                                  <span class="c">// decrement only if still positive</span>
+                    <span class="k">if</span> (buckets.<span class="f">compareAndSet</span>(i, left, left - <span class="n">1</span>)) {
+                        <span class="k">return</span> <span class="k">true</span>;
+                    }
+                    left = buckets.<span class="f">get</span>(i);                          <span class="c">// lost the race: re-read and retry</span>
+                }
+            }
+            <span class="k">return</span> <span class="k">false</span>;                                           <span class="c">// stock never grows, so every bucket is empty</span>
+        }
+
+        <span class="t">int</span> <span class="f">remaining</span>() {
+            <span class="t">int</span> sum = <span class="n">0</span>;
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; buckets.<span class="f">length</span>(); i += <span class="n">1</span>) {
+                sum += buckets.<span class="f">get</span>(i);
+            }
+            <span class="k">return</span> sum;
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">ShardedStock</span> stock = <span class="k">new</span> <span class="t">ShardedStock</span>(<span class="n">1_000</span>, <span class="n">4</span>);
+        <span class="t">AtomicInteger</span> sold = <span class="k">new</span> <span class="t">AtomicInteger</span>(), turnedAway = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">CountDownLatch</span> saleOpens = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; buyers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">8</span>; t += <span class="n">1</span>) {
+            <span class="t">Thread</span> b = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    saleOpens.<span class="f">await</span>();                              <span class="c">// everyone rushes in at noon</span>
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                    <span class="k">return</span>;
+                }
+                <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">300</span>; k += <span class="n">1</span>) {
+                    <span class="k">if</span> (stock.<span class="f">tryTake</span>()) {
+                        sold.<span class="f">incrementAndGet</span>();
+                    } <span class="k">else</span> {
+                        turnedAway.<span class="f">incrementAndGet</span>();
+                    }
+                }
+            }, <span class="s">"buyers-"</span> + t);
+            buyers.<span class="f">add</span>(b);
+            b.<span class="f">start</span>();
+        }
+        saleOpens.<span class="f">countDown</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> b : buyers) {
+            b.<span class="f">join</span>();
+        }
+        <span class="k">if</span> (sold.<span class="f">get</span>() != <span class="n">1_000</span> || turnedAway.<span class="f">get</span>() != <span class="n">1_400</span> || stock.<span class="f">remaining</span>() != <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"inventory invariant failed"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"attempts: 2400, sold: "</span> + sold.<span class="f">get</span>() + <span class="s">", turned away: "</span> + turnedAway.<span class="f">get</span>());
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"units left: "</span> + stock.<span class="f">remaining</span>() + <span class="s">" (never negative, never oversold)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>attempts: 2400, sold: 1000, turned away: 1400
+units left: 0 (never negative, never oversold)</pre></div><div class="runout" hidden></div></figure>
+<p>The output is the same on every run, which is the point: whatever the interleaving, exactly 1,000 units sell. The tempting shortcut, <code>if (stock.get() &gt; 0) stock.decrementAndGet();</code>, is a check-then-act that oversells under exactly this load. The C++ buckets are aligned to 64 bytes to reduce <a class="term" data-term="false-sharing" href="glossary.html#false-sharing">false sharing</a> on machines with 64-byte cache lines; this is not a portable hardware guarantee (some machines use larger lines). Java's <code>AtomicIntegerArray</code> packs counters together, which is fine for a demo and worth a sentence in an interview.</p>
+<p>The C++ start gate uses C++20 <code>std::latch</code>; a mutex, condition variable and boolean predicate provide the C++17 fallback. Constructor inputs require nonnegative units and a positive shard count. <code>remaining()</code> is exact after the buyers join; during purchases it is not an atomic snapshot. Undersell is the other half. Units reserved for carts that are abandoned must come back: give each reservation an expiry, then atomically transition it from held to released exactly once while restoring stock. Confirmation and expiry must compete on the same reservation state. With explicit counters, lazy expiry must still reclaim the counter; simply ignoring the expired row leaks stock. When stock can increase, scanning buckets individually cannot prove a single instant when all were empty, so report temporary unavailability or coordinate a consistent exhaustion check. "Avoiding both overselling and underselling" was the stated goal in a Flipkart flash sale design report.</p>
+
+<h2 id="case-3-a-distributed-scheduler-with-idempotent-effects">Case 3: A distributed scheduler with idempotent effects</h2>
+<p><strong>Invariant</strong>, honestly stated: each completed logical job occurrence has one externally visible effect, provided the downstream operation supports atomic deduplication. Execution itself cannot be exactly once, because a worker can run a job, pause, and lose its lease mid-way (<a href="distributed-locks-and-fencing.html">the paused holder</a>). So the design is at-least-once claiming, fenced writes and idempotent effects.</p>
+<figure class="code single" data-sample="design-cases.8"><figcaption><span class="ctitle">Claim, heartbeat, finish, reap (Postgres)</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code>/* claim up to 10 due jobs; attempt doubles as the fencing token */
+UPDATE jobs
+   SET status = 'running', owner = :worker, lease_until = clock_timestamp() + interval '60 seconds',
+       attempt = attempt + 1
+ WHERE id IN (SELECT id FROM jobs
+               WHERE status = 'queued' AND run_at &lt;= now()
+               ORDER BY run_at
+               LIMIT 10
+               FOR UPDATE SKIP LOCKED)
+RETURNING id, attempt, payload;
+
+/* heartbeat while the job runs; expiry revokes authority, even before reaping */
+BEGIN;
+SELECT id FROM jobs WHERE id = :id FOR UPDATE;
+UPDATE jobs SET lease_until = clock_timestamp() + interval '60 seconds'
+ WHERE id = :id AND attempt = :attempt AND status = 'running'
+   AND owner = :worker AND lease_until &gt; clock_timestamp();
+
+COMMIT;
+
+/* finish, fenced: a worker whose lease was taken over changes 0 rows */
+BEGIN;
+SELECT id FROM jobs WHERE id = :id FOR UPDATE;
+UPDATE jobs SET status = 'done'
+ WHERE id = :id AND attempt = :attempt AND status = 'running'
+   AND owner = :worker AND lease_until &gt; clock_timestamp();
+
+/* only on 1 changed row, insert the next recurring occurrence in this transaction */
+COMMIT;
+
+/* the reaper, every few seconds */
+UPDATE jobs SET status = 'queued', owner = NULL
+ WHERE status = 'running' AND lease_until &lt;= clock_timestamp();</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>These are short transactions; the explicit row locks make heartbeat and finish expiry checks occur after waiting, as with seats. Initialize <code>attempt</code> to zero, and use a type whose range covers the job's lifetime. Job-table fencing protects only that row: a shared external resource needs its own storage-enforced token, scoped to that resource. The job's side effects carry an idempotency key built from the job id (and its scheduled time for recurring jobs), so if a paused worker and its replacement both run the job, the downstream system applies the effect once. Only a successful fenced finish inserts a recurring job's next occurrence in the same transaction, under a unique key on <code>(job_name, scheduled_for)</code>, so two nodes computing "the next run" cannot create it twice. Inside one process the same shape is the delayed scheduler from <a href="scheduled-executors.html">scheduled executors</a> and the dependency runner from <a href="dependency-job-runner.html">the job runner lesson</a>; across machines, the database supplies the claim queue. Add retry backoff, an attempt limit and an inspectable failed-job state for permanent failures. Without downstream idempotency or a shared transaction, choose between possible duplicate effects and possible lost effects; fencing alone does not deliver exactly-once effects.</p>
+
+<h2 id="case-4-counters-at-scale-likes">Case 4: Counters at scale: likes</h2>
+<p>A like counter hides two different problems. <strong>Uniqueness</strong>: one like per user per post, even when the client retries. <strong>Counting</strong>: a viral post receives likes faster than one row can absorb.</p>
+<figure class="code single" data-sample="design-cases.9"><figcaption><span class="ctitle">Uniqueness, then a counter that can take the heat</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code>BEGIN;
+/* uniqueness under PRIMARY KEY (post_id, user_id) */
+INSERT INTO likes (post_id, user_id) VALUES (:post, :user)
+ON CONFLICT (post_id, user_id) DO NOTHING;
+/* branch: only on 1 inserted row run the counter update below; on 0 skip it */
+
+/* counting a hot post: 16 counter rows per post, each like picks one at random */
+UPDATE post_like_shards SET likes = likes + 1
+ WHERE post_id = :post AND shard = :randomShard;
+/* require 1 counter row changed; rows are pre-created, otherwise ROLLBACK */
+COMMIT;
+SELECT sum(likes) FROM post_like_shards WHERE post_id = :post;</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The other common answer buffers likes in memory on each application server and flushes one delta per post per second, turning a thousand row updates into one. It is <a href="counters-at-scale.html">counters at scale</a> applied to a database:</p>
+<figure class="code pair" data-sample="design-cases.3"><figcaption><span class="ctitle">Buffer likes in memory, flush deltas once a second</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;shared_mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> LikeBuffer {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">like</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; postId) {                      <span class="c">// many request threads</span>
+        {
+            <span class="t">std</span>::<span class="t">shared_lock</span>&lt;<span class="t">std</span>::<span class="t">shared_mutex</span>&gt; <span class="f">read</span>(m_);
+            <span class="k">auto</span> it = pending_.<span class="f">find</span>(postId);
+            <span class="k">if</span> (it != pending_.<span class="f">end</span>()) {
+                it-&gt;second-&gt;<span class="f">fetch_add</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_relaxed);
+                <span class="k">return</span>;
+            }
+        }
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">shared_mutex</span>&gt; <span class="f">write</span>(m_);           <span class="c">// first like for this post</span>
+        <span class="k">auto</span> [it, inserted] = pending_.<span class="f">try_emplace</span>(postId, <span class="t">std</span>::<span class="t">make_unique</span>&lt;<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt;&gt;(<span class="n">0</span>));
+        it-&gt;second-&gt;<span class="f">fetch_add</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_relaxed);
+    }
+
+    <span class="c">// One flusher thread, once a second: one UPDATE per post instead of one per like.</span>
+    <span class="t">void</span> <span class="f">flush</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;, <span class="t">long</span>)&gt;&amp; writeDelta) {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt;*&gt;&gt; counters;
+        {
+            <span class="t">std</span>::<span class="t">shared_lock</span>&lt;<span class="t">std</span>::<span class="t">shared_mutex</span>&gt; <span class="f">read</span>(m_);
+            <span class="k">for</span> (<span class="k">auto</span>&amp; [postId, counter] : pending_) {
+                counters.<span class="f">emplace_back</span>(postId, counter.<span class="f">get</span>());   <span class="c">// entries are never removed</span>
+            }
+        }
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; [postId, counter] : counters) {
+            <span class="t">long</span> delta = counter-&gt;<span class="f">exchange</span>(<span class="n">0</span>, <span class="t">std</span>::memory_order_relaxed);
+            <span class="k">if</span> (delta == <span class="n">0</span>) <span class="k">continue</span>;
+            <span class="k">try</span> {
+                <span class="f">writeDelta</span>(postId, delta);                      <span class="c">// no lock held during I/O</span>
+            } <span class="k">catch</span> (...) {
+                counter-&gt;<span class="f">fetch_add</span>(delta, <span class="t">std</span>::memory_order_relaxed);
+                <span class="k">throw</span>;                                         <span class="c">// untouched counters are not drained</span>
+            }
+        }
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">shared_mutex</span> m_;                                       <span class="c">// guards the map's shape, not the counts</span>
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">unique_ptr</span>&lt;<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt;&gt;&gt; pending_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ConcurrentHashMap</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+<span class="k">import</span> java.util.function.<span class="t">BiConsumer</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">LikeBuffer</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ConcurrentHashMap</span>&lt;<span class="t">String</span>, <span class="t">AtomicLong</span>&gt; pending = <span class="k">new</span> <span class="t">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="k">void</span> <span class="f">like</span>(<span class="t">String</span> postId) {                                   <span class="c">// many request threads</span>
+        pending.<span class="f">computeIfAbsent</span>(postId, k -&gt; <span class="k">new</span> <span class="t">AtomicLong</span>()).<span class="f">incrementAndGet</span>();
+    }
+
+    <span class="c">// One flusher thread, once a second: one UPDATE per post instead of one per like.</span>
+    <span class="k">void</span> <span class="f">flush</span>(<span class="t">BiConsumer</span>&lt;<span class="t">String</span>, <span class="t">Long</span>&gt; writeDelta) {
+        <span class="k">for</span> (<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>, <span class="t">AtomicLong</span>&gt; e : pending.<span class="f">entrySet</span>()) {
+            <span class="t">long</span> delta = e.<span class="f">getValue</span>().<span class="f">getAndSet</span>(<span class="n">0</span>);            <span class="c">// every like lands in exactly one flush</span>
+            <span class="k">if</span> (delta == <span class="n">0</span>) {
+                <span class="k">continue</span>;
+            }
+            <span class="k">try</span> {
+                writeDelta.<span class="f">accept</span>(e.<span class="f">getKey</span>(), delta);            <span class="c">// UPDATE posts SET likes = likes + ? WHERE id = ?</span>
+            } <span class="k">catch</span> (<span class="t">RuntimeException</span> ex) {
+                e.<span class="f">getValue</span>().<span class="f">addAndGet</span>(delta);                  <span class="c">// retry later; an unknown outcome may duplicate</span>
+                <span class="k">throw</span> ex;
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong>Atomic drain is only an in-process guarantee.</strong> <code>AtomicLong.getAndSet(0)</code> and C++ <code>exchange(0)</code> assign each increment to one drain, assuming counters do not overflow. Java's <code>LongAdder.sumThenReset()</code> does not promise an atomic interval boundary during concurrent updates, so this example uses <code>AtomicLong</code>; see the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/atomic/LongAdder.html">Java 21 contract</a>. Only one flusher runs, entries are never removed, and their lifetime covers the flush. Removing idle entries requires coordinating with updaters holding old references.</p>
+<p>A callback exception restores the drained amount, but a timeout may mean the database already applied it, so retries can double count. A process crash can lose all unflushed memory. Feed the buffer only after a unique like insertion; unlike contributes a negative delta. This is an approximate display counter, repaired from a consistent snapshot of the authoritative likes table. Exact accounting instead commits a durable outbox event with each like, and stores each flush batch id atomically with its delta. A recount must define a snapshot boundary so concurrent events are not both included and reapplied.</p>
+<p>At larger scale, one aggregator owns each post's count in a partitioned stream (<a href="ordering-by-ownership.html">ordering by ownership</a>). An absolute count keyed by post and time window is retry-safe only if the same finalized value is replayed, or the sink also conditionally checks a version. Otherwise an older retry can overwrite a newer total.</p>
+
+<h2 id="case-5-leaderboard">Case 5: Leaderboard</h2>
+<p><strong>Operations</strong>: add to a player's score (or keep their best), read the top K, read one player's rank. <strong>Invariant</strong>: the ranking always agrees with the scores. In a store, a Redis sorted set supports these individual operations atomically; Redis runs commands one at a time, so each command is a single owner's atomic step:</p>
+<figure class="code single" data-sample="design-cases.10"><figcaption><span class="ctitle">A leaderboard as a Redis sorted set</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code>ZINCRBY board:weekly 50 player:42        /* add 50 to a score, atomically */
+ZADD board:best GT 1830 player:42        /* keep the best score only (Redis 6.2 and later) */
+ZREVRANGE board:weekly 0 9 WITHSCORES    /* top 10; newer syntax: ZRANGE board:weekly 0 9 REV WITHSCORES */
+ZREVRANK board:weekly player:42          /* the player's rank, counting from 0 */</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Each Redis command is atomic, but a sequence of commands is not one snapshot. <code>ZINCRBY</code> also repeats on a client retry, so deduplicate score-event ids when required. Scores use floating-point storage; exact integer scores must stay within its exact-integer range. Redis reverse ranges break score ties by reverse lexicographic member order, whereas the local example below deliberately uses ascending player id. See the <a href="https://redis.io/docs/latest/commands/zadd/">sorted-set score and ordering contract</a>.</p>
+<p>In a low level design round you build it, and the trap is the two structures: a map from player to score and an ordered set of (score, player). An update must remove the old entry and insert the new one together, or a reader sees the player missing (between the two steps) and two concurrent updates leave duplicate entries and a lost increment. One lock for both structures, read-shared:</p>
+<figure class="code pair" data-sample="design-cases.4"><figcaption><span class="ctitle">A thread-safe leaderboard</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;set&gt;</span>
+<span class="p">#include &lt;shared_mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Leaderboard {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">addScore</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; player, <span class="t">long</span> delta) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">shared_mutex</span>&gt; <span class="f">write</span>(m_);
+        <span class="k">auto</span> it = scores_.<span class="f">find</span>(player);
+        <span class="t">long</span> score = <span class="n">0</span>;
+        <span class="k">if</span> (it != scores_.<span class="f">end</span>()) {
+            score = it-&gt;second;
+            ranked_.<span class="f">erase</span>({score, player});                     <span class="c">// both structures change together</span>
+        }
+        score += delta;
+        scores_[player] = score;
+        ranked_.<span class="f">insert</span>({score, player});
+    }
+
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">long</span>, <span class="t">std</span>::<span class="t">string</span>&gt;&gt; <span class="f">top</span>(<span class="t">std</span>::<span class="t">size_t</span> k) <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">shared_lock</span>&lt;<span class="t">std</span>::<span class="t">shared_mutex</span>&gt; <span class="f">read</span>(m_);
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">long</span>, <span class="t">std</span>::<span class="t">string</span>&gt;&gt; out;
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; e : ranked_) {
+            <span class="k">if</span> (out.<span class="f">size</span>() == k) {
+                <span class="k">break</span>;
+            }
+            out.<span class="f">push_back</span>(e);
+        }
+        <span class="k">return</span> out;
+    }
+
+<span class="k">private</span>:
+    <span class="k">struct</span> ByRank {                                             <span class="c">// higher score first, then by name</span>
+        <span class="t">bool</span> <span class="k">operator</span>()(<span class="k">const</span> <span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">long</span>, <span class="t">std</span>::<span class="t">string</span>&gt;&amp; a, <span class="k">const</span> <span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">long</span>, <span class="t">std</span>::<span class="t">string</span>&gt;&amp; b) <span class="k">const</span> {
+            <span class="k">if</span> (a.first != b.first) {
+                <span class="k">return</span> a.first &gt; b.first;
+            }
+            <span class="k">return</span> a.second &lt; b.second;
+        }
+    };
+
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">shared_mutex</span> m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">long</span>&gt; scores_;              <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">set</span>&lt;<span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">long</span>, <span class="t">std</span>::<span class="t">string</span>&gt;, ByRank&gt; ranked_;     <span class="c">// guarded by m_; always matches scores_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">HashMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantReadWriteLock</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">Leaderboard</span> {
+    <span class="k">record</span> <span class="t">Entry</span>(<span class="t">String</span> player, <span class="t">long</span> score) {}
+
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">Comparator</span>&lt;<span class="t">Entry</span>&gt; BY_RANK =
+            <span class="t">Comparator</span>.<span class="f">comparingLong</span>(<span class="t">Entry</span>::score).<span class="f">reversed</span>().<span class="f">thenComparing</span>(<span class="t">Entry</span>::player);
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantReadWriteLock</span> rw = <span class="k">new</span> <span class="t">ReentrantReadWriteLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Long</span>&gt; scores = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();          <span class="c">// guarded by rw</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">TreeSet</span>&lt;<span class="t">Entry</span>&gt; ranked = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(BY_RANK);      <span class="c">// guarded by rw; always matches scores</span>
+
+    <span class="k">void</span> <span class="f">addScore</span>(<span class="t">String</span> player, <span class="t">long</span> delta) {
+        rw.<span class="f">writeLock</span>().<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="t">Long</span> old = scores.<span class="f">get</span>(player);
+            <span class="t">long</span> now = <span class="t">Math</span>.<span class="f">addExact</span>(old == <span class="k">null</span> ? <span class="n">0</span> : old, delta);
+            <span class="k">if</span> (old != <span class="k">null</span>) {
+                ranked.<span class="f">remove</span>(<span class="k">new</span> <span class="t">Entry</span>(player, old));                 <span class="c">// both structures change together</span>
+            }
+            scores.<span class="f">put</span>(player, now);
+            ranked.<span class="f">add</span>(<span class="k">new</span> <span class="t">Entry</span>(player, now));
+        } <span class="k">finally</span> {
+            rw.<span class="f">writeLock</span>().<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="t">List</span>&lt;<span class="t">Entry</span>&gt; <span class="f">top</span>(<span class="t">int</span> k) {
+        <span class="k">if</span> (k &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"negative k"</span>);
+        rw.<span class="f">readLock</span>().<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="t">List</span>&lt;<span class="t">Entry</span>&gt; out = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(k);
+            <span class="k">for</span> (<span class="t">Entry</span> e : ranked) {
+                <span class="k">if</span> (out.<span class="f">size</span>() == k) {
+                    <span class="k">break</span>;
+                }
+                out.<span class="f">add</span>(e);
+            }
+            <span class="k">return</span> out;
+        } <span class="k">finally</span> {
+            rw.<span class="f">readLock</span>().<span class="f">unlock</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>These fragments assume representable score sums and successful allocation; a production implementation also needs an exception-safe rollback strategy for updates spanning two allocating containers. Updates take O(log N), top K takes O(K), and ties use player id. Neither <code>TreeSet</code> nor <code>std::set</code> provides logarithmic rank: scanning is O(N); use a tree augmented with subtree sizes for O(log N) rank. A read-write lock can help when reads dominate, but benchmark its overhead and fairness. When score updates pour in, another design is one writer for the entire board (a keyed executor was one Uber candidate's proposal; its key must identify the board, not each player) that applies updates and periodically publishes an immutable snapshot of the top K for readers, the <a href="copy-on-write-and-snapshots.html">copy-on-write</a> pattern.</p>
+
+<h2 id="case-6-a-cache-or-key-value-store-on-one-machine">Case 6: A cache or key-value store on one machine</h2>
+<p>"Design memcache on one machine with 32 cores and 256 GB of memory" sounds like a capacity question. It is a locking question. A Meta E6 candidate reported that what the interviewer praised was sharding the hash table into roughly one part per core "to be able to lock more efficiently"; a Meta recruiter note for the single-node design round said it could cover concurrency and multithreading; and an Uber SDE2 candidate who designed a single-node in-memory cache (LRU, TTL, a write ahead log) concluded afterwards that the round should have stayed on locking strategies and read-write contention, not distributed theory.</p>
+<table>
+<thead><tr><th>Decision</th><th>Weak answer</th><th>Strong answer</th></tr></thead>
+<tbody>
+<tr><td>Locking</td><td>One lock around the whole table: 32 cores take turns, and the lock is the serial fraction in <a href="performance-and-contention.html">Amdahl's law</a></td><td>Shard by key hash into a power-of-two number of shards, starting around one per core and tuned by measurement, each with its own lock, its own table and its own memory budget (<a href="lock-granularity-and-striping.html">lock striping</a>)</td></tr>
+<tr><td>LRU order</td><td>A read-write lock, because "reads dominate"</td><td>Every LRU <code>get</code> moves the entry, so it is a write and a read lock buys nothing. Keep an LRU list per shard (approximate global LRU), or record reads cheaply and apply them in batches (the Caffeine library buffers reads this way), or sample for eviction (Redis approximates LRU by sampling keys)</td></tr>
+<tr><td>Expiry</td><td>A timer per key</td><td>Lazy expiry on read plus a background sweeper per shard that samples a few keys at a time</td></tr>
+<tr><td>Threads</td><td>A thread per connection that locks whatever it touches</td><td>Either worker threads over locked shards, or shared-nothing: each core owns its shards and requests are routed to the owning core (<a href="ordering-by-ownership.html">ordering by ownership</a> inside one box)</td></tr>
+<tr><td>Durability</td><td>Write and <code>fsync</code> the log on every set, under the shard lock</td><td>Group commit: request threads hand records to one log writer, which writes a batch, calls <code>fsync</code> once and then completes every waiting request's future; acknowledge only after the <code>fsync</code> if durability is promised (<a href="durable-log-writer.html">the durable log writer</a>). Recovery replays the log after the last snapshot</td></tr>
+<tr><td>Hot keys</td><td>Ignore them</td><td>One hot key makes one shard's lock hot again; replicate hot read-mostly values per core, or stripe hot counters</td></tr>
+</tbody>
+</table>
+<p>The senior move is to say the numbers out loud: on typical storage, a durable flush can be orders of magnitude slower than a memory write, although its cost is hardware and workload dependent, so batching turns thousands of small <code>fsync</code> calls into a few large ones, and one lock per core shard lets the cores work in parallel except on the same shard. It exposes parallelism; it does not guarantee full utilization. Measure hot-key skew, allocator contention, memory bandwidth, queueing and I/O. Keep each key's log order consistent with its applied mutation order, and never wait under a shard lock for a log writer that needs that lock; snapshots need a known log boundary.</p>
+
+<h2 id="case-7-an-auction-with-a-contended-highest-bid">Case 7: An auction with a contended highest bid</h2>
+<p><strong>Invariant</strong>: the recorded high bid only goes up, a bid is accepted only if it beats the current high bid, and no bid is accepted after the auction closes. Auction bidding appears in an aggregated list of Meta product architecture questions and in a self-reported community database of Meta questions (where one candidate proposed Redlock and the follow up was a celebrity's hot auction), so treat the attribution as a lead rather than a confirmed first-hand report. <strong>Contention</strong>: every bid on one auction targets one value, and the last seconds of a popular auction are a flash sale in reverse.</p>
+<figure class="code single" data-sample="design-cases.11"><figcaption><span class="ctitle">Accept a bid only if it is higher and the auction is open</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</span><code>BEGIN;
+UPDATE auctions SET high_bid = :amount, high_bidder = :user
+ WHERE id = :auction AND status = 'open' AND high_bid &lt; :amount;
+/* 1 row: you lead. 0 rows: outbid already, or closed */
+INSERT INTO bids (auction_id, bidder, amount, accepted) VALUES (:auction, :user, :amount, :leads);
+COMMIT;
+
+/* closing takes the same row lock, so no bid can land after the winner is fixed */
+UPDATE auctions SET status = 'closed' WHERE id = :auction AND status = 'open';</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>In memory the same rule is one compare-and-swap on an immutable record, and the important detail is that <strong>closing goes through the same atomic state</strong>. A separate <code>closed</code> flag checked before the CAS would be a check-then-act: a bid could pass the check, the auction could close and pick a winner, and the bid could still land.</p>
+<figure class="code pair" data-sample="design-cases.5"><figcaption><span class="ctitle">Bids and closing through one atomic state</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+
+<span class="k">class</span> Auction {
+<span class="k">public</span>:
+    <span class="k">struct</span> State {
+        <span class="t">long</span> amount = <span class="n">0</span>;
+        <span class="t">std</span>::<span class="t">string</span> bidder;
+        <span class="t">bool</span> closed = <span class="k">false</span>;
+    };
+
+    <span class="t">bool</span> <span class="f">bid</span>(<span class="t">long</span> amount, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; bidder) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);                   <span class="c">// amount, bidder and closed change together</span>
+        <span class="k">if</span> (state_.closed || amount &lt;= state_.amount) {
+            <span class="k">return</span> <span class="k">false</span>;                                       <span class="c">// closed, or already outbid</span>
+        }
+        state_.bidder = bidder;                                <span class="c">// copy can throw; do it before changing amount</span>
+        state_.amount = amount;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="c">// Closing takes the same lock, so no bid can land after the winner is fixed.</span>
+    State <span class="f">close</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        state_.closed = <span class="k">true</span>;
+        <span class="k">return</span> state_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    State state_;                                               <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicReference</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">Auction</span> {
+    <span class="k">record</span> <span class="t">State</span>(<span class="t">long</span> amount, <span class="t">String</span> bidder, <span class="t">boolean</span> closed) {}
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicReference</span>&lt;<span class="t">State</span>&gt; state = <span class="k">new</span> <span class="t">AtomicReference</span>&lt;&gt;(<span class="k">new</span> <span class="t">State</span>(<span class="n">0</span>, <span class="s">""</span>, <span class="k">false</span>));
+
+    <span class="c">// Accept only a higher bid on an open auction: one CAS on an immutable record.</span>
+    <span class="t">boolean</span> <span class="f">bid</span>(<span class="t">long</span> amount, <span class="t">String</span> bidder) {
+        <span class="k">for</span> (;;) {
+            <span class="t">State</span> cur = state.<span class="f">get</span>();
+            <span class="k">if</span> (cur.<span class="f">closed</span>() || amount &lt;= cur.<span class="f">amount</span>()) {
+                <span class="k">return</span> <span class="k">false</span>;                                   <span class="c">// closed, or already outbid</span>
+            }
+            <span class="k">if</span> (state.<span class="f">compareAndSet</span>(cur, <span class="k">new</span> <span class="t">State</span>(amount, bidder, <span class="k">false</span>))) {
+                <span class="k">return</span> <span class="k">true</span>;                                    <span class="c">// nobody changed it since we looked</span>
+            }
+        }
+    }
+
+    <span class="c">// Closing goes through the same atomic state, so no bid can land after the winner is fixed.</span>
+    <span class="t">State</span> <span class="f">close</span>() {
+        <span class="k">for</span> (;;) {
+            <span class="t">State</span> cur = state.<span class="f">get</span>();
+            <span class="k">if</span> (cur.<span class="f">closed</span>() || state.<span class="f">compareAndSet</span>(cur, <span class="k">new</span> <span class="t">State</span>(cur.<span class="f">amount</span>(), cur.<span class="f">bidder</span>(), <span class="k">true</span>))) {
+                <span class="k">return</span> state.<span class="f">get</span>();
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The C++ version uses a mutex because the state holds a <code>std::string</code>: <code>std::atomic&lt;State&gt;</code> needs a trivially copyable type, and <code>std::atomic&lt;std::shared_ptr&lt;T&gt;&gt;</code> is C++20 but missing from some standard libraries, including the Apple libc++ that builds Tandem's code.</p>
+<p>Scaling a hot auction uses the monotonic invariant. For one auction generation with no bid retractions or failover rollback, the true committed high bid only grows, so <strong>a stale cached high bid is a safe filter</strong>: any bid at or below the cached value is certainly losing and can be rejected at the edge without touching the arbiter, and only bids above it go through. Beyond that, give each auction a single owner (partition bids by auction id) that applies them in order, log every bid for audit and disputes, and decide the close by the arbiter's clock, not the bidders'. If someone proposes a distributed lock around the auction, ask what happens when the lock holder pauses past its lease: the database conditional update takes a row lock internally and atomically checks the auction state, avoiding a separate distributed lock service. For a scheduled deadline, first lock the row and check database time against <code>closes_at</code>; an explicit close call alone does not enforce a wall-clock deadline. Persist bid ids and their original outcomes to make client retries idempotent.</p>
+
+<h2 id="who-asks-what">Who asks what</h2>
+<table>
+<thead><tr><th>Case</th><th>Reported at (first-hand reports unless noted)</th></tr></thead>
+<tbody>
+<tr><td>Seat or ticket booking</td><td>Meta (several Ticketmaster and ticket booking design reports, with deep dives on concurrency control); Amazon (BookMyShow style LLD and design, seat map updates while another user books); Confluent (movie ticketing design); Flipkart (BookMyShow seat locking, airline seats); Salesforce (movie booking LLD); Swiggy (train booking); Rubrik (a System Coding round modelled on BookMyShow, and a debugging round on cinema booking code); Rippling lists BookMyShow among its design prompts without detail</td></tr>
+<tr><td>Hotel nights</td><td>Rippling, repeatedly from 2023 to 2025 ("how to handle multiple bookings", booking for a set of days, an aggregator variant)</td></tr>
+<tr><td>Flash sale, last unit</td><td>Flipkart (flash sale design, and two threads buying the last unit in a machine coding review); Amazon (one unit left, two orders at once); Swiggy (Instamart stock depletion and flash sale races)</td></tr>
+<tr><td>Job scheduler</td><td>Salesforce (distributed job scheduler design); Rubrik (a scheduler over N nodes with rebalancing); Microsoft (cron or Airflow style scheduler with thread safety); Uber (multithreaded job scheduler); Bloomberg (only one backup job across clusters)</td></tr>
+<tr><td>Counters</td><td>LinkedIn (high-throughput event counts, Staff); Google (a per-user counter map under many threads); Rippling (event rollups with idempotent retries); Meta ad click aggregation and Amazon likes and views appear in self-reported question lists</td></tr>
+<tr><td>Leaderboard</td><td>Uber (thread-safe leaderboard in an SDE2 LLD round); PhonePe (leaderboards with concurrent score submissions); a Meta real-time leaderboard appears in a self-reported question database</td></tr>
+<tr><td>Cache or KV store on one machine</td><td>Meta (single-machine memcache, E6, 2024; the single-node design round per a 2025 recruiter note); Uber (single-node in-memory cache with LRU, TTL and a write ahead log, SDE2, 2026)</td></tr>
+<tr><td>Auction</td><td>Meta, from an aggregated list of product architecture questions and a self-reported community database, not a single first-hand report; a 2024 Meta E5 candidate's unnamed high-contention question was guessed by commenters to be a flash sale or an auction</td></tr>
+</tbody>
+</table>
+
+<div class="box example">
+<h3>Worked example: sizing the flash sale</h3>
+<p>5,000 units, and 100,000 people press Buy within the first ten seconds.</p>
+<p><strong>One row.</strong> At roughly a millisecond of lock time per purchase (an order of magnitude, not a benchmark), one row sells about 1,000 units a second, so the 5,000 units take about five seconds while excess requests risk a large queue. Whether they time out depends on arrival shape, rejection cost and deadlines; this is a capacity estimate, not a measured result.</p>
+<p><strong>A gate in front.</strong> An atomic counter (in memory per instance with a fixed allocation each, or one Redis key with a check-and-decrement script) admits at most 5,000 distinct reservations before refill; remaining callers get a fast unavailable response. During this first wave, assume no failures or cancellations. A depleted gate can mean temporarily reserved, not permanently sold. The 5,000 admitted requests create orders through a queue with idempotency keys.</p>
+<p><strong>The database stays the truth.</strong> Stock is split into, say, 20 rows of 250, so the admitted orders decrement in parallel at an idealized upper bound of 20,000 a second if row locks are the only bottleneck. Shared logging, CPU and storage can lower that bound. Unpaid reservations expire after ten minutes; release them once in the database and propagate an idempotent release event to the gate. Allocate disjoint per-instance quotas durably so restarts cannot recreate spent permits. A reconciliation job compares the gate's count with the database's, because they cannot commit together.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Holding a database lock for the user's think time.</strong> Use a committed hold with an expiry instead of an open <code>FOR UPDATE</code>.</li>
+<li><strong>Expiring holds only with a sweeper.</strong> If the sweeper stops, seats stay stuck. Treat an expired hold as free in the condition itself.</li>
+<li><strong>Confirming without checking the hold is still yours and still live.</strong> That is how a lapsed hold sells one seat twice.</li>
+<li><strong>Using app server clocks for expiry.</strong> Use one clock, the database's.</li>
+<li><strong>A Redis gate as the only truth.</strong> It cannot commit with the database; keep a database constraint as the final arbiter and reconcile.</li>
+<li><strong>"Exactly-once job execution".</strong> Promise one logical effect only where an atomic idempotency contract supports it; fence stale writes and state the downstream limitation.</li>
+<li><strong>Counting likes without uniqueness.</strong> A retried like counts twice unless the insert is guarded by a primary key.</li>
+<li><strong>Two structures, two steps, no lock.</strong> A leaderboard's map and sorted set must change together.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>These prompts usually arrive as ordinary product designs, and the concurrency part is where senior candidates are separated. Meta's ticket booking rounds were described as "really deep dives into concurrency control and race condition resolutions", one Meta candidate believed that missing the one specific mitigation the interviewer wanted for a high-contention question was fatal, and a Flipkart candidate's seat locking approach was judged weak. Lead with the invariant and the arbiter, then volunteer the failure cases before you are asked.</p>
+<blockquote>The invariant is one ticket per seat. The arbiter is the database: a hold is a conditional update that treats an expired hold as free, and confirmation is a conditional update that checks the hold is mine and still live, with a unique index on tickets as the backstop. I would authorize payment, confirm the seat, then capture, voiding the authorization if the confirm finds the hold lapsed.</blockquote>
+<blockquote>For the flash sale, if measurements show one millisecond of serialized lock time, one row has an ideal ceiling near a thousand purchases a second, so I would put an atomic gate in front that admits at most its allocated stock and turns everyone else away fast, split the stock across rows, expire unpaid reservations so we do not undersell, and reconcile the gate with the database.</blockquote>
+<p>Follow ups to expect: "What if the hold expires during payment?", "How do you release seats from abandoned checkouts?", "What if the Redis gate and the database disagree?", "Can your scheduler run a job twice?" (yes, so the effects are idempotent and the writes are fenced), "How do you count likes for a celebrity's post?", and "How would the leaderboard work across shards?" (with one shard per player, merge each shard's top K under the same tie order; exact global top K or rank needs a consistent snapshot, and rank needs counts strictly ahead of the player, including ties).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Pick consistency per field, not per system.</strong> Seat ownership and stock need strong consistency at one arbiter. The seat map display, like counts and leaderboard pages can be seconds stale. Saying which is which, and why, is the clearest senior signal in these rounds.</p>
+<p><strong>Every gate needs a way back.</strong> Holds, reservations and admitted-but-unpaid orders are all leases on inventory. Each needs an expiry, a single clock, and a path back to the pool, or the system slowly leaks stock until a sale "sells out" with units still on the shelf.</p>
+<p><strong>Cross-system steps need sagas and reconciliation.</strong> Payment provider plus seat database, Redis gate plus order database, hotel plus external channels: none can commit together. Design each step to be idempotent and compensable (void, refund, release), and run a reconciler, because some failure will always land between two steps.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Name the shared invariant, pick an arbiter and make the entire state transition atomic.</li>
+<li>Holds are committed rows with an expiry that counts as free when lapsed; confirm only a live hold you own; keep a unique constraint as the backstop.</li>
+<li>A hot row caps throughput; split the stock, gate in front, or claim one row per unit with SKIP LOCKED, and expire reservations to avoid underselling.</li>
+<li>Schedulers retry execution; one logical effect needs downstream idempotency or a shared transaction, alongside lease claims and fenced completion.</li>
+<li>Counters separate uniqueness (a primary key) from counting (sharded rows, buffered deltas, or one owner per key); leaderboards change both structures under one lock or one writer.</li>
+<li>On one machine, shard by core with a lock and an LRU per shard, and batch log fsyncs with group commit; in an auction, bids and the close go through one atomic state.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="design-cases"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="design-cases.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">For one auction with no retractions or rollback, edge servers cache only committed high bids, refreshed every second, and reject any incoming bid at or below the cached value without contacting the arbiter. Is that safe?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No: the cache can be stale, so a winning bid might be rejected</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: the true high bid only grows, so a bid at or below a stale cached value is also at or below the true one; bids above it still go to the arbiter's conditional update</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only if the cache is updated inside the same transaction as each bid</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only if every edge server holds a distributed lock on the auction</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Staleness only ever makes the cached value lower than the truth, which means the filter rejects only bids that are certainly losing. The decision for every bid that might win still happens atomically at the arbiter. The same reasoning fails for a value that can go down, such as stock that can be returned.</div></div><div class="mcq" data-id="design-cases.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A user's seat hold lapses while their payment is still processing, and another user holds the seat. Which approach avoids holding a database lock across payment and rejects A's expired hold before capture, assuming no previous confirm succeeded?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Charge the card, then insert the ticket, then release the hold</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Authorize the payment, confirm the seat with a conditional update that requires a live hold owned by this user, then capture; if the confirm changes 0 rows, void the authorization</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Extend every hold to an hour so it cannot lapse</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Lock the seat row with <code>FOR UPDATE</code> before payment and release it after</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The confirm checks the exact hold id, user and live expiry. Authorization reserves funds; capture is attempted only after a durable booking. A lost hold requires voiding the authorization. Longer holds cannot eliminate slow calls, and holding a row lock during payment violates the stated requirement. Charging first needs a compensating refund. Capture failures and unknown outcomes still need the durable workflow described above.</div></div><div class="mcq" data-id="design-cases.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A flash sale item's stock is one row, and each purchase transaction holds its row lock for about 2 ms. Roughly how many purchases per second can that row handle, and what helps most?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">About 50,000 a second; add more application servers</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">About 500 a second as an ideal ceiling; split the stock across rows to raise write capacity</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Unlimited, because row locks are short</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">About 500 a second; switch the item to optimistic locking</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Purchases on one row are serialized by its lock: 1 / 0.002 s is about 500 a second whatever the number of servers. Optimistic locking does not raise the ceiling, it adds failed retries. Splitting stock across rows can add parallel write capacity. An admission gate reduces overload but leaves the single row's service ceiling unchanged.</div></div><div class="mcq" data-id="design-cases.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the sharded stock code, <code>tryTake</code> returns false only after it has seen every bucket at zero. Why is it safe to report "sold out" then, even though other threads are still running?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because the buckets are atomic, so reads are always up to date</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Because stock never increases during the sale, so a bucket seen at zero stays at zero</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because the CAS loop locks each bucket while scanning</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is not safe; another bucket may have been refilled</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The argument is monotonicity: counts only go down, so once every bucket has been observed empty, no unit can appear later. If returns or expired reservations could add stock back during the sale, the sold-out answer would need a different rule.</div></div><div class="mcq" data-id="design-cases.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A like service runs <code>UPDATE posts SET likes = likes + 1 WHERE id = :post</code> for every like request. Clients retry on timeouts; assume no unlikes. What is the best fix for the double counting?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Make the counter column <code>BIGINT</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Run the update at SERIALIZABLE</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Insert into <code>likes (post_id, user_id)</code> under a primary key with <code>ON CONFLICT DO NOTHING</code>, and increment in the same transaction only if inserted</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Use a Redis INCR instead of the database</span></button></li></ol><div class="why" hidden><strong>Why.</strong> For repeated likes without an intervening unlike, the duplicate comes from retries, so the fix is uniqueness: the insert either creates the like once or does nothing. Serializable isolation does not know a retry is a duplicate, and Redis INCR repeats on retry just the same.</div></div><div class="mcq" data-id="design-cases.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A scheduler worker paused past its lease; the reaper requeued the job and another worker finished it as attempt 2. The first worker wakes and runs <code>UPDATE jobs SET status = &#x27;done&#x27; WHERE id = :id AND attempt = 1 AND status = &#x27;running&#x27;</code>. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It marks the job done again, harmlessly</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It changes 0 rows, because the job's attempt is now 2 and it is already done: the stale worker is fenced off</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It deadlocks with the second worker</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It resets the job to attempt 1</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The attempt number works as a fencing token: only the current attempt's writes match. The stale worker's side effects, if any, must still be idempotent (keyed by job id), because fencing protects the jobs table, not the outside world.</div></div><div class="mcq" data-id="design-cases.q7" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">A leaderboard keeps a <code>ConcurrentHashMap</code> of scores and a <code>ConcurrentSkipListSet</code> of (score, player), and <code>addScore</code> reads the old score, removes its set entry, writes <code>old + delta</code> to the map, then adds the new set entry without an outer lock. Which can go wrong? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A reader of the top list briefly sees a player missing</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Two concurrent updates for one player leave two entries for that player in the set</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two concurrent updates for one player lose one of the increments</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A deadlock between the map and the set</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Each structure is thread-safe, but the update is several steps across two of them. A reader between remove and add sees the player gone; two updaters can both read the old score, both remove it, and both add a different new entry, leaving duplicates and a lost increment. No application lock cycle is introduced by this sequence; the collections' internal synchronization does not make the compound operation atomic. One lock over both structures, or one writer, fixes it.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="design-cases.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Design seat booking for a hot movie release: 300 seats per show, a hundred thousand fans at opening time, ten-minute holds, card payments. Cover the invariant, holds, payment, expiry and the traffic spike.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>Invariant and arbiter.</strong> One ticket per seat, enforced in the database: <code>seats(show_id, seat_id, status, held_by, hold_id, hold_expires_at)</code> plus a unique index on <code>tickets(show_id, seat_id)</code> as the backstop.</p>
+<p><strong>Holds.</strong> A conditional UPDATE that succeeds only if the seat is free or its hold has expired, setting the user, a fresh hold id and an expiry ten minutes after the locked decision; group holds lock the seats in seat order with <code>FOR UPDATE</code> and require every seat to update, else roll back. Read <code>clock_timestamp()</code> after taking the locks; <code>now()</code> is the transaction start time in PostgreSQL. Expired holds are free by definition, so no sweeper is needed for correctness.</p>
+<p><strong>Payment.</strong> Authorize with a stable operation-specific key; confirm only the matching user, hold id and live expiry after locking. Commit the ticket, retry result and capture outbox together. Resolve unknown confirmation outcomes by order id; void only when no booking succeeded. Retry capture idempotently, with reconciliation and a cancellation policy for terminal failure. Optionally extend the hold when checkout starts.</p>
+<p><strong>The spike.</strong> A virtual waiting room admits users at the rate the system can serve; the seat map is served from a cache refreshed every second or two (stale views are corrected by the conditional update); writes are per seat, so contention is limited to people fighting over the same seats. Every API is idempotent so client retries are safe, and a reconciler compares payments with tickets.</p></div></div><div class="cq" data-q="design-cases.c2" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">A flash sale offers 20,000 units, and you expect 20,000 purchase attempts a second at peak. One stock row handles about 1,000 conditional decrements a second. How would you split the stock, and what else do you need?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>One row gives about 1,000 a second, so 20 rows is the ideal capacity lower bound if rows scale independently. I would start with around 40 and measure skew, logging and storage limits to leave headroom, since queueing delay climbs steeply as a single server approaches full utilization. Each row starts with 500 units; a buyer picks a random row and moves on when it is empty, and an empty scan proves permanent exhaustion only when stock never increases. With expiry returns, an unsynchronized scan means temporary unavailability unless a consistent exhaustion protocol is added. I would also put an atomic gate in front, admitting at most the remaining stock so that late attempts are turned away without touching the database, expire unpaid reservations after a few minutes and return them so we do not undersell, enforce a per-user limit with a unique key, and reconcile the gate and the rows afterwards.</p></div></div><div class="cq" data-q="design-cases.c3" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Design the like counter for a social app where some posts get a million likes in an hour. Users must not be able to like twice, and the displayed count may lag by a few seconds.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>Uniqueness.</strong> <code>likes(post_id, user_id)</code> with a primary key. Like is <code>INSERT ... ON CONFLICT DO NOTHING</code>; unlike is a <code>DELETE</code>. Only an actual insertion or deletion emits a delta. Also deduplicate request ids: a delayed retry of Like after a later Unlike must not recreate the like, so enforce an operation version if command order matters.</p>
+<p><strong>Counting.</strong> A million an hour is about 280 a second, more for spikes, all on one post. Commit each unique like or unlike together with a durable outbox event. Aggregators buffer those events and flush a delta per post each second. Use a recoverable batch identity and commit its deduplication record with the counter change before acknowledging the source events. For the hottest posts, use multiple counter rows and sum them on read; fix each batch's target shard across retries.</p>
+<p><strong>Reads.</strong> Served from a cache with a few seconds of staleness, which the requirement allows.</p>
+<p><strong>Correctness over time.</strong> A timeout can hide a successful flush, so retries use that same durable batch id. Crashed aggregators replay the source events, and deduplication prevents double counting. Monitor end-to-end lag to keep the few-second freshness target during normal operation; outages may violate it and must be surfaced. A periodic recount from a consistent snapshot is a repair tool, not a substitute for durable deltas. A purely in-memory buffer plus a nightly recount would not meet this freshness requirement after failures.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="design-cases.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"A customer paid while their seat hold expired. How would your booking flow prevent a double sale and recover the payment?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Database owns the seat invariant and a unique constraint prevents duplicate current tickets</li><li>Confirm checks the exact hold generation, user and live expiry after acquiring the row lock</li><li>Authorize first; commit booking, retry result and capture outbox atomically</li><li>Resolve unknown confirmation outcomes before voiding or repeating work</li><li>Retry capture with its stable key and reconcile terminal or ambiguous failures</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would make the database decide seat ownership and treat payment as a recoverable workflow. Every hold has a unique id, a user and an expiry. To confirm, I lock the seat row and check that exact hold is still live using current database time. Checking only the user is insufficient because an old checkout could consume a later hold belonging to the same user. A unique seat constraint is the final duplicate-ticket backstop. I authorize payment first, then commit the booking, its retry result and a capture request in an outbox together. If the hold has genuinely been lost, I void the authorization. If the database call timed out, I first look up the recorded order result, because the booking may already have committed. After a successful booking, the outbox worker captures with a stable operation-specific key. A crash before capture is then recoverable. A terminal capture failure needs a defined cancellation policy, and an ambiguous provider response needs reconciliation before I release the seat. I never keep the database transaction open across the payment call. This prevents two buyers owning the seat while making every failure between booking and payment visible and repairable.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would the transaction change if the customer needs three adjacent seats or none?</span></p></div></div><div class="sq" data-sq="design-cases.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Our flash sale row holds its lock for two milliseconds. Would a Redis gate fix throughput, and how do you return abandoned stock safely?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Two milliseconds of serialized lock time gives an ideal ceiling near 500 purchases per second</li><li>A gate limits demand but does not increase the row's write capacity</li><li>Split stock into independent allocations and retain a database no-oversell check</li><li>Use reservation identities and one atomic transition for expiry versus confirmation</li><li>Make cross-store release propagation idempotent and avoid claiming final exhaustion from a refillable scan</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">A gate would control overload, but it would not raise the stock row's write capacity. Two milliseconds per serialized purchase gives an ideal ceiling of about five hundred purchases per second, before other bottlenecks. To add capacity I would split the stock into independent allocations, spread requests across them and measure shared database limits. The gate admits at most its allocated inventory using reservation ids, so a retried request does not consume a second permit. The database still enforces no oversell. Each reservation has held, confirmed and released states. Expiry and confirmation compete in one atomic transition, and only the successful release returns the unit. If the gate is separate, I publish a durable release event and apply it idempotently there; reconciliation repairs disagreements. I also distinguish sold from temporarily reserved. With returns, a scan that saw each bucket empty at different times does not prove all were empty together. I can report temporary unavailability, retry, or coordinate a stronger exhaustion check. Capacity estimates and admission controls are useful only with that reservation lifecycle.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What if a gate instance crashes and restarts with its original quota?</span></p></div></div><div class="sq" data-sq="design-cases.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A scheduler worker wakes after its replacement has finished the job. What stops it from doing the work twice?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A lease cannot stop paused code from resuming; duplicate execution is possible</li><li>Fence job-table writes with occurrence identity, attempt, status and lease validity</li><li>Use a stable logical-effect idempotency key across attempts</li><li>Downstream deduplication and effect must be atomic; job-table fencing does not protect external effects</li><li>Recover retries and schedule recurrence only after a successful fenced completion</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Nothing about the lease can stop the old code from resuming. I design for duplicate execution and prevent duplicate logical effects at the places that commit them. Each claim increments an attempt number. Heartbeats and completion check the job occurrence, current attempt, running status and live lease, so an old attempt cannot overwrite its replacement's result. That fences the jobs table only. For a payment or message, I send a stable effect key derived from the logical job occurrence, not the attempt number. The receiving system must atomically record that key with the effect and return the original result on retries. If it cannot provide that contract and cannot share a transaction, I cannot promise exactly-once effects. A crash after the effect but before completion then causes a safe retry when deduplication exists. Only a successful fenced finish schedules the next recurring occurrence, under a unique schedule key. I would also add retry backoff, attempt limits and an inspectable failure state, so permanent failures do not loop forever. The guarantee is about committed effects, not how many times the function runs.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Would a fencing token derived separately for each job protect two jobs writing the same external resource?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-seat-booking.html" data-problem="seat-booking"><span class="pk">Thread-safe designs · hard</span><b>Seat booking with expiring holds</b><span class="pst"></span></a><a class="pcard" href="p-room-booking.html" data-problem="room-booking"><span class="pk">Thread-safe designs · medium</span><b>Room booking</b><span class="pst"></span></a><a class="pcard" href="p-inventory-reservations.html" data-problem="inventory-reservations"><span class="pk">Thread-safe designs · hard</span><b>Inventory reservations</b><span class="pst"></span></a><a class="pcard" href="p-parking-lot.html" data-problem="parking-lot"><span class="pk">Thread-safe designs · medium</span><b>Parking lot for cars and trucks</b><span class="pst"></span></a><a class="pcard" href="p-hit-counter.html" data-problem="hit-counter"><span class="pk">Thread-safe structures · medium</span><b>Thread-safe hit counter</b><span class="pst"></span></a><a class="pcard" href="p-scheduled-executor.html" data-problem="scheduled-executor"><span class="pk">Executors and async · hard</span><b>Scheduled executor</b><span class="pst"></span></a><a class="pcard" href="p-dependency-job-runner.html" data-problem="dependency-job-runner"><span class="pk">Executors and async · hard</span><b>Dependency-aware job runner</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="ordering-by-ownership.html"><span>Previous</span><b>Ordering by ownership: partitions and single writers</b></a><a class="next" href="system-coding-rounds.html"><span>Next</span><b>System coding rounds: what they are and how they are graded</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#one-method-for-every-case">One method for every case</a><a href="#case-1-seat-booking-with-holds-and-expiry">Case 1: Seat booking with holds and expiry</a><a href="#case-2-flash-sale-inventory">Case 2: Flash sale inventory</a><a href="#case-3-a-distributed-scheduler-with-idempotent-effects">Case 3: A distributed scheduler with idempotent effects</a><a href="#case-4-counters-at-scale-likes">Case 4: Counters at scale: likes</a><a href="#case-5-leaderboard">Case 5: Leaderboard</a><a href="#case-6-a-cache-or-key-value-store-on-one-machine">Case 6: A cache or key-value store on one machine</a><a href="#case-7-an-auction-with-a-contended-highest-bid">Case 7: An auction with a contended highest bid</a><a href="#who-asks-what">Who asks what</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

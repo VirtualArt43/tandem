@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Futures and promises · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="futures-and-promises" data-title="Futures and promises" data-track="core" data-module="core-9" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details open><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises" class=here><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m9">Module 09: Thread pools and async</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 09.5</span><span>28 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Futures and promises</h1><p class="lsum">Futures deliver values and failures; promises complete them. Learn waiting, deadlines, cooperative cancellation, batch results and C++ ownership traps.</p><div class="asked"><span>Asked at</span><span class="co">Databricks</span><span class="co">Rubrik</span></div><div class="prereq"><span>Before this:</span><a href="why-thread-pools.html">Why thread pools exist</a><a href="passing-data-to-threads.html">Passing data in and getting results out</a></div></header><article class="prose" id="article">
+<p class="lead">Starting work on another thread is the easy part. Getting the answer back, with its errors, without waiting forever, is the hard part. Futures and promises are the standard answer in both languages, and many asynchronous APIs expose this pattern.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>At a busy food court you order, pay, and get a buzzer. The buzzer is a <strong>future</strong>: a claim on food that does not exist yet. The kitchen keeps the other half of the pair, the <strong>promise</strong>: when the food is ready, they press the button, or they press a different one to say "sorry, we are out".</p>
+<p>You choose how to wait. Stand at the counter until it buzzes (block), glance at it now and then (poll), or decide that if it has not buzzed in 15 minutes you will eat elsewhere (a timeout). If the kitchen closes without pressing anything, C++ can signal a broken promise when the kitchen gives up its handle. Java needs the producer to report failure explicitly.</p>
+</div>
+
+<h2 id="two-halves-of-one-shared-state">Two halves of one shared state</h2>
+<p>A <a class="term" data-term="future" href="glossary.html#future">future</a> and a <a class="term" data-term="promise" href="glossary.html#promise">promise</a> are two handles on one small shared object: a slot that is empty, then completed once with a value or an exception (or a cancellation state in Java), plus a way for readers to wait until it is filled.</p>
+<ul>
+<li>The <strong>promise</strong> (write side) is held by whoever produces the result: a worker thread, an I/O callback, a pool task.</li>
+<li>The <strong>future</strong> (read side) is held by whoever needs the result. <code>get()</code> waits until the slot is filled, then returns the value or throws the stored exception.</li>
+<li>The slot is filled <strong>once</strong>. A second attempt is ignored or reported as an error, never an overwrite. (Java's <code>CompletableFuture.obtrudeValue</code> and <code>obtrudeException</code> deliberately override outcomes for error recovery; ordinary completion does not.)</li>
+</ul>
+<p><strong>Completion publishes the result.</strong> In Java, actions of the asynchronous computation happen-before actions after the corresponding <code>Future.get()</code>. In C++, storing the result synchronizes with a waiting operation successfully detecting that the shared state is ready. This publishes preceding writes, not mutations made afterwards. A timeout or cancellation does not prove that the producer has stopped; separately synchronize access to anything it can still mutate.</p>
+
+<figure class="timeline"><figcaption>get() waits for the one-time fill</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Main thread (reader)</span><span>Worker (writer)</span><span>Shared state</span></div><div class="tl-row"><span class="t">1</span><span class="cell">submits the task and gets a future back at once</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">starts computing</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">calls get(): the slot is empty, so main blocks</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell risk">empty</span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">fills the slot with 42 (or with an exception)</span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell good">filled: waiting readers are woken</span></div><div class="tl-row"><span class="t">7</span><span class="cell">get() returns 42, and sees everything the worker wrote before filling the slot</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">The future safely publishes writes made before completion; later shared mutations need their own synchronization.</div></div></figure>
+
+<h2 id="getting-a-result-back">Getting a result back</h2>
+<p>In Java, <code>ExecutorService.submit(Callable)</code> returns a <code>Future&lt;V&gt;</code>. In C++, <code>std::async</code> returns a <code>std::future&lt;T&gt;</code>. Both deliver the task's exception through the future, with one difference worth remembering: <strong>Java wraps it in <code>ExecutionException</code>; C++ rethrows the original exception object.</strong></p>
+
+<figure class="code pair" data-sample="futures-and-promises.1" data-expect="ok"><figcaption><span class="ctitle">A value and an error come back through futures</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; answer = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, [] { <span class="k">return</span> <span class="n">6</span> * <span class="n">7</span>; });
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; broken = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, []() -&gt; <span class="t">int</span> {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"bad input"</span>);
+    });
+    <span class="k">try</span> {
+        <span class="k">if</span> (answer.<span class="f">wait_for</span>(1s) != <span class="t">std</span>::future_status::ready ||
+            broken.<span class="f">wait_for</span>(1s) != <span class="t">std</span>::future_status::ready) {
+            <span class="t">std</span>::<span class="f">puts</span>(<span class="s">"a wait timed out; async cleanup can still wait"</span>);
+            <span class="k">return</span> <span class="n">0</span>;
+        }
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"answer = %d\n"</span>, answer.<span class="f">get</span>());
+        broken.<span class="f">get</span>();
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::invalid_argument&amp; e) {                     <span class="c">// the task's own exception, unwrapped</span>
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"broken task failed: std::invalid_argument: %s\n"</span>, e.<span class="f">what</span>());
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeoutException</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span>, <span class="t">TimeoutException</span> {
+        <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">2</span>);
+        <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; answer = pool.<span class="f">submit</span>(() -&gt; <span class="n">6</span> * <span class="n">7</span>);          <span class="c">// a Callable: it returns a value</span>
+        <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; broken = pool.<span class="f">submit</span>(() -&gt; {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"bad input"</span>);
+        });
+        <span class="k">try</span> {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"answer = "</span> + answer.<span class="f">get</span>(<span class="n">1</span>, <span class="t">TimeUnit</span>.SECONDS));   <span class="c">// limits this wait, not the entire operation</span>
+            broken.<span class="f">get</span>(<span class="n">1</span>, <span class="t">TimeUnit</span>.SECONDS);
+        } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {                             <span class="c">// the task's exception, wrapped</span>
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"broken task failed: "</span> + e.<span class="f">getCause</span>());
+        } <span class="k">finally</span> {
+            pool.<span class="f">shutdown</span>();
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>answer = 42
+broken task failed: java.lang.IllegalArgumentException: bad input</pre></div><div class="runout" hidden></div></figure>
+
+<div class="only only-java"><span class="otag">Java</span>
+<p>The Java <code>Future</code> API in full: <code>get()</code>, <code>get(timeout, unit)</code>, <code>isDone()</code>, <code>cancel(mayInterruptIfRunning)</code> and <code>isCancelled()</code>, plus, since Java 19, <code>state()</code> (RUNNING, SUCCESS, FAILED or CANCELLED), <code>resultNow()</code> and <code>exceptionNow()</code> for inspecting completion without waiting. <code>resultNow()</code> requires success; <code>exceptionNow()</code> requires failure; otherwise they throw <code>IllegalStateException</code>. <code>isDone()</code> also includes failure and cancellation, and <code>RUNNING</code> means incomplete, possibly still queued. <code>get</code> can throw four things, and each means something different: <code>ExecutionException</code> (the task threw; the cause is the real error), <code>CancellationException</code> (someone cancelled it), <code>TimeoutException</code> (your timed <code>get</code> gave up; it does not cancel queued or running work), and <code>InterruptedException</code> (your waiting thread was interrupted; restore the flag or propagate it).</p>
+</div>
+<div class="only only-cpp"><span class="otag">C++</span>
+<p>The C++ <code>std::future&lt;T&gt;</code> API includes <code>get()</code>, <code>valid()</code>, <code>share()</code> and waits. <code>get()</code> consumes the state even when it rethrows a stored exception; afterwards <code>valid()</code> is false. Calling <code>get()</code> again has undefined behavior, so do not rely on any particular crash or diagnostic. <code>valid()</code> means a state exists, not that it is ready. <code>wait()</code> returns <code>void</code>; only <code>wait_for(duration)</code> and <code>wait_until(time_point)</code> return <code>std::future_status</code> (<code>ready</code>, <code>timeout</code> or <code>deferred</code>). Waiting for readiness does not rethrow the task's exception; <code>get()</code> does. Machinery errors use <code>std::future_error</code>, for example <code>broken_promise</code>, <code>future_already_retrieved</code> or <code>promise_already_satisfied</code>.</p>
+</div>
+
+<p>A ready future is not a thread join: a producer can call <code>set_value</code> or <code>complete</code> and then continue working. Reclaim shared resources only after the appropriate join or executor termination, and synchronize any accesses after publication. The <code>std::async</code> asynchronous-thread wait has additional join-like semantics, discussed below.</p>
+
+<h2 id="a-task-object-that-carries-its-own-future">A task object that carries its own future</h2>
+<p>Pools need a way to turn "a function" into "a function whose result lands in a future". Java's <a class="term" data-term="future-task" href="glossary.html#future-task">FutureTask</a> and C++'s <a class="term" data-term="packaged-task" href="glossary.html#packaged-task">std::packaged_task</a> are exactly that: a task wrapper that, when run on a thread, fills its own shared state. They are useful building blocks for result-returning pools. With ordinary <code>run()</code> or invocation, each shared state is completed at most once: Java ignores a second run; C++ throws. <code>packaged_task::reset()</code> creates a new state for reuse, not a second result in the old state. Retrieve each promise or packaged task's future once, then move it to the consumer.</p>
+
+<figure class="code pair" data-sample="futures-and-promises.2" data-expect="ok"><figcaption><span class="ctitle">Wrap a function so its result lands in a future</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="t">int</span>()&gt; <span class="f">task</span>([] {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"computing on the worker thread\n"</span>);
+        <span class="k">return</span> <span class="n">6</span> * <span class="n">7</span>;
+    });
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; result = task.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>(<span class="t">std</span>::<span class="f">ref</span>(task));                  <span class="c">// a packaged_task is callable: any thread can run it</span>
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"result = %d\n"</span>, result.<span class="f">get</span>());          <span class="c">// waits for the result, not necessarily for thread exit</span>
+    worker.<span class="f">join</span>();
+    <span class="k">try</span> {
+        <span class="f">task</span>();                                          <span class="c">// a second call fails: it runs at most once</span>
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::future_error&amp; e) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"a second call throws: %s\n"</span>, e.<span class="f">what</span>());
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="k">import</span> java.util.concurrent.<span class="t">FutureTask</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">FutureTask</span>&lt;<span class="t">Integer</span>&gt; task = <span class="k">new</span> <span class="t">FutureTask</span>&lt;&gt;(() -&gt; {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"computing on "</span> + <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>());
+            <span class="k">return</span> <span class="n">6</span> * <span class="n">7</span>;
+        });
+        <span class="t">Thread</span> worker = <span class="k">new</span> <span class="t">Thread</span>(task, <span class="s">"worker"</span>);      <span class="c">// a FutureTask is a Runnable: any thread can run it</span>
+        worker.<span class="f">start</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"result = "</span> + task.<span class="f">get</span>());    <span class="c">// waits for the result, not necessarily for thread exit</span>
+        worker.<span class="f">join</span>();
+        task.<span class="f">run</span>();                                      <span class="c">// a second run is ignored: it runs at most once</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"after a second run: still "</span> + task.<span class="f">get</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>computing on worker
+result = 42
+after a second run: still 42</pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="the-promise-side-by-hand">The promise side, by hand</h2>
+<p>Sometimes there is no task to wrap: the result arrives from a callback, a message, or the end of a batch. Then you hold the write side yourself. C++ has <code>std::promise</code> with <code>set_value</code> and <code>set_exception</code>. Java has no class named promise; <code>CompletableFuture</code> plays both roles, with <code>complete</code> and <code>completeExceptionally</code> as the write side. The next lesson is about the rest of <code>CompletableFuture</code>.</p>
+
+<figure class="code pair" data-sample="futures-and-promises.3" data-expect="ok"><figcaption><span class="ctitle">Fill a result from another thread, including failure</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</span><code><span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; configPromise;                    <span class="c">// the write side</span>
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; config = configPromise.<span class="f">get_future</span>();   <span class="c">// the read side</span>
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">loader</span>([p = <span class="t">std</span>::<span class="f">move</span>(configPromise)]() <span class="k">mutable</span> {
+        p.<span class="f">set_value</span>(<span class="s">"timeout=30s"</span>);
+    });
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"config: %s\n"</span>, config.<span class="f">get</span>().<span class="f">c_str</span>());
+
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; reportPromise;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; report = reportPromise.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">builder</span>([p = <span class="t">std</span>::<span class="f">move</span>(reportPromise)]() <span class="k">mutable</span> {
+        p.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">make_exception_ptr</span>(<span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"disk full"</span>)));
+    });
+    <span class="k">try</span> {
+        report.<span class="f">get</span>();
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp; e) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"report failed: %s\n"</span>, e.<span class="f">what</span>());
+    }
+
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; orphan;
+    {
+        <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; forgotten;                            <span class="c">// destroyed without ever being set</span>
+        orphan = forgotten.<span class="f">get_future</span>();
+    }
+    <span class="k">try</span> {
+        orphan.<span class="f">get</span>();
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::future_error&amp; e) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"broken promise: %s\n"</span>, e.<span class="f">code</span>() == <span class="t">std</span>::future_errc::broken_promise ? <span class="s">"yes"</span> : <span class="s">"no"</span>);
+    }
+    loader.<span class="f">join</span>();
+    builder.<span class="f">join</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; config = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();   <span class="c">// the promise and the future in one</span>
+        <span class="t">Thread</span> loader = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; config.<span class="f">complete</span>(<span class="s">"timeout=30s"</span>), <span class="s">"loader"</span>);
+        loader.<span class="f">start</span>();
+        <span class="k">try</span> {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"config: "</span> + config.<span class="f">get</span>());
+        } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"failed: "</span> + e.<span class="f">getCause</span>());
+        }
+
+        <span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; report = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+        <span class="t">Thread</span> builder = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; report.<span class="f">completeExceptionally</span>(<span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"disk full"</span>)), <span class="s">"builder"</span>);
+        builder.<span class="f">start</span>();
+        <span class="k">try</span> {
+            report.<span class="f">get</span>();
+        } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"report failed: "</span> + e.<span class="f">getCause</span>().<span class="f">getMessage</span>());
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"second complete wins? "</span> + report.<span class="f">complete</span>(<span class="s">"late value"</span>));   <span class="c">// only the first completion counts</span>
+        loader.<span class="f">join</span>();
+        builder.<span class="f">join</span>();
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>config: timeout=30s
+report failed: disk full
+second complete wins? false</pre></div><div class="runout" hidden></div></figure>
+
+<p>Look at the last part of the C++ program: <strong>a promise destroyed without being set stores a <code>broken_promise</code> error</strong>, so the reader wakes up with an exception instead of hanging. That is a real safety net. Java has no equivalent: a <code>CompletableFuture</code> that nobody completes stays incomplete forever, and an untimed <code>get()</code> on it waits forever. In Java, every code path of the producer must complete the future, including the error paths, so catch failures at the producer boundary and call <code>completeExceptionally</code>. Completing a future does not decide whether a fatal error should also be rethrown or terminate the worker.</p>
+
+<h2 id="waiting-with-a-deadline-and-cancelling">Waiting with a deadline, and cancelling</h2>
+<p>An untimed <code>get()</code> trusts the producer to finish. A timeout limits the wait, not the work. For a Java <code>FutureTask</code> from <code>ThreadPoolExecutor.submit</code>, successful <code>cancel(true)</code> requests interruption of a running task; the task stops only if it responds. <code>CompletableFuture.cancel(true)</code> does not interrupt its producer at all. C++ futures have no cancellation API: pass a C++20 <code>std::stop_token</code> (<a class="term" data-term="stop-token" href="glossary.html#stop-token">std::stop_token</a>) and check it. In C++17, use a shared atomic stop flag and join owned threads explicitly.</p>
+
+<figure class="code pair" data-sample="futures-and-promises.4" data-expect="ok"><figcaption><span class="ctitle">Give up after 100 ms, then ask the task to stop</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="t">promise</span>;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; slow = <span class="t">promise</span>.<span class="f">get_future</span>();
+    <span class="c">// C++ futures cannot cancel anything. The task gets a stop_token and checks it.</span>
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([p = <span class="t">std</span>::<span class="f">move</span>(<span class="t">promise</span>)](<span class="t">std</span>::<span class="t">stop_token</span> stop) <span class="k">mutable</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">500</span>; i += <span class="n">1</span>) {                       <span class="c">// simulate slow work; sleeps illustrate timing, not synchronization</span>
+            <span class="k">if</span> (stop.<span class="f">stop_requested</span>()) {
+                <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"the task saw the cancellation and stopped\n"</span>);
+                p.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">make_exception_ptr</span>(<span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"cancelled"</span>)));
+                <span class="k">return</span>;
+            }
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(10ms);
+        }
+        p.<span class="f">set_value</span>(<span class="s">"done"</span>);
+    });
+    <span class="k">if</span> (slow.<span class="f">wait_for</span>(100ms) == <span class="t">std</span>::future_status::timeout) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"gave up after 100 ms\n"</span>);
+        worker.<span class="f">request_stop</span>();                                    <span class="c">// a request, not a command</span>
+    }
+    worker.<span class="f">join</span>();
+    <span class="k">try</span> {
+        slow.<span class="f">get</span>();
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp; e) {
+        <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"get() throws: %s\n"</span>, e.<span class="f">what</span>());
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeoutException</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>(
+                <span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"slow-worker"</span>).<span class="f">factory</span>());
+        <span class="t">CountDownLatch</span> started = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">Future</span>&lt;<span class="t">String</span>&gt; slow = pool.<span class="f">submit</span>(() -&gt; {
+            started.<span class="f">countDown</span>();
+            <span class="k">try</span> {
+                <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">5_000</span>);                              <span class="c">// a call that is taking far too long</span>
+                <span class="k">return</span> <span class="s">"done"</span>;
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"the task saw the cancellation and stopped"</span>);
+                <span class="k">throw</span> e;
+            }
+        });
+        <span class="k">try</span> {
+            started.<span class="f">await</span>();                              <span class="c">// establish that cancellation reaches a running task</span>
+            slow.<span class="f">get</span>(<span class="n">100</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+        } <span class="k">catch</span> (<span class="t">TimeoutException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"gave up after 100 ms"</span>);
+            slow.<span class="f">cancel</span>(<span class="k">true</span>);                                     <span class="c">// requests interruption</span>
+        } <span class="k">finally</span> {
+            slow.<span class="f">cancel</span>(<span class="k">true</span>);
+            pool.<span class="f">shutdown</span>();
+        }
+        pool.<span class="f">awaitTermination</span>(<span class="n">1</span>, <span class="t">TimeUnit</span>.SECONDS);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"isCancelled = "</span> + slow.<span class="f">isCancelled</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>gave up after 100 ms
+the task saw the cancellation and stopped
+isCancelled = true</pre></div><div class="runout" hidden></div></figure>
+
+<p>When cancellation wins on a <code>FutureTask</code>, <code>isCancelled()</code> and <code>isDone()</code> become true and <code>get()</code> throws <code>CancellationException</code>, even if the task keeps running. <code>cancel(false)</code> can also win after the callable has started; it does not interrupt it, and its eventual result is ignored. If normal completion already won, cancellation fails. These are <code>FutureTask</code> semantics; a general <code>Future</code> implementation may refuse cancellation. Cancellation also does not roll back side effects or necessarily remove the queued wrapper immediately.</p>
+<p><strong>Use one deadline for a whole operation.</strong> Compute remaining time before each wait, including admission and downstream calls; two consecutive one-second waits can spend two seconds. A timed wait may overrun because of scheduling, and cleanup may wait for threads. A hard response deadline needs a longer-lived owner for unfinished work, safe captured lifetimes, and a separate cleanup policy. See <a href="interruption-and-cancellation.html">Stopping a thread</a> for the cancellation contract.</p>
+
+<h2 id="waiting-for-a-batch-invokeall-and-invokeany">Waiting for a batch: invokeAll and invokeAny</h2>
+<p>Two batch shapes come up constantly: "run all of these and give me every result" and "run all of these and give me whichever succeeds first". Java's <code>ExecutorService</code> has a method for each; C++ has neither, and you should be able to write both.</p>
+<ul>
+<li><strong><code>invokeAll(tasks)</code></strong> submits every task and <strong>blocks until all of them are done</strong>, normally or by failing. It returns the futures in the same order as the input, each already complete, so <code>get()</code> on them never waits. It does not throw a task's exception itself; each failure surfaces when you call <code>get()</code> on that task's future, as an <code>ExecutionException</code>.</li>
+<li><strong><code>invokeAll(tasks, timeout, unit)</code></strong> returns when all are done or when the timeout passes, whichever comes first, and <strong>cancels every task that has not finished</strong>, so those futures report <code>isCancelled()</code> and their <code>get()</code> throws <code>CancellationException</code>.</li>
+<li><strong><code>invokeAny(tasks)</code></strong> blocks until <strong>one task completes successfully</strong> and returns its result directly (not a future). Failures are skipped while others are still running. As soon as it has a winner, or gives up, it <strong>cancels unfinished tasks; the standard thread-pool implementation requests interruption</strong>. If every task fails it throws <code>ExecutionException</code> carrying one of the failures; with a timeout it throws <code>TimeoutException</code> if nothing succeeded in time.</li>
+</ul>
+<p><code>invokeAll</code> accepts an empty collection and returns an empty list; <code>invokeAny</code> rejects one with <code>IllegalArgumentException</code>. Interruption cancels unfinished batch tasks and propagates <code>InterruptedException</code>. Both block the calling thread, so the self-deadlock rule applies: do not consume all workers waiting on batches queued to the same pool. And when you want results in the order they finish rather than input order, <code>ExecutorCompletionService</code> hands you futures as they complete. The C++ versions below illustrate related result policies, not the full Java executor contract: <code>invokeAll</code> is "submit everything, then wait for each future in order", and <code>invokeAny</code> is a small shared state (a mutex, the winner, a failure count) plus a <code>std::stop_source</code> that asks losers to stop. This C++ helper owns and joins its threads before returning; Java batch cancellation need not wait for a losing callable to exit. The Java example closes its executor afterwards, which does wait for task termination.</p>
+
+<figure class="code pair" data-sample="futures-and-promises.5" data-expect="ok"><figcaption><span class="ctitle">All results, or the first success</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">using</span> Task = <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">std</span>::<span class="t">string</span>(<span class="t">std</span>::<span class="t">stop_token</span>)&gt;;
+
+<span class="c">// invokeAll: run every task, return only when all are done, futures in input order.</span>
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&gt; <span class="f">invokeAll</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;Task&gt;&amp; tasks) {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&gt; futures;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; threads;                <span class="c">// joins on launch failure too; use a pool in real code</span>
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; task : tasks) {
+        <span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="t">std</span>::<span class="t">string</span>()&gt; <span class="f">job</span>([task] { <span class="k">return</span> <span class="f">task</span>(<span class="t">std</span>::<span class="t">stop_token</span>{}); });
+        futures.<span class="f">push_back</span>(job.<span class="f">get_future</span>());
+        threads.<span class="f">emplace_back</span>(<span class="t">std</span>::<span class="f">move</span>(job));
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    <span class="k">return</span> futures;                                   <span class="c">// each holds a value or an exception</span>
+}
+
+<span class="c">// invokeAny: return the first successful result, ask the others to stop, throw if every task fails.</span>
+<span class="t">std</span>::<span class="t">string</span> <span class="f">invokeAny</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;Task&gt;&amp; tasks) {
+    <span class="k">if</span> (tasks.<span class="f">empty</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"no tasks"</span>);
+    <span class="t">std</span>::<span class="t">mutex</span> m;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv;
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; winner;                <span class="c">// guarded by m</span>
+    <span class="t">std</span>::<span class="t">exception_ptr</span> lastError;                     <span class="c">// guarded by m</span>
+    <span class="t">std</span>::<span class="t">size_t</span> failed = <span class="n">0</span>;                           <span class="c">// guarded by m</span>
+    <span class="t">std</span>::<span class="t">stop_source</span> stop;                            <span class="c">// tells the losers to give up</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; threads;
+    <span class="k">try</span> {
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; task : tasks) {
+            threads.<span class="f">emplace_back</span>([&amp;, task] {
+                <span class="t">bool</span> won = <span class="k">false</span>;
+                <span class="k">try</span> {
+                    <span class="t">std</span>::<span class="t">string</span> value = <span class="f">task</span>(stop.<span class="f">get_token</span>());
+                    {
+                        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m);
+                        <span class="k">if</span> (!winner) {
+                            winner = <span class="t">std</span>::<span class="f">move</span>(value);
+                            won = <span class="k">true</span>;
+                        }
+                    }
+                } <span class="k">catch</span> (...) {
+                    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m);
+                    failed += <span class="n">1</span>;
+                    lastError = <span class="t">std</span>::<span class="f">current_exception</span>();
+                }
+                cv.<span class="f">notify_all</span>();
+                <span class="k">if</span> (won) stop.<span class="f">request_stop</span>();   <span class="c">// callbacks may run synchronously: no result mutex held</span>
+            });
+        }
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m);
+        cv.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> winner.<span class="f">has_value</span>() || failed == tasks.<span class="f">size</span>(); });
+    } <span class="k">catch</span> (...) {
+        stop.<span class="f">request_stop</span>();                  <span class="c">// also stop launched tasks if a later launch fails</span>
+        <span class="k">throw</span>;                                <span class="c">// thread vector joins before referenced state dies</span>
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();          <span class="c">// may exceed the winner's latency</span>
+    <span class="k">if</span> (winner) <span class="k">return</span> *winner;
+    <span class="t">std</span>::<span class="f">rethrow_exception</span>(lastError);                <span class="c">// all failed: report one of the failures</span>
+}
+
+<span class="t">std</span>::<span class="t">string</span> <span class="f">sleepFor</span>(<span class="t">std</span>::<span class="t">stop_token</span> stop, <span class="t">int</span> ms, <span class="k">const</span> <span class="t">char</span>* name) {
+    <span class="k">for</span> (<span class="t">int</span> waited = <span class="n">0</span>; waited &lt; ms; waited += <span class="n">10</span>) {
+        <span class="k">if</span> (stop.<span class="f">stop_requested</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"cancelled"</span>);
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">10</span>));
+    }
+    <span class="k">return</span> name;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;Task&gt; mirrors = {
+        [](<span class="t">std</span>::<span class="t">stop_token</span> st) { <span class="k">return</span> <span class="f">sleepFor</span>(st, <span class="n">300</span>, <span class="s">"mirror-a"</span>); },   <span class="c">// slow</span>
+        [](<span class="t">std</span>::<span class="t">stop_token</span> st) { <span class="k">return</span> <span class="f">sleepFor</span>(st, <span class="n">50</span>, <span class="s">"mirror-b"</span>); },    <span class="c">// fast</span>
+        [](<span class="t">std</span>::<span class="t">stop_token</span>) -&gt; <span class="t">std</span>::<span class="t">string</span> { <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"mirror-c is down"</span>); },
+    };
+    <span class="k">for</span> (<span class="k">auto</span>&amp; f : <span class="f">invokeAll</span>(mirrors)) {
+        <span class="k">try</span> {
+            <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"invokeAll: %s\n"</span>, f.<span class="f">get</span>().<span class="f">c_str</span>());
+        } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+            <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"invokeAll: failed, %s\n"</span>, e.<span class="f">what</span>());
+        }
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"invokeAny: %s\n"</span>, <span class="f">invokeAny</span>(mirrors).<span class="f">c_str</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Callable</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">3</span>)) {
+            <span class="t">List</span>&lt;<span class="t">Callable</span>&lt;<span class="t">String</span>&gt;&gt; mirrors = <span class="t">List</span>.<span class="f">of</span>(
+                    () -&gt; { <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">300</span>); <span class="k">return</span> <span class="s">"mirror-a"</span>; },          <span class="c">// simulated latency only</span>
+                    () -&gt; { <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">50</span>); <span class="k">return</span> <span class="s">"mirror-b"</span>; },           <span class="c">// fast</span>
+                    () -&gt; { <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"mirror-c is down"</span>); });
+
+            <span class="t">List</span>&lt;<span class="t">Future</span>&lt;<span class="t">String</span>&gt;&gt; all = pool.<span class="f">invokeAll</span>(mirrors);   <span class="c">// blocks until every task is done; input order</span>
+            <span class="k">for</span> (<span class="t">Future</span>&lt;<span class="t">String</span>&gt; f : all) {
+                <span class="k">try</span> {
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"invokeAll: "</span> + f.<span class="f">get</span>());           <span class="c">// never blocks here: all are done</span>
+                } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"invokeAll: failed, "</span> + e.<span class="f">getCause</span>().<span class="f">getMessage</span>());
+                }
+            }
+            <span class="t">String</span> first = pool.<span class="f">invokeAny</span>(mirrors);               <span class="c">// first success wins; the rest are cancelled</span>
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"invokeAny: "</span> + first);
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>invokeAll: mirror-a
+invokeAll: mirror-b
+invokeAll: failed, mirror-c is down
+invokeAny: mirror-b</pre></div><div class="runout" hidden></div></figure>
+
+<p>Typical output shows mirror B winning, but sleep durations do not guarantee completion order under every schedule. <code>invokeAll</code> returns all results, including the failure. <code>invokeAny</code> chooses the first observed success and requests cancellation of losers. The C++ version then joins them, so an uncooperative loser can delay its return indefinitely. A deadline-aware version must wait against one deadline and arrange both stop requests and ownership of unfinished work; adding timed waits alone does not bound cleanup.</p>
+
+<div class="only only-cpp"><span class="otag">C++</span>
+<h3>std::async: launch policies and the blocking destructor</h3>
+<p><code>std::async</code> takes a launch policy, and the policy changes everything:</p>
+<ul>
+<li><code>std::launch::async</code>: run the task as if on a new thread. This does not guarantee immediate scheduling, and <code>std::async</code> is not a bounded thread-pool API.</li>
+<li><code>std::launch::deferred</code>: do not run it at all yet. It runs lazily on the first thread to make an untimed wait (<code>get()</code> or <code>wait()</code>), and never runs if nobody does.</li>
+<li>No policy (the default, <code>async | deferred</code>): the implementation picks. So you cannot assume another thread, you cannot rely on <code>thread_local</code> values, and a loop like <code>while (f.wait_for(10ms) != std::future_status::ready)</code> can spin forever, because a deferred task reports <code>deferred</code>, never <code>ready</code>. Always pass a policy explicitly.</li>
+</ul>
+<p>And the rule that bites everyone once: <strong>releasing the last reference to an unfinished <code>std::async</code> state launched with <code>std::launch::async</code> waits for its thread</strong>. A future that dies at the end of a loop iteration, or a return value you never stored, serializes work by waiting for its background thread at each scope exit. A never-started deferred task is not launched by destruction. C++20 marks <code>std::async</code> <code>[[nodiscard]]</code>, so ignoring its result outright can produce a compiler warning; a named short-lived future avoids that particular diagnostic.</p>
+<figure class="code single" data-sample="futures-and-promises.8" data-expect="ok"><figcaption><span class="ctitle">Two background tasks that run one after the other</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+<span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>;
+
+<span class="t">long</span> <span class="t">long</span> <span class="f">msSince</span>(Clock::<span class="t">time_point</span> t) {
+    <span class="k">return</span> <span class="t">std</span>::<span class="t">chrono</span>::duration_cast&lt;<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>&gt;(Clock::<span class="f">now</span>() - t).<span class="f">count</span>();
+}
+
+<span class="t">void</span> <span class="f">slow</span>() {
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(100ms);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">auto</span> t0 = Clock::<span class="f">now</span>();
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        <span class="k">auto</span> f = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, slow);   <span class="c">// f dies at the end of each iteration,</span>
+    }                                                     <span class="c">// and its destructor waits for slow() to finish</span>
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"futures destroyed in the loop: %lld ms (one after the other)\n"</span>, <span class="f">msSince</span>(t0));
+
+    <span class="k">auto</span> t1 = Clock::<span class="f">now</span>();
+    {
+        <span class="k">auto</span> a = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, slow);
+        <span class="k">auto</span> b = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, slow);   <span class="c">// both alive at once: they overlap</span>
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"futures kept alive together:   %lld ms (in parallel)\n"</span>, <span class="f">msSince</span>(t1));
+
+    <span class="k">auto</span> lazy = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::deferred, [] { <span class="k">return</span> <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">get_id</span>(); });
+    <span class="t">bool</span> deferred = lazy.<span class="f">wait_for</span>(0s) == <span class="t">std</span>::future_status::deferred;   <span class="c">// has not started, and never will by itself</span>
+    <span class="t">bool</span> onCaller = lazy.<span class="f">get</span>() == <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">get_id</span>();           <span class="c">// get() runs it, here, now</span>
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"deferred: status is deferred = %s, ran on the caller = %s\n"</span>,
+                deferred ? <span class="s">"true"</span> : <span class="s">"false"</span>, onCaller ? <span class="s">"true"</span> : <span class="s">"false"</span>);
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Futures from <code>std::promise</code> and <code>std::packaged_task</code> do not block in their destructors; an unfinished asynchronously launched <code>std::async</code> state is the special case. Dropping a promise-backed future does not stop its producer: ensure references captured by the task still outlive it. That is one more reason real code runs tasks on a pool and returns <code>packaged_task</code> futures, as you will in <a href="build-thread-pool.html">the build-it lesson</a>.</p>
+<h3>Many readers: std::shared_future</h3>
+<p>A <code>std::future</code> is move-only and its <code>get()</code> works once, so it has one consuming handle; move that handle when transferring ownership. When several threads need the same result (a loaded configuration, a "start" signal), call <code>share()</code> to get a <a class="term" data-term="shared-future" href="glossary.html#shared-future">std::shared_future</a>. It is copyable, <code>get()</code> for a value type returns <code>const T&amp;</code> and can be repeated (<code>T&amp;</code> and <code>void</code> specializations differ), and each thread should hold its own copy. Keep a copy alive while using the returned reference, and do not assume a const reference makes pointed-to data immutable.</p>
+<figure class="code single" data-sample="futures-and-promises.9" data-expect="ok"><figcaption><span class="ctitle">Three readers, one result</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; ready;
+    <span class="t">std</span>::<span class="t">shared_future</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; config = ready.<span class="f">get_future</span>().<span class="f">share</span>();   <span class="c">// copyable, readable many times</span>
+    <span class="t">std</span>::<span class="t">mutex</span> printMutex;
+    ready.<span class="f">set_value</span>(<span class="s">"timeout=30s"</span>);                  <span class="c">// already ready; readers also work if completed later</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; readers;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+        readers.<span class="f">emplace_back</span>([config, i, &amp;printMutex] {    <span class="c">// each thread holds its own copy</span>
+            <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; value = config.<span class="f">get</span>();         <span class="c">// all three retrieve the same value</span>
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(printMutex);
+            <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"reader %d sees %s\n"</span>, i, value.<span class="f">c_str</span>());
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : readers) t.<span class="f">join</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+</div>
+<div class="only only-java"><span class="otag">Java</span>
+<h3>Many readers, and fire and forget</h3>
+<p>A Java <code>Future</code> can be read by any number of threads, any number of times: <code>get()</code> on a finished future just returns the stored result again. Dropping a Java future never waits for anything; the task can keep running, but nobody observes its result or exception unless another reporting path exists (the failures lesson covers that trap). C++ differs on both points, which is worth knowing when you pair with a C++ engineer.</p>
+</div>
+
+<div class="box example">
+<h3>Worked example: an event writer that acknowledges after fsync</h3>
+<p>A Databricks concurrency round asked for a thread-safe <code>EventWriter</code> whose <code>appendEvent</code> returns only once the data is durable on disk, with high throughput. The candidate's path went from a mutex plus write plus fsync per event (correct but slow: one fsync per event), to one writer thread fed by a queue, to batching, and finally to a per-event promise completed after the batch's fsync; a full C++ implementation was expected. The promise is the piece that lets thousands of callers wait for one shared fsync.</p>
+<p>The fragment below is only the batch I/O and completion boundary. A surrounding writer owns a bounded FIFO queue, copies submitted bytes, drains accepted events on close, and on I/O failure stops admission and fails both the current batch and queued requests. It calls this method with fresh, uniquely owned promises. Callbacks must not block the writer waiting for another append.</p>
+<figure class="code pair" data-sample="futures-and-promises.6"><figcaption><span class="ctitle">Complete a batch only after all bytes are written and forced</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="p">#include &lt;cerrno&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;system_error&gt;</span>
+<span class="p">#include &lt;unistd.h&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">struct</span> Pending {
+    <span class="t">std</span>::<span class="t">string</span> event;
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; durable;
+};
+
+<span class="c">// Single writer, blocking POSIX descriptor; teaching batches fit in ssize_t.</span>
+<span class="t">void</span> <span class="f">writeBatch</span>(<span class="t">int</span> fd, <span class="t">std</span>::<span class="t">vector</span>&lt;Pending&gt;&amp; batch) {
+    <span class="k">try</span> {
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; p : batch) {
+            <span class="t">std</span>::<span class="t">size_t</span> offset = <span class="n">0</span>;
+            <span class="k">while</span> (offset &lt; p.event.<span class="f">size</span>()) {
+                ssize_t n = ::<span class="f">write</span>(fd, p.event.<span class="f">data</span>() + offset, p.event.<span class="f">size</span>() - offset);
+                <span class="k">if</span> (n &lt; <span class="n">0</span> &amp;&amp; errno == EINTR) <span class="k">continue</span>;
+                <span class="k">if</span> (n &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(n &lt; <span class="n">0</span> ? errno : EIO,
+                                                   <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"write"</span>);
+                offset += <span class="k">static_cast</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt;(n);
+            }
+        }
+        <span class="t">int</span> status;
+        <span class="k">do</span> { status = ::<span class="f">fsync</span>(fd); } <span class="k">while</span> (status != <span class="n">0</span> &amp;&amp; errno == EINTR);
+        <span class="k">if</span> (status != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"fsync"</span>);
+    } <span class="k">catch</span> (...) {
+        <span class="k">auto</span> error = <span class="t">std</span>::<span class="f">current_exception</span>();
+        <span class="k">for</span> (<span class="k">auto</span>&amp; p : batch) p.durable.<span class="f">set_exception</span>(error);
+        <span class="k">throw</span>;                           <span class="c">// owner must fail queued requests and reject new ones</span>
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; p : batch) p.durable.<span class="f">set_value</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">import</span> java.io.<span class="t">IOException</span>;
+<span class="k">import</span> java.nio.<span class="t">ByteBuffer</span>;
+<span class="k">import</span> java.nio.channels.<span class="t">FileChannel</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+
+<span class="k">record</span> <span class="t">Pending</span>(<span class="t">byte</span>[] event, <span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt; durable) {}
+
+<span class="c">// Method inside the single writer; caller owns the file and failure policy.</span>
+<span class="k">static</span> <span class="k">void</span> <span class="f">writeBatch</span>(<span class="t">FileChannel</span> channel, <span class="t">List</span>&lt;<span class="t">Pending</span>&gt; batch) <span class="k">throws</span> <span class="t">IOException</span> {
+    <span class="k">try</span> {
+        <span class="k">for</span> (<span class="t">Pending</span> p : batch) {
+            <span class="t">ByteBuffer</span> bytes = <span class="t">ByteBuffer</span>.<span class="f">wrap</span>(p.<span class="f">event</span>());
+            <span class="k">while</span> (bytes.<span class="f">hasRemaining</span>()) {
+                <span class="k">if</span> (channel.<span class="f">write</span>(bytes) == <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IOException</span>(<span class="s">"write made no progress"</span>);
+            }
+        }
+        channel.<span class="f">force</span>(<span class="k">true</span>);             <span class="c">// request content and metadata persistence for this file</span>
+    } <span class="k">catch</span> (<span class="t">IOException</span> e) {
+        <span class="k">for</span> (<span class="t">Pending</span> p : batch) p.<span class="f">durable</span>().<span class="f">completeExceptionally</span>(e);
+        <span class="k">throw</span> e;                         <span class="c">// owner must fail queued requests and reject new ones</span>
+    }
+    <span class="k">for</span> (<span class="t">Pending</span> p : batch) p.<span class="f">durable</span>().<span class="f">complete</span>(<span class="k">null</span>);
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Why this is the right shape: callers block only on their own future, the single writer keeps events in order, and one fsync is shared by a whole batch, so the synchronization cost is amortized across the batch. The acknowledgement promises only the durability contract of the chosen storage API. Errors reach every affected caller through the same futures. A failed write may have partially reached disk; failure does not mean rollback. New-file directory persistence and device power-loss guarantees need separate treatment. On macOS, <code>fsync</code> alone is not a guarantee that volatile drive caches are flushed; a stronger contract may require <code>F_FULLFSYNC</code>. See <a href="file-io-and-durability.html">files and durability</a> and <a href="p-durable-log-writer.html">the durable log writer problem</a>.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Calling <code>get()</code> right after submitting.</strong> <code>submit(a).get(); submit(b).get();</code> runs a and b one after the other. Submit everything first, then wait.</li>
+<li><strong>Untimed <code>get()</code> on anything remote.</strong> If the producer hangs, so do you, and there is no default timeout in either language. Wait with a deadline, then cancel.</li>
+<li><strong>Swallowing the cause.</strong> Catching <code>ExecutionException</code> and logging only its message loses the real error; use <code>getCause()</code>. Catching <code>InterruptedException</code> and carrying on loses the interrupt; restore it.</li>
+<li><strong>Believing cancel stops the task.</strong> Successful <code>FutureTask.cancel(true)</code> requests interruption; <code>CompletableFuture.cancel</code> does not. C++ needs a separate stop request. None forcibly stops arbitrary work.</li>
+<li><strong>A Java producer with an error path that never completes the future.</strong> The reader waits forever. Complete exceptionally in a catch block.</li>
+<li><strong>C++: <code>std::async</code> without a policy,</strong> or a short-lived <code>std::async</code> future that silently serializes the work in its destructor.</li>
+<li><strong>C++: calling <code>get()</code> twice</strong> on a <code>std::future</code>. Use <code>shared_future</code> for several reads.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Futures appear inside bigger questions far more often than on their own. A Rubrik system coding round asked for a JavaScript-style Promise in Java (working code first, then optimize); Databricks expected <code>std::promise</code> and <code>std::future</code> in a C++ durable event writer; and a result-returning pool needs the same completion mechanism. The theory questions are predictable: future versus promise, what <code>get</code> throws, how timeouts and cancellation work, and in C++, launch policies and the <code>std::async</code> destructor.</p>
+<blockquote>A future is the read side of a single-assignment slot and a promise is the write side; the producer fills it once with a value or an exception, and filling it happens-before get returns, so the reader needs no extra locking. I never call get without a deadline on anything remote, and I treat cancellation as cooperative: FutureTask cancellation may request interruption, CompletableFuture cancellation does not, and C++ needs a separate stop token. In C++ I pass an explicit launch policy to std::async and keep its future alive, because releasing its last asynchronous state can wait for the task.</blockquote>
+<p>Follow ups to expect: "What is the difference between <code>invokeAll</code> and <code>invokeAny</code>?" (all results after all finish, versus the first success with the rest cancelled; both block the caller), "What if an unset C++ promise is destroyed?" (<code>get</code> throws <code>std::future_error</code> with <code>broken_promise</code>; an exception escaping a raw thread instead terminates the process), "How would you wait for the first of several futures?" (<code>ExecutorCompletionService</code> gives completed submitted tasks; <code>CompletableFuture.anyOf</code> races the first completion, including failure, and does not cancel losers; C++20 has no standard <code>when_any</code>), and "Two tasks of 300 and 500 ms in parallel, how long until both are done?" (about 500 ms if submitted together, whichever order you call <code>get</code> in).</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A future reads and a promise writes one shared slot, filled once with a value or an exception; the fill happens-before <code>get</code> returns.</li>
+<li>Java wraps a task's exception in <code>ExecutionException</code>; C++ rethrows the original. Destroying an unset C++ promise reports <code>broken_promise</code>; a Java promise that nobody completes can leave readers waiting forever.</li>
+<li><code>FutureTask</code> and <code>std::packaged_task</code> turn a function into a runnable that fills its own future; pools are built on them.</li>
+<li>Wait with one deadline; cancellation is separate from stopping work. Use interruption-aware tasks or stop tokens, with an explicit cleanup owner.</li>
+<li>C++: always give <code>std::async</code> a launch policy, keep its future alive, and use <code>shared_future</code> for many readers.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="futures-and-promises"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="futures-and-promises.q1" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">The main thread submits a task that prints <code>B</code> and then returns. Main then prints <code>A</code>, calls <code>get()</code> on the task's future, and prints <code>C</code>. Assume each print is one synchronized output operation and the task is not cancelled. Which outputs are possible? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>A B C</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>B A C</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>A C B</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>C A B</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The task may print before or after main prints <code>A</code>, so both of the first two happen. But <code>get()</code> returns only after the task has finished, and the task prints <code>B</code> before finishing, so <code>C</code> always comes after <code>B</code>. Main prints <code>A</code> before it calls <code>get()</code>, so <code>C</code> can never come first either.</div></div><div class="mcq" data-id="futures-and-promises.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A task throws <code>IllegalArgumentException</code> in Java, or <code>std::invalid_argument</code> in C++. What does <code>get()</code> on its future do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Returns null (Java) or a default-constructed value (C++), and logs the error</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Java throws <code>ExecutionException</code> with the original as its cause; C++ rethrows the original <code>std::invalid_argument</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Both throw the original exception type directly</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Both wrap it: Java in <code>ExecutionException</code>, C++ in <code>std::future_error</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Java's <code>get</code> always wraps a task failure in a checked <code>ExecutionException</code>, so you read <code>getCause()</code>. C++ stores an <code>exception_ptr</code> and rethrows the very same exception object, so you catch the original type. <code>std::future_error</code> is only for problems with the future machinery itself, such as a broken promise.</div></div><div class="mcq" data-id="futures-and-promises.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A worker fills a result object's fields and then completes a future with it. No thread mutates those fields after completion. Another thread successfully calls <code>get()</code> and reads the fields without any lock. Is that safe?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Yes: completing the future happens-before <code>get()</code> returns, so all the writes before completion are visible</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Only if every field of the result is volatile or atomic</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only if the result object is immutable</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No: the reader must lock the same mutex the worker used</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Both languages guarantee the edge: Java documents that actions in the asynchronous computation happen-before actions after <code>Future.get()</code>, and in C++ setting the promise synchronizes with the return from <code>get()</code>. Immutability is still good design, but it is not what makes this particular handoff safe. Writes made after completing the future are not covered.</div></div><div class="mcq" data-id="futures-and-promises.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two independent remote calls take 300 ms and 500 ms. Ignore scheduling and submission overhead. You submit both to a pool with free threads, then call <code>get()</code> on the 500 ms one first and on the 300 ms one second. About how long until you have both results?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">800 ms</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">500 ms</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">300 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It depends on the order of the <code>get()</code> calls</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Under the stated assumptions, both calls run in parallel. Waiting for the 500 ms one covers the 300 ms one too, so the second <code>get()</code> returns immediately. Calling <code>get()</code> does not reschedule independent tasks; submitting the second only after waiting for the first would serialize them. Ignore scheduling and submission overhead for this estimate.</div></div><div class="mcq" data-id="futures-and-promises.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An "any of these" call (Java's <code>invokeAny</code>, or the C++ version in this lesson) gets three tasks: one fails immediately, one succeeds first after 50 ms, and one is still running then. Assume losers promptly honour cancellation. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It throws the immediate failure, because that task finished first</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It selects the 50 ms result and requests cancellation of the unfinished task; the failure is ignored because another task succeeded</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It waits for all three and returns the first result in input order</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It returns a list of three futures</span></button></li></ol><div class="why" hidden><strong>Why.</strong> "Any" means the first success: failures are skipped while other tasks can still win, and once there is a winner the rest are cancelled (interrupted in Java, asked to stop through a token in C++). The untimed result policy throws if all tasks fail; interruption or submission failure can also abort the call. The C++ helper joins losers before returning. A list of completed futures is what <code>invokeAll</code> returns, after waiting for all of them.</div></div><div class="mcq" data-id="futures-and-promises.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A <code>FutureTask</code> submitted to a <code>ThreadPoolExecutor</code> is running a CPU loop with no interrupt checks or interruptible operations. While it runs, <code>cancel(true)</code> succeeds. What is true afterwards?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The loop stops immediately because <code>cancel(true)</code> kills the thread</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>isCancelled()</code> is true and <code>get()</code> throws <code>CancellationException</code>, but the loop runs to the end; its result is discarded</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>cancel</code> returns false because the task is already running</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>get()</code> waits for the loop to finish and then returns its result</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Successful <code>FutureTask.cancel(true)</code> changes the future state and requests interruption of the runner. A loop that never checks it keeps going. The future, however, moves to the cancelled state right away, so waiters stop waiting. Here cancellation is stated to have succeeded, so normal completion did not win the race. This is not a guarantee for every implementation of <code>Future</code>.</div></div><div class="mcq" data-id="futures-and-promises.q7" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>This loop runs twice: <code>for (int i = 0; i &lt; 2; i += 1) { auto f = std::async(std::launch::async, task100ms); }</code>. How long does it take?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">About 0 ms: the tasks run in the background</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">About 100 ms: the two tasks run in parallel</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">About 200 ms: each future's destructor waits for its task, so they run one after the other</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile, because the future is unused</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Here <code>std::launch::async</code> was explicit, and each unfinished task's last future waits for its thread on destruction. <code>f</code> is destroyed at the end of each iteration, so iteration two starts only after task one is done. C++20 marks the returned future <code>[[nodiscard]]</code>, which encourages a warning when ignored; naming it does not prevent scope-exit waiting.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="futures-and-promises.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write <code>sumBoth(a, b)</code>: launch two tasks, wait in input order and sum their results, using one overall waiting deadline of 1 second. Propagate observed failures and request cancellation on failure or timeout. In C++, join owned threads safely. Explain why this does not guarantee a hard response deadline or fail-fast detection of the second task's error. Assume the sum fits in int.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="futures-and-promises.7"><figcaption><span class="ctitle">Two tasks, one deadline</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">sumBoth</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">int</span>(<span class="t">std</span>::<span class="t">stop_token</span>)&gt; a, <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">int</span>(<span class="t">std</span>::<span class="t">stop_token</span>)&gt; b) {
+    <span class="k">auto</span> deadline = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() + <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">seconds</span>(<span class="n">1</span>);
+    <span class="t">std</span>::<span class="t">stop_source</span> stop;
+    <span class="k">auto</span> wrap = [token = stop.<span class="f">get_token</span>()](<span class="k">auto</span> task) {
+        <span class="k">return</span> <span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="t">int</span>()&gt;([task = <span class="t">std</span>::<span class="f">move</span>(task), token] { <span class="k">return</span> <span class="f">task</span>(token); });
+    };
+    <span class="k">auto</span> ja = <span class="f">wrap</span>(<span class="t">std</span>::<span class="f">move</span>(a)), jb = <span class="f">wrap</span>(<span class="t">std</span>::<span class="f">move</span>(b));
+    <span class="k">auto</span> fa = ja.<span class="f">get_future</span>(), fb = jb.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> ta, tb;                       <span class="c">// default constructed, safe if a launch fails</span>
+    <span class="k">try</span> {
+        ta = <span class="t">std</span>::<span class="t">jthread</span>(<span class="t">std</span>::<span class="f">move</span>(ja));
+        tb = <span class="t">std</span>::<span class="t">jthread</span>(<span class="t">std</span>::<span class="f">move</span>(jb));
+        <span class="k">if</span> (fa.<span class="f">wait_until</span>(deadline) != <span class="t">std</span>::future_status::ready)
+            <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"timed out"</span>);
+        <span class="t">int</span> x = fa.<span class="f">get</span>();                      <span class="c">// observe a's error before waiting for b</span>
+        <span class="k">if</span> (fb.<span class="f">wait_until</span>(deadline) != <span class="t">std</span>::future_status::ready)
+            <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"timed out"</span>);
+        <span class="k">return</span> x + fb.<span class="f">get</span>();
+    } <span class="k">catch</span> (...) {
+        stop.<span class="f">request_stop</span>();                  <span class="c">// request both stops before either destructor joins</span>
+        <span class="k">throw</span>;
+    }                                         <span class="c">// jthreads join on success and failure</span>
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">import</span> java.util.concurrent.*;
+
+<span class="c">// Method in the caller's class. Call from outside this pool, with capacity for both tasks.</span>
+<span class="k">static</span> <span class="t">int</span> <span class="f">sumBoth</span>(<span class="t">ExecutorService</span> pool, <span class="t">Callable</span>&lt;<span class="t">Integer</span>&gt; a, <span class="t">Callable</span>&lt;<span class="t">Integer</span>&gt; b) <span class="k">throws</span> <span class="t">Exception</span> {
+    <span class="t">long</span> deadline = <span class="t">System</span>.<span class="f">nanoTime</span>() + <span class="t">TimeUnit</span>.SECONDS.<span class="f">toNanos</span>(<span class="n">1</span>);
+    <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; fa = pool.<span class="f">submit</span>(a);
+    <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; fb = <span class="k">null</span>;
+    <span class="k">try</span> {
+        fb = pool.<span class="f">submit</span>(b);                   <span class="c">// rejection here must still cancel a</span>
+        <span class="t">int</span> x = fa.<span class="f">get</span>(deadline - <span class="t">System</span>.<span class="f">nanoTime</span>(), <span class="t">TimeUnit</span>.NANOSECONDS);
+        <span class="t">int</span> y = fb.<span class="f">get</span>(deadline - <span class="t">System</span>.<span class="f">nanoTime</span>(), <span class="t">TimeUnit</span>.NANOSECONDS);
+        <span class="k">return</span> x + y;
+    } <span class="k">finally</span> {
+        fa.<span class="f">cancel</span>(<span class="k">true</span>);
+        <span class="k">if</span> (fb != <span class="k">null</span>) fb.<span class="f">cancel</span>(<span class="k">true</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Submit both before waiting and reuse one monotonic deadline. The Java <code>finally</code> also handles rejection of the second submission; the C++ catch handles launch failure and requests both stops before joining either thread. Waiting in input order can hide B's early failure behind A's timeout; use a completion queue or continuations for fail-fast observation. Cancellation does not roll back side effects. C++ cleanup still waits for cooperative tasks, so it can exceed the deadline, indefinitely if a task ignores stop. For a prompt response, a longer-lived executor must own unfinished tasks and all their captured data; a detached thread referencing stack data is not a safe shortcut.</p></div></div><div class="cq" data-q="futures-and-promises.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain to an interviewer what a future and a promise are, who holds which, and what happens if the producer dies or forgets to set the result, in Java and in C++.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>They are the two ends of one single-assignment shared state. The producer holds the promise and fills the state exactly once, with a value or an exception; the consumer holds the future and waits on it, then gets the value or observes the failure, wrapped in Java and rethrown directly in C++. Filling the state happens-before the consumer's <code>get()</code> returns, so the result is safely published without extra locks. In C++ these are separate types, <code>std::promise</code> and <code>std::future</code>, and a <code>packaged_task</code> bundles a function with its promise. In Java, <code>FutureTask</code> plays the task role and <code>CompletableFuture</code> is both ends at once, with <code>complete</code> and <code>completeExceptionally</code> as the write side.</p>
+<p>If the producer never fills it, the languages differ. In C++, destroying an unset <code>std::promise</code> stores a <code>broken_promise</code> error, so the consumer wakes with a <code>std::future_error</code>. In Java, an incomplete <code>CompletableFuture</code> stays incomplete forever, so an untimed <code>get()</code> hangs; every producer path, especially the error path, must complete it, and consumers should wait with timeouts.</p></div></div><div class="cq" data-q="futures-and-promises.c3" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Many threads call <code>appendEvent(bytes)</code>, which must return only after the bytes are durable on disk. For this estimate, assume a serialized fsync takes 5 ms and other costs are negligible. How do you get far more than 200 appends a second, and what does each caller wait on?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>With one writer and the stated timing assumptions, one fsync per append caps you at about 200 appends a second. Instead: producers put <code>(bytes, promise)</code> into a bounded queue and wait on the promise's future. A single writer thread takes everything waiting in the queue as one batch, writes it in order, calls fsync once, and then completes every promise in the batch (or fails them all with the I/O error). While one fsync is in progress, new events accumulate for the next batch, so batch size grows with load: at 50 events per batch, the simplified model gives about 10,000 appends a second, before write bandwidth, queueing and scheduling overhead. This is group commit. The bounded queue gives backpressure, a single writer keeps order, and <code>close()</code> stops accepting, drains the queue, does a final fsync and completes the last promises. Each caller waits only on its own future, ideally with a timeout.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="futures-and-promises.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Explain a future and a promise to a teammate. What makes reading the result safe?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A future consumes a result and a promise completes their shared state once</li><li>Completion delivers a value or failure and publishes preceding writes</li><li>Later mutations still require synchronization</li><li>Java permits repeated Future.get; C++ future.get consumes its state and shared_future enables repeated reads</li><li>An abandoned unset C++ promise produces broken_promise; an uncompleted Java CompletableFuture can wait forever</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">A future is the read handle for a result, and a promise is the producer's way to complete that result. They refer to one shared state that moves from incomplete to a value or a failure. A waiting consumer can then retrieve the outcome. Completion also publishes the producer's preceding writes, so a consumer that successfully gets a constructed result does not need an extra lock just for that handoff. It does need synchronization for later shared mutations. In Java, CompletableFuture combines the producer and consumer roles, while an executor can return the narrower Future interface. Java callers may get the result repeatedly. In C++, promise and future are separate types, and future.get consumes its state, even when it rethrows a stored exception. For several readers I use shared_future copies and keep the state alive while using a returned reference. There is also a lifecycle difference: destroying an unset C++ promise reports broken_promise. Forgetting to complete a Java CompletableFuture can leave readers waiting forever, so every producer path needs an outcome.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Does valid being true mean a C++ future is ready?</span></p></div></div><div class="sq" data-sq="futures-and-promises.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A request times out after one second. Can you guarantee its background work has stopped?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Timeout ends a wait and does not stop or roll back work</li><li>Successful FutureTask.cancel(true) requests interruption; CompletableFuture.cancel does not interrupt</li><li>C++ futures need a separate stop mechanism and tasks must cooperate</li><li>Use one deadline across admission and multiple waits</li><li>Joining or async state destruction can delay return; unfinished work needs a longer-lived owner</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">No. A timeout tells me the caller stopped waiting; it does not prove the producer stopped or undo its side effects. With a Java FutureTask, successful cancel with interruption enabled requests an interrupt, but a CPU loop that ignores interruption can continue after its future reports cancelled. CompletableFuture cancellation does not even interrupt the producer. In C++, a future has no cancellation operation, so I pass a stop token and make the task check it or use an operation that supports cancellation. I would propagate one deadline through admission and every wait, instead of spending a fresh second at each step. Cleanup matters too. A jthread joins when destroyed, and releasing the last unfinished asynchronous state from std::async can wait for its thread. Either can delay the response beyond the deadline. If the caller must return promptly, a longer-lived executor must own unfinished work and its captured data. I would bound that outstanding work and monitor cleanup, rather than detach a thread that might reference a dead stack frame.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What would you do if the downstream call ignores both interruption and cancellation?</span></p></div></div><div class="sq" data-sq="futures-and-promises.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"One replica fails immediately, another succeeds, and a third is slow. Which result should an any operation return?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Clarify first completion versus first successful completion</li><li>invokeAny skips failures while success remains possible and cancels unfinished tasks</li><li>CompletableFuture.anyOf can complete exceptionally first and does not cancel losers</li><li>C++20 has no standard when_any; a helper needs synchronized winner and failure accounting</li><li>Request stop outside shared-state locks and distinguish selection latency from joining losers</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first clarify whether any means the first completion or the first success. For a replicated read, I usually want the first success. Java's invokeAny ignores an early task failure while another can succeed, returns a successful result, and cancels unfinished tasks. CompletableFuture.anyOf has a different contract: an early failure can complete the combined future exceptionally, and it does not automatically cancel the losers. In C++20 there is no standard when_any, so I need a completion queue or shared state recording the first winner and how many tasks failed. If all fail, I report a failure. I request stop outside the result mutex, because stop callbacks can execute synchronously. Finally, selecting a winner is different from returning it. The helper in this lesson joins its threads before returning, so an uncooperative loser can still delay the caller. That ownership decision must be explicit.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you return the winner promptly while keeping losing tasks and their data alive safely?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-durable-log-writer.html" data-problem="durable-log-writer"><span class="pk">Concurrent systems · senior</span><b>Durable log writer with group commit</b><span class="pst"></span></a><a class="pcard" href="p-future-from-scratch.html" data-problem="future-from-scratch"><span class="pk">Build a primitive · hard</span><b>A future from scratch</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="rejection-and-pool-failures.html"><span>Previous</span><b>Bounded queues, rejection and the ways pools fail</b></a><a class="next" href="composing-async.html"><span>Next</span><b>Composing async work: CompletableFuture and continuations</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#two-halves-of-one-shared-state">Two halves of one shared state</a><a href="#getting-a-result-back">Getting a result back</a><a href="#a-task-object-that-carries-its-own-future">A task object that carries its own future</a><a href="#the-promise-side-by-hand">The promise side, by hand</a><a href="#waiting-with-a-deadline-and-cancelling">Waiting with a deadline, and cancelling</a><a href="#waiting-for-a-batch-invokeall-and-invokeany">Waiting for a batch: invokeAll and invokeAny</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

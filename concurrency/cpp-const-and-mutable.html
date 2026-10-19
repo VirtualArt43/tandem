@@ -1,0 +1,634 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>const correctness and mutable · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-const-and-mutable" data-title="const correctness and mutable" data-track="cpp" data-module="cpp-1" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details open><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable" class=here><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m1">Module 01: The language core</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 01.5</span><span>18 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>const correctness and mutable</h1><p class="lsum">const variables, pointers and member functions, mutable for a mutex in a const getter, and the standard library&#x27;s promise about concurrent const calls.</p><div class="prereq"><span>Before this:</span><a href="cpp-classes-raii.html">Classes, constructors, destructors and RAII</a></div></header><article class="prose" id="article">
+<p class="lead">Since C++11, <code>const</code> carries a promise that matters for threads: the standard library guarantees that const member functions can be called from many threads at once, and your own classes are expected to keep the same promise. <code>mutable</code> is how you keep it when a const function still has to lock, cache or count.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A museum painting has a sign: look, do not touch. A hundred visitors can look at it at the same time and nothing goes wrong, because looking changes nothing. That is <code>const</code>: any number of readers, no coordination needed.</p>
+<p>But the museum also counts visitors with a clicker at the door. The counting happens while people only look, yet the clicker changes. If two guards share one clicker without taking turns, some visitors go uncounted. In C++ the clicker is a <code>mutable</code> member: <strong>it may change inside a const function, so it needs its own protection</strong>.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li>The standard library promises that <strong>concurrent calls to const member functions of one object do not race</strong>, as long as no thread calls a non-const function at the same time. That is why many threads can <code>find</code> in one <code>std::map</code> with no lock while nobody writes it.</li>
+<li>Your own classes are expected to honour the same contract: a const function is either truly read-only or internally synchronized.</li>
+<li>A const getter that locks needs <code>mutable std::mutex m_;</code>. Interviewers see that line constantly, and "why is the mutex mutable?" is a standard follow up.</li>
+<li>A const function that fills a <code>mutable</code> cache without a lock breaks the contract: two "readers" race on the cache.</li>
+<li><code>const</code> is shallow. A const object holding a pointer can still change what it points to, so immutability for threads must go all the way down.</li>
+</ul>
+</div>
+
+<h2 id="const-on-variables-references-and-pointers">const on variables, references and pointers</h2>
+<p><a class="term" data-term="const-correctness" href="glossary.html#const-correctness">const correctness</a> starts with the simple forms, which you have met already:</p>
+<ul>
+<li><code>const int max_workers = 8;</code> cannot change after initialization.</li>
+<li><code>const T&amp;</code> is a read-only path to an object somebody else may still change (the values lesson).</li>
+<li><code>const T*</code> cannot write through the pointer; <code>T* const</code> cannot be repointed.</li>
+<li><code>constexpr</code> means "known at compile time" (and implies const for variables). C++20 <code>constinit</code> means "initialized at compile time", but the variable may change later, which is handy for a global <code>std::mutex</code> or an atomic counter.</li>
+</ul>
+<p>The part people forget is that <strong>const is shallow</strong>. It protects the object's own bytes, not the things its members point to:</p>
+
+<figure class="code single" data-sample="cpp-const-and-mutable.1"><figcaption><span class="ctitle">const stops at the pointer</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code><span class="k">struct</span> Job {
+    <span class="t">std</span>::<span class="t">string</span>* log;          <span class="c">// a pointer member</span>
+};
+
+<span class="t">void</span> <span class="f">touch</span>(<span class="k">const</span> Job&amp; job) {
+    <span class="c">// job.log = nullptr;      // does not compile: the pointer itself is const</span>
+    job.log-&gt;<span class="f">append</span>(<span class="s">"x"</span>);      <span class="c">// compiles: the string it points to is not const</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>So "I only hand out const references" does not make data safe to share if those objects lead, through pointers, to things other threads write.</p>
+
+<h2 id="const-member-functions">const member functions</h2>
+<p>A member function marked <code>const</code> promises not to change the object. Inside it, <code>this</code> is a pointer to const: you can read members and call other const members, and the compiler rejects writes to members and calls to non-const members.</p>
+
+<figure class="code single" data-sample="cpp-const-and-mutable.2"><figcaption><span class="ctitle">Reads are const, writes are not</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="k">class</span> Roster {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">add</span>(<span class="t">std</span>::<span class="t">string</span> name);                  <span class="c">// changes the roster: not const</span>
+    <span class="t">std</span>::<span class="t">size_t</span> <span class="f">size</span>() <span class="k">const</span>;                    <span class="c">// a read: const</span>
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; <span class="f">at</span>(<span class="t">std</span>::<span class="t">size_t</span> i) <span class="k">const</span>;  <span class="c">// const overload, for const Rosters</span>
+    <span class="t">std</span>::<span class="t">string</span>&amp; <span class="f">at</span>(<span class="t">std</span>::<span class="t">size_t</span> i);              <span class="c">// non-const overload, for everyone else</span>
+};
+
+<span class="t">void</span> <span class="f">print</span>(<span class="k">const</span> Roster&amp; r) {                    <span class="c">// a const reference: only const members can be called</span>
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; r.<span class="f">size</span>(); i += <span class="n">1</span>) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; r.<span class="f">at</span>(i) &lt;&lt; <span class="s">"\n"</span>;            <span class="c">// picks the const overload</span>
+    }
+    <span class="c">// r.add("Ira");                             // does not compile</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Const correctness means marking every member function that does not change the object's observable state <code>const</code>, and taking parameters as <code>const T&amp;</code> when you only read them. For a single thread it is compiler-checked documentation. For several threads it is more: <strong>the set of const functions is the set of calls that should be safe to run concurrently</strong>.</p>
+
+<h2 id="physical-versus-logical-constness">Physical versus logical constness</h2>
+<p>There are two ways to read "this function does not change the object".</p>
+<ul>
+<li><strong>Physical (bitwise) constness:</strong> not one bit of the object changes during the call. The compiler enforces a narrower rule: ordinary writes through const access are rejected, but <code>mutable</code> members and pointed-to objects are exceptions.</li>
+<li><strong><a class="term" data-term="logical-constness" href="glossary.html#logical-constness">logical constness</a>:</strong> the object's observable value does not change, even though some internal bits do: a cached result, a statistics counter, a lazily computed hash, a mutex being locked and unlocked.</li>
+</ul>
+<p>A <a class="term" data-term="mutable" href="glossary.html#mutable">mutable</a> member may be modified even inside a const member function. It exists for logical constness: <strong>state that is not part of the object's value</strong>. Locks, caches and counters qualify. Anything a caller could observe does not; if you find yourself making real data <code>mutable</code>, the function was never const.</p>
+
+<h2 id="mutable-for-a-mutex-inside-a-const-getter">mutable for a mutex inside a const getter</h2>
+<p>Here is the pattern you will write in nearly every thread-safe class. <code>std::lock_guard</code> calls <code>lock()</code>, which modifies the mutex. Inside a const member function every member is const, so without <code>mutable</code> the guard does not compile (clang reports that there is no matching constructor for <code>std::lock_guard&lt;std::mutex&gt;</code>, because it was handed a const mutex).</p>
+
+<figure class="code single" data-sample="cpp-const-and-mutable.3" data-expect="ok"><figcaption><span class="ctitle">A const reader and a writer, both locked</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">class</span> Account {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        balance_ += amount;
+    }
+
+    <span class="t">long</span> <span class="f">balance</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);   <span class="c">// locking modifies m_, so m_ must be mutable</span>
+        <span class="k">return</span> balance_;
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;   <span class="c">// not part of the account's value: locking it changes nothing observable</span>
+    <span class="t">long</span> balance_ = <span class="n">0</span>;       <span class="c">// guarded by m_</span>
+};
+
+<span class="t">void</span> <span class="f">audit</span>(<span class="k">const</span> Account&amp; acc, <span class="t">long</span>&amp; highest) {   <span class="c">// a const reference: may only call const members</span>
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">1000</span>; i += <span class="n">1</span>) {
+        highest = <span class="t">std</span>::<span class="f">max</span>(highest, acc.<span class="f">balance</span>());
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Account acc;
+    <span class="t">long</span> highest = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">auditor</span>(audit, <span class="t">std</span>::<span class="f">cref</span>(acc), <span class="t">std</span>::<span class="f">ref</span>(highest));
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">depositor</span>([&amp;acc] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">1000</span>; i += <span class="n">1</span>) {
+            acc.<span class="f">deposit</span>(<span class="n">1</span>);
+        }
+    });
+    depositor.<span class="f">join</span>();
+    auditor.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"final balance "</span> &lt;&lt; acc.<span class="f">balance</span>() &lt;&lt; <span class="s">", the auditor saw at most "</span> &lt;&lt; highest &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The final balance is always 1000; what the auditor saw depends on timing. The <code>mutable</code> keyword is honest here: the mutex is not part of the account's value, and locking it changes no balance.</p>
+
+<h2 id="the-standard-library-s-promise">The standard library's promise</h2>
+<p>The rule, in plain words: <strong>a standard library function does not modify any object other threads can reach, except through its non-const arguments, including <code>this</code></strong>. Concurrent read operations on a safely published, live container are supported. User-supplied comparators and element operations must also avoid races. Non-const operations need closer inspection: containers explicitly permit some of them concurrently.</p>
+<p>Containers add two refinements. For data race purposes, these count as const even in their non-const overloads: <code>begin</code>, <code>end</code>, <code>front</code>, <code>back</code>, <code>data</code>, <code>find</code>, <code>lower_bound</code>, <code>upper_bound</code>, <code>equal_range</code>, <code>at</code>, and <code>operator[]</code> except on maps and the other associative containers. And different elements of one container may be modified concurrently, except in <code>std::vector&lt;bool&gt;</code>, whose elements share bytes.</p>
+<table>
+<thead><tr><th>Thread 1</th><th>Thread 2, same container, no lock</th><th>Data race?</th></tr></thead>
+<tbody>
+<tr><td><code>m.find(1)</code> on a <code>std::map</code></td><td><code>m.find(2)</code></td><td>No: both are const</td></tr>
+<tr><td><code>v.size()</code></td><td>reading <code>v[3]</code></td><td>No</td></tr>
+<tr><td><code>v[1] = 10</code> on a <code>std::vector&lt;int&gt;</code></td><td><code>v[2] = 20</code></td><td>No: different elements</td></tr>
+<tr><td><code>vb[1] = true</code> on a <code>std::vector&lt;bool&gt;</code></td><td><code>vb[2] = false</code></td><td>May race: different bits can share the same storage unit</td></tr>
+<tr><td><code>m[&quot;k&quot;]</code> on a <code>std::map</code>, even for an existing key</td><td><code>m.find(&quot;j&quot;)</code></td><td>Not guaranteed safe: <code>operator[]</code> may insert, so it counts as a write</td></tr>
+<tr><td><code>v.push_back(x)</code></td><td>reading <code>v[0]</code></td><td>Yes: <code>push_back</code> may reallocate the storage being read</td></tr>
+</tbody>
+</table>
+<p>Two cautions. "No data race" is about single calls; <code>if (m.count(k) == 0) m.insert(...)</code> is still a <a class="term" data-term="check-then-act" href="glossary.html#check-then-act">check then act</a> across two calls. A structural change can conflict with reads of container metadata or invalidate elements and iterators. Synchronize those conflicting accesses; the permission to modify distinct existing elements does not permit arbitrary concurrent insertion or erasure.</p>
+
+<h2 id="when-const-lies-a-mutable-cache-without-a-lock">When const lies: a mutable cache without a lock</h2>
+<p>This class looks perfectly read-only from the outside. <code>mean()</code> is const, and the object is declared const. Run it under ThreadSanitizer:</p>
+
+<figure class="code single" data-sample="cpp-const-and-mutable.4" data-expect="race"><figcaption><span class="ctitle">Two const calls that race</span><span class="cnote bad">has a deliberate race</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Stats {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Stats</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">double</span>&gt; values) : <span class="f">values_</span>(<span class="t">std</span>::<span class="f">move</span>(values)) {}
+
+    <span class="c">// Looks read-only, and it is const. But the first call writes two members.</span>
+    <span class="t">double</span> <span class="f">mean</span>() <span class="k">const</span> {
+        <span class="k">if</span> (!cached_) {
+            cache_ = <span class="t">std</span>::<span class="f">accumulate</span>(values_.<span class="f">begin</span>(), values_.<span class="f">end</span>(), <span class="n">0.0</span>) / values_.<span class="f">size</span>();
+            cached_ = <span class="k">true</span>;
+        }
+        <span class="k">return</span> cache_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">double</span>&gt; values_;
+    <span class="k">mutable</span> <span class="t">bool</span> cached_ = <span class="k">false</span>;
+    <span class="k">mutable</span> <span class="t">double</span> cache_ = <span class="n">0.0</span>;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">const</span> Stats <span class="f">stats</span>({<span class="n">2.0</span>, <span class="n">4.0</span>, <span class="n">6.0</span>, <span class="n">8.0</span>});
+    <span class="t">double</span> a = <span class="n">0</span>, b = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t1</span>([&amp;] { a = stats.<span class="f">mean</span>(); });   <span class="c">// two "readers" of a const object</span>
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t2</span>([&amp;] { b = stats.<span class="f">mean</span>(); });
+    t1.<span class="f">join</span>();
+    t2.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"means: "</span> &lt;&lt; a &lt;&lt; <span class="s">" and "</span> &lt;&lt; b &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>Two readers, one cache</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Thread 1</span><span>Thread 2</span><span>cache_ and cached_</span></div><div class="tl-row"><span class="t">1</span><span class="cell">mean(): reads cached_ (false)</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">mean(): reads cached_ (false)</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">writes cache_ = 5, cached_ = true</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">writes cache_ = 5, cached_ = true</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">two unsynchronized writes to the same members: a data race</span></div><div class="tl-note">The program printed 5 and 5, and it is still undefined behavior. Correct output proves nothing.</div></div></figure>
+
+<p>The fix keeps the function const and makes it honest: the cache is guarded by a <code>mutable</code> mutex, exactly like the balance above.</p>
+
+<figure class="code single" data-sample="cpp-const-and-mutable.5" data-expect="ok"><figcaption><span class="ctitle">The same cache, guarded</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Stats {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Stats</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">double</span>&gt; values) : <span class="f">values_</span>(<span class="t">std</span>::<span class="f">move</span>(values)) {}
+
+    <span class="t">double</span> <span class="f">mean</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">if</span> (!cache_) {
+            cache_ = <span class="t">std</span>::<span class="f">accumulate</span>(values_.<span class="f">begin</span>(), values_.<span class="f">end</span>(), <span class="n">0.0</span>) / values_.<span class="f">size</span>();
+        }
+        <span class="k">return</span> *cache_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">double</span>&gt; values_;                 <span class="c">// never changes after construction</span>
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;                       <span class="c">// guards cache_</span>
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">double</span>&gt; cache_;        <span class="c">// derived from values_, not part of the value; guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">const</span> Stats <span class="f">stats</span>({<span class="n">2.0</span>, <span class="n">4.0</span>, <span class="n">6.0</span>, <span class="n">8.0</span>});
+    <span class="t">double</span> a = <span class="n">0</span>, b = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t1</span>([&amp;] { a = stats.<span class="f">mean</span>(); });
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t2</span>([&amp;] { b = stats.<span class="f">mean</span>(); });
+    t1.<span class="f">join</span>();
+    t2.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"means: "</span> &lt;&lt; a &lt;&lt; <span class="s">" and "</span> &lt;&lt; b &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Other correct options: compute the mean eagerly in the constructor, then safely publish the immutable object; or use <code>std::call_once</code> with a <code>mutable std::once_flag</code>. For a single counter, a <code>mutable std::atomic&lt;long&gt;</code> is enough, because <code>fetch_add</code> is atomic on its own. Two separate atomics do not automatically make a combined update or snapshot atomic; consistency across them needs an additional protocol.</p>
+
+<h2 id="immutable-objects-need-no-locks">Immutable objects need no locks</h2>
+<p>An <a class="term" data-term="immutable-object" href="glossary.html#immutable-object">immutable object</a> gets all its state in the constructor and never changes afterwards. Any number of threads can use it with no locking at all, because there is no writer to race with. In C++, <strong>share it through a pointer to const</strong>, so no thread can even call a non-const member:</p>
+
+<figure class="code single" data-sample="cpp-const-and-mutable.6" data-expect="ok"><figcaption><span class="ctitle">Build once, share read-only</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="c">// Built once, then only read. Through a pointer to const, nobody can call a non-const member.</span>
+    <span class="k">auto</span> prices = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;&gt;(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;{<span class="n">120</span>, <span class="n">80</span>, <span class="n">45</span>, <span class="n">300</span>, <span class="n">15</span>});
+
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">long</span>&gt; <span class="f">totals</span>(<span class="n">4</span>, <span class="n">0</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; readers;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">4</span>; i += <span class="n">1</span>) {
+        readers.<span class="f">emplace_back</span>([prices, &amp;totals, i] {   <span class="c">// each thread holds its own copy of the shared_ptr</span>
+            totals[i] = <span class="t">std</span>::<span class="f">accumulate</span>(prices-&gt;<span class="f">begin</span>(), prices-&gt;<span class="f">end</span>(), <span class="n">0L</span>) * (i + <span class="n">1</span>);
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; r : readers) {
+        r.<span class="f">join</span>();
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"totals: "</span> &lt;&lt; totals[<span class="n">0</span>] &lt;&lt; <span class="s">" "</span> &lt;&lt; totals[<span class="n">1</span>] &lt;&lt; <span class="s">" "</span> &lt;&lt; totals[<span class="n">2</span>] &lt;&lt; <span class="s">" "</span> &lt;&lt; totals[<span class="n">3</span>] &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Two conditions keep this honest. The constness must be deep: no <code>mutable</code> members without synchronization and no pointers to data that others write. And the hand-off of the pointer itself must be synchronized; here thread creation does that. Swapping in a new version while readers run is the copy-on-write pattern, built in <a href="cpp-smart-pointers.html">the smart pointer lesson</a> and in <a href="copy-on-write-and-snapshots.html">copy-on-write and snapshots</a>.</p>
+
+<div class="box example">
+<h3>Worked example: an LRU cache whose get is a write</h3>
+<p>A read-heavy LRU cache seems like the perfect place for a read-write lock: shared lock in <code>get</code>, exclusive lock in <code>put</code>. Here is that version:</p>
+<figure class="code single" data-sample="cpp-const-and-mutable.7"><figcaption><span class="ctitle">A read lock in the wrong place</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="k">class</span> BadLru {
+<span class="k">public</span>:
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">get</span>(<span class="t">int</span> key) <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">shared_lock</span>&lt;<span class="t">std</span>::<span class="t">shared_mutex</span>&gt; <span class="f">lock</span>(m_);       <span class="c">// BUG: many readers at once...</span>
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it == index_.<span class="f">end</span>()) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;
+        }
+        order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);  <span class="c">// ...all rewiring the same list</span>
+        <span class="k">return</span> it-&gt;second-&gt;second;
+    }
+
+<span class="k">private</span>:
+    <span class="k">using</span> Entry = <span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">int</span>, <span class="t">std</span>::<span class="t">string</span>&gt;;
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">shared_mutex</span> m_;
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">list</span>&lt;Entry&gt; order_;
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">int</span>, <span class="t">std</span>::<span class="t">list</span>&lt;Entry&gt;::iterator&gt; index_;
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>get</code> is const and its result does not change the cache's contents, so it is <em>logically</em> a read. <strong>Physically it is a write</strong>: marking an entry as most recently used moves a node to the front of the list. Two threads holding the shared lock splice the same list at once, corrupting its links. A Blind thread about a Microsoft LRU question (2024) turns on exactly this point: every <code>get</code> moves an entry, so a read lock does not help.</p>
+<p>The fix is to admit that <code>get</code> writes and take an exclusive lock. Whether you keep <code>get</code> const (with <code>mutable</code> internals, because the contents do not change) or make it non-const (because it reorders), the threading rule is the same: <strong>decide locks by what the code physically writes, not by what the name suggests</strong>.</p>
+<figure class="code single" data-sample="cpp-const-and-mutable.8"><figcaption><span class="ctitle">An LRU cache with honest locking</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</span><code><span class="k">class</span> LruCache {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">LruCache</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="c">// Looks like a read. Physically it reorders the list, so it is a write: exclusive lock.</span>
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">get</span>(<span class="t">int</span> key) <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it == index_.<span class="f">end</span>()) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;
+        }
+        order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);   <span class="c">// move to the front: most recently used</span>
+        <span class="k">return</span> it-&gt;second-&gt;second;
+    }
+
+    <span class="t">void</span> <span class="f">put</span>(<span class="t">int</span> key, <span class="t">std</span>::<span class="t">string</span> value) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it != index_.<span class="f">end</span>()) {
+            it-&gt;second-&gt;second = <span class="t">std</span>::<span class="f">move</span>(value);
+            order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);
+            <span class="k">return</span>;
+        }
+        order_.<span class="f">emplace_front</span>(key, <span class="t">std</span>::<span class="f">move</span>(value));
+        <span class="k">try</span> {
+            index_.<span class="f">emplace</span>(key, order_.<span class="f">begin</span>());
+        } <span class="k">catch</span> (...) {
+            order_.<span class="f">pop_front</span>();   <span class="c">// keep the list and index consistent if allocation fails</span>
+            <span class="k">throw</span>;
+        }
+        <span class="k">if</span> (order_.<span class="f">size</span>() &gt; capacity_) {
+            index_.<span class="f">erase</span>(order_.<span class="f">back</span>().first);              <span class="c">// evict the least recently used</span>
+            order_.<span class="f">pop_back</span>();
+        }
+    }
+
+<span class="k">private</span>:
+    <span class="k">using</span> Entry = <span class="t">std</span>::<span class="t">pair</span>&lt;<span class="t">int</span>, <span class="t">std</span>::<span class="t">string</span>&gt;;
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">list</span>&lt;Entry&gt; order_;                                       <span class="c">// front is most recent</span>
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">int</span>, <span class="t">std</span>::<span class="t">list</span>&lt;Entry&gt;::iterator&gt; index_;   <span class="c">// key to list position</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>If one lock becomes the bottleneck, the senior answers are sharding (several independent LRU caches, each with its own lock, chosen by key hash, giving an approximate global order) or not moving an entry that was moved very recently. Those come back in <a href="concurrent-caches.html">thread-safe caches</a>.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>A const getter that writes a <code>mutable</code> cache without a lock.</strong> Two readers race. Lock it, or compute it in the constructor.</li>
+<li><strong>Reading a shared <code>std::map</code> with <code>operator[]</code>.</strong> It inserts missing keys and counts as a write. Use <code>find</code> or <code>at</code>.</li>
+<li><strong>"const means immutable."</strong> It is shallow, and other non-const aliases to the same object may exist.</li>
+<li><strong><code>const_cast</code> to modify something.</strong> Writing to an object that was defined const is undefined behavior, and casting away const on shared data invents a race.</li>
+<li><strong>Making real data <code>mutable</code> so a function compiles.</strong> If callers can observe the change, the function is not const.</li>
+<li><strong>A shared (reader) lock around code that writes internally,</strong> such as an LRU <code>get</code> or a lazy cache fill.</li>
+<li><strong>Returning <code>const std::string</code> by value.</strong> The const blocks moving the result. Return plain <code>std::string</code>.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>You write <code>long get() const</code> with a <code>std::lock_guard</code> inside and the interviewer asks, "why is the mutex mutable?" Or, "is <code>std::vector</code> thread-safe?", "can two threads call <code>find</code> on one <code>std::unordered_map</code>?", and for caches, "can <code>get</code> take a read lock?". Precise answers here separate people who memorized "STL is not thread-safe" from people who know the actual contract.</p>
+<blockquote>The mutex is <code>mutable</code> because locking it modifies it, and inside a const member function every member is const. It is legitimate: the mutex is not part of the object's observable value, so <code>get</code> stays logically const.</blockquote>
+<blockquote>The standard containers guarantee that concurrent const operations on one container do not race, and that different elements can be written concurrently, except in <code>vector&lt;bool&gt;</code>. Any operation that can change the container's structure, like <code>push_back</code>, <code>insert</code> or <code>map::operator[]</code>, needs external synchronization against every other access, reads included.</blockquote>
+<p>Follow ups: "What does <code>mutable</code> mean on a lambda?" (a different use of the same keyword: it lets the call operator modify by-value captures, covered in <a href="cpp-lambdas-callables.html">lambdas</a>); "How would you make a read-mostly class scale?" (a <code>mutable std::shared_mutex</code>, shared locks in truly read-only const functions, unique locks in writers, or immutable snapshots); "Is a const object safe to share without locks?" (only if its constness is deep and it has no unsynchronized <code>mutable</code> state).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>const gained a threading meaning in C++11.</strong> Herb Sutter's 2012 talk "You Don't Know const and mutable" made the point widely known: because the standard library assumes const operations are safe to run concurrently, a const member function in your class should be either bitwise const or internally synchronized. <code>mutable</code> members should be things like mutexes and atomics, which are safe to change from const functions by design.</p>
+<p><strong>Compiler-checked locking.</strong> Clang's thread safety analysis (<code>-Wthread-safety</code>) can check comments like "guarded by <code>m_</code>" at compile time, using attributes such as <code>GUARDED_BY</code> and <code>REQUIRES</code> on annotated mutex types. Large C++ codebases use it to catch an unlocked read of a guarded member before any test runs.</p>
+<p><strong>Read-write locks pay off only when const really means read-only</strong> and the critical sections are long enough to outweigh the extra bookkeeping. A <code>mutable std::shared_mutex</code> with <code>std::shared_lock</code> in const getters is correct only if no const getter writes anything, cache or statistics included.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Mark everything that does not change observable state <code>const</code>; for threads, the const functions are the ones that should be safe to call concurrently.</li>
+<li><code>mutable</code> is for state outside the object's value: mutexes, caches, counters. A const getter that locks needs <code>mutable std::mutex</code>.</li>
+<li>Concurrent container reads are supported, including specified non-const overloads such as <code>find</code> and <code>at</code>. Distinct existing elements may be modified concurrently, except in <code>vector&lt;bool&gt;</code>; conflicting accesses still need synchronization. <code>map::operator[]</code> is excluded from the const-operation guarantee.</li>
+<li>A <code>mutable</code> cache written without a lock turns two "readers" into a data race.</li>
+<li>const is shallow. Immutable objects shared through <code>std::shared_ptr&lt;const T&gt;</code> need no locks, provided their constness is deep and the hand-off is synchronized.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-const-and-mutable"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-const-and-mutable.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why must <code>m_</code> be declared <code>mutable</code> here?<figure class="code single" data-sample="cpp-const-and-mutable.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">long</span> Account::<span class="f">balance</span>() <span class="k">const</span> {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+    <span class="k">return</span> balance_;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Inside a const member function every member is const, and locking needs a non-const mutex</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>mutable</code> makes the mutex faster to lock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::lock_guard</code> only accepts mutexes declared <code>mutable</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not need to be: <code>lock_guard</code> casts away const</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>lock()</code> modifies the mutex, and a const member function sees <code>m_</code> as a const mutex, so the guard's constructor does not compile. <code>mutable</code> exempts the mutex, which is legitimate because the mutex is not part of the account's observable value.</div></div><div class="mcq" data-id="cpp-const-and-mutable.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two threads read a shared <code>std::map&lt;std::string, int&gt;</code> with <code>m[&quot;k&quot;]</code>. The key <code>&quot;k&quot;</code> already exists and no thread inserts anything. Does the standard guarantee there is no data race?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No: <code>operator[]</code> is a non-const function that may insert, so it is treated as a write; use <code>find</code> or <code>at</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: the key exists, so nothing is modified</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Yes: <code>std::map</code> is thread-safe for reads</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No, because <code>std::map</code> can never be used from two threads without a lock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The library's no-race promise covers const operations, plus a short list of non-const functions that containers must treat as const, and <code>operator[]</code> on associative containers is deliberately left off that list. <code>find</code> and <code>at</code> are on it, so they are safe to call concurrently while nobody writes.</div></div><div class="mcq" data-id="cpp-const-and-mutable.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>const Stats stats(...)</code> is shared by two threads, which both call <code>stats.mean()</code>. <code>mean()</code> is const and fills a <code>mutable</code> cache on its first call, with no lock. Both threads print the right mean. What is true?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is a data race, and so undefined behavior, even though the output was right</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It is safe, because the object is const</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It is safe, because both threads write the same value</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile, because a const object cannot have mutable members</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Both threads may read the "not cached" flag and then both write the cache: unsynchronized writes to the same memory locations. Writing equal values is still a data race. Guard the cache with a <code>mutable std::mutex</code>, use <code>std::call_once</code>, or compute it in the constructor.</div></div><div class="mcq" data-id="cpp-const-and-mutable.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Does this compile?<figure class="code single" data-sample="cpp-const-and-mutable.10"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="k">struct</span> Job { <span class="t">std</span>::<span class="t">string</span>* log; };
+
+<span class="t">void</span> <span class="f">touch</span>(<span class="k">const</span> Job&amp; job) {
+    job.log-&gt;<span class="f">append</span>(<span class="s">"x"</span>);
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Yes: const applies to the pointer member, not to the string it points to</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">No: <code>job</code> is const, so nothing reachable from it can change</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Yes, but it is undefined behavior</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only if <code>log</code> is declared <code>mutable</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Inside <code>touch</code>, <code>job.log</code> has type <code>std::string* const</code>: the pointer cannot be changed, but the pointee can. Const is shallow, which is why "I only share const objects" is not, by itself, a thread safety argument.</div></div><div class="mcq" data-id="cpp-const-and-mutable.q5" data-a="0,1,4" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Two threads make these calls at the same time on one shared container, with no lock and nothing else running. Which pairs are free of data races? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>v[1] = 10</code> and <code>v[2] = 20</code> on a <code>std::vector&lt;int&gt;</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>m.find(1)</code> and <code>m.find(2)</code> on a <code>std::map&lt;int, int&gt;</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>v.push_back(1)</code> and <code>v.size()</code> on a <code>std::vector&lt;int&gt;</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>vb[1] = true</code> and <code>vb[2] = false</code> on a <code>std::vector&lt;bool&gt;</code></span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>m.at(1)</code> and <code>m.count(2)</code> on a <code>std::map&lt;int, int&gt;</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Different elements of a container may be written concurrently, except in <code>std::vector&lt;bool&gt;</code>, which packs elements as bits in shared bytes. <code>find</code>, <code>at</code> and <code>count</code> are read operations. <code>push_back</code> may reallocate, which races with every other access, <code>size()</code> included.</div></div><div class="mcq" data-id="cpp-const-and-mutable.q6" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An LRU cache uses a <code>std::shared_mutex</code>: <code>get</code> takes a <code>std::shared_lock</code>, finds the entry and splices it to the front of the recency list; <code>put</code> takes a <code>std::unique_lock</code>. What is wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>get</code> modifies the list, so two threads in <code>get</code> at once race on it; it needs an exclusive lock</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: <code>get</code> does not change the cached values, so a shared lock is right</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::shared_lock</code> cannot be used inside a const function</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only <code>put</code> is wrong: it should use a shared lock too</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Marking an entry as recently used physically rewires list nodes. Shared locks let many <code>get</code> calls run together, all splicing the same list: a data race that can corrupt it. Choose locks by what the code writes, not by whether the function sounds like a read.</div></div><div class="mcq" data-id="cpp-const-and-mutable.q7" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this do?<figure class="code single" data-sample="cpp-const-and-mutable.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><code><span class="k">const</span> <span class="t">int</span> limit = <span class="n">10</span>;
+<span class="k">const_cast</span>&lt;<span class="t">int</span>&amp;&gt;(limit) = <span class="n">20</span>;</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Undefined behavior: the object was defined const, so writing to it is not allowed even through a cast</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It sets <code>limit</code> to 20</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It creates a modified copy and leaves <code>limit</code> at 10</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>const_cast</code> removes const from a reference's type, but writing through it is only valid when the original object was not const. Here it was, so the program is undefined; the compiler may even have folded <code>limit</code> to 10 everywhere.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-const-and-mutable.c1" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain logical versus physical constness, and why the mutex in a thread-safe class is <code>mutable</code>, as you would to an interviewer.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Physical constness means no bit of the object changes. The compiler does not enforce that fully: const access still permits modification of mutable members and pointed-to objects. Logical constness means the object's abstract value does not change, even if internal bookkeeping does: a cache, a counter, a lock. <code>mutable</code> is the escape hatch for bookkeeping outside that abstract value.</p>
+<p>A thread-safe getter must lock, and locking modifies the mutex, so in a const function the mutex has to be <code>mutable</code>. That is the textbook legitimate use: the mutex is not part of the value, it exists precisely to make const calls safe to run concurrently. And that is the contract C++ code is expected to keep, because the standard library assumes it: concurrent const calls on one object must not race. So any <code>mutable</code> state my const functions touch must itself be synchronized, by that mutex or by being atomic.</p></div></div><div class="cq" data-q="cpp-const-and-mutable.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Make this class const correct and safe for many threads: <code>class Sensor { std::vector&lt;double&gt; readings_; double cached_average_; bool dirty_; public: void add(double r); double average(); };</code></div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-const-and-mutable.12"><figcaption><span class="ctitle">Sensor, const correct and thread-safe</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Sensor {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">add</span>(<span class="t">double</span> reading) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        readings_.<span class="f">push_back</span>(reading);
+        cached_average_.<span class="f">reset</span>();                  <span class="c">// the cache is now stale</span>
+    }
+
+    <span class="t">double</span> <span class="f">average</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">if</span> (!cached_average_) {
+            cached_average_ = readings_.<span class="f">empty</span>()
+                ? <span class="n">0.0</span>
+                : <span class="t">std</span>::<span class="f">accumulate</span>(readings_.<span class="f">begin</span>(), readings_.<span class="f">end</span>(), <span class="n">0.0</span>) / readings_.<span class="f">size</span>();
+        }
+        <span class="k">return</span> *cached_average_;
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;                        <span class="c">// guards everything below</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">double</span>&gt; readings_;
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">double</span>&gt; cached_average_;
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>average</code> becomes const because it does not change the sensor's observable value. The cache and the mutex are <code>mutable</code> because they are bookkeeping, and the cache is only touched under the mutex, so two concurrent <code>average</code> calls cannot race. <code>std::optional</code> replaces the separate <code>dirty_</code> flag, so the flag and the value can never disagree. <code>add</code> takes the same lock, appends, and invalidates the cache.</p></div></div><div class="cq" data-q="cpp-const-and-mutable.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A read-mostly lookup table uses a <code>mutable std::shared_mutex</code>: <code>lookup() const</code> takes a <code>std::shared_lock</code>, <code>insert()</code> takes a <code>std::unique_lock</code>. A teammate adds hit counting to <code>lookup</code>: <code>hits_[key] += 1;</code> where <code>hits_</code> is a <code>mutable std::unordered_map&lt;std::string, long&gt;</code>. What breaks, and how would you fix it?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Many threads hold the shared lock at the same time, so many threads now run <code>hits_[key] += 1</code> concurrently. That is a data race twice over: concurrent increments of the same counter lose updates, and <code>operator[]</code> may insert a new key, rehashing the map while other threads walk it, which can crash. The const and the shared lock both say "read-only", and the code no longer is.</p>
+<p>Fixes, depending on needs: keep the counts out of the shared structure, for example per-thread counts in a <code>thread_local</code> map merged periodically; or give the stats their own mutex, taken briefly inside <code>lookup</code>, accepting some contention; or preallocate one <code>std::atomic&lt;long&gt;</code> per key when the key set is fixed, so <code>lookup</code> only does <code>fetch_add</code> with no structural change. Taking the exclusive lock in <code>lookup</code> also works, but it throws away the read concurrency the table was built for.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-const-and-mutable.s1" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Your balance getter is const, but its mutex is mutable. Explain why that is legitimate and whether const makes the getter thread-safe."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>The getter preserves the account's logical value even though locking changes internal mutex state</li><li>A const member function cannot lock an ordinary non-mutable mutex member</li><li>Mutable permits modification through const access but supplies no synchronization</li><li>Readers and writers protect the balance with the same mutex</li><li>Const access is shallow and does not stop writes through other aliases</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The getter is logically const because reading the balance does not change the account's value. Locking still changes the mutex's internal state. Through a const member function, an ordinary mutex member would be const, and its lock operation requires a non-const mutex. Declaring that member mutable allows this bookkeeping without making the balance mutable. The keyword supplies permission to modify the member, not synchronization. The actual safety comes from the getter and every writer taking the same mutex around the balance. A const qualifier alone does not make a user-defined function safe to call concurrently. It can still write a mutable cache, or follow a pointer to shared data. A const reference also does not stop another alias from modifying the account. I would therefore explain constness as the interface promise and the mutex protocol as the mechanism that keeps concurrent access safe.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why would returning a const reference to a protected string be risky after the getter releases its lock?</span></p></div></div><div class="sq" data-sq="cpp-const-and-mutable.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Two callers use a const getter under shared locks. You add a lazy cache and now ThreadSanitizer reports a race. What happened, and which fix would you choose?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Shared locks admit both callers; filling the cache is a physical write despite logical constness</li><li>Unsynchronized conflicting accesses are a data race even when both compute the same result</li><li>An exclusive lock must protect checking, computing or publishing, and reading the cache</li><li>For immutable input, eager computation or call_once can avoid repeated cache locking</li><li>Changing input requires synchronized invalidation; call_once is not a resettable cache mechanism</li><li>Choose lock mode by actual writes, including LRU recency updates</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The getter stopped being physically read-only when it began filling the cache. Shared locks let both callers enter, so both can see an empty cache and write its value and readiness state. That is a data race and undefined behavior, even when they compute the same answer. My simplest fix is an exclusive lock protecting the cache check, initialization and read. If the input never changes, I would also consider computing eagerly in the constructor. That removes lazy writes entirely, provided the finished object is safely published. If computation is expensive and often unused, call_once is a good alternative for one successful initialization. If the input can change, I need writers to invalidate the cache under the same protocol; a once flag is not resettable and does not solve that case. I would choose using the cost of computation and the update pattern, then measure contention. The same reasoning applies to an LRU getter: it may return a value without changing that value, but moving its list node is still a write. Lock mode follows the implementation's accesses.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Would making only the cache's ready flag atomic be enough, and what publication and initialization rules would still be needed?</span></p></div></div><div class="sq" data-sq="cpp-const-and-mutable.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A teammate says STL containers always need a mutex. Another says const access is always safe. Give me the precise rules you would use in a review."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Concurrent standard container read operations are supported with safe publication and lifetime</li><li>Certain non-const overloads count as const for data races, such as find and at; associative operator[] does not</li><li>Existing distinct vector<int> elements may be updated concurrently without structural changes</li><li>Vector<bool> is excluded from the distinct-element guarantee</li><li>Structural changes and same-element conflicting access need appropriate synchronization</li><li>Safe individual calls do not make a multi-call check and update atomic</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would inspect which operations run together and which memory they touch. Standard containers support concurrent read operations on a safely published, live container. The rules also treat some non-const overloads as const for data races, including find and at. Map subscript is excluded because it can insert a missing key, so I would use find or at for lookup. A pre-sized vector of integers allows two threads to modify different existing elements while its structure stays fixed. The packed vector of bool is excluded from that guarantee, because separate bits can share storage. If threads access the same element and one writes, I need synchronization for that element. If an operation changes the container's structure, such as push_back, I need to coordinate accesses that can conflict with metadata changes or invalidation. A mutex around those operations is the straightforward design. Finally, safe individual calls do not make a check followed by an insertion atomic. I would protect that whole decision with one protocol. Const is useful information, but I still check aliases, element behavior and the complete operation.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Would reserving enough vector capacity make concurrent <code>push_back</code> and <code>size</code> safe?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-safe-lru-cache.html" data-problem="thread-safe-lru-cache"><span class="pk">Thread-safe structures · medium</span><b>Thread-safe LRU cache</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-classes-raii.html"><span>Previous</span><b>Classes, constructors, destructors and RAII</b></a><a class="next" href="cpp-types-casts-and-initialization.html"><span>Next</span><b>Types, casts, conversions and initialization</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#const-on-variables-references-and-pointers">const on variables, references and pointers</a><a href="#const-member-functions">const member functions</a><a href="#physical-versus-logical-constness">Physical versus logical constness</a><a href="#mutable-for-a-mutex-inside-a-const-getter">mutable for a mutex inside a const getter</a><a href="#the-standard-library-s-promise">The standard library&#x27;s promise</a><a href="#when-const-lies-a-mutable-cache-without-a-lock">When const lies: a mutable cache without a lock</a><a href="#immutable-objects-need-no-locks">Immutable objects need no locks</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

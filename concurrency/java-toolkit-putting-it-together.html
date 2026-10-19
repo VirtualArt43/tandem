@@ -1,0 +1,563 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Putting it together: a thread safe class from scratch · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-toolkit-putting-it-together" data-title="Putting it together: a thread safe class from scratch" data-track="java" data-module="java-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details open><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together" class=here><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m5">Module 05: The concurrency toolkit</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.7</span><span>28 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Putting it together: a thread safe class from scratch</h1><p class="lsum">Build a bounded queue with timed admission and graceful shutdown, connect two workers, and audit the class for safety and progress.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">LinkedIn</span></div><div class="prereq"><span>Before this:</span><a href="java-toolkit-locks.html">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</a><a href="java-toolkit-threads.html">The toolkit: Thread, Runnable, Callable and virtual threads</a><a href="java-toolkit-collections-and-synchronizers.html">The toolkit: concurrent collections and synchronizers</a><a href="java-time-units.html">Time: nanoTime, Duration and TimeUnit</a><a href="java-oop-principles.html">Encapsulation, composition and SOLID</a></div></header><article class="prose" id="article">
+<p class="lead">A threaded class earns its name by keeping a promise across every method, including timeout, interruption and shutdown. Build a bounded work queue, then use two workers to show what that promise does and does not guarantee.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A small repair shop has two mechanics and a shelf with room for three waiting jobs. When the shelf is full, a customer can wait briefly or leave. At closing time the owner stops accepting jobs, wakes anyone waiting, and lets the mechanics finish the jobs already accepted.</p>
+<p>The closed sign and the shelf must follow <strong>one shared rule</strong>. Checking the sign, walking away, then putting a job on the shelf leaves a gap in which the owner can close the shop. A separate lock on each action does not close that gap.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<p>You already have the parts: <a href="java-toolkit-locks.html">locks and conditions</a>, <a href="java-toolkit-threads.html">threads and tasks</a>, and <a href="java-time-units.html">timeout budgets</a>. Here you make their contracts agree. The same review applies to a connection pool, cache, reservation service or background logger.</p>
+<p>For LLD, apply <a href="java-oop-principles.html">encapsulation and composition</a>: the queue owns admission and storage, workers own execution, and the caller owns shutdown and joining. Rubrik reports include a bounded queue followed by a pool built on it; LinkedIn reports include producers, consumers and draining shutdown. The important skill is explaining the ownership and lifecycle of each piece.</p>
+</div>
+
+<h2 id="start-with-the-contract">Start with the contract</h2>
+<p>Our custom <code>CloseableQueue&lt;E&gt;</code> accepts non-null elements in first in, first out order. Capacity is a positive number of <strong>waiting elements</strong>, excluding jobs workers have already removed. Timed admission provides <a class="term" data-term="backpressure" href="glossary.html#backpressure">back-pressure</a>: a caller cannot grow the waiting list without a bound.</p>
+<table>
+<thead><tr><th>Operation</th><th>Contract</th></tr></thead>
+<tbody>
+<tr><td><code>new CloseableQueue&lt;E&gt;(capacity)</code></td><td>Reject nonpositive capacity with <code>IllegalArgumentException</code>.</td></tr>
+<tr><td><code>offer(item, timeout, unit)</code></td><td>Return <code>true</code> only after inserting; return <code>false</code> when the lock or space wait exhausts its budget. Throw <code>IllegalStateException</code> if closure is observed under the lock.</td></tr>
+<tr><td><code>take()</code></td><td>Wait for an element while open; remove the oldest element if present. Return <code>null</code> only when closed and empty.</td></tr>
+<tr><td><code>close()</code></td><td>Reject future admission, preserve existing elements and wake all waiters. Repeated calls are harmless. Return without waiting for jobs to finish.</td></tr>
+</tbody>
+</table>
+<p><code>offer</code> rejects a null element or unit with <code>NullPointerException</code>, and a negative timeout with <code>IllegalArgumentException</code>. Zero means attempt without waiting. Both admission and removal propagate <code>InterruptedException</code> if their lock acquisition or condition wait detects interruption; that throwing call has not inserted or removed an element.</p>
+<p>A timeout limits <strong>requested waiting</strong>, not wall-clock completion. Scheduling pauses and reacquiring the lock after a condition wait can delay return beyond the budget. After acquiring the lock, available space may win even if the budget has just expired; if still full, no further condition wait is requested.</p>
+<p>If lock acquisition times out, <code>offer</code> returns <code>false</code> without inspecting closure. This avoids promising a shutdown diagnosis without owning the lock. <code>close()</code> also needs the lock and can wait to acquire it; it does not wait for task completion.</p>
+
+<h2 id="write-the-invariant-before-the-fields">Write the invariant before the fields</h2>
+<p>The <a class="term" data-term="invariant" href="glossary.html#invariant">invariant</a> is: <code>0 &lt;= items.size() &lt;= capacity</code>; insertion and removal preserve FIFO; once closed, no insertion succeeds. One private lock guards both the deque and <code>closed</code>, including every read. No caller receives the deque, its iterator or the lock.</p>
+<table>
+<thead><tr><th>State</th><th>Producer</th><th>Consumer</th></tr></thead>
+<tbody>
+<tr><td>Open, empty</td><td>May insert</td><td>Wait</td></tr>
+<tr><td>Open, full</td><td>Wait within budget</td><td>May remove</td></tr>
+<tr><td>Closed, elements remain</td><td>Reject</td><td>Drain</td></tr>
+<tr><td>Closed, empty</td><td>Reject</td><td>Return <code>null</code></td></tr>
+</tbody>
+</table>
+<p>There are two <a class="term" data-term="condition-variable" href="glossary.html#condition-variable">conditions</a>, attached to that same lock. A producer waits while full and open; a consumer waits while empty and open. Closure changes both predicates, so it must wake <strong>both sets of waiters</strong>. Read <a href="invariants-and-critical-sections.html">invariants and critical sections</a> for the general method.</p>
+
+<h2 id="first-make-the-admission-race-visible">First make the admission race visible</h2>
+<p>This deliberately broken miniature has no unsynchronized field access. Its flaw is the gap between checking and inserting, the <a href="check-then-act.html">check then act</a> pattern applied to shutdown. The latches force that gap open; they are test controls, not a proposed fix.</p>
+<figure class="code single" data-sample="java-toolkit-putting-it-together.1" data-expect="ok"><figcaption><span class="ctitle">Individually synchronized methods still admit work after close</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">BrokenAdmission</span> {
+        <span class="k">private</span> <span class="t">boolean</span> closed;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;<span class="t">Integer</span>&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+
+        <span class="k">synchronized</span> <span class="t">boolean</span> <span class="f">isOpen</span>() { <span class="k">return</span> !closed; }
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">close</span>() { closed = <span class="k">true</span>; }
+        <span class="k">synchronized</span> <span class="k">void</span> <span class="f">append</span>(<span class="t">int</span> item) { items.<span class="f">addLast</span>(item); }
+        <span class="k">synchronized</span> <span class="t">int</span> <span class="f">size</span>() { <span class="k">return</span> items.<span class="f">size</span>(); }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">BrokenAdmission</span> queue = <span class="k">new</span> <span class="t">BrokenAdmission</span>();
+        <span class="t">CountDownLatch</span> checked = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">CountDownLatch</span> continueSubmit = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">Thread</span> submitter = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="t">boolean</span> open = queue.<span class="f">isOpen</span>();
+            checked.<span class="f">countDown</span>();
+            <span class="k">try</span> {
+                continueSubmit.<span class="f">await</span>();
+                <span class="k">if</span> (open) queue.<span class="f">append</span>(<span class="n">7</span>);
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"submitter"</span>);
+        submitter.<span class="f">start</span>();
+        checked.<span class="f">await</span>();
+        queue.<span class="f">close</span>();
+        continueSubmit.<span class="f">countDown</span>();
+        submitter.<span class="f">join</span>();
+        <span class="k">if</span> (queue.<span class="f">isOpen</span>() || queue.<span class="f">size</span>() != <span class="n">1</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"the forced schedule did not occur"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"BUG: closed queue accepted 1 late item"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>A separate atomic or volatile closed flag has the same composition problem. Keep the closed check and actual insertion in <strong>one critical section</strong>. The <a href="java-toolkit-volatile-and-atomics.html">atomics toolkit</a> explains why visibility alone cannot supply that atomicity.</p>
+
+<h2 id="api-card-the-small-set-we-compose">API card: the small set we compose</h2>
+<table>
+<thead><tr><th>Type</th><th>Methods used and their semantics</th></tr></thead>
+<tbody>
+<tr><td><code>ArrayDeque&lt;E&gt;</code></td><td><code>addLast(e)</code> appends, <code>removeFirst()</code> removes the head, <code>size()</code> counts, <code>isEmpty()</code> tests emptiness; external locking is required here.</td></tr>
+<tr><td><code>ReentrantLock</code></td><td><code>newCondition()</code> binds a wait set; <code>tryLock(time, unit)</code> acquires within a waiting budget or returns false; <code>lockInterruptibly()</code> permits cancellation while acquiring; <code>lock()</code> waits without throwing on interruption; <code>unlock()</code> releases.</td></tr>
+<tr><td><code>Condition</code></td><td>For this <code>ReentrantLock</code>, waiting and signalling require owning the lock. <code>await()</code> and <code>awaitNanos(n)</code> atomically release it and wait, then reacquire it before continuing, including when throwing for interruption. The timed method returns estimated remaining time. <code>signal()</code> wakes one waiter; <code>signalAll()</code> wakes all.</td></tr>
+<tr><td><code>System</code>, <code>TimeUnit</code></td><td><code>System.nanoTime()</code> supplies elapsed-time readings; <code>unit.toNanos(n)</code> converts the budget, saturating on overflow. Compare elapsed differences.</td></tr>
+<tr><td><code>Objects</code></td><td><code>requireNonNull(x, name)</code> returns the reference or throws <code>NullPointerException</code>.</td></tr>
+<tr><td><code>AutoCloseable</code></td><td><code>close()</code> is the cleanup hook used by try-with-resources; our override closes admission without joining workers.</td></tr>
+<tr><td><code>Runnable</code>, <code>Thread</code></td><td><code>run()</code> performs a task; <code>new Thread(task, name)</code> constructs, <code>start()</code> begins execution, <code>join()</code> awaits termination, <code>currentThread().interrupt()</code> restores interruption.</td></tr>
+<tr><td><code>AtomicInteger</code></td><td><code>addAndGet(n)</code> and <code>incrementAndGet()</code> update demo metrics atomically; <code>get()</code> reads them.</td></tr>
+<tr><td><code>CountDownLatch</code></td><td><code>countDown()</code> opens a gate when its count reaches zero; <code>await()</code> waits interruptibly for that gate.</td></tr>
+</tbody>
+</table>
+<p>These are the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/ReentrantLock.html">Java 21 lock</a> and <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/locks/Condition.html">condition contracts</a>. The <a href="java-toolkit-collections-and-synchronizers.html">collections and synchronizers toolkit</a> covers the library alternatives. A standard <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/BlockingQueue.html"><code>BlockingQueue</code></a> has no general close operation, so this is a custom API, not an implementation of that interface.</p>
+
+<h2 id="the-complete-component-then-two-workers">The complete component, then two workers</h2>
+<p>Read the queue first, then <code>worker</code>, then <code>main</code>. This capstone is longer than an API example because it includes the full lifecycle and executable assertions. It uses only Java 21 standard library APIs.</p>
+<figure class="code single" data-sample="java-toolkit-putting-it-together.2" data-expect="ok"><figcaption><span class="ctitle">Bounded admission, timed waiting, draining close and two workers</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">Objects</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">CloseableQueue</span>&lt;E&gt; <span class="k">implements</span> <span class="t">AutoCloseable</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notEmpty = lock.<span class="f">newCondition</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;E&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+        <span class="k">private</span> <span class="t">boolean</span> closed; <span class="c">// Both closed and items are guarded by lock.</span>
+
+        <span class="t">CloseableQueue</span>(<span class="t">int</span> capacity) {
+            <span class="k">if</span> (capacity &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"capacity"</span>);
+            <span class="k">this</span>.capacity = capacity;
+        }
+
+        <span class="k">public</span> <span class="t">boolean</span> <span class="f">offer</span>(E item, <span class="t">long</span> timeout, <span class="t">TimeUnit</span> unit)
+                <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            <span class="t">Objects</span>.<span class="f">requireNonNull</span>(item, <span class="s">"item"</span>);
+            <span class="t">Objects</span>.<span class="f">requireNonNull</span>(unit, <span class="s">"unit"</span>);
+            <span class="k">if</span> (timeout &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"timeout"</span>);
+            <span class="t">long</span> budget = unit.<span class="f">toNanos</span>(timeout);
+            <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="k">if</span> (!lock.<span class="f">tryLock</span>(budget, <span class="t">TimeUnit</span>.NANOSECONDS)) <span class="k">return</span> <span class="k">false</span>;
+            <span class="k">try</span> {
+                <span class="k">while</span> (items.<span class="f">size</span>() == capacity &amp;&amp; !closed) {
+                    <span class="t">long</span> remaining = budget - (<span class="t">System</span>.<span class="f">nanoTime</span>() - start);
+                    <span class="k">if</span> (remaining &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;
+                    notFull.<span class="f">awaitNanos</span>(remaining);
+                }
+                <span class="k">if</span> (closed) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"queue closed"</span>);
+                items.<span class="f">addLast</span>(item);
+                notEmpty.<span class="f">signal</span>();
+                <span class="k">return</span> <span class="k">true</span>;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="k">public</span> E <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (items.<span class="f">isEmpty</span>() &amp;&amp; !closed) {
+                    notEmpty.<span class="f">await</span>();
+                }
+                <span class="k">if</span> (items.<span class="f">isEmpty</span>()) <span class="k">return</span> <span class="k">null</span>; <span class="c">// Closed and drained.</span>
+                E item = items.<span class="f">removeFirst</span>();
+                notFull.<span class="f">signal</span>();
+                <span class="k">return</span> item;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="a">@Override</span>
+        <span class="k">public</span> <span class="k">void</span> <span class="f">close</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                closed = <span class="k">true</span>;
+                notEmpty.<span class="f">signalAll</span>();
+                notFull.<span class="f">signalAll</span>();
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">require</span>(<span class="t">boolean</span> condition, <span class="t">String</span> message) {
+        <span class="k">if</span> (!condition) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(message);
+    }
+
+    <span class="k">static</span> <span class="t">Thread</span> <span class="f">worker</span>(<span class="t">CloseableQueue</span>&lt;<span class="t">Runnable</span>&gt; queue,
+                         <span class="t">AtomicInteger</span> failures, <span class="t">String</span> name) {
+        <span class="k">return</span> <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                <span class="k">for</span> (;;) {
+                    <span class="t">Runnable</span> task = queue.<span class="f">take</span>();
+                    <span class="k">if</span> (task == <span class="k">null</span>) <span class="k">return</span>;
+                    <span class="k">try</span> {
+                        task.<span class="f">run</span>(); <span class="c">// This worker no longer holds the queue lock.</span>
+                    } <span class="k">catch</span> (<span class="t">RuntimeException</span> failure) {
+                        failures.<span class="f">incrementAndGet</span>();
+                    }
+                }
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, name);
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">joinAll</span>(<span class="t">Thread</span>... workers) {
+        <span class="t">boolean</span> interrupted = <span class="k">false</span>;
+        <span class="k">for</span> (<span class="t">Thread</span> worker : workers) {
+            <span class="k">for</span> (;;) {
+                <span class="k">try</span> {
+                    worker.<span class="f">join</span>();
+                    <span class="k">break</span>;
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    interrupted = <span class="k">true</span>; <span class="c">// Finish cleanup before restoring cancellation.</span>
+                }
+            }
+        }
+        <span class="k">if</span> (interrupted) <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">CloseableQueue</span>&lt;<span class="t">Integer</span>&gt; probe = <span class="k">new</span> <span class="t">CloseableQueue</span>&lt;&gt;(<span class="n">2</span>);
+        <span class="f">require</span>(probe.<span class="f">offer</span>(<span class="n">10</span>, <span class="n">0</span>, <span class="t">TimeUnit</span>.NANOSECONDS), <span class="s">"first offer"</span>);
+        <span class="f">require</span>(probe.<span class="f">offer</span>(<span class="n">20</span>, <span class="n">0</span>, <span class="t">TimeUnit</span>.NANOSECONDS), <span class="s">"second offer"</span>);
+        <span class="f">require</span>(!probe.<span class="f">offer</span>(<span class="n">30</span>, <span class="n">10</span>, <span class="t">TimeUnit</span>.MILLISECONDS), <span class="s">"full timeout"</span>);
+        probe.<span class="f">close</span>();
+        probe.<span class="f">close</span>();
+        <span class="f">require</span>(probe.<span class="f">take</span>() == <span class="n">10</span> &amp;&amp; probe.<span class="f">take</span>() == <span class="n">20</span>, <span class="s">"FIFO drain"</span>);
+        <span class="f">require</span>(probe.<span class="f">take</span>() == <span class="k">null</span>, <span class="s">"end of stream"</span>);
+        <span class="t">boolean</span> rejected = <span class="k">false</span>;
+        <span class="k">try</span> {
+            probe.<span class="f">offer</span>(<span class="n">40</span>, <span class="n">0</span>, <span class="t">TimeUnit</span>.NANOSECONDS);
+        } <span class="k">catch</span> (<span class="t">IllegalStateException</span> expected) {
+            rejected = <span class="k">true</span>;
+        }
+        <span class="f">require</span>(rejected, <span class="s">"closed admission"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"queue contract checks passed"</span>);
+
+        <span class="t">CloseableQueue</span>&lt;<span class="t">Runnable</span>&gt; queue = <span class="k">new</span> <span class="t">CloseableQueue</span>&lt;&gt;(<span class="n">2</span>);
+        <span class="t">AtomicInteger</span> sum = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">AtomicInteger</span> failures = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">Thread</span> first = <span class="f">worker</span>(queue, failures, <span class="s">"worker-1"</span>);
+        <span class="t">Thread</span> second = <span class="f">worker</span>(queue, failures, <span class="s">"worker-2"</span>);
+        first.<span class="f">start</span>();
+        second.<span class="f">start</span>();
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">int</span> value = <span class="n">1</span>; value &lt;= <span class="n">6</span>; value += <span class="n">1</span>) {
+                <span class="t">int</span> captured = value;
+                <span class="f">require</span>(queue.<span class="f">offer</span>(() -&gt; sum.<span class="f">addAndGet</span>(captured),
+                                    <span class="n">1</span>, <span class="t">TimeUnit</span>.SECONDS), <span class="s">"admission timeout"</span>);
+            }
+            <span class="f">require</span>(queue.<span class="f">offer</span>(() -&gt; {
+                <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"demo task failure"</span>);
+            }, <span class="n">1</span>, <span class="t">TimeUnit</span>.SECONDS), <span class="s">"failure task admission"</span>);
+        } <span class="k">finally</span> {
+            queue.<span class="f">close</span>();
+            <span class="f">joinAll</span>(first, second);
+        }
+        <span class="f">require</span>(sum.<span class="f">get</span>() == <span class="n">21</span> &amp;&amp; failures.<span class="f">get</span>() == <span class="n">1</span>, <span class="s">"worker results"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"sum="</span> + sum.<span class="f">get</span>() + <span class="s">", failures="</span> + failures.<span class="f">get</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="explain-the-java-choices-as-a-reviewer">Explain the Java choices as a reviewer</h2>
+<table>
+<thead><tr><th>Code choice</th><th>Why it belongs here</th></tr></thead>
+<tbody>
+<tr><td><code>static final class CloseableQueue&lt;E&gt;</code></td><td><code>static</code> avoids an enclosing <code>Main</code> instance; <code>final</code> prevents subclass overrides that weaken the protocol; <code>&lt;E&gt;</code> makes one implementation serve integers and tasks.</td></tr>
+<tr><td><code>private final</code> fields</td><td>Callers cannot replace or use the internal objects. <code>final</code> fixes references, not deque contents; every content access still needs the lock.</td></tr>
+<tr><td><code>boolean closed</code></td><td>Initially false. It needs no <code>volatile</code> because all access uses the same lock, together with the deque.</td></tr>
+<tr><td><code>implements AutoCloseable</code>, <code>@Override</code>, <code>public void close()</code></td><td>The class promises the cleanup interface; the annotation checks the signature. <code>public</code> preserves interface visibility; <code>void</code> means there is no result. The override narrows away checked exceptions.</td></tr>
+<tr><td><code>throws InterruptedException</code></td><td>The queue propagates cancellation to its caller. A worker's <code>Runnable</code> cannot declare that checked exception, so the worker restores the flag and exits.</td></tr>
+<tr><td>Acquire, then <code>try</code>, then <code>finally</code></td><td>Only a successful acquisition enters the protected region. <code>finally</code> releases on returns and exceptions. Putting acquisition inside this <code>try</code> could unlock a lock never acquired.</td></tr>
+<tr><td><code>while</code>, <code>&amp;&amp;</code>, <code>if</code>, <code>return</code>, <code>throw</code></td><td>The loop rechecks state after every wakeup; <code>&amp;&amp; !closed</code> stops waiting on closure. Branches select insertion, timeout, end of stream or rejection.</td></tr>
+<tr><td><code>long budget</code>, <code>long start</code></td><td>Nanoseconds exceed <code>int</code> range quickly. One elapsed-time budget covers acquisition and every wait; conversion saturates rather than wrapping.</td></tr>
+<tr><td><code>new</code>, <code>this.capacity</code>, <code>import</code></td><td>Each queue gets its own storage and lock; <code>this.capacity</code> distinguishes the field from the parameter. Imports only shorten type names.</td></tr>
+<tr><td><code>int captured = value</code>, <code>() -&gt; ...</code></td><td>A fresh effectively final local supplies each lambda's value. Tasks are separate from the threads running them.</td></tr>
+</tbody>
+</table>
+<p>For syntax refreshers use <a href="java-classes-interfaces.html">classes and interfaces</a>, <a href="java-generics.html">generics</a>, <a href="java-lambdas-functional.html">lambdas</a> and <a href="java-exceptions.html">exceptions and cleanup</a>. For an extensible service boundary, use <a href="java-oop-design-for-lld.html">LLD design</a>; do not add inheritance just to reuse queue storage.</p>
+<p>We ignore the value returned by <code>awaitNanos</code> because we recompute from the original start after every wakeup. That charges time spent acquiring the lock as well as waiting for space. <strong>Never restart the full budget.</strong> Timeout arithmetic assumes elapsed intervals shorter than <code>Long.MAX_VALUE</code> nanoseconds, as explained in the time lesson.</p>
+<p>One insertion makes one consumer eligible; one removal makes one producer eligible, so ordinary updates use <code>signal</code>. Closure changes what every waiter must do, so it uses <code>signalAll</code> twice. The zero-time <code>tryLock</code> overload here is still interruptible; an interrupt racing with a completed insertion may instead leave a successful return and a set interrupt flag. An interrupt is not a rollback.</p>
+<p><strong>A signal neither hands over the lock nor reserves an element.</strong> The waiter must reacquire the lock and recheck in a loop because another caller may take the item or space first; <a class="term" data-term="spurious-wakeup" href="glossary.html#spurious-wakeup">spurious wakeups</a> are also permitted. Checking the predicate under the lock and atomically releasing it when waiting prevents a notification from slipping into an unprotected check-to-wait gap. Signals are not stored for future waiters: the queue state is what remembers available work.</p>
+
+<div class="box example">
+<h3>Worked example: closure beats a waiting producer</h3>
+<p>A capacity one queue contains job A. Producer P wants to submit B; consumer C has not yet taken A. The owner O closes admission.</p>
+<figure class="timeline"><figcaption>Reject B, preserve A, then finish</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Producer</span><span>Owner</span><span>Consumer</span></div><div class="tl-row"><span class="t">1</span><span class="cell">holds lock, sees full and open, awaits notFull and releases lock</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">takes lock, sets closed true</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">signals all on notFull and notEmpty, unlocks</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">reacquires lock, leaves loop because closed, throws without inserting B</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">takes lock, removes A even though closed, unlocks</span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">runs A outside the queue lock</span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">calls take again, observes closed and empty, gets null</span></div><div class="tl-note">Closing admission does not discard accepted work or execute it under the lock.</div></div></figure>
+<p>If P inserted before O set <code>closed</code>, B would be accepted and drained. The insertion is the successful offer's <a class="term" data-term="linearization-point" href="glossary.html#linearization-point">linearization point</a>; closing takes effect at <code>closed = true</code>. Returning <code>true</code> after <code>close()</code> returns is possible when the calls overlapped and insertion happened first. Returning <code>true</code> does not mean the job has finished.</p>
+</div>
+
+<h2 id="what-the-worker-demo-proves-and-what-it-leaves-to-the-pool">What the worker demo proves, and what it leaves to the pool</h2>
+<p>Constructing the queue before <code>Thread.start()</code> safely publishes it to both workers. Producer writes before an offer's unlock become visible after a consumer acquires that lock: this is a <a class="term" data-term="happens-before" href="glossary.html#happens-before">happens-before</a> relationship. The queue transfers references; it does not make mutable payloads safe to change after submission. Prefer immutable jobs or exclusive ownership, and study <a href="safe-publication.html">safe publication</a> for the full argument.</p>
+<p>With two workers and capacity two, at most four accepted jobs are queued or executing at once. Blocked submitters may still hold additional jobs in their own stacks, so capacity does not bound total application memory. FIFO describes removal order; workers can start or finish jobs in a different order.</p>
+<p>The demo counts task <code>RuntimeException</code>s and keeps processing. It does not retry, return futures, replace workers after <code>Error</code>, or forcibly stop hung jobs. Draining assumes workers remain available and tasks eventually return. A worker exits when <code>take()</code> detects interruption; a running task can ignore or clear interruption, so interrupting a worker does not guarantee it stops.</p>
+<p><a class="term" data-term="graceful-shutdown" href="glossary.html#graceful-shutdown">Graceful shutdown</a> has two steps: close admission, then join workers outside the queue lock. Empty storage is not evidence that running jobs have finished. Here <code>joinAll</code> finishes joining every worker even if the owner is interrupted, then restores the owner's interrupt flag. It defers cancellation during cleanup and has no time bound, which is suitable only when waiting for these terminating demo tasks is acceptable.</p>
+<p>Restoring the flag inside the retry loop would make the next blocking <code>join()</code> throw again. Restore it after cleanup instead; an <code>InterruptedException</code> from submission still propagates after the <code>finally</code> block. For futures and bounded termination waiting, continue to <a href="build-thread-pool.html">building a thread pool</a> and <a href="interruption-and-cancellation.html">cooperative cancellation</a>; for application code start with <a href="java-toolkit-executors-and-futures.html">library executors</a>.</p>
+
+<h2 id="the-checklist-for-any-threaded-class">The checklist for any threaded class</h2>
+<ol>
+<li><strong>Contract:</strong> define results, rejection, timeout, interruption and lifecycle transitions before fields.</li>
+<li><strong>Ownership:</strong> list shared mutable state, its protecting lock and any escaping references; include payloads and callbacks.</li>
+<li><strong>Invariant:</strong> put every check and update needed to preserve it under the same protection, including reads.</li>
+<li><strong>Atomic effect:</strong> identify where each successful operation takes effect and how overlapping calls are ordered.</li>
+<li><strong>Waiting:</strong> state each predicate, loop after wakeups and list every state change that must signal it.</li>
+<li><strong>Cancellation:</strong> charge one timeout budget, specify what remains unchanged on failure, and release locks on every exit.</li>
+<li><strong>Lifetime:</strong> publish fully constructed objects; close admission, wake waiters, and wait for workers without holding their lock.</li>
+<li><strong>Progress and cost:</strong> keep callbacks outside locks; admit that unfair locking can starve a caller. Deque operations are amortized O(1), storage O(capacity), and blocking delay is separate.</li>
+<li><strong>Evidence:</strong> test capacity one, empty/full waits, closure on both wait sets, interruption, timeout, FIFO and exact item identities under many producers and consumers.</li>
+</ol>
+<p>A useful shutdown regression starts several consumers, verifies they reached the condition wait, closes an empty queue, then bounds every join. Repeat with a full queue and waiting producers; all must reject while the original element survives. Use latches or test-only instrumentation for scheduling, capture worker failures, and use a watchdog for hangs. A start latch alone does not prove a thread reached <code>await</code>.</p>
+<p>The samples check a forced bad schedule and a small correct run; they are not an exhaustive concurrency test suite. <a href="testing-concurrent-code.html">Testing concurrent code</a> develops stronger harnesses; <a href="linearizability.html">linearizability</a> explains how to check histories. Also work through <a href="producer-consumer.html">producer and consumer</a> and <a href="wait-in-a-loop.html">spurious and stolen wakeups</a>.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>A separate open check:</strong> closure can slip between checking and inserting. Combine them under the queue lock.</li>
+<li><strong>Stopping on <code>closed</code> before inspecting items:</strong> this discards accepted work. Stop consumers only when closed and empty.</li>
+<li><strong>Waking only consumers on close:</strong> full-queue producers can remain asleep until timeout. Signal both conditions to all waiters.</li>
+<li><strong>Calling <code>task.run()</code> or <code>join()</code> under the lock:</strong> tasks can block, call back or require the same queue; waiting workers cannot finish. Release first.</li>
+<li><strong>Returning false for interruption:</strong> this erases cancellation. Propagate it from queue methods; restore it at the worker boundary.</li>
+<li><strong>Equating FIFO with completion order:</strong> two workers can finish in either order. Ordered results require another protocol.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Expect "implement a bounded work queue", then "add timeouts", "shut it down", and "build workers on top". Clarify draining versus discarding, whether producers may race with shutdown, and what successful submission means before coding.</p>
+<blockquote>I will guard admission state and storage with one private lock. An offer checks closure and inserts atomically. Close wakes both producer and consumer waiters; consumers drain accepted work before seeing end of stream. Workers execute after releasing the queue lock, and the owner joins them after closing admission.</blockquote>
+<p>For "why not <code>synchronized</code>?", it can implement the same state rules; <a href="java-toolkit-synchronized.html">the monitor toolkit</a> covers that version. This implementation chooses interruptible timed acquisition and two targeted wait sets. For "why not a library queue?", use one when allowed, but still define the lifecycle around it. Review <a href="trylock-timeouts-fairness.html">timeouts and fairness</a> before promising latency or starvation freedom.</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Immediate shutdown needs a different contract.</strong> Close admission and remove pending items under the queue lock, wake both wait sets, then request cooperative cancellation of workers outside it. A task already removed by a worker is absent from the queue even if <code>run()</code> has not begun. Returning every task that has not started therefore needs extra coordination between shutdown and the worker's transition to running; draining the deque alone cannot meet that promise.</p>
+<p><strong><a class="term" data-term="poison-pill" href="glossary.html#poison-pill">Poison pills</a> need producer coordination.</strong> If each worker exits after taking one sentinel, stop all producers first and enqueue one sentinel per worker, after the real jobs. The sentinel must be distinguishable from every valid job, and insertion may block when the queue is full. This queue reserves <code>null</code> for closed and empty, so <code>null</code> cannot be an enqueued sentinel.</p>
+<p><strong>Callbacks outside locks can still exhaust a pool.</strong> If both workers submit child jobs to their own full queue and wait for space, neither worker is available to drain it. A timed offer can break that stall by failing; replacing timed offers with indefinite waits can deadlock. Waiting for child results can also deadlock even when admission succeeds, so choose an explicit policy such as rejecting worker submissions, executing suitable children inline, or composing asynchronously.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>State the contract and invariant before choosing synchronization.</li>
+<li>One lock makes checking closure and admitting work one atomic decision.</li>
+<li>Conditions are prompts to recheck; closure must wake both wait sets.</li>
+<li>One elapsed-time budget covers lock acquisition and repeated space waits.</li>
+<li>Closing admission, draining storage and finishing execution are different events.</li>
+<li>Keep task execution outside queue locks; thread safety does not transfer automatically to payloads.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-toolkit-putting-it-together"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-toolkit-putting-it-together.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An <code>offer</code> inserts just before another thread executes <code>closed = true</code>. Its caller is paused before returning. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>close()</code> returns first, then the offer returns <code>true</code>; the accepted item remains drainable</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The offer must throw because it returns after close</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Close removes the item to preserve the capacity bound</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The JVM delays close until every offer caller returns</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Insertion orders this overlapping offer before closure. The caller can pause after unlocking but before its response, so close can return first. Close neither removes the item nor retroactively rejects it, and the JVM does not wait for every caller to return. An offer begun after close has returned cannot insert.</div></div><div class="mcq" data-id="java-toolkit-putting-it-together.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">After closing a queue containing 10 then 20, with no other consumers or interruption, what is printed if you print the results of three consecutive <code>take()</code> calls?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>null</code>, <code>null</code>, <code>null</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>10</code>, then an exception</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>10</code>, <code>20</code>, <code>null</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>20</code>, <code>10</code>, <code>null</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Close prevents insertion but preserves FIFO contents, so 10 precedes 20 and neither removal throws because of closure. <code>null</code> means closed and empty; returning it immediately would break draining.</div></div><div class="mcq" data-id="java-toolkit-putting-it-together.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An offer has a 100 ms budget. Lock acquisition consumed 60 ms and the queue is still full. Approximately how much waiting budget remains?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">100 ms, because condition waiting has not started</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">40 ms, with later wakeups reducing it further</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">60 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Zero, because lock contention always fails the offer</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Subtract the 60 ms spent acquiring the lock from the original 100 ms, leaving about 40 ms. Passing 100 ms again would extend the budget; 60 ms is time spent, not time remaining, and contention does not itself force failure. Scheduling and lock reacquisition after a condition wait can still postpone actual return.</div></div><div class="mcq" data-id="java-toolkit-putting-it-together.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Several producers wait on a full queue when <code>close()</code> sets the flag and signals only <code>notEmpty</code>. What is the bug?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Close always throws <code>IllegalMonitorStateException</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The flag needs to be an <code>AtomicBoolean</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Producers are not notified of closure and may remain waiting until their timeouts</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>signalAll</code> automatically signals every condition from the same lock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each condition has its own wait set, so signalling <code>notEmpty</code> does not signal <code>notFull</code>. Close holds the required lock, so the changed signal alone does not cause <code>IllegalMonitorStateException</code>. Making the flag atomic would not wake sleeping producers. Timed producers can eventually escape on timeout, but shutdown should notify them promptly.</div></div><div class="mcq" data-id="java-toolkit-putting-it-together.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does the queue guarantee when <code>offer</code> throws <code>InterruptedException</code> from its condition wait?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The item was accepted but will be cancelled later</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">This call inserted nothing, released the lock, and propagated cancellation</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">All queued work is discarded</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The queue permanently becomes closed</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Insertion is after the interruptible waiting steps, and <code>finally</code> unlocks. Throwing <code>InterruptedException</code> clears the thread's interrupt status; the caller must propagate it or restore the flag when handling it. Interruption cancels this waiting call; it neither discards accepted work nor changes the queue lifecycle.</div></div><div class="mcq" data-id="java-toolkit-putting-it-together.q6" data-a="0,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">With capacity 3 and two workers, which claims hold for the demo's design? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">At most five accepted jobs can be queued or executing at once</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">At most five job objects can exist anywhere in the application</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two dequeued tasks may complete in the opposite order</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Once <code>close()</code> returns, both worker threads have terminated</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The bound is three queued plus two executing. Blocked producers may retain additional jobs. Closing admission does not wait for worker termination, and parallel execution does not preserve completion order.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-toolkit-putting-it-together.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">List the queue's shared mutable state, wait predicates and atomic effects. Why is a final deque plus a volatile closed flag insufficient by itself?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The mutable deque contents and closed flag share one private lock. A producer waits while full and open; a consumer waits while empty and open. Successful offer takes effect at insertion, successful take at removal, and first close at the flag write. Terminal take observes closed and empty under the lock.</p><p>Final fixes the deque reference, not its mutable contents. Volatile makes flag accesses visible but cannot combine the open check and insertion into one operation. The same lock must cover both, and all deque reads and writes.</p></div></div><div class="cq" data-q="java-toolkit-putting-it-together.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A shutdown implementation sets closed, signals both conditions, then joins workers while holding the queue lock. Explain a deadlocking schedule and the repair.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A worker is waiting in <code>take</code>. Shutdown takes the lock, sets closed and signals it, but keeps the lock while joining. The worker must reacquire that lock before returning from <code>await</code> and observing closure. The owner waits for the worker; the worker waits for the owner. Move joins after the finally block releases the lock. Do not make a worker join itself; lifecycle waiting belongs to an external owner.</p></div></div><div class="cq" data-q="java-toolkit-putting-it-together.c3" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Add <code>int size()</code> for diagnostics. Explain whether <code>if (queue.size() &lt; limit) queue.offer(...)</code> reserves space.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="java-toolkit-putting-it-together.3"><figcaption><span class="ctitle">Method to add inside CloseableQueue</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code><span class="k">public</span> <span class="t">int</span> <span class="f">size</span>() {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="k">return</span> items.<span class="f">size</span>();
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><p>It returns a consistent snapshot during the call, but reserves nothing. Another producer may insert immediately after unlock. Use <code>offer</code> itself to test and perform admission atomically; treat size as diagnostics, not permission.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="java-toolkit-putting-it-together.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"You have a bounded queue and two workers. Walk me through a clean shutdown while producers are still submitting."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Close means reject new admission and drain accepted jobs</li><li>One lock guards the closed check and insertion; overlapping calls are ordered by their effects</li><li>Close sets the flag and signals all producer and consumer waiters</li><li>Consumers return queued elements after closure and terminate only when closed and empty</li><li>Workers execute outside the lock; the owner joins after closing and releasing the lock</li><li>Draining requires available workers and terminating tasks; interruption is a separate cancellation policy</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would close admission first, drain accepted jobs, and then wait for the workers. The queue's closed flag and contents share one private lock. An offer checks the flag and inserts while holding that lock, so there is no gap where shutdown can slip in. If insertion happens first, the job is accepted. If closure happens first, the offer is rejected. An accepted offer can return after close because those calls overlapped.
+Close sets the flag and signals all waiters on both conditions. Producers waiting for space need to wake and reject; consumers waiting for work need to wake and observe the terminal state. Consumers keep removing existing jobs after closure. They return end of stream only when the queue is both closed and empty.
+Each worker runs its task after releasing the queue lock. The owner then joins the workers outside that lock, because a waking worker must reacquire it before exiting. An empty queue alone is insufficient: a worker may still be executing its last job.
+This is graceful shutdown, assuming workers remain available and tasks eventually finish. Interrupting workers is a different cancellation policy. For bounded shutdown latency, I would add a termination timeout and define what happens to unfinished jobs.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if shutdown must return immediately and give the caller every job that has not started?</span></p></div></div><div class="sq" data-sq="java-toolkit-putting-it-together.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"All the fields are private and every method takes a lock. Is the class thread safe now? What would you review next?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Private fields and individual locking are insufficient for a compound invariant</li><li>Check that admission and lifecycle state use one lock across check and update</li><li>Review waiting predicates, loop rechecks and shutdown notifications</li><li>Review timeout budgets, interruption and exception cleanup</li><li>Check escaped references, callback placement and a concrete adversarial test</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">No, I still need to check the class's contract across methods. Two individually locked calls can leave a race between checking that the queue is open and inserting a job. I would identify the invariant and ensure the same lock protects the whole decision, including lifecycle state and reads.
+Next I would write each waiting predicate and identify every change that can make a waiter proceed. Waits need loops, and closing this queue must wake both producers and consumers. I would check that timeouts share one budget and that interruption leaves no partial insertion and releases the lock.
+Then I would inspect references and callbacks: no internal collection should escape, and task execution belongs outside the lock. Finally, I would force a producer to wait on a full queue, close it, and verify rejection while the original job remains drainable.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you test that a blocked consumer is woken by close without using sleep to arrange the schedule?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-broken-shutdown.html" data-problem="fix-the-broken-shutdown"><span class="pk">Bug hunts · hard</span><b>Fix the broken shutdown</b><span class="pst"></span></a><a class="pcard" href="p-thread-pool-from-scratch.html" data-problem="thread-pool-from-scratch"><span class="pk">Executors and async · hard</span><b>Thread pool from scratch</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-toolkit-collections-and-synchronizers.html"><span>Previous</span><b>The toolkit: concurrent collections and synchronizers</b></a><a class="next" href="java-interview-style.html"><span>Next</span><b>Writing Java in an interview</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#start-with-the-contract">Start with the contract</a><a href="#write-the-invariant-before-the-fields">Write the invariant before the fields</a><a href="#first-make-the-admission-race-visible">First make the admission race visible</a><a href="#api-card-the-small-set-we-compose">API card: the small set we compose</a><a href="#the-complete-component-then-two-workers">The complete component, then two workers</a><a href="#explain-the-java-choices-as-a-reviewer">Explain the Java choices as a reviewer</a><a href="#what-the-worker-demo-proves-and-what-it-leaves-to-the-pool">What the worker demo proves, and what it leaves to the pool</a><a href="#the-checklist-for-any-threaded-class">The checklist for any threaded class</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

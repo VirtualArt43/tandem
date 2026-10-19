@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Predict the output, Java set 2 · Drill · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-test page-drill" data-test="drill-predict-java-02" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><section class="pagehead"><p class="eyebrow"><a href="practice.html#drills">Timed drills</a> · Predict the output · Java</p><h1>Predict the output, Java set 2</h1><p class="hhsub">Thirteen more Java snippets on waiting, thread locals, synchronizers, executors, futures and safe publication.</p><p>The second Java set goes past the basics: what <code>wait</code> and <code>sleep</code> do to a held monitor, what a thread local leaks on a pool thread, what a latch does on its second round, which thread runs a <code>CompletableFuture</code> callback, and where a parallel stream loses data. Every deterministic snippet was compiled and run on Java 21. Where several outputs are possible, the question says "can" and every possible output among the options is marked correct.</p><div class="drillstart" id="dstart"><p>13 questions, 20 minutes. Answers and explanations stay hidden until you submit or the clock runs out. Multi answer questions say so; pick every option that is true.</p><button type="button" class="btn" data-dstart><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Start the clock</button><span class="tbest" data-testbest="drill-predict-java-02"></span></div><div class="testbar drillbar" hidden><span class="dtimer" id="dtimer">20:00</span><span id="tprog">0 answered</span><span id="tscore"></span><button type="button" class="btn small" data-dsubmit>Submit</button><button type="button" class="btn ghost small" data-treset hidden>Start again</button></div></section><section class="testbody quiz drillbody" data-test="drill-predict-java-02" data-drill="predict-java-02" data-minutes="20" hidden><div class="mcq" data-id="d-predict-java-02.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does it print with <code>lock.wait(500)</code> as written, and what if that line becomes <code>Thread.sleep(500)</code>? Assume no spurious wakeup.
+<figure class="code single" data-sample="d-predict-java-02.1"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+<span class="t">CountDownLatch</span> inside = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+<span class="t">Thread</span> t = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+    <span class="k">synchronized</span> (lock) {
+        inside.<span class="f">countDown</span>();
+        <span class="k">try</span> {
+            lock.<span class="f">wait</span>(<span class="n">500</span>);
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="k">return</span>;
+        }
+        <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"T "</span>);
+    }
+});
+t.<span class="f">start</span>();
+inside.<span class="f">await</span>();                 <span class="c">// t is now inside the synchronized block</span>
+<span class="k">synchronized</span> (lock) {
+    <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"M "</span>);
+}
+t.<span class="f">join</span>();</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>T M</code> both ways: neither call lets go of the monitor</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>M T</code> both ways: both calls let go of the monitor</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">With <code>wait</code>: either <code>M T</code> or <code>T M</code>. With <code>sleep</code>: <code>T M</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">With <code>wait</code>: <code>T M</code>. With <code>sleep</code>: <code>M T</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>lock.wait(500)</code> releases the monitor and reacquires it before returning. That permits main to print <code>M</code> while the worker waits, producing <code>M T</code>, but does not guarantee main runs within 500 ms. If the wait times out and the worker reacquires the monitor first, it prints <code>T M</code>. The latch proves only that the worker entered the synchronized block, not that main acquires the monitor before the timeout. Both orders were reproduced, with the second probe delaying main. <code>Thread.sleep(500)</code> keeps the monitor throughout, so main cannot enter until after the worker prints <code>T</code>: that version prints <code>T M</code>. A timeout creates an opportunity for another thread to run, not a scheduling promise.</div></div><div class="mcq" data-id="d-predict-java-02.q2" data-a="0,3" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Two consumer threads are both parked inside <code>take()</code> when another thread calls <code>put(&quot;x&quot;)</code> once. Which outcomes are possible? Select all that apply.
+<figure class="code single" data-sample="d-predict-java-02.2"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">class</span> <span class="t">Box</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Deque</span>&lt;<span class="t">String</span>&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">put</span>(<span class="t">String</span> s) {
+        items.<span class="f">addLast</span>(s);
+        <span class="f">notifyAll</span>();
+    }
+
+    <span class="k">synchronized</span> <span class="t">String</span> <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (items.<span class="f">isEmpty</span>()) {
+            <span class="f">wait</span>();
+        }
+        <span class="k">return</span> items.<span class="f">removeFirst</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">One consumer returns <code>x</code> and the other throws <code>NoSuchElementException</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">One consumer returns <code>x</code> and the other goes back to waiting</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Both consumers return <code>x</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Even with a single consumer and no <code>put</code> at all, <code>take()</code> can throw <code>NoSuchElementException</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>notifyAll</code> wakes both consumers. They reacquire the monitor one at a time: the first removes <code>x</code>; the second continues after <code>wait()</code> without checking again, because the check is an <code>if</code>, and <code>removeFirst()</code> on an empty deque throws. We ran it with both consumers parked: one got <code>x</code>, the other threw. Going back to waiting is what a <code>while</code> loop would do. Both cannot get <code>x</code>, because <code>removeFirst</code> runs under the monitor. A single consumer can also throw, because <code>Object.wait</code> may return spuriously, without any notify. The rule: always wait in a loop that rechecks the condition.</div></div><div class="mcq" data-id="d-predict-java-02.q3" data-a="3" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-java-02.3"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">static</span> <span class="k">final</span> <span class="t">ThreadLocal</span>&lt;<span class="t">Integer</span>&gt; plain = <span class="t">ThreadLocal</span>.<span class="f">withInitial</span>(() -&gt; <span class="n">0</span>);
+<span class="k">static</span> <span class="k">final</span> <span class="t">InheritableThreadLocal</span>&lt;<span class="t">Integer</span>&gt; inherit = <span class="k">new</span> <span class="t">InheritableThreadLocal</span>&lt;&gt;() {
+    <span class="a">@Override</span> <span class="k">protected</span> <span class="t">Integer</span> <span class="f">initialValue</span>() { <span class="k">return</span> <span class="n">0</span>; }
+};
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    plain.<span class="f">set</span>(<span class="n">5</span>);
+    inherit.<span class="f">set</span>(<span class="n">5</span>);
+    <span class="t">Thread</span> t = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+        <span class="t">System</span>.out.<span class="f">print</span>(plain.<span class="f">get</span>() + <span class="s">" "</span> + inherit.<span class="f">get</span>() + <span class="s">" "</span>);
+        plain.<span class="f">set</span>(<span class="n">9</span>);
+        inherit.<span class="f">set</span>(<span class="n">9</span>);
+    });
+    t.<span class="f">start</span>();
+    t.<span class="f">join</span>();
+    <span class="t">System</span>.out.<span class="f">println</span>(plain.<span class="f">get</span>() + <span class="s">" "</span> + inherit.<span class="f">get</span>());
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>5 5 9 9</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>0 0 5 5</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>5 5 5 5</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>0 5 5 5</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> A <code>ThreadLocal</code> keeps one value per thread. The new thread has never set <code>plain</code>, so it sees the initial value 0. An <code>InheritableThreadLocal</code> copies the parent's current value into the child when the <code>Thread</code> object is constructed, so the child sees 5. The child's <code>set(9)</code> changes only the child's copies, so main still prints <code>5 5</code>. Two follow ups: the copy is taken at construction, not at <code>start()</code>, and pool threads were constructed long before your task, so inheritance does not carry request data into an executor.</div></div><div class="mcq" data-id="d-predict-java-02.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-java-02.4"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="k">static</span> <span class="k">final</span> <span class="t">ThreadLocal</span>&lt;<span class="t">StringBuilder</span>&gt; buf = <span class="t">ThreadLocal</span>.<span class="f">withInitial</span>(<span class="t">StringBuilder</span>::<span class="k">new</span>);
+
+<span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+    <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>();
+    <span class="k">for</span> (<span class="t">String</span> req : <span class="k">new</span> <span class="t">String</span>[] {<span class="s">"a"</span>, <span class="s">"b"</span>, <span class="s">"c"</span>}) {
+        <span class="t">Future</span>&lt;<span class="t">String</span>&gt; f = pool.<span class="f">submit</span>(() -&gt; buf.<span class="f">get</span>().<span class="f">append</span>(req).<span class="f">toString</span>());
+        <span class="t">System</span>.out.<span class="f">print</span>(f.<span class="f">get</span>() + <span class="s">" "</span>);
+    }
+    pool.<span class="f">shutdown</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>a b c</code>: each task gets a fresh thread local</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>a ab abc</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>abc abc abc</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It depends on timing: anything from <code>a b c</code> to <code>a ab abc</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> A thread local belongs to the thread, not to the task. The single thread executor runs all three tasks on the same thread, so they share one <code>StringBuilder</code>, and each task sees what the previous one left behind. Nothing is random here: one thread, tasks in order, and <code>f.get()</code> waits for each. This is how per request data (user ids, buffers, security context) leaks from one request into the next on a pooled thread. Clear it in a <code>finally</code> with <code>buf.remove()</code>, or do not use a thread local for per task state.</div></div><div class="mcq" data-id="d-predict-java-02.q5" data-a="3" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-java-02.5"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</span><code><span class="t">Semaphore</span> s = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">2</span>);
+s.<span class="f">acquire</span>();
+s.<span class="f">release</span>();
+s.<span class="f">release</span>();
+s.<span class="f">release</span>();
+<span class="t">System</span>.out.<span class="f">print</span>(s.<span class="f">availablePermits</span>() + <span class="s">" "</span>);
+s.<span class="f">acquire</span>(<span class="n">3</span>);
+<span class="t">System</span>.out.<span class="f">print</span>(s.<span class="f">tryAcquire</span>(<span class="n">2</span>) + <span class="s">" "</span>);
+<span class="t">System</span>.out.<span class="f">println</span>(s.<span class="f">availablePermits</span>());</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>2 false 0</code>: permits cannot go above the starting count</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>4 true 0</code>: <code>tryAcquire(2)</code> takes the one permit that is left</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws <code>IllegalStateException</code> at the third <code>release()</code>, because there were more releases than acquires</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>4 false 1</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> A semaphore counts permits without tracking owners. Here the count goes from 2 to 1, then three releases raise it to 4. <code>acquire(3)</code> leaves 1. <code>tryAcquire(2)</code> requires both requested permits, so it returns false and leaves that one permit untouched: <code>4 false 1</code>. The initial count is not a ceiling, but the count is not mathematically unbounded: Java stores it as an <code>int</code>, and overflowing <code>Integer.MAX_VALUE</code> on release throws <code>Error</code>. A negative initial count is also legal; starting at -1 requires two releases before a single permit can be acquired. Extra releases can therefore silently raise an application's intended concurrency limit long before any overflow.</div></div><div class="mcq" data-id="d-predict-java-02.q6" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print? Each round should wait for its two workers.
+<figure class="code single" data-sample="d-predict-java-02.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code><span class="t">CountDownLatch</span> round = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">2</span>);
+<span class="k">for</span> (<span class="t">int</span> r = <span class="n">1</span>; r &lt;= <span class="n">2</span>; r += <span class="n">1</span>) {
+    <span class="t">int</span> rr = r;
+    <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; <span class="n">2</span>; w += <span class="n">1</span>) {
+        <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> { <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">100</span> * rr); } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="k">return</span>; }
+            <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"w"</span> + rr + <span class="s">" "</span>);
+            round.<span class="f">countDown</span>();
+        }).<span class="f">start</span>();
+    }
+    round.<span class="f">await</span>();
+    <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"[round "</span> + r + <span class="s">"] "</span>);
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>w1 w1 [round 1]</code> first; <code>[round 2]</code> may print before, between or after the two <code>w2</code> prints</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Always <code>w1 w1 [round 1] w2 w2 [round 2]</code>, because the latch resets automatically</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>w1 w1 [round 1] </code> and then it hangs, because <code>await()</code> on a used latch blocks forever</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws <code>IllegalStateException</code> when <code>countDown()</code> is called on a latch already at zero</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Both <code>w1</code> prints precede the first <code>[round 1]</code>, because each worker prints before counting down and the first <code>await()</code> waits for both. A <code>CountDownLatch</code> stays at zero once released, so the second <code>await()</code> does not wait for the second round. Usually <code>[round 2]</code> prints before either <code>w2</code>, as in the ordinary run. But the scheduler can delay main until one or both workers finish their sleeps, so <code>[round 2]</code> may also fall between or after the <code>w2</code> prints. A delayed-main probe produced <code>w1 w1 [round 1] w2 w2 [round 2]</code>. Extra decrements at zero do nothing, and these non daemon workers still finish. Use a fresh latch per round, <code>CyclicBarrier</code> or <code>Phaser</code> for the intended barrier.</div></div><div class="mcq" data-id="d-predict-java-02.q7" data-a="0,2,4" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">What can happen when this runs? Select all that apply.
+<figure class="code single" data-sample="d-predict-java-02.7"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><code><span class="t">List</span>&lt;<span class="t">Integer</span>&gt; out = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+<span class="t">IntStream</span>.<span class="f">range</span>(<span class="n">0</span>, <span class="n">10_000</span>).<span class="f">parallel</span>().<span class="f">forEach</span>(out::add);
+<span class="t">System</span>.out.<span class="f">println</span>(out.<span class="f">size</span>());</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It prints <code>10000</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It prints a number above <code>10000</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It prints a number below <code>10000</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It never finishes, because the worker threads deadlock on the list</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">It throws <code>ArrayIndexOutOfBoundsException</code> from inside <code>ArrayList.add</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> A parallel stream runs <code>forEach</code> on several common pool threads at once, and <code>ArrayList.add</code> is not thread safe. Two threads can read the same size and write the same slot (lost elements, a smaller size), and a thread can write past the end while another grows the array (<code>ArrayIndexOutOfBoundsException</code>). In 200 runs we saw a short list 192 times (often with <code>null</code> holes), the exception 6 times and a correct 10000 twice. A size above 10000 is impossible, since each add sets the size to one more than a value it read, and there are no locks, so no deadlock. Let the stream build the list: <code>.boxed().collect(Collectors.toList())</code> is correct and even keeps the order.</div></div><div class="mcq" data-id="d-predict-java-02.q8" data-a="1,2,4" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Many threads call <code>Config.get().port</code> at the same time. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-predict-java-02.8"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">class</span> <span class="t">Config</span> {
+    <span class="k">private</span> <span class="k">static</span> <span class="t">Config</span> instance;
+    <span class="t">int</span> port;
+
+    <span class="k">private</span> <span class="t">Config</span>() { port = <span class="n">8080</span>; }
+
+    <span class="k">static</span> <span class="t">Config</span> <span class="f">get</span>() {
+        <span class="k">if</span> (instance == <span class="k">null</span>) {
+            <span class="k">synchronized</span> (<span class="t">Config</span>.<span class="k">class</span>) {
+                <span class="k">if</span> (instance == <span class="k">null</span>) {
+                    instance = <span class="k">new</span> <span class="t">Config</span>();
+                }
+            }
+        }
+        <span class="k">return</span> instance;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Two threads can each create a <code>Config</code>, because both can pass the first <code>null</code> check</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A thread can get a non null <code>instance</code> and still read <code>port</code> as 0</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Declaring <code>instance</code> as <code>volatile</code> fixes it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The <code>synchronized</code> block guarantees that every thread sees a fully built object, even threads that never enter it</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">A holder class, <code>static class Holder { static final Config I = new Config(); }</code>, is both lazy and thread safe</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> This is double checked locking without <code>volatile</code>. The second check, inside the lock, does stop a second construction. The bug is publication: a thread that sees <code>instance != null</code> at the first check never enters the lock, so nothing orders its reads after the writer's constructor. The JIT or CPU may let it see the reference before the write of <code>port</code>, so it reads 0. A <code>volatile</code> write of <code>instance</code> happens before every read that sees it, which fixes it. The holder idiom relies on class initialization, which the JVM runs once under a lock, on first use. VMware asked candidates to walk through a thread safe singleton line by line.</div></div><div class="mcq" data-id="d-predict-java-02.q9" data-a="0,1,3" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which of these can it print? Select every possible output.
+<figure class="code single" data-sample="d-predict-java-02.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>();
+<span class="t">CountDownLatch</span> started = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+pool.<span class="f">submit</span>(() -&gt; {
+    started.<span class="f">countDown</span>();
+    <span class="k">try</span> {
+        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">5_000</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"A finished"</span>);
+    } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"A interrupted"</span>);
+    }
+});
+pool.<span class="f">submit</span>(() -&gt; <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"B"</span>));
+pool.<span class="f">submit</span>(() -&gt; <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"C"</span>));
+started.<span class="f">await</span>();
+<span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; neverRan = pool.<span class="f">shutdownNow</span>();
+<span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"never ran: "</span> + neverRan.<span class="f">size</span>());</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>A finished</code>, <code>B</code>, <code>C</code>, then <code>never ran: 0</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>A interrupted</code>, then <code>never ran: 2</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>A interrupted</code>, <code>B</code>, <code>C</code>, then <code>never ran: 0</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>never ran: 2</code>, then <code>A interrupted</code></span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>never ran: 3</code>, then <code>A interrupted</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The latch proves A has started; it does not prove A is still sleeping when main calls <code>shutdownNow()</code>. If shutdown happens during A's sleep, the interrupt makes A print <code>A interrupted</code>, and B and C are returned as two queued tasks. Main and A can print in either order, giving both interrupted options. If main is delayed until all three tasks finish, the output can instead be <code>A finished</code>, <code>B</code>, <code>C</code>, <code>never ran: 0</code>; that schedule was reproduced. Other partial-completion schedules are also possible beyond the listed options. A cannot be returned as never started, because it already counted down the latch. After shutdown interrupts A, this single worker cannot go on to start queued B and C. Queue draining and worker interruption are not a completion barrier.</div></div><div class="mcq" data-id="d-predict-java-02.q10" data-a="1,3" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">On a machine with several cores, which thread names can this print? Select all that apply.
+<figure class="code single" data-sample="d-predict-java-02.10"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><code><span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt; f = <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; <span class="s">"x"</span>);
+<span class="t">String</span> who = f.<span class="f">thenApply</span>(s -&gt; <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>()).<span class="f">join</span>();
+<span class="t">System</span>.out.<span class="f">println</span>(who);</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A new thread created just to run the <code>thenApply</code> function</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>main</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>pool-1-thread-1</code>, a thread from a default <code>newCachedThreadPool</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>ForkJoinPool.commonPool-worker-1</code>, or another common pool worker</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> With common-pool parallelism of at least two, both listed names are possible. If <code>f</code> is complete when main attaches <code>thenApply</code>, main can run the callback immediately. Otherwise the common pool worker completing the supplier can run it. A non async callback does not request a new thread of its own, and no cached pool was created. Core count alone does not determine the executor: the common pool can be configured with parallelism below two. In that case <code>supplyAsync</code> creates a fallback thread for the supplier, and that thread may also run the callback; a probe with parallelism 1 printed <code>Thread-0</code>. That is a supplier thread, not a thread created just for <code>thenApply</code>. Use <code>thenApplyAsync(fn, executor)</code> when the callback needs a chosen executor.</div></div><div class="mcq" data-id="d-predict-java-02.q11" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-java-02.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; f = <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; <span class="n">10</span> / <span class="n">0</span>);
+<span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; g = f.<span class="f">thenApply</span>(x -&gt; {
+    <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"A "</span>);
+    <span class="k">return</span> x + <span class="n">1</span>;
+});
+<span class="t">CompletableFuture</span>&lt;<span class="t">Integer</span>&gt; h = g.<span class="f">handle</span>((v, e) -&gt; {
+    <span class="t">System</span>.out.<span class="f">print</span>(<span class="s">"H "</span>);
+    <span class="k">return</span> e == <span class="k">null</span> ? v : -<span class="n">1</span>;
+});
+<span class="t">System</span>.out.<span class="f">print</span>(h.<span class="f">join</span>() + <span class="s">" "</span>);
+<span class="k">try</span> {
+    g.<span class="f">get</span>();
+} <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+    <span class="t">System</span>.out.<span class="f">print</span>(e.<span class="f">getCause</span>().<span class="f">getClass</span>().<span class="f">getSimpleName</span>());
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>A H -1 ArithmeticException</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>H -1 CompletionException</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>H -1 ArithmeticException</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>H -1 </code>, with nothing after it, because <code>handle</code> recovered <code>g</code> as well</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The division throws, so <code>f</code> fails and <code>thenApply</code> is skipped (no <code>A</code>). <code>handle</code> always runs, success or failure; it sees the exception and returns -1, so <code>h.join()</code> gives -1. But <code>handle</code> returns a new stage: <code>g</code> itself is still failed. <code>get()</code> throws the checked <code>ExecutionException</code>, and it unwraps the internal <code>CompletionException</code>, so the cause is the original <code>ArithmeticException</code>. (<code>g.join()</code> would instead throw an unchecked <code>CompletionException</code>.) Verified on Java 21.</div></div><div class="mcq" data-id="d-predict-java-02.q12" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-java-02.12"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+<span class="k">synchronized</span> (lock) {
+    <span class="t">Thread</span> child = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+        <span class="k">synchronized</span> (lock) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"child"</span>);
+        }
+    });
+    child.<span class="f">start</span>();
+    child.<span class="f">join</span>();
+}
+<span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"done"</span>);</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>child</code>, then <code>done</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>done</code>, then <code>child</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nothing: it hangs forever</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws <code>IllegalMonitorStateException</code>, because <code>join()</code> is called while holding a monitor</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Main holds <code>lock</code> and waits in <code>join()</code> for the child to finish. The child cannot finish, because it is blocked trying to enter <code>synchronized (lock)</code>. Each waits for the other: a deadlock with only one lock, where the second resource is "the child finishing". <code>join()</code> waits on the <code>Thread</code> object's own monitor, so it releases nothing that main holds on <code>lock</code>. A thread dump shows main <code>WAITING</code> in <code>join</code> and the child <code>BLOCKED</code> on the monitor. The fix: join outside the synchronized block. With <code>child.join(200)</code> instead, main gives up after 200 ms, leaves the block, and both lines print.</div></div><div class="mcq" data-id="d-predict-java-02.q13" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-java-02.13"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code><span class="t">List</span>&lt;<span class="t">Integer</span>&gt; list = <span class="k">new</span> <span class="t">CopyOnWriteArrayList</span>&lt;&gt;(<span class="t">List</span>.<span class="f">of</span>(<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>));
+<span class="k">for</span> (<span class="t">int</span> x : list) {
+    <span class="k">if</span> (x == <span class="n">1</span>) list.<span class="f">add</span>(<span class="n">4</span>);
+    <span class="t">System</span>.out.<span class="f">print</span>(x);
+}
+<span class="t">System</span>.out.<span class="f">println</span>(<span class="s">" "</span> + list);</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>123 [1, 2, 3, 4]</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>1234 [1, 2, 3, 4]</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws <code>ConcurrentModificationException</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>123 [1, 2, 3]</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> A <code>CopyOnWriteArrayList</code> iterator walks the array that existed when the iterator was created. <code>add(4)</code> copies the array and swaps in a new one, so the loop never sees 4, but the list does. Its iterators never throw <code>ConcurrentModificationException</code>, and <code>iterator.remove()</code> throws <code>UnsupportedOperationException</code> instead. Every write copies the whole array, so it suits read mostly data such as listener lists, not a busy queue.</div></div></section><section class="testend" id="testend" hidden></section></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

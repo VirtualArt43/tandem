@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Memory and object layout: sizeof, alignment, new and delete · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-memory-and-object-layout" data-title="Memory and object layout: sizeof, alignment, new and delete" data-track="cpp" data-module="cpp-1" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details open><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout" class=here><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m1">Module 01: The language core</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 01.7</span><span>35 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Memory and object layout: sizeof, alignment, new and delete</h1><p class="lsum">Measure object size, explain padding and virtual dispatch overhead, match allocation with destruction, and connect storage layout to concurrent allocators.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span></div><div class="prereq"><span>Before this:</span><a href="cpp-lifetime-stack-heap.html">Object lifetime, the stack and the heap</a><a href="cpp-classes-raii.html">Classes, constructors, destructors and RAII</a></div></header><article class="prose" id="article">
+<p class="lead">A struct's fields can add up to six bytes while the struct occupies twelve. Understanding those missing bytes, and the difference between reserving storage and constructing an object, lets you explain memory costs and build the storage underneath a concurrent queue.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Imagine a warehouse with numbered floor tiles. A small crate fits anywhere, but a loading machine needs every large crate to start at a tile numbered in multiples of four. Workers leave gaps to obey that rule, and rearranging the crates can save space.</p>
+<p>Reserving a patch of floor does not assemble the machine that will stand there. Likewise, dismantling that machine does not return the floor to the warehouse. <strong>Storage and the object occupying it are separate things.</strong></p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<p>A queue can reserve a buffer once, then construct and destroy elements inside individual slots. Separately, two threads can update different objects safely yet run slowly because those objects occupy the same <a class="term" data-term="cache-line" href="glossary.html#cache-line">cache line</a>. Correct lifetime and efficient placement are different requirements.</p>
+<p>This is also preparation for allocator rounds: a <a href="https://leetcode.com/discuss/post/6539601/">2025 Rubrik candidate report</a> describes <code>alloc(size)</code> and <code>free(index)</code> over a fixed arena, with the interviewer steering toward buddy allocation. The full algorithms belong in <a href="memory-allocators.html">memory allocators</a>; here you learn what a valid allocation must provide.</p>
+</div>
+
+<h2 id="sizeof-measures-an-object-not-everything-it-owns">sizeof measures an object, not everything it owns</h2>
+<p><code>sizeof(T)</code> and <code>sizeof expression</code> return a compile-time <code>std::size_t</code> count of C++ bytes. A byte is <code>sizeof(char)</code>, always 1; its bit count is <code>CHAR_BIT</code> from <code>&lt;climits&gt;</code>, normally 8 on our targets. <strong>The operand is not evaluated</strong>, so even <code>sizeof(function())</code> makes no call.</p>
+<ul>
+<li>An array's size includes every element. A pointer's size measures the pointer alone. A function parameter written <code>int values[]</code> is adjusted to a pointer, so it has lost the array extent.</li>
+<li><code>sizeof(std::vector&lt;int&gt;)</code> includes the vector's own bookkeeping, not its allocated elements. Changing the length does not change that <code>sizeof</code>. Container behavior is covered in <a href="cpp-stl-containers.html">STL containers</a> and <a href="cpp-stl-for-coding-rounds.html">the STL for coding rounds</a>.</li>
+<li><code>sizeof(reference)</code> gives the referred-to type's size. It does not expose how a reference is implemented. <code>sizeof(*base_pointer)</code> uses the static type, even if the object is derived.</li>
+<li>You cannot apply <code>sizeof</code> to <code>void</code>, an incomplete class, a function type or a bit-field in standard C++. Variable-length arrays are a compiler extension, not C++20.</li>
+</ul>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.1" data-expect="ok"><figcaption><span class="ctitle">An array, a pointer and an unevaluated call</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> calls = <span class="n">0</span>;
+<span class="t">int</span> <span class="f">touch</span>() { calls += <span class="n">1</span>; <span class="k">return</span> <span class="n">7</span>; }
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> values[<span class="n">4</span>]{};
+    <span class="t">int</span>* pointer = values;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; <span class="f">small</span>(<span class="n">2</span>), <span class="f">large</span>(<span class="n">1000</span>);
+    <span class="k">const</span> <span class="k">auto</span> result_bytes = <span class="k">sizeof</span>(<span class="f">touch</span>());
+    <span class="f">assert</span>(calls == <span class="n">0</span>);
+    <span class="f">assert</span>(<span class="k">sizeof</span>(small) == <span class="k">sizeof</span>(large));
+    <span class="k">static_assert</span>(<span class="k">sizeof</span>(values) == <span class="n">4</span> * <span class="k">sizeof</span>(<span class="t">int</span>));
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"calls="</span> &lt;&lt; calls &lt;&lt; <span class="s">" result-bytes="</span> &lt;&lt; result_bytes &lt;&lt; <span class="s">'\n'</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"elements="</span> &lt;&lt; <span class="k">sizeof</span>(values) / <span class="k">sizeof</span>(values[<span class="n">0</span>])
+              &lt;&lt; <span class="s">" array-bytes="</span> &lt;&lt; <span class="k">sizeof</span>(values)
+              &lt;&lt; <span class="s">" pointer-bytes="</span> &lt;&lt; <span class="k">sizeof</span>(pointer) &lt;&lt; <span class="s">'\n'</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"vector-object-bytes="</span> &lt;&lt; <span class="k">sizeof</span>(small) &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The call count is 0 and the element count is 4 on every conforming implementation. The byte counts are measurements of your compiler and target, not universal constants. <code>sizeof</code> also excludes allocator metadata outside the object.</p>
+
+<h2 id="alignment-padding-and-the-stride-of-an-array">Alignment, padding and the stride of an array</h2>
+<p><a class="term" data-term="object-alignment" href="glossary.html#object-alignment">Alignment</a> restricts the addresses at which an object may begin. <code>alignof(T)</code> reports that requirement in bytes. For a straightforward struct, the compiler inserts <a class="term" data-term="object-padding" href="glossary.html#object-padding">padding</a> before members to satisfy their alignment, and often at the end so the next element in an array is aligned too.</p>
+<p>For ordinary complete object types, <strong><code>sizeof(T)</code> is a multiple of <code>alignof(T)</code></strong>. Array elements are contiguous with a stride of <code>sizeof(T)</code>; there is no extra gap between elements beyond the padding already counted inside that size. The exact member offsets and alignment are implementation choices.</p>
+
+<div class="box example">
+<h3>Worked example: shrink twelve bytes to eight</h3>
+<p>The application binary interface (ABI) specifies how compiled code represents and passes objects on a target. Assume <code>char</code> has size and alignment 1, <code>int</code> has size and alignment 4, and the ABI uses the usual minimal padding. Compare <code>char tag; int count; char ready;</code> with <code>int count; char tag; char ready;</code>.</p>
+<table>
+<thead><tr><th>Layout</th><th>Byte offsets</th><th>Size and alignment</th></tr></thead>
+<tbody>
+<tr><td>Original</td><td><code>tag</code>: 0; gap: 1 to 3; <code>count</code>: 4 to 7; <code>ready</code>: 8; tail gap: 9 to 11</td><td>Size 12, alignment 4</td></tr>
+<tr><td>Reordered</td><td><code>count</code>: 0 to 3; <code>tag</code>: 4; <code>ready</code>: 5; tail gap: 6 to 7</td><td>Size 8, alignment 4</td></tr>
+</tbody>
+</table>
+<p>The payload is six bytes in both. Reordering saves four bytes per object, or 4,000,000 bytes for a million elements, excluding allocation overhead. Grouping members by decreasing alignment is a useful heuristic, but <strong>measure the result</strong>.</p>
+<figure class="code single" data-sample="cpp-memory-and-object-layout.2" data-expect="ok"><figcaption><span class="ctitle">Measure offsets and complete object size</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+
+<span class="k">struct</span> Original { <span class="t">char</span> tag; <span class="t">int</span> count; <span class="t">char</span> ready; };
+<span class="k">struct</span> Reordered { <span class="t">int</span> count; <span class="t">char</span> tag; <span class="t">char</span> ready; };
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_standard_layout_v&lt;Original&gt;);
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_standard_layout_v&lt;Reordered&gt;);
+    <span class="k">static_assert</span>(<span class="k">sizeof</span>(Original) % <span class="k">alignof</span>(Original) == <span class="n">0</span>);
+    <span class="k">static_assert</span>(<span class="k">sizeof</span>(Reordered) % <span class="k">alignof</span>(Reordered) == <span class="n">0</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"original size="</span> &lt;&lt; <span class="k">sizeof</span>(Original)
+              &lt;&lt; <span class="s">" alignment="</span> &lt;&lt; <span class="k">alignof</span>(Original) &lt;&lt; <span class="s">" offsets="</span>
+              &lt;&lt; <span class="f">offsetof</span>(Original, tag) &lt;&lt; <span class="s">','</span> &lt;&lt; <span class="f">offsetof</span>(Original, count)
+              &lt;&lt; <span class="s">','</span> &lt;&lt; <span class="f">offsetof</span>(Original, ready) &lt;&lt; <span class="s">'\n'</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"reordered size="</span> &lt;&lt; <span class="k">sizeof</span>(Reordered)
+              &lt;&lt; <span class="s">" alignment="</span> &lt;&lt; <span class="k">alignof</span>(Reordered) &lt;&lt; <span class="s">" offsets="</span>
+              &lt;&lt; <span class="f">offsetof</span>(Reordered, count) &lt;&lt; <span class="s">','</span> &lt;&lt; <span class="f">offsetof</span>(Reordered, tag)
+              &lt;&lt; <span class="s">','</span> &lt;&lt; <span class="f">offsetof</span>(Reordered, ready) &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>offsetof(T, member)</code> from <code>&lt;cstddef&gt;</code> gives the member's byte offset. These are <a class="term" data-term="standard-layout" href="glossary.html#standard-layout">standard-layout types</a>, a language category with restricted inheritance and member layout; use <code>offsetof</code> on such types for portable results. It is only conditionally supported for other class types.</p>
+</div>
+
+<p>Reordering changes the binary interface, aggregate initialization positions and member construction order. Check dependencies before changing declarations. Avoid packing pragmas as a general optimization: they are nonstandard and can produce misaligned members, especially dangerous for atomics.</p>
+<p>Padding bytes are not field values. <strong>Do not use <code>memcmp</code> as struct equality or dump a struct as a portable file format.</strong> Equal fields can coexist with different padding; sizes, byte order and layout can differ across targets. Serialize the named fields deliberately.</p>
+<p><strong>Standard layout and byte-copy safety are separate properties.</strong> For distinct, complete, live objects of the same <a class="term" data-term="trivially-copyable" href="glossary.html#trivially-copyable">trivially copyable type</a>, <code>std::memcpy</code> from <code>&lt;cstring&gt;</code> can copy an initialized source's representation into the destination and preserve its value. Check <code>std::is_trivially_copyable_v&lt;T&gt;</code> from <code>&lt;type_traits&gt;</code>; standard layout alone is insufficient, and copying the bytes of a <code>std::string</code> or smart pointer is not an ownership-preserving copy. Even a trivially copyable struct is not automatically a portable wire format. These are the <a href="https://timsong-cpp.github.io/cppwp/n4861/basic.types">C++20 object-representation guarantees</a>.</p>
+
+<h2 id="api-card-size-storage-and-lifetime">API card: size, storage and lifetime</h2>
+<table>
+<thead><tr><th>Operation or type</th><th>One-line semantics</th></tr></thead>
+<tbody>
+<tr><td><code>sizeof(T)</code>, <code>sizeof(expr)</code></td><td>Object representation size, including padding; result is <code>std::size_t</code>, operand unevaluated.</td></tr>
+<tr><td><code>alignof(T)</code>, <code>alignas(N)</code></td><td>Query a type's alignment; request supported alignment for a type or variable.</td></tr>
+<tr><td><code>std::byte</code> (<code>&lt;cstddef&gt;</code>, C++17)</td><td>A byte storage type, useful for buffers that will hold objects.</td></tr>
+<tr><td><code>new T(args)</code>, <code>delete p</code></td><td>Allocate and initialize one object; destroy it and deallocate its storage.</td></tr>
+<tr><td><code>new T[n]</code>, <code>delete[] p</code></td><td>Initialize an array; destroy its elements in reverse order and release the allocation.</td></tr>
+<tr><td><code>std::malloc(n)</code>, <code>std::free(p)</code> (<code>&lt;cstdlib&gt;</code>)</td><td>Reserve uninitialized storage or return it; neither calls C++ constructors or destructors.</td></tr>
+<tr><td><code>::operator new(n)</code>, <code>::operator delete(p)</code> (<code>&lt;new&gt;</code>)</td><td>Call global allocation/deallocation functions directly, without construction/destruction.</td></tr>
+<tr><td><code>::new (address) T(args)</code>, <code>p-&gt;~T()</code></td><td>Construct in supplied storage; explicitly destroy without releasing storage.</td></tr>
+<tr><td><code>std::construct_at(p, args...)</code>, <code>std::destroy_at(p)</code> (<code>&lt;memory&gt;</code>)</td><td>Library spellings for construction (C++20) and destruction (C++17) in suitable storage.</td></tr>
+<tr><td><code>std::align(a, n, p, space)</code> (<code>&lt;memory&gt;</code>)</td><td>With power-of-two <code>a</code>, find room for <code>n</code> bytes at an aligned address. On success update the <code>void*&amp;</code> pointer and subtract only skipped padding from the <code>std::size_t&amp;</code> space; on failure return null and leave both unchanged.</td></tr>
+<tr><td><code>std::align_val_t</code> (<code>&lt;new&gt;</code>, C++17)</td><td>Carries an alignment to matching aligned allocation and deallocation overloads.</td></tr>
+</tbody>
+</table>
+
+<h2 id="alignas-requests-a-boundary-not-synchronization">alignas requests a boundary, not synchronization</h2>
+<p><code>struct alignas(64) Slot { long count; };</code> requests at least 64-byte alignment for the type. Its size is rounded to preserve that alignment in arrays. <code>alignas(T)</code> requests <code>T</code>'s alignment; if several specifiers appear, their strongest nonzero requirement wins and must not weaken the natural alignment. Unsupported extended alignments are rejected; <code>alignas(0)</code> has no effect.</p>
+<p>Applying <code>alignas</code> to a variable changes that object's placement, not the underlying type's <code>alignof</code>. Aligning an array's beginning does not separate its elements: <code>alignas(64) long counts[2]</code> still has adjacent <code>long</code> elements. <strong>Align the element type when you need a padded stride.</strong></p>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.3" data-expect="ok"><figcaption><span class="ctitle">Aligned objects have an aligned array stride</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+
+<span class="k">struct</span> <span class="k">alignas</span>(<span class="n">64</span>) Slot { <span class="t">long</span> count = <span class="n">0</span>; };
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Slot local[<span class="n">2</span>]{};
+    <span class="k">auto</span> dynamic = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Slot[]&gt;(<span class="n">2</span>);
+    <span class="k">static_assert</span>(<span class="k">alignof</span>(Slot) &gt;= <span class="n">64</span>);
+    <span class="k">static_assert</span>(<span class="k">sizeof</span>(Slot) % <span class="k">alignof</span>(Slot) == <span class="n">0</span>);
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        <span class="f">assert</span>(<span class="k">reinterpret_cast</span>&lt;<span class="t">std</span>::uintptr_t&gt;(&amp;local[i]) % <span class="n">64</span> == <span class="n">0</span>);
+        <span class="f">assert</span>(<span class="k">reinterpret_cast</span>&lt;<span class="t">std</span>::uintptr_t&gt;(&amp;dynamic[i]) % <span class="n">64</span> == <span class="n">0</span>);
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"alignment="</span> &lt;&lt; <span class="k">alignof</span>(Slot)
+              &lt;&lt; <span class="s">" stride="</span> &lt;&lt; <span class="k">sizeof</span>(Slot) &lt;&lt; <span class="s">'\n'</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"local and dynamic elements meet the requested boundary\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Here the integer address conversion is a target-level diagnostic; the cast itself is covered in <a href="cpp-types-casts-and-initialization.html">types, casts and initialization</a>. Since C++17, normal <code>new</code> expressions support over-aligned types through alignment-aware allocation; custom allocation functions must honor the requirement too.</p>
+
+<h3>Why a smaller struct can be slower</h3>
+<p><a class="term" data-term="false-sharing" href="glossary.html#false-sharing">False sharing</a> happens when threads on different cores access independent memory locations in one cache line and at least one thread writes. This can be race-free and still cause repeated coherence traffic, including when one field has a writer and a neighbouring field has only readers, as the <a href="https://docs.kernel.org/kernel-hacking/false-sharing.html">Linux kernel's false-sharing guide</a> illustrates. Making two hot per-thread counters adjacent saves bytes but can worsen this traffic; separating them consumes memory and can reduce it.</p>
+<p>The sample's 64 is a layout exercise, <strong>not a promise about this Mac's cache line</strong>. C++17 offers <code>std::hardware_destructive_interference_size</code> in <code>&lt;new&gt;</code> when the library supports it, advertised by <code>__cpp_lib_hardware_interference_size</code>; otherwise use a documented target choice and benchmark. Neither padding nor alignment makes concurrent writes to the same plain counter safe. Continue with <a href="caches-and-false-sharing.html">CPU caches and false sharing</a> and <a href="counters-at-scale.html">counters at scale</a>.</p>
+<p><strong>Different member names do not always mean different memory locations.</strong> In <code>struct Flags { unsigned ready : 1; unsigned done : 1; };</code>, the adjacent nonzero-width bit-fields form one memory location. Two threads writing one field each without synchronization have a data race, not merely false sharing. Separate ordinary scalar members are distinct memory locations; read and write only your own member, keep the containing object alive, and synchronize any access that conflicts. The <a href="https://timsong-cpp.github.io/cppwp/n4861/intro.memory">C++20 memory-location rules</a> make this distinction explicit.</p>
+
+<h2 id="what-a-virtual-function-costs-in-object-size">What a virtual function costs in object size</h2>
+<p>A class with virtual functions is polymorphic. Common ABIs place a hidden <a class="term" data-term="vtable-pointer" href="glossary.html#vtable-pointer">vtable pointer</a> in each simple polymorphic object, pointing to shared dispatch metadata. On an ordinary 64-bit pointer ABI that pointer is typically eight bytes; alignment can make the total size increase larger. The standard does not require this representation.</p>
+<p>Adding five virtual methods does not add five pointers per object; their entries belong to the shared table. Multiple inheritance can require more than one dispatch pointer, and a derived class may reuse a base's pointer. Static members and ordinary member function bodies do not occupy a slot in every object. <a href="cpp-inheritance-and-virtual-functions.html">Inheritance and virtual functions</a> covers dispatch and deletion through a base pointer.</p>
+<p>For a polymorphic base intended to own derived objects, provide a virtual destructor. The default deleter of <code>std::unique_ptr&lt;Base&gt;</code> needs the same safe base-deletion contract as ordinary scalar <code>delete</code>. A virtual destructor still does not permit deleting a derived array through a base pointer.</p>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.4" data-expect="ok"><figcaption><span class="ctitle">Measure virtual dispatch overhead on your ABI</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="p">#include &lt;iostream&gt;</span>
+
+<span class="k">struct</span> Plain { <span class="t">int</span> value = <span class="n">0</span>; <span class="t">void</span> <span class="f">ping</span>() {} };
+<span class="k">struct</span> Virtual {
+    <span class="t">int</span> value = <span class="n">0</span>;
+    <span class="k">virtual</span> <span class="t">void</span> <span class="f">ping</span>() {}
+    <span class="k">virtual</span> ~<span class="f">Virtual</span>() = <span class="k">default</span>;
+};
+<span class="k">struct</span> MoreVirtual : Virtual { <span class="k">virtual</span> <span class="t">void</span> <span class="f">pong</span>() {} };
+<span class="k">struct</span> Empty {};
+<span class="k">struct</span> WithEmptyBase : Empty { <span class="t">int</span> value = <span class="n">0</span>; };
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"plain="</span> &lt;&lt; <span class="k">sizeof</span>(Plain) &lt;&lt; <span class="s">" virtual="</span> &lt;&lt; <span class="k">sizeof</span>(Virtual)
+              &lt;&lt; <span class="s">" more-virtual="</span> &lt;&lt; <span class="k">sizeof</span>(MoreVirtual) &lt;&lt; <span class="s">'\n'</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"empty="</span> &lt;&lt; <span class="k">sizeof</span>(Empty)
+              &lt;&lt; <span class="s">" empty-base-plus-int="</span> &lt;&lt; <span class="k">sizeof</span>(WithEmptyBase) &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Typical results on this Mac are <code>plain=4 virtual=16 more-virtual=16</code>. The twelve-byte increase includes an eight-byte pointer and four bytes of padding. Treat this as an ABI observation, not a portable size equation; the <a href="https://itanium-cxx-abi.github.io/cxx-abi/abi.html#class-types">Itanium ABI layout rules</a> explain this common implementation family.</p>
+
+<p><strong>Empty base optimization</strong> lets an empty base subobject occupy no additional space in suitable layouts. A complete empty object still has nonzero <code>sizeof</code>, usually 1, so array elements have distinct addresses, but <code>WithEmptyBase</code> commonly occupies only its <code>int</code>'s four bytes. This helps store stateless policies or deleters; same-type address constraints and inheritance layout rules limit when it works. C++20 <code>[[no_unique_address]]</code> allows similar overlap for eligible members, without guaranteeing that every compiler will eliminate their space.</p>
+
+<h2 id="new-and-delete-combine-two-jobs">new and delete combine two jobs</h2>
+<p>A <strong>new-expression</strong>, such as <code>new Job(&quot;queued&quot;)</code>, obtains suitably aligned storage through an allocation function and initializes the object there. <code>delete p</code> runs the destructor and then a deallocation function. Calling <code>operator new</code> directly does only the storage step; it does not run a constructor.</p>
+<p><code>std::malloc</code> and <code>std::free</code> are C storage APIs: they do not call C++ constructors or destructors. C++20 allows malloc to implicitly create objects of implicit-lifetime types, including some class types, when that makes subsequent access valid. That does not run a <code>std::string</code> constructor, and a cast cannot replace one; resource-owning objects still need proper construction. See the <a href="https://timsong-cpp.github.io/cppwp/n4861/c.malloc">C++20 allocation wording</a>.</p>
+<table>
+<thead><tr><th>Acquire</th><th>Release</th><th>Important contract</th></tr></thead>
+<tbody>
+<tr><td><code>new T(args)</code></td><td><code>delete p</code></td><td>Ordinary allocation failure throws <code>std::bad_alloc</code>; initialization may also throw.</td></tr>
+<tr><td><code>new T[n]</code></td><td><code>delete[] p</code></td><td>Array form must match even for one element or trivial element types.</td></tr>
+<tr><td><code>std::malloc(bytes)</code></td><td><code>std::free(p)</code></td><td>Failure returns null; storage supports fundamental alignment, not arbitrary over-alignment.</td></tr>
+<tr><td>Standard placement <code>new</code> in your buffer</td><td>Explicit destructor, then release the buffer according to its owner</td><td>It allocates nothing; <code>delete</code> is not the matching operation.</td></tr>
+</tbody>
+</table>
+<p><code>new (std::nothrow) T</code> returns null for allocation failure; a throwing <code>T</code> constructor still propagates its exception. If initialization in an ordinary new-expression throws, matching deallocation releases the acquired storage; completed array elements are destroyed too. <code>new int</code> leaves an indeterminate value, while <code>new int{}</code> initializes zero; see <a href="cpp-types-casts-and-initialization.html">initialization rules</a>.</p>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.5" data-expect="ok"><figcaption><span class="ctitle">Owners pair scalar, array and C storage operations</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;cstdlib&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+
+<span class="k">struct</span> Tracked {
+    <span class="k">inline</span> <span class="k">static</span> <span class="t">int</span> alive = <span class="n">0</span>;
+    <span class="k">inline</span> <span class="k">static</span> <span class="t">int</span> destroyed = <span class="n">0</span>;
+    <span class="f">Tracked</span>() { alive += <span class="n">1</span>; }
+    ~<span class="f">Tracked</span>() { alive -= <span class="n">1</span>; destroyed += <span class="n">1</span>; }
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    {
+        <span class="k">auto</span> one = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Tracked&gt;();
+        <span class="f">assert</span>(Tracked::alive == <span class="n">1</span>);
+    } <span class="c">// The scalar owner uses delete.</span>
+    {
+        <span class="k">auto</span> batch = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Tracked[]&gt;(<span class="n">3</span>);
+        <span class="f">assert</span>(Tracked::alive == <span class="n">3</span>);
+    } <span class="c">// The array owner uses delete[].</span>
+    <span class="t">std</span>::<span class="t">unique_ptr</span>&lt;<span class="t">void</span>, <span class="k">decltype</span>(&amp;<span class="t">std</span>::free)&gt; <span class="f">storage</span>(
+        <span class="t">std</span>::<span class="f">malloc</span>(<span class="k">sizeof</span>(Tracked)), &amp;<span class="t">std</span>::free);
+    <span class="k">if</span> (storage == <span class="k">nullptr</span>) { <span class="k">return</span> <span class="n">1</span>; }
+    <span class="f">assert</span>(Tracked::alive == <span class="n">0</span>);
+    storage.<span class="f">reset</span>();
+    <span class="f">assert</span>(Tracked::destroyed == <span class="n">4</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"alive="</span> &lt;&lt; Tracked::alive
+              &lt;&lt; <span class="s">" destroyed="</span> &lt;&lt; Tracked::destroyed &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The malloc call reserves bytes without running <code>Tracked</code>'s constructor. Array allocation can have bookkeeping outside the elements, often an element count for destruction; never guess its location or pass an interior pointer to deallocation. Applying <code>delete</code> or <code>delete[]</code> to a suitably typed null pointer is harmless, as is <code>std::free(nullptr)</code>; freeing the same non-null allocation twice is undefined behavior.</p>
+<p>These raw operations expose the mechanism for allocator work. In application code, retain the ownership rules from <a href="cpp-classes-raii.html">RAII</a>: use <code>std::make_unique&lt;T&gt;</code>, <code>std::make_unique&lt;T[]&gt;</code> or containers so exceptions and early returns cannot skip cleanup. <a href="cpp-smart-pointers.html">Smart pointers</a> teaches that ownership API.</p>
+
+<h2 id="placement-new-construct-in-storage-you-already-own">Placement new: construct in storage you already own</h2>
+<p><a class="term" data-term="placement-new" href="glossary.html#placement-new">Placement new</a> has the form <code>::new (address) T(args)</code>. The standard non-allocating overload returns that address and construction happens there. You must supply a non-null pointer, sufficient space, correct alignment and storage available for the new lifetime.</p>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.6" data-expect="ok"><figcaption><span class="ctitle">Two object lifetimes in one aligned slot</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;new&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+
+<span class="k">struct</span> Job {
+    <span class="t">std</span>::<span class="t">string</span> name;
+    <span class="k">inline</span> <span class="k">static</span> <span class="t">int</span> destroyed = <span class="n">0</span>;
+    <span class="k">explicit</span> <span class="f">Job</span>(<span class="k">const</span> <span class="t">char</span>* text) : <span class="f">name</span>(text) {}
+    ~<span class="f">Job</span>() { destroyed += <span class="n">1</span>; }
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">alignas</span>(Job) <span class="t">std</span>::byte storage[<span class="k">sizeof</span>(Job)];
+    Job* first = ::<span class="k">new</span> (<span class="k">static_cast</span>&lt;<span class="t">void</span>*&gt;(storage)) <span class="f">Job</span>(<span class="s">"first"</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; first-&gt;name &lt;&lt; <span class="s">'\n'</span>;
+    first-&gt;~<span class="f">Job</span>();
+    Job* second = ::<span class="k">new</span> (<span class="k">static_cast</span>&lt;<span class="t">void</span>*&gt;(storage)) <span class="f">Job</span>(<span class="s">"second"</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; second-&gt;name &lt;&lt; <span class="s">'\n'</span>;
+    second-&gt;~<span class="f">Job</span>();
+    <span class="f">assert</span>(Job::destroyed == <span class="n">2</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"destroyed="</span> &lt;&lt; Job::destroyed &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The destructor also destroys the <code>std::string</code> member, but the byte array remains until scope exit. Each construction uses its returned pointer, avoiding stale pointers across replacement. <code>std::construct_at</code> is the C++20 library spelling; placement new is the C++17 alternative, and <code>std::destroy_at</code> can replace the explicit destructor call.</p>
+<p>In this exact example the two complete, non-const <code>Job</code> objects are transparently replaceable, so <code>first</code> can also refer to the second object after construction finishes. That automatic retargeting does not apply to every replacement, including base subobjects. Prefer the new construction's returned pointer. C++17 <code>std::launder</code> in <code>&lt;new&gt;</code> can obtain a pointer to an already-live replacement under its type and reachable-storage requirements; it neither constructs an object nor fixes a race. See the <a href="https://timsong-cpp.github.io/cppwp/n4861/basic.life">C++20 replacement rules</a>.</p>
+<p>Never apply <code>delete</code> to this buffer. If you used malloc storage instead, destroy the constructed object and then call <code>free</code> on the original allocation; if construction throws, free the storage without destroying the object that never finished construction. A real reusable slot needs an engaged flag and an RAII owner to enforce exactly one destructor call on all paths.</p>
+<p>Calling <code>x.~T()</code> on an ordinary local <code>T x</code> is usually a bug: scope exit will try to destroy it again unless you correctly reconstruct it. Placement storage also needs exclusive access during construction, destruction and reuse; an allocator's lock cannot protect a client that continues using a freed object. Follow the lifetime problem into <a href="lock-free-stack-and-aba.html">lock-free stacks and memory reclamation</a>.</p>
+
+<h3>Advance an arena cursor correctly</h3>
+<p>An arena must align the actual address, not just round an offset while ignoring the buffer's base alignment. <code>std::align</code> finds space; it neither allocates nor constructs. After success, reserve the object's bytes yourself, because the function subtracts only padding from the remaining capacity.</p>
+<figure class="code single" data-sample="cpp-memory-and-object-layout.7" data-expect="ok"><figcaption><span class="ctitle">Two aligned slots without overlapping their storage</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+
+<span class="k">struct</span> <span class="k">alignas</span>(<span class="n">64</span>) Item {
+    <span class="t">int</span> id;
+    <span class="k">explicit</span> <span class="f">Item</span>(<span class="t">int</span> value) <span class="k">noexcept</span> : <span class="f">id</span>(value) {}
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">alignas</span>(Item) <span class="t">std</span>::byte arena[<span class="n">2</span> * <span class="k">sizeof</span>(Item) + <span class="k">alignof</span>(Item)];
+    <span class="t">void</span>* cursor = arena + <span class="n">1</span>; <span class="c">// Deliberately start past the aligned base.</span>
+    <span class="t">std</span>::<span class="t">size_t</span> space = <span class="k">sizeof</span>(arena) - <span class="n">1</span>;
+    Item* items[<span class="n">2</span>]{};
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        <span class="t">void</span>* slot = <span class="t">std</span>::<span class="f">align</span>(<span class="k">alignof</span>(Item), <span class="k">sizeof</span>(Item), cursor, space);
+        <span class="k">if</span> (slot == <span class="k">nullptr</span>) { <span class="k">return</span> <span class="n">1</span>; }
+        <span class="c">// Reserve the payload as well as the padding consumed by align.</span>
+        cursor = <span class="k">static_cast</span>&lt;<span class="t">std</span>::byte*&gt;(cursor) + <span class="k">sizeof</span>(Item);
+        space -= <span class="k">sizeof</span>(Item);
+        items[i] = <span class="t">std</span>::<span class="f">construct_at</span>(<span class="k">static_cast</span>&lt;Item*&gt;(slot), i);
+    }
+    <span class="f">assert</span>(items[<span class="n">0</span>]-&gt;id == <span class="n">0</span> &amp;&amp; items[<span class="n">1</span>]-&gt;id == <span class="n">1</span>);
+    <span class="t">void</span>* saved_cursor = cursor;
+    <span class="k">const</span> <span class="k">auto</span> saved_space = space;
+    <span class="f">assert</span>(<span class="t">std</span>::<span class="f">align</span>(<span class="k">alignof</span>(Item), <span class="k">sizeof</span>(arena) + <span class="n">1</span>, cursor, space) == <span class="k">nullptr</span>);
+    <span class="f">assert</span>(cursor == saved_cursor &amp;&amp; space == saved_space);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"distinct item IDs="</span> &lt;&lt; items[<span class="n">0</span>]-&gt;id &lt;&lt; <span class="s">','</span> &lt;&lt; items[<span class="n">1</span>]-&gt;id
+              &lt;&lt; <span class="s">" remaining bytes="</span> &lt;&lt; space &lt;&lt; <span class="s">'\n'</span>;
+    <span class="k">for</span> (Item* item : items) { <span class="t">std</span>::<span class="f">destroy_at</span>(item); }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The fixed buffer has enough room for both slots, and <code>Item</code> construction cannot throw. A generic arena needs a cleanup owner for successfully constructed objects and a rollback policy if a later constructor fails. Check count-times-size and padding arithmetic for overflow when capacities come from input; <a href="https://timsong-cpp.github.io/cppwp/n4861/ptr.align">the <code>std::align</code> contract</a> does not check arithmetic you performed before calling it.</p>
+
+<h2 id="overload-allocation-for-one-class">Overload allocation for one class</h2>
+<p>A class can provide <code>static void* operator new(std::size_t)</code> and <code>static void operator delete(void*) noexcept</code>. The first supplies storage; the new-expression still runs the constructor. The second releases storage; a normal delete-expression has already run the destructor. They are static even if you omit the keyword.</p>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.8" data-expect="ok"><figcaption><span class="ctitle">Class allocation hooks also clean up failed construction</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;new&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="k">class</span> Ticket <span class="k">final</span> {
+<span class="k">public</span>:
+    <span class="k">inline</span> <span class="k">static</span> <span class="t">int</span> allocated = <span class="n">0</span>, released = <span class="n">0</span>, destroyed = <span class="n">0</span>;
+    <span class="k">static</span> <span class="t">void</span>* <span class="k">operator</span> <span class="k">new</span>(<span class="t">std</span>::<span class="t">size_t</span> bytes) {
+        <span class="t">void</span>* storage = ::<span class="k">operator</span> <span class="k">new</span>(bytes);
+        allocated += <span class="n">1</span>;
+        <span class="k">return</span> storage;
+    }
+    <span class="k">static</span> <span class="t">void</span> <span class="k">operator</span> <span class="k">delete</span>(<span class="t">void</span>* storage) <span class="k">noexcept</span> {
+        released += <span class="n">1</span>;
+        ::<span class="k">operator</span> <span class="k">delete</span>(storage);
+    }
+    <span class="k">explicit</span> <span class="f">Ticket</span>(<span class="t">bool</span> reject) {
+        <span class="k">if</span> (reject) { <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"rejected"</span>); }
+    }
+    ~<span class="f">Ticket</span>() { destroyed += <span class="n">1</span>; }
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">auto</span> accepted = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Ticket&gt;(<span class="k">false</span>);
+    accepted.<span class="f">reset</span>();
+    <span class="k">try</span> { <span class="k">auto</span> rejected = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Ticket&gt;(<span class="k">true</span>); }
+    <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp;) { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"constructor failed\n"</span>; }
+    <span class="f">assert</span>(Ticket::allocated == <span class="n">2</span> &amp;&amp; Ticket::released == <span class="n">2</span>);
+    <span class="f">assert</span>(Ticket::destroyed == <span class="n">1</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"allocated="</span> &lt;&lt; Ticket::allocated &lt;&lt; <span class="s">" released="</span>
+              &lt;&lt; Ticket::released &lt;&lt; <span class="s">" destroyed="</span> &lt;&lt; Ticket::destroyed &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>std::make_unique&lt;Ticket&gt;</code> uses a new-expression internally, so the class hooks still run; its owner performs deletion. Both allocations are released, but only the successfully constructed object's destructor runs. The <code>::</code> selects the global storage functions instead of recursively calling the class hooks. This normally aligned, final class uses single-threaded counters; those counters would need synchronization under concurrent allocations.</p>
+<p>Scalar hooks do not intercept array new-expressions: arrays use <code>operator new[]</code> and <code>operator delete[]</code>. Other forms include sized delete (<code>void*, std::size_t</code>, C++14) and aligned overloads (<code>std::align_val_t</code>, C++17). If an unsized and a sized usual class delete are both available, the unsized one is selected. Keep each allocation family paired.</p>
+<p>For an over-aligned class, implement alignment-aware hooks or explicitly obtain and release appropriately aligned storage. A size-only class hook can hide the global aligned overload, so blindly forwarding to <code>::operator new(bytes)</code> can under-align the object. A pool must also handle exhaustion, slot size, alignment, constructor failure and concurrent free-list changes; see <a href="memory-allocators.html">the allocator lesson</a>.</p>
+
+<h2 id="find-a-leak-then-fix-ownership">Find a leak, then fix ownership</h2>
+<p>A <a class="term" data-term="memory-leak" href="glossary.html#memory-leak">memory leak</a> is allocated storage that is never released when it should be. Losing the last pointer, skipping manual cleanup on an exception and owning-reference cycles are common causes. An unbounded cache can also retain reachable memory forever; a reachability-based leak detector may report nothing.</p>
+<ol>
+<li>Repeat one workload, drain outstanding work and compare live allocation counts or bytes between iterations. Resident memory alone also includes allocator caching and fragmentation.</li>
+<li>Use AddressSanitizer for invalid memory access and a supported LeakSanitizer runtime for leaked allocations. Follow the allocation stack to the missing owner, not merely the place memory was used.</li>
+<li>Give the allocation an RAII owner and rerun the workload, including its failure paths. Use ThreadSanitizer separately for races; a clean race report is not a leak check.</li>
+</ol>
+
+<figure class="code single" data-sample="cpp-memory-and-object-layout.9" data-expect="ok"><figcaption><span class="ctitle">An exception releases an owned allocation</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="k">struct</span> Buffer {
+    <span class="k">inline</span> <span class="k">static</span> <span class="t">int</span> live = <span class="n">0</span>;
+    <span class="f">Buffer</span>() { live += <span class="n">1</span>; }
+    ~<span class="f">Buffer</span>() { live -= <span class="n">1</span>; }
+};
+
+<span class="t">void</span> <span class="f">request</span>() {
+    <span class="k">auto</span> buffer = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Buffer&gt;();
+    <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"request failed"</span>);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">100</span>; i += <span class="n">1</span>) {
+        <span class="k">try</span> { <span class="f">request</span>(); }
+        <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp;) {}
+    }
+    <span class="f">assert</span>(Buffer::live == <span class="n">0</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"live buffers after 100 failures="</span> &lt;&lt; Buffer::live &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Save that program as <code>memory_demo.cpp</code>. Build a separate ASan binary, without ThreadSanitizer:</p>
+<figure class="code single" data-sample="cpp-memory-and-object-layout.10"><figcaption><span class="ctitle">AddressSanitizer and the leak-support probe</span><span class="ctabs"><span class="clang">Shell</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-bash" data-lang="bash"><div class="cwrap"><code>clang++ -std=c++20 -g -O1 -fsanitize=address -fno-omit-frame-pointer memory_demo.cpp -o memory_demo_asan
+./memory_demo_asan
+ASAN_OPTIONS=detect_leaks=1 ./memory_demo_asan</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong>On this Mac's tested Apple Clang 17 arm64 runtime, the last command aborts</strong> with <code>AddressSanitizer: detect_leaks is not supported on this platform.</code> That is unavailable tooling, not evidence of a leak or a leak-free program. <a href="https://clang.llvm.org/docs/AddressSanitizer.html#memory-leak-detection">Upstream Clang documents the option</a> for supported macOS runtimes; verify the installed runtime with a deliberately leaked test allocation before relying on it.</p>
+<p>On this Mac, use Instruments' Allocations and Leaks instruments to inspect allocation stacks and retained growth.</p>
+<p>ASan without that option remains useful for out-of-bounds access, use after free and double free. An actual successful leak-detection check requires a runtime that supports it, for example a supported Linux setup. See <a href="cpp-build-debug-sanitizers.html">building, debugging and sanitizers</a> for the wider workflow.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Adding field sizes and calling that <code>sizeof</code>.</strong> Account for internal and tail padding, and label ABI assumptions.</li>
+<li><strong>Allocating <code>sizeof(pointer)</code> bytes for its target.</strong> Use the object's type and check multiplication overflow before allocating arrays of raw bytes.</li>
+<li><strong>Mixing allocation families.</strong> Scalar delete on an array, free on new storage and delete on malloc storage are undefined behavior.</li>
+<li><strong>Treating an aligned address as a live object.</strong> Storage capacity and alignment do not run a class constructor.</li>
+<li><strong>Destroying a placement object twice.</strong> Track whether the slot contains a live object; release its backing storage separately.</li>
+<li><strong>Using alignment as a race fix.</strong> It can help layout and performance, but shared mutable state still needs synchronization.</li>
+<li><strong>Calling an unsupported leak check a clean result.</strong> Confirm detector support, then test a known leak as well as the repaired program.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Expect a struct-size calculation, a mismatched deletion to diagnose, or a request to place objects inside a fixed buffer. For the reported Rubrik allocator shape, first clarify whether the API returns offsets or typed objects: an integer offset simulation does not itself construct a C++ object.</p>
+<blockquote>I will state the target's size and alignment assumptions, place each member at an allowed offset, then round the total size for the array stride. After that I can reorder independent members, but I will check ABI and construction-order constraints.</blockquote>
+<blockquote>My allocator promises nonoverlapping storage with the requested size and alignment. Constructing the object is a separate step. I will pair destruction with the correct storage return, handle construction failure, and synchronize allocator metadata without claiming that makes the user's objects thread-safe.</blockquote>
+<p>Follow ups: "What if the constructor throws?", "What if the type requires 128-byte alignment?", "Why did shrinking the struct hurt throughput?", and "Can another thread still hold this slot when you reuse it?" These lead into <a href="fixed-buffer-queues.html">fixed-buffer queues</a> and <a href="memory-allocators.html">free lists and buddy allocation</a>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li><code>sizeof</code> includes the object's padding and excludes allocations it points to. <code>alignof</code> describes valid starting addresses.</li>
+<li>Reorder independent members to reduce padding; separate hot per-thread fields when false sharing is the measured bottleneck.</li>
+<li>Virtual dispatch often adds a pointer per simple polymorphic object plus padding, not a pointer per virtual method.</li>
+<li>New/delete combine storage and lifetime operations. Malloc/free and direct allocation functions do not run constructors or destructors.</li>
+<li>Placement new and class allocation hooks require explicit alignment, lifetime, cleanup and concurrency contracts.</li>
+<li>Own allocations with RAII. Validate leak-detector support; ThreadSanitizer does not replace memory-error or leak checks.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-memory-and-object-layout"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-memory-and-object-layout.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Assume <code>char</code> has size/alignment 1, <code>int</code> has size/alignment 4, and ordinary minimal ABI padding. What are the sizes of <code>{ char a; int b; char c; }</code> and <code>{ int b; char a; char c; }</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">6 and 6</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">9 and 6</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">12 and 8</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">16 and 8</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The first has three padding bytes before <code>b</code> and three after <code>c</code>. The second has only two tail padding bytes. The tempting 9 and 6 ignores the rounding needed for the next array element's alignment.</div></div><div class="mcq" data-id="cpp-memory-and-object-layout.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does <code>int n = 4; auto bytes = sizeof(n += 1); std::cout &lt;&lt; n;</code> print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">4</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">5</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The size of an int</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It depends on pointer size</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The operand of <code>sizeof</code> is unevaluated, so the increment never happens. The size is stored in <code>bytes</code>, but the printed variable is <code>n</code>.</div></div><div class="mcq" data-id="cpp-memory-and-object-layout.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>Widget* p = new Widget[1]; delete p;</code> uses an array with only one element. Is it correct?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Yes, because there is exactly one destructor to run</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes, if Widget is trivially destructible</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No, the array allocation requires <code>delete[] p</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No, it needs <code>std::free(p)</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Allocation and deallocation forms must match independently of the element count or destructor triviality. One element does not turn an array new-expression into a scalar one.</div></div><div class="mcq" data-id="cpp-memory-and-object-layout.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The resource-owning <code>Job</code> above is constructed using placement new inside <code>alignas(Job) std::byte storage[sizeof(Job)]</code>. What is the correct cleanup before the buffer leaves scope?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>delete p</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>std::free(p)</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>p-&gt;~Job()</code> exactly once; the automatic byte buffer needs no manual deallocation</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing: the compiler automatically destroys the placement object at scope exit</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Leaving scope releases the byte array's storage and ends any remaining contained object lifetime, but does not automatically call the placement Job's destructor. Explicit destruction first releases its resources; delete and free would misuse the automatic backing storage.</div></div><div class="mcq" data-id="cpp-memory-and-object-layout.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the <code>Ticket</code> allocation-hook example, storage allocation succeeds and the constructor throws. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Neither destruction nor deallocation occurs</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Ticket's destructor runs, followed by its operator delete</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The matching operator delete runs, but Ticket's destructor does not</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Operator delete runs only if the catch block explicitly calls it</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The new-expression handles failed initialization by releasing storage. There is no fully constructed Ticket to destroy; any completed bases and members are cleaned up during unwinding.</div></div><div class="mcq" data-id="cpp-memory-and-object-layout.q6" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two threads repeatedly write different <code>long</code> array elements. Which claim about <code>alignas(64) long counters[2]</code> is correct?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Each element begins on a separate 64-byte boundary</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">All accesses become atomic</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only the array's start gains that alignment; its elements remain adjacent</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The array is guaranteed to avoid false sharing on every CPU</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Array alignment does not change element stride. Use an aligned wrapper type to separate elements, choose the boundary for the target, and measure. Alignment never adds synchronization.</div></div><div class="mcq" data-id="cpp-memory-and-object-layout.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Adding another virtual method to the simple <code>Virtual</code> example usually leaves its object size unchanged. Why?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Virtual methods have no memory cost anywhere</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The new entry is in shared dispatch metadata; each object can reuse its existing vtable pointer</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Each object gains a pointer but <code>sizeof</code> excludes it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The C++ standard requires every polymorphic class to have size 16</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The common ABI keeps the dispatch entries outside each object. <code>sizeof</code> includes hidden in-object overhead, but neither a vtable representation nor an exact size is mandated by C++.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-memory-and-object-layout.c1" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">Using the worked example's ABI assumptions, lay out <code>struct Record { char kind; double score; int count; char ready; };</code> when double has size/alignment 8. Reorder it to reduce size, give both sizes and offsets, and name two reasons not to ship the change blindly.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Initially <code>kind</code> is at 0, <code>score</code> at 8, <code>count</code> at 16 and <code>ready</code> at 20. Seven initial padding bytes and three tail padding bytes produce size 24 and alignment 8. Reorder to <code>double score; int count; char kind; char ready;</code>: offsets 0, 8, 12 and 13, followed by two tail padding bytes, produce size 16 and alignment 8. That saves eight bytes per element. The change breaks binary layout compatibility and changes aggregate initializer positions; it also changes member construction order, which can break dependencies. I would measure on the target and check all those contracts.</p></div></div><div class="cq" data-q="cpp-memory-and-object-layout.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A reusable slot must hold one nontrivial <code>T</code> without an allocation on each insertion. Describe insertion, removal, exception handling and the concurrency contract.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Use at least <code>sizeof(T)</code> bytes aligned for <code>T</code>, plus an engaged flag. Under the slot's ownership or synchronization protocol, insertion first verifies the slot is empty, constructs with placement new, and sets engaged only after success. If construction throws, the flag stays false and there is no complete T to destroy. Removal uses the live object, destroys it exactly once, then marks the slot empty. The owner destroys any remaining engaged object before releasing the backing storage. Accessors must not retain a reference across removal; a lock around allocation metadata alone cannot enforce that. Publication and reclamation need a protocol that all clients obey.</p></div></div><div class="cq" data-q="cpp-memory-and-object-layout.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A service's resident memory keeps growing, ThreadSanitizer is quiet, and the Mac aborts when you set <code>ASAN_OPTIONS=detect_leaks=1</code>. What can you conclude, and what do you do next?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>I cannot conclude that there is a leak or that the service is leak-free. ThreadSanitizer checks races, and this Apple runtime has rejected leak detection rather than completed it. I would repeat a bounded workload, drain it, and compare live allocations using Instruments or a supported LeakSanitizer runtime verified with a known leak. I would inspect exceptional exits and ownership cycles for leaked allocations, and separate those from reachable growth such as an unbounded cache or queued tasks. Resident memory can also remain high because an allocator retains freed storage. The fix needs a workload regression showing the appropriate live counts return to baseline.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-memory-and-object-layout.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"This struct has only six bytes of fields. Walk me through why <code>sizeof</code> says twelve, and whether you would reorder it in our concurrent service."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>State the size and alignment assumptions before calculating an ABI-dependent result</li><li>Place char, int, char at offsets 0, 4 and 8, then round the complete size to 12</li><li>Reordering int, char, char gives offsets 0, 4 and 5 and a size of 8</li><li>Check ABI compatibility, initializer positions and construction dependencies before reordering</li><li>Different writers can false-share a line; padding does not make shared writes safe</li><li>Measure layout and workload performance instead of assuming smaller is always faster</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The extra bytes are alignment padding. Assuming a one-byte char and a four-byte int aligned to four bytes, the first char sits at offset zero. The int cannot start at offset one, so the compiler leaves three bytes and places it at four. The last char lands at eight. Three tail bytes bring the size to twelve, which keeps the next object in an array correctly aligned. If I put the int first, the chars can occupy offsets four and five, and the complete size becomes eight. Before shipping that change, I would check binary compatibility, aggregate initializers and any constructor dependency on declaration order. In a concurrent service I would also ask which threads write these fields. Packing independent hot counters together can increase false sharing, while padding cannot make writes to the same plain counter safe. I would measure the actual offsets and size on our compiler, then benchmark the real workload. Smaller objects help capacity, but their placement can still hurt throughput.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if I align the array itself to 64 bytes instead of aligning its element type?</span></p></div></div><div class="sq" data-sq="cpp-memory-and-object-layout.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"We already have a buffer. Why can't I just cast its address to <code>Job*</code> and later delete that pointer? Compare the correct options."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A cast does not run a nontrivial Job constructor; storage and object lifetime are separate</li><li>Require enough storage, correct alignment and exclusive access before placement construction</li><li>Use placement new and its returned pointer, then explicitly destroy the constructed object exactly once</li><li>Release backing storage using its original allocation family; an automatic buffer is not deleted</li><li>Handle constructor failure without destroying an incomplete object; retain RAII ownership of storage</li><li>Ordinary new/delete combine both stages and smart owners are the default outside allocator internals</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">A cast gives me a different pointer type; it does not construct a nontrivial Job. I first need enough storage, the right alignment and exclusive access to that slot. Then I can use placement new to construct Job there and keep the pointer it returns. When I remove the job, I explicitly run its destructor exactly once. That releases the job's own resources but leaves the slot's storage available for reuse. I must return that storage according to its original owner. For a local byte array there is no manual deallocation. For malloc storage I eventually call free on the original allocation. Ordinary delete is wrong for either placement pointer because it couples destruction with a different deallocation contract. If construction throws, I leave the slot empty and preserve or release its storage through its owner; there is no complete Job to destroy. Ordinary new and delete combine those stages for me. Outside allocator internals I would use an RAII owner, usually a container or unique pointer, to keep failure paths correct.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What protects a reference another thread obtained just before you destroyed and reused the slot?</span></p></div></div><div class="sq" data-sq="cpp-memory-and-object-layout.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Our process grows after every failed request, but ThreadSanitizer reports nothing. How would you investigate on this Mac?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A quiet ThreadSanitizer run does not check leaks; distinguish live allocations from resident memory</li><li>Repeat and drain a bounded workload, then compare live allocation counts or bytes</li><li>The tested Apple Clang runtime rejects detect_leaks; use Instruments or a verified supported runtime</li><li>Follow allocation stacks to skipped cleanup, retained work or ownership cycles</li><li>Repair ownership with RAII and retest failure paths as well as success</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would investigate ownership and retention, because a quiet ThreadSanitizer run says nothing about leaks. First I would repeat one bounded request workload, wait for outstanding work to drain, and compare live allocation counts or bytes. Resident memory alone can grow because of allocator caching or fragmentation. I would then inspect allocation stacks and ask which owner should have released each surviving allocation. On this Mac, the tested Apple Clang runtime rejects the AddressSanitizer leak option, so I would use Instruments or a supported LeakSanitizer runtime validated with a known leak. I would check exceptional exits, abandoned queued work, unbounded caches and ownership cycles. For skipped cleanup, the repair is to establish an RAII owner as soon as allocation succeeds. Finally I would rerun both successful and failing requests and verify that the live allocations return to the expected baseline.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Could a reachability-based leak detector miss an unbounded cache that still holds every pointer?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-buddy-allocator.html" data-problem="buddy-allocator"><span class="pk">Thread-safe structures · senior</span><b>Thread-safe buddy allocator</b><span class="pst"></span></a><a class="pcard" href="p-two-queues-one-buffer.html" data-problem="two-queues-one-buffer"><span class="pk">Thread-safe structures · hard</span><b>Two queues, one buffer</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-types-casts-and-initialization.html"><span>Previous</span><b>Types, casts, conversions and initialization</b></a><a class="next" href="cpp-move-semantics.html"><span>Next</span><b>Copy, move and move-only types</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#sizeof-measures-an-object-not-everything-it-owns">sizeof measures an object, not everything it owns</a><a href="#alignment-padding-and-the-stride-of-an-array">Alignment, padding and the stride of an array</a><a href="#api-card-size-storage-and-lifetime">API card: size, storage and lifetime</a><a href="#alignas-requests-a-boundary-not-synchronization">alignas requests a boundary, not synchronization</a><a href="#what-a-virtual-function-costs-in-object-size">What a virtual function costs in object size</a><a href="#new-and-delete-combine-two-jobs">new and delete combine two jobs</a><a href="#placement-new-construct-in-storage-you-already-own">Placement new: construct in storage you already own</a><a href="#overload-allocation-for-one-class">Overload allocation for one class</a><a href="#find-a-leak-then-fix-ownership">Find a leak, then fix ownership</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

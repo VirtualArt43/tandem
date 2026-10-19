@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Build it yourself: semaphore and latch · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="build-semaphore-and-latch" data-title="Build it yourself: semaphore and latch" data-track="core" data-module="core-8" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details open><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch" class=here><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m8">Module 08: Synchronizers</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 08.4</span><span>25 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Build it yourself: semaphore and latch</h1><p class="lsum">Build a semaphore and latch from locks and conditions, prove their invariants and publication, and handle timeouts, overflow, cancellation and fairness.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Microsoft</span></div><div class="prereq"><span>Before this:</span><a href="condition-variables.html">Condition variables and monitors</a><a href="wait-in-a-loop.html">Spurious and stolen wakeups: always wait in a loop</a><a href="semaphores.html">Semaphores: permits as a resource limit</a><a href="latches.html">Latches: wait until N things happen</a></div></header><article class="prose" id="article">
+<p class="lead">Rubrik interviewers often ban <code>java.util.concurrent</code>, and a Microsoft round asked a candidate to implement a working semaphore. Building a semaphore and a latch from a lock and a condition variable takes a few lines each, and every one of those lines is a chance to show that you understand waiting correctly.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>You already know the parking lot with the "spaces free" board. Now you are the attendant. You keep the number in a notebook, and only one person may write in the notebook at a time. Drivers who find the number at zero sit on a bench. When a car leaves, you add one to the number and tap one driver on the shoulder; that driver walks up, looks at the notebook again (someone may have slipped in first), and either takes the space or sits back down.</p>
+<p>The notebook is the <strong>state</strong>, the one-writer rule is the <strong>lock</strong>, the bench is the <strong>condition variable</strong>, and "look again before taking it" is the <strong>wait loop</strong>. Those four things are enough to build the synchronizers here.</p>
+</div>
+
+<h2 id="the-recipe">The recipe</h2>
+<p>Both classes follow the <a class="term" data-term="monitor" href="glossary.html#monitor">monitor</a> pattern, and you will reuse the same recipe in the next lesson and in every "build a primitive" problem:</p>
+<ol>
+<li><strong>Name the state and its invariant.</strong> For a semaphore: <code>permits</code>, never negative. For a latch: <code>count</code>, never negative and never rising.</li>
+<li><strong>Guard all of the state with one lock.</strong> Every read and every write, including the ones in "harmless" getters.</li>
+<li><strong>One <a class="term" data-term="condition-variable" href="glossary.html#condition-variable">condition variable</a> per thing threads wait for.</strong> "A permit is free", "the count reached zero".</li>
+<li><strong>For each operation: lock, wait in a loop if needed, change state if needed, notify eligible waiters, unlock.</strong></li>
+</ol>
+<p>The loop in step 4 is not optional. A waiting thread can wake up because of a <a class="term" data-term="spurious-wakeup" href="glossary.html#spurious-wakeup">spurious wakeup</a>, or because it was signalled but another thread took the permit before it got the lock back, a <a class="term" data-term="stolen-wakeup" href="glossary.html#stolen-wakeup">stolen wakeup</a>. Waking up means "look again", never "go ahead".</p>
+
+<h2 id="a-counting-semaphore">A counting semaphore</h2>
+<p>State: <code>permits</code>. Invariant: <code>permits &gt;= 0</code>, and it equals the initial count plus releases minus successful acquires. <code>acquire</code> waits while <code>permits == 0</code>, then takes one. <code>release</code> adds one and wakes one waiter. A timed <code>tryAcquire</code> uses one deadline for its condition waits.</p>
+<p>This version rejects negative initial counts, has no ownership or fairness guarantee, and allows releases by threads that never acquired. It is a general counting semaphore, not a bounded resource pool: releases can raise it above its initial count, but must not overflow its integer representation.</p>
+
+<figure class="code pair" data-sample="build-semaphore-and-latch.1" data-expect="ok"><figcaption><span class="ctitle">A counting semaphore from a lock and a condition</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;limits&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> CountingSemaphore {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">CountingSemaphore</span>(<span class="t">int</span> permits) : <span class="f">permits_</span>(permits) {
+        <span class="k">if</span> (permits &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"permits &lt; 0"</span>);
+    }
+
+    <span class="t">void</span> <span class="f">acquire</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        available_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> permits_ &gt; <span class="n">0</span>; });   <span class="c">// the predicate is the while loop</span>
+        permits_ -= <span class="n">1</span>;
+    }
+
+    <span class="k">template</span> &lt;<span class="k">typename</span> Rep, <span class="k">typename</span> Period&gt;
+    <span class="t">bool</span> <span class="f">try_acquire_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">duration</span>&lt;Rep, Period&gt; timeout) {
+        <span class="k">auto</span> deadline = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() + timeout;
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (!available_.<span class="f">wait_until</span>(lock, deadline, [<span class="k">this</span>] { <span class="k">return</span> permits_ &gt; <span class="n">0</span>; })) {
+            <span class="k">return</span> <span class="k">false</span>;                          <span class="c">// timed out with no permit</span>
+        }
+        permits_ -= <span class="n">1</span>;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">void</span> <span class="f">release</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (permits_ == <span class="t">std</span>::numeric_limits&lt;<span class="t">int</span>&gt;::<span class="f">max</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="f">overflow_error</span>(<span class="s">"permit overflow"</span>);
+        permits_ += <span class="n">1</span>;
+        available_.<span class="f">notify_one</span>();                   <span class="c">// one permit can satisfy exactly one waiter</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> available_;
+    <span class="t">int</span> permits_;                                  <span class="c">// guarded by m_; never negative</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    CountingSemaphore <span class="f">sem</span>(<span class="n">2</span>);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; inside{<span class="n">0</span>}, most{<span class="n">0</span>};
+    {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; users;
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">6</span>; i += <span class="n">1</span>) {
+            users.<span class="f">emplace_back</span>([&amp;] {
+                <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">3</span>; k += <span class="n">1</span>) {
+                    sem.<span class="f">acquire</span>();
+                    <span class="t">int</span> now = inside.<span class="f">fetch_add</span>(<span class="n">1</span>) + <span class="n">1</span>;
+                    <span class="t">int</span> seen = most.<span class="f">load</span>();
+                    <span class="k">while</span> (now &gt; seen &amp;&amp; !most.<span class="f">compare_exchange_weak</span>(seen, now)) {
+                    }
+                    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">5</span>));   <span class="c">// hold it briefly (a demo sleep)</span>
+                    inside.<span class="f">fetch_sub</span>(<span class="n">1</span>);
+                    sem.<span class="f">release</span>();
+                }
+            });
+        }
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"most threads inside at once: "</span> &lt;&lt; most.<span class="f">load</span>() &lt;&lt; <span class="s">" (permits 2)\n"</span>;
+
+    sem.<span class="f">acquire</span>();
+    sem.<span class="f">acquire</span>();                                 <span class="c">// both permits taken</span>
+    <span class="k">auto</span> start = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>();
+    <span class="t">bool</span> got = sem.<span class="f">try_acquire_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">50</span>));
+    <span class="k">auto</span> ms = <span class="t">std</span>::<span class="t">chrono</span>::duration_cast&lt;<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>&gt;(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() - start).<span class="f">count</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"try_acquire_for with none free: "</span> &lt;&lt; <span class="t">std</span>::boolalpha &lt;&lt; got &lt;&lt; <span class="s">" after about "</span> &lt;&lt; ms &lt;&lt; <span class="s">" ms\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</span><code><span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">CountingSemaphore</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> available = lock.<span class="f">newCondition</span>();
+        <span class="k">private</span> <span class="t">int</span> <span class="k">permits</span>;                                 <span class="c">// guarded by lock; never negative</span>
+
+        <span class="t">CountingSemaphore</span>(<span class="t">int</span> <span class="k">permits</span>) {
+            <span class="k">if</span> (<span class="k">permits</span> &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"permits &lt; 0"</span>);
+            <span class="k">this</span>.<span class="k">permits</span> = <span class="k">permits</span>;
+        }
+
+        <span class="k">void</span> <span class="f">acquire</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (<span class="k">permits</span> == <span class="n">0</span>) {                       <span class="c">// while, never if: re-check after every wakeup</span>
+                    available.<span class="f">await</span>();                       <span class="c">// releases the lock while it sleeps</span>
+                }
+                <span class="k">permits</span> -= <span class="n">1</span>;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="t">boolean</span> <span class="f">tryAcquire</span>(<span class="t">long</span> timeout, <span class="t">TimeUnit</span> unit) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            <span class="t">long</span> budget = <span class="t">Math</span>.<span class="f">max</span>(<span class="n">0L</span>, unit.<span class="f">toNanos</span>(timeout));
+            <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (<span class="k">permits</span> == <span class="n">0</span>) {
+                    <span class="t">long</span> remaining = budget - (<span class="t">System</span>.<span class="f">nanoTime</span>() - start);
+                    <span class="k">if</span> (remaining &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;
+                    available.<span class="f">awaitNanos</span>(remaining);         <span class="c">// next iteration recomputes the same budget</span>
+                }
+                <span class="k">permits</span> -= <span class="n">1</span>;
+                <span class="k">return</span> <span class="k">true</span>;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="k">void</span> <span class="f">release</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">if</span> (<span class="k">permits</span> == <span class="t">Integer</span>.MAX_VALUE) <span class="k">throw</span> <span class="k">new</span> <span class="t">ArithmeticException</span>(<span class="s">"permit overflow"</span>);
+                <span class="k">permits</span> += <span class="n">1</span>;
+                available.<span class="f">signal</span>();                          <span class="c">// one permit can satisfy exactly one waiter</span>
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">CountingSemaphore</span> sem = <span class="k">new</span> <span class="t">CountingSemaphore</span>(<span class="n">2</span>);
+        <span class="t">AtomicInteger</span> inside = <span class="k">new</span> <span class="t">AtomicInteger</span>(), most = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">Thread</span>[] users = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">6</span>];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; users.length; i += <span class="n">1</span>) {
+            users[i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">3</span>; k += <span class="n">1</span>) {
+                        sem.<span class="f">acquire</span>();
+                        <span class="k">try</span> {
+                            most.<span class="f">accumulateAndGet</span>(inside.<span class="f">incrementAndGet</span>(), <span class="t">Math</span>::max);
+                            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">5</span>);                 <span class="c">// hold it briefly (a demo sleep)</span>
+                        } <span class="k">finally</span> {
+                            inside.<span class="f">decrementAndGet</span>();
+                            sem.<span class="f">release</span>();
+                        }
+                    }
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"user-"</span> + i);
+            users[i].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> u : users) u.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"most threads inside at once: "</span> + most.<span class="f">get</span>() + <span class="s">" (permits 2)"</span>);
+
+        sem.<span class="f">acquire</span>();
+        sem.<span class="f">acquire</span>();                                       <span class="c">// both permits taken</span>
+        <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+        <span class="t">boolean</span> got = sem.<span class="f">tryAcquire</span>(<span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"tryAcquire with none free: "</span> + got + <span class="s">" after about "</span>
+                + (<span class="t">System</span>.<span class="f">nanoTime</span>() - start) / <span class="n">1_000_000</span> + <span class="s">" ms"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>most threads inside at once: 2 (permits 2)
+tryAcquire with none free: false after about 51 ms</pre></div><div class="runout" hidden></div></figure>
+
+<p>These classes use ordinary mutexes, so lock acquisition and reacquisition can outlast the deadline; scheduling can delay return too. The budget begins before locking, so time spent acquiring the lock is not followed by another full timeout. For bounded initial lock acquisition, use Java's timed <code>tryLock</code>, or C++'s <code>std::timed_mutex</code> with <code>std::condition_variable_any</code>, sharing the same deadline. Even then, this is not a hard real-time return guarantee. The C++ examples assume durations whose conversion and deadline addition fit the clock's representation.</p>
+<p>The demo sleep only makes overlapping holders easier to observe; it is not synchronization. A run may observe a maximum of 1 or 2. These monitor classes also work in C++17; replace the demo's C++20 <code>std::jthread</code> with <code>std::thread</code> and explicitly join each thread. Real permit users need <code>finally</code> in Java or an RAII permit guard in C++ if work can throw.</p>
+
+<div class="only only-java"><span class="otag">Java</span>
+<p><strong>Clarify a library ban.</strong> The code above builds the synchronizer but still uses <code>ReentrantLock</code> and <code>Condition</code>. If all of <code>java.util.concurrent</code> is forbidden, use <code>synchronized</code> methods, <code>wait</code> in the same predicate loop, and <code>notify</code> or <code>notifyAll</code> on that monitor. Monitor entry is not interruptible, although <code>wait</code> is; the fixed-latch checkpoint shows that version.</p>
+</div>
+
+<h3>Why each line is there</h3>
+<table>
+<thead><tr><th>Line</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>One lock around every access to <code>permits</code></td><td>The check "is there a permit?" and the take "permits minus one" must be one atomic step, or two threads both take the last permit.</td></tr>
+<tr><td><code>while (permits == 0)</code>, or the predicate overload of <code>wait</code></td><td>Spurious and stolen wakeups. The C++ predicate overload is exactly this loop.</td></tr>
+<tr><td><code>await</code> and <code>wait</code> release the lock while sleeping</td><td>Otherwise no thread could ever <code>release</code>. They take the lock back before returning, so the re-check is safe.</td></tr>
+<tr><td><code>signal</code> / <code>notify_one</code> in <code>release</code></td><td>All waiters wait for the same thing, and one permit lets exactly one of them proceed, so waking one is enough. Waking all would be correct but wasteful.</td></tr>
+<tr><td><code>lockInterruptibly</code> and <code>throws InterruptedException</code> (Java)</td><td>A thread blocked in <code>acquire</code> can be cancelled. <code>await</code> already throws when interrupted; the method declares it so callers decide.</td></tr>
+<tr><td>Deadline-based timed wait</td><td>Java subtracts elapsed <code>nanoTime</code> from the original budget on every loop. C++ passes one <code>steady_clock</code> deadline to predicate <code>wait_until</code>. Neither starts a fresh timeout after a wakeup.</td></tr>
+</tbody>
+</table>
+
+<figure class="timeline"><figcaption>Why the wait must be a loop: a stolen permit</figcaption><div class="tl c4"><div class="tl-head"><span class="t">step</span><span>T1 in acquire()</span><span>Releaser</span><span>T3 arrives</span><span>permits</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">permits is 0</span></div><div class="tl-row"><span class="t">2</span><span class="cell">sees 0, waits (and releases the lock)</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">release(): permits becomes 1, signals T1</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">calls acquire(), gets the lock before T1 wakes, sees 1, takes it</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">permits is 0 again</span></div><div class="tl-row"><span class="t">6</span><span class="cell">wakes with the lock. With if: takes a permit anyway</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">7</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">permits is minus 1: two threads hold one permit</span></div><div class="tl-note">With while, T1 re-checks, sees 0 and waits again. Nothing is lost: T3 used the permit, and the next release will wake T1.</div></div></figure>
+
+<h2 id="a-countdown-latch">A countdown latch</h2>
+<p>State: <code>count</code>. Invariant: <code>count &gt;= 0</code>, it only goes down, and once it is 0 it stays 0. <code>countDown</code> lowers it and, when it reaches zero, wakes <strong>every</strong> waiter. <code>await</code> waits while <code>count &gt; 0</code>.</p>
+
+<figure class="code pair" data-sample="build-semaphore-and-latch.2" data-expect="ok"><figcaption><span class="ctitle">A countdown latch from a lock and a condition</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;limits&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Latch {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Latch</span>(<span class="t">int</span> count) : <span class="f">count_</span>(count) {
+        <span class="k">if</span> (count &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"count &lt; 0"</span>);
+    }
+
+    <span class="t">void</span> <span class="f">count_down</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (count_ == <span class="n">0</span>) <span class="k">return</span>;                 <span class="c">// extra calls are harmless here, unlike std::latch</span>
+        count_ -= <span class="n">1</span>;
+        <span class="k">if</span> (count_ == <span class="n">0</span>) zero_.<span class="f">notify_all</span>();     <span class="c">// every waiter can go; notified under the lock on purpose</span>
+    }
+
+    <span class="t">void</span> <span class="f">wait</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        zero_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> count_ == <span class="n">0</span>; });
+    }
+
+    <span class="k">template</span> &lt;<span class="k">typename</span> Rep, <span class="k">typename</span> Period&gt;
+    <span class="t">bool</span> <span class="f">wait_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">duration</span>&lt;Rep, Period&gt; timeout) {
+        <span class="k">auto</span> deadline = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() + timeout;
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> zero_.<span class="f">wait_until</span>(lock, deadline, [<span class="k">this</span>] { <span class="k">return</span> count_ == <span class="n">0</span>; });
+    }
+
+    <span class="t">int</span> <span class="f">count</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> count_;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> zero_;
+    <span class="t">int</span> count_;                                  <span class="c">// guarded by m_; only ever goes down</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Latch <span class="f">loaded</span>(<span class="n">3</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; <span class="f">parts</span>(<span class="n">3</span>, <span class="n">0</span>);                <span class="c">// plain data, published by the latch</span>
+    <span class="t">std</span>::<span class="t">mutex</span> out;
+    {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; threads;
+        <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; <span class="n">2</span>; w += <span class="n">1</span>) {
+            threads.<span class="f">emplace_back</span>([&amp;, w] {
+                loaded.<span class="f">wait</span>();                   <span class="c">// both waiters are released by the third count down</span>
+                <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(out);
+                <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"waiter "</span> &lt;&lt; w &lt;&lt; <span class="s">" sees "</span> &lt;&lt; parts[<span class="n">0</span>] + parts[<span class="n">1</span>] + parts[<span class="n">2</span>] &lt;&lt; <span class="s">"\n"</span>;
+            });
+        }
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+            threads.<span class="f">emplace_back</span>([&amp;, i] {
+                parts[i] = (i + <span class="n">1</span>) * <span class="n">10</span>;         <span class="c">// write first, then count down</span>
+                loaded.<span class="f">count_down</span>();
+            });
+        }
+    }
+    Latch <span class="f">never</span>(<span class="n">1</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"wait_for on a latch nobody counts down: "</span> &lt;&lt; <span class="t">std</span>::boolalpha
+              &lt;&lt; never.<span class="f">wait_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">50</span>)) &lt;&lt; <span class="s">", count "</span> &lt;&lt; never.<span class="f">count</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</span><code><span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">Latch</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> reachedZero = lock.<span class="f">newCondition</span>();
+        <span class="k">private</span> <span class="t">int</span> count;                                   <span class="c">// guarded by lock; only ever goes down</span>
+
+        <span class="t">Latch</span>(<span class="t">int</span> count) {
+            <span class="k">if</span> (count &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"count &lt; 0"</span>);
+            <span class="k">this</span>.count = count;
+        }
+
+        <span class="k">void</span> <span class="f">countDown</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">if</span> (count == <span class="n">0</span>) <span class="k">return</span>;                      <span class="c">// extra calls are harmless, as in the JDK</span>
+                count -= <span class="n">1</span>;
+                <span class="k">if</span> (count == <span class="n">0</span>) reachedZero.<span class="f">signalAll</span>();     <span class="c">// every waiter can go, not just one</span>
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="k">void</span> <span class="f">await</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (count &gt; <span class="n">0</span>) reachedZero.<span class="f">await</span>();
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="t">boolean</span> <span class="f">await</span>(<span class="t">long</span> timeout, <span class="t">TimeUnit</span> unit) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            <span class="t">long</span> budget = <span class="t">Math</span>.<span class="f">max</span>(<span class="n">0L</span>, unit.<span class="f">toNanos</span>(timeout));
+            <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (count &gt; <span class="n">0</span>) {
+                    <span class="t">long</span> remaining = budget - (<span class="t">System</span>.<span class="f">nanoTime</span>() - start);
+                    <span class="k">if</span> (remaining &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;
+                    reachedZero.<span class="f">awaitNanos</span>(remaining);
+                }
+                <span class="k">return</span> <span class="k">true</span>;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="t">int</span> <span class="f">getCount</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">return</span> count;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Latch</span> loaded = <span class="k">new</span> <span class="t">Latch</span>(<span class="n">3</span>);
+        <span class="t">int</span>[] parts = <span class="k">new</span> <span class="t">int</span>[<span class="n">3</span>];                            <span class="c">// plain data, published by the latch</span>
+        <span class="t">Thread</span>[] threads = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">5</span>];
+        <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; <span class="n">2</span>; w += <span class="n">1</span>) {
+            <span class="t">int</span> id = w;
+            threads[w] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    loaded.<span class="f">await</span>();                          <span class="c">// both waiters are released by the third countDown</span>
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"waiter "</span> + id + <span class="s">" sees "</span> + (parts[<span class="n">0</span>] + parts[<span class="n">1</span>] + parts[<span class="n">2</span>]));
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"waiter-"</span> + w);
+        }
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+            <span class="t">int</span> id = i;
+            threads[<span class="n">2</span> + i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                parts[id] = (id + <span class="n">1</span>) * <span class="n">10</span>;                   <span class="c">// write first, then count down</span>
+                loaded.<span class="f">countDown</span>();
+            }, <span class="s">"loader-"</span> + i);
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">join</span>();
+
+        <span class="t">Latch</span> never = <span class="k">new</span> <span class="t">Latch</span>(<span class="n">1</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"await(50 ms) on a latch nobody counts down: "</span>
+                + never.<span class="f">await</span>(<span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS) + <span class="s">", count "</span> + never.<span class="f">getCount</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>waiter 0 sees 60
+waiter 1 sees 60
+await(50 ms) on a latch nobody counts down: false, count 1</pre></div><div class="runout" hidden></div></figure>
+
+<h3>The two lines that differ from the semaphore</h3>
+<ul>
+<li><strong><code>signalAll</code> / <code>notify_all</code>, not one.</strong> Reaching zero lets <em>every</em> waiter proceed. Waking one would leave the others asleep forever, because the count never changes again and nobody else will signal. Compare the semaphore, where one release enables exactly one acquirer. The rule from <a class="term" data-term="notify-all" href="glossary.html#notify-all">notify versus notifyAll</a>: wake one only when every waiter waits for the same thing and one change lets exactly one of them proceed.</li>
+<li><strong>Notify while holding the lock (C++).</strong> Notifying after unlocking is legal if the condition variable stays alive. If a waiter owns the latch and may destroy it after returning, however, it could observe zero before a delayed notification touches the object. Keeping the notification under the lock closes that gap. It does not establish ownership for all users: keep the latch alive until every waiter and countdown caller has finished, normally by joining them. Java keeps the object alive while a method uses it, but <code>Condition.signalAll</code> still requires its associated lock.</li>
+</ul>
+
+<h2 id="why-the-result-data-is-visible">Why the result data is visible</h2>
+<p><strong>The mutex publishes the data, not the notification.</strong> Each loader writes its own array element before locking and counting down. Its unlock synchronizes with a later lock of the same mutex. The chain through all countdowns and the waiter's final acquisition makes all three writes happen-before the read after a successful wait, so each printed sum is 60. A false timed wait does not establish that all results are ready, and the latch does not protect later writes to those elements.</p>
+<p>The semaphore's successful acquire linearizes at its decrement under the lock; release linearizes at its increment. A latch countdown linearizes at its decrement, and a successful wait observes zero while locked. A timeout makes its final failed predicate check while locked. If release and expiry race, whichever state the locked check observes determines the result. <code>getCount</code> is only a snapshot, not permission for a later action.</p>
+<p>Both primitives have constant-size state and O(1) state changes. Waiting time is unbounded without cancellation or a usable deadline. Latch opening wakes W waiters, so its notification and rescheduling costs can grow with W. A latch opens once; resetting its count would need generations and rules for waiters, which leads to a reusable barrier.</p>
+
+<h2 id="timeouts-done-right">Timeouts done right</h2>
+<p>A timed wait has one classic bug: waiting for the full timeout again after every wakeup.</p>
+<figure class="code pair" data-sample="build-semaphore-and-latch.3"><figcaption><span class="ctitle">Deadline, not duration, inside the loop</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> TimedWait {
+<span class="k">public</span>:
+    <span class="t">bool</span> <span class="f">wait_done</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> timeout) {
+        <span class="k">auto</span> deadline = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() + timeout;   <span class="c">// fix the deadline once</span>
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> ready_.<span class="f">wait_until</span>(lock, deadline, [<span class="k">this</span>] { <span class="k">return</span> done_; });
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> ready_;
+    <span class="t">bool</span> done_ = <span class="k">false</span>;                                  <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">TimedWait</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> ready = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="t">boolean</span> done;                                <span class="c">// guarded by lock</span>
+
+    <span class="t">boolean</span> <span class="f">awaitDone</span>(<span class="t">long</span> timeout, <span class="t">TimeUnit</span> unit) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">long</span> budget = <span class="t">Math</span>.<span class="f">max</span>(<span class="n">0L</span>, unit.<span class="f">toNanos</span>(timeout));
+        <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (!done) {
+                <span class="t">long</span> remaining = budget - (<span class="t">System</span>.<span class="f">nanoTime</span>() - start);
+                <span class="k">if</span> (remaining &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">false</span>;
+                ready.<span class="f">awaitNanos</span>(remaining);              <span class="c">// never restart the original budget</span>
+            }
+            <span class="k">return</span> <span class="k">true</span>;
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Fix the deadline once, before the loop, and measure it on a monotonic clock (<code>System.nanoTime</code> in Java, <code>steady_clock</code> in C++), never the wall clock, which can jump when the system time is corrected. At expiry, check the predicate while still holding the lock: it may have become true near the deadline. The predicate overload does that final check for C++. A nonpositive timeout still tests the predicate once; it does not consume a permit if the predicate is false.</p>
+
+<div class="box example">
+<h3>Worked example: a semaphore with acquire(n) and release(n)</h3>
+<p>An interviewer extends the problem: "Now support taking and returning several permits at once." The predicate and notification policy change, and the API must validate positive requests and prevent overflow.</p>
+<ul>
+<li><code>acquire(n)</code> waits <strong>while <code>permits &lt; n</code></strong>, then subtracts n.</li>
+<li>In this simple shared-condition design, <code>release(n)</code> adds n and must now <strong>signal all</strong>. With a single signal, the release might wake a thread that wants 5 permits when only 2 are free; it re-checks and sleeps again, while a thread wanting 1 permit stays asleep even though it could proceed. Waiters now wait for different things, so the "wake one" rule no longer holds.</li>
+</ul>
+<p>Then the follow up: <strong>starvation</strong>. With <code>signalAll</code>, small requests keep slipping in ahead of a large one, which may never see enough permits at once. The fix is FIFO: give each waiter a ticket number and let only the oldest ticket take permits, holding later requests back even when they could fit. That can cause head-of-line blocking: one permit remains idle behind a request for five. If a ticket holder times out or is interrupted, remove it and wake eligible successors or the abandoned ticket blocks the queue forever. Saying "signalAll for correctness, then FIFO if starvation matters" is the senior answer.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong><code>if</code> instead of <code>while</code>.</strong> A stolen or spurious wakeup takes a permit that is not there, as the timeline shows.</li>
+<li><strong>Checking the state outside the lock.</strong> <code>if (count &gt; 0) { lock; wait; }</code> lets the last <code>countDown</code> and its signal happen between your check and your wait: a <a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a>, and you sleep forever. Check and wait under the same lock. In C++ the unlocked read is also a data race.</li>
+<li><strong><code>signal</code> in the latch.</strong> Only one of several waiters wakes when the count reaches zero.</li>
+<li><strong>Signalling one waiter when waiters want different things</strong>, as with <code>acquire(n)</code>. Use <code>signalAll</code>.</li>
+<li><strong>Restarting the full timeout after every wakeup.</strong> The caller can wait many times longer than asked. Use a deadline.</li>
+<li><strong>Swallowing <code>InterruptedException</code>.</strong> Propagate it, or restore the flag with <code>Thread.currentThread().interrupt()</code>.</li>
+<li><strong>Notifying after unlock in a C++ latch that lives on the waiter's stack.</strong> The waiter may already have destroyed it.</li>
+<li><strong>Calling user code while holding the lock</strong>, for example a callback in <code>countDown</code>. It can block forever or try to take the same lock.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>"Implement a semaphore" (Microsoft asked it in a 2022 round) and "wait for all tasks without the library" (Rubrik's recurring <code>waitUntilComplete</code>) are the two common shapes; Rubrik's library bans mean you should be able to write both on a whiteboard in a few minutes. Graders check the loop, the right notify, the lock around every access, interruption in Java, and that you can state the invariant.</p>
+<blockquote>I will build it as a monitor: one lock guards the permit count, and one condition variable, "a permit is available". Acquire takes the lock, waits in a loop while the count is zero (the loop handles spurious and stolen wakeups), then decrements. Release increments and signals one waiter, which is enough because one permit lets exactly one waiter proceed. The invariant is that the count is never negative and equals the initial count plus releases minus acquires. For the timed version I wait against a deadline on a monotonic clock. A latch is the same skeleton, except reaching zero must signal all waiters, because all of them can proceed.</blockquote>
+<p>Follow ups to expect: "Why <code>while</code>?" (draw the stolen permit), "Why <code>signal</code> and not <code>signalAll</code>?" (and when the answer flips), "Make it fair", "Add <code>acquire(n)</code>", and "Can you do it with atomics only?" (see below).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>How the real ones are built.</strong> Java 21's <code>Semaphore</code> and <code>CountDownLatch</code> use <a class="term" data-term="aqs" href="glossary.html#aqs">AbstractQueuedSynchronizer</a>, <code>AbstractQueuedSynchronizer</code>: atomic state and a wait queue, with shared acquisition for these primitives. Their uncontended paths can avoid parking, but the operations are still blocking when permits or events are unavailable. A FIFO wait queue alone does not make admission fair. libc++ also uses atomic state and waiting machinery for its C++20 primitives; the OS mechanism is platform-dependent, not necessarily a Linux futex. Performance relative to a monitor needs measurement on the workload.</p>
+<p><strong>Fairness needs admission control.</strong> A fair semaphore prevents new arrivals from overtaking queued waiters. One design directly reserves a permit for the queue head; another lets an acquiring thread proceed only when it is the head and enough permits exist. Direct handoff is not mandatory. Define the FIFO ordering point and handle timeout and cancellation removal. Neither fairness nor notification guarantees that the OS schedules a particular waiter promptly.</p>
+<p><strong>Semaphores from binary semaphores.</strong> A mutex semaphore plus a binary waiting gate needs a baton or acknowledgement protocol. Two releases cannot simply signal the binary gate twice: the gate cannot store two outstanding wakeups, and a C++ binary semaphore must not be treated as an unbounded counter. The protocol must preserve each owed wakeup, including releases that happen before a waiter blocks. That is why the textbook negative-count algorithm cannot be copied blindly onto a binary gate.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Recipe: state with an invariant, one lock around all of it, predicates checked in loops, and notifications when state enables waiting operations.</li>
+<li>Semaphore: wait while no permits, take one; release adds one and signals one waiter, because one permit enables exactly one.</li>
+<li>Latch: count down under the lock; reaching zero must signal all, because every waiter can proceed.</li>
+<li>Timed waits use one monotonic budget and a final locked predicate check; mutex and scheduler delays can still postpone return.</li>
+<li>Switch to signal all whenever waiters wait for different things, as with <code>acquire(n)</code>; add FIFO tickets if starvation matters.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="build-semaphore-and-latch"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="build-semaphore-and-latch.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A hand-built semaphore's <code>acquire</code> is written as <code>lock; if (permits == 0) wait; permits -= 1; unlock</code>. What can go wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing, as long as <code>release</code> signals while holding the lock</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A woken thread can find the permit already taken (or wake spuriously) and still subtract, so <code>permits</code> goes negative and two threads share one permit</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It deadlocks, because <code>wait</code> keeps the lock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It only fails on multi-core machines</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Waking up does not mean the permit is still there: another thread may have taken it before the woken thread got the lock back, and spurious wakeups happen with no signal at all. Only a loop that re-checks <code>permits == 0</code> after every wakeup is safe. Waiting releases the lock, signalling under the lock does not reserve the permit, and the same interleaving can occur on one core.</div></div><div class="mcq" data-id="build-semaphore-and-latch.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A hand-built latch calls <code>signal()</code> (or <code>notify_one()</code>) when the count reaches zero. Three threads are waiting. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">All three wake, because the count is zero</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">One waiter wakes; the other two can stay asleep forever, because nothing will signal again</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No waiter wakes until another <code>countDown</code> call</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The latch throws because three threads are waiting</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Every waiter is waiting for the same, permanent condition, and all of them can proceed, so all must be woken. After zero, extra countdown calls do nothing and there are no later signals for the sleepers. The count does not itself wake a condition waiter, and having several waiters is legal.</div></div><div class="mcq" data-id="build-semaphore-and-latch.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">All acquires request one permit. Why can a semaphore's <code>release()</code> wake just one waiter, while a latch reaching zero must wake all of them?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Because semaphores are fair and latches are not</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">One released permit lets exactly one waiter proceed, but a count of zero lets every waiter proceed</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because a latch's condition variable cannot signal just one thread</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">There is no difference; both should always signal all</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Signal one is safe only when all waiters wait for the same thing and one change lets exactly one of them go. That holds for a semaphore with single-permit acquires; it does not hold for a latch, nor for a semaphore with <code>acquire(n)</code>.</div></div><div class="mcq" data-id="build-semaphore-and-latch.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A timed acquire with a 100 ms timeout waits like this:<figure class="code single" data-sample="build-semaphore-and-latch.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><code>while permits == 0:
+    wait on the condition for up to the full timeout
+    if that wait timed out: return false</code></div></pre></div><div class="runout" hidden></div></figure>If the thread is woken early three times (spuriously, or by a permit another thread then takes), how long can the caller wait in total?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">At most about 100 ms in total</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Possibly much longer: every spurious or stolen wakeup restarts a fresh 100 ms wait</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Exactly 100 ms, because the wait cannot wake early</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It never returns false</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each pass waits a full timeout, so three early wakeups can stretch a 100 ms timeout towards 400 ms. Compute a deadline once and wait only for the time remaining, as <code>awaitNanos</code> (which returns the remaining time) and <code>wait_until</code> do.</div></div><div class="mcq" data-id="build-semaphore-and-latch.q5" data-a="2" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>In the Java semaphore, why must <code>available.signal()</code> be called while holding <code>lock</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It does not have to; signalling after <code>unlock()</code> is faster</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">To prevent spurious wakeups</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>Condition.signal()</code> on a <code>ReentrantLock</code> condition throws <code>IllegalMonitorStateException</code> if the lock is not held</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because <code>signal</code> releases the lock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A <code>ReentrantLock</code> condition requires ownership when signalling, just as <code>Object.notify</code> requires monitor ownership. Signalling neither releases the lock nor prevents spurious wakeups; the predicate protocol prevents lost wakeups. C++ allows notifying after unlocking, which is sometimes an optimization and sometimes, as with a latch that the waiter may destroy, a bug.</div></div><div class="mcq" data-id="build-semaphore-and-latch.q6" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>A C++ latch lives on the waiting thread's stack. Several producers can count down concurrently. What is wrong with this <code>count_down</code>?
+<figure class="code single" data-sample="build-semaphore-and-latch.7"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</span><code><span class="t">void</span> <span class="f">count_down</span>() {
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        count_ -= <span class="n">1</span>;
+    }
+    <span class="k">if</span> (count_ == <span class="n">0</span>) zero_.<span class="f">notify_all</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: notifying after unlocking is always allowed</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It should use <code>notify_one</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It reads <code>count_</code> without the lock, a data race, and the waiter may see zero, return and destroy the latch before <code>notify_all</code> runs on it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The <code>lock_guard</code> releases the mutex too early for the decrement to be visible</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Two bugs. The unlocked read of <code>count_</code> races with other <code>count_down</code> calls. And once the count is zero, a waiter woken spuriously (or already about to check) can return and destroy the latch while this thread is still about to call <code>notify_all</code> on it. Decide and notify while holding the lock.</div></div><div class="mcq" data-id="build-semaphore-and-latch.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A hand-built semaphore has 0 permits and 3 threads waiting in <code>acquire</code>. Each waiter prints <code>acquired</code> after acquiring. Two other threads each call <code>release()</code> once. Assume the waiters are eventually scheduled, none cancels, nobody else acquires, and there are no more releases. How many <code>acquired</code> lines are eventually printed?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">One, because signals can merge</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Exactly two</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">All three, because waking is broadcast</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It depends on spurious wakeups</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each release adds one permit and wakes one waiter, so exactly two acquires succeed and the third waiter keeps waiting. If a thread wakes spuriously, the loop makes it re-check and sleep again when no permit is left; it cannot create a permit, and a permit cannot be lost, because every change to the count happens under the lock.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="build-semaphore-and-latch.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Extend the counting semaphore with <code>acquire(int n)</code> and <code>release(int n)</code>. Write the changed methods and explain what changes in the signalling, and why.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="build-semaphore-and-latch.4"><figcaption><span class="ctitle">Multi-permit acquire and release</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="t">void</span> <span class="f">acquire</span>(<span class="t">int</span> n) {
+    <span class="k">if</span> (n &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"n must be positive"</span>);
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    available_.<span class="f">wait</span>(lock, [<span class="k">this</span>, n] { <span class="k">return</span> permits_ &gt;= n; });   <span class="c">// wait until n are free at once</span>
+    permits_ -= n;
+}
+
+<span class="t">void</span> <span class="f">release</span>(<span class="t">int</span> n) {
+    <span class="k">if</span> (n &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"n must be positive"</span>);
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    <span class="k">if</span> (n &gt; <span class="t">std</span>::numeric_limits&lt;<span class="t">int</span>&gt;::<span class="f">max</span>() - permits_) <span class="k">throw</span> <span class="t">std</span>::<span class="f">overflow_error</span>(<span class="s">"permit overflow"</span>);
+    permits_ += n;
+    available_.<span class="f">notify_all</span>();                  <span class="c">// waiters want different amounts: wake them all to re-check</span>
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">void</span> <span class="f">acquire</span>(<span class="t">int</span> n) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    <span class="k">if</span> (n &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"n must be positive"</span>);
+    lock.<span class="f">lockInterruptibly</span>();
+    <span class="k">try</span> {
+        <span class="k">while</span> (<span class="k">permits</span> &lt; n) {                 <span class="c">// wait until n are free at once</span>
+            available.<span class="f">await</span>();
+        }
+        <span class="k">permits</span> -= n;
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}
+
+<span class="k">void</span> <span class="f">release</span>(<span class="t">int</span> n) {
+    <span class="k">if</span> (n &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"n must be positive"</span>);
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="k">if</span> (n &gt; <span class="t">Integer</span>.MAX_VALUE - <span class="k">permits</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">ArithmeticException</span>(<span class="s">"permit overflow"</span>);
+        <span class="k">permits</span> += n;
+        available.<span class="f">signalAll</span>();                <span class="c">// waiters want different amounts: wake them all to re-check</span>
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>These methods replace the single-permit methods above; keep their fields and imports or includes, including <code>&lt;limits&gt;</code> and <code>&lt;stdexcept&gt;</code> in C++. The wait condition becomes <code>permits &lt; n</code>. Validate <code>n &gt; 0</code> and check overflow before addition so failure leaves state unchanged. In this shared-condition design the signalling must become signal-all, because waiters now wait for different things: a single signal might wake a thread that needs 5 permits when 2 are free, while a thread that needs 1 stays asleep with permits available. Waking everyone lets each re-check its own condition. The cost is a burst of wakeups, and a fairness problem: large requests can starve behind a stream of small ones. If that matters, I would serve waiters in FIFO order with tickets, accepting lower throughput.</p></div></div><div class="cq" data-q="build-semaphore-and-latch.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">This latch sometimes hangs and sometimes lets a waiter through early. Find every bug and fix it. (A C++ version written the same way, with <code>notify_one</code> and an unlocked check, has the same bugs, plus a data race on the count.)
+<figure class="code single" data-sample="build-semaphore-and-latch.8"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">class</span> <span class="t">BuggyLatch</span> {
+    <span class="k">private</span> <span class="t">int</span> count;
+    <span class="t">BuggyLatch</span>(<span class="t">int</span> count) { <span class="k">this</span>.count = count; }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">countDown</span>() {
+        count -= <span class="n">1</span>;
+        <span class="k">if</span> (count == <span class="n">0</span>) <span class="f">notify</span>();
+    }
+
+    <span class="k">void</span> <span class="f">await</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (count &gt; <span class="n">0</span>) {
+            <span class="k">synchronized</span> (<span class="k">this</span>) { <span class="f">wait</span>(); }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Five bugs:</p>
+<ul>
+<li><strong>The check is outside the lock.</strong> <code>await</code> reads <code>count</code> without synchronization, so it may see a stale value, and between the check and the <code>wait</code> the last <code>countDown</code> can run and notify before this thread waits: a lost wakeup, and the waiter hangs forever.</li>
+<li><strong><code>if</code> instead of <code>while</code>.</strong> A spurious wakeup returns from <code>wait</code> with the count still above zero, so the waiter goes through early.</li>
+<li><strong><code>notify</code> instead of <code>notifyAll</code>.</strong> With several waiters only one wakes at zero; the others hang.</li>
+<li><strong>The count can go negative</strong> with extra <code>countDown</code> calls, violating the latch invariant and eventually risking integer overflow. Ignore calls at zero.</li>
+<li><strong>The constructor accepts a negative count.</strong> Java's <code>count &gt; 0</code> check then allows an immediate return, while a C++ zero predicate could wait forever. Reject negative counts.</li>
+</ul>
+<figure class="code pair" data-sample="build-semaphore-and-latch.5"><figcaption><span class="ctitle">The fixed latch</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="k">class</span> FixedLatch {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">FixedLatch</span>(<span class="t">int</span> count) : <span class="f">count_</span>(count) {
+        <span class="k">if</span> (count &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"count &lt; 0"</span>);
+    }
+
+    <span class="t">void</span> <span class="f">count_down</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (count_ == <span class="n">0</span>) <span class="k">return</span>;
+        count_ -= <span class="n">1</span>;
+        <span class="k">if</span> (count_ == <span class="n">0</span>) zero_.<span class="f">notify_all</span>();  <span class="c">// under the lock</span>
+    }
+
+    <span class="t">void</span> <span class="f">wait</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        zero_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> count_ == <span class="n">0</span>; });
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> zero_;
+    <span class="t">int</span> count_;                               <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">class</span> <span class="t">FixedLatch</span> {
+    <span class="k">private</span> <span class="t">int</span> count;                        <span class="c">// guarded by this</span>
+
+    <span class="t">FixedLatch</span>(<span class="t">int</span> count) {
+        <span class="k">if</span> (count &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"count &lt; 0"</span>);
+        <span class="k">this</span>.count = count;
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">countDown</span>() {
+        <span class="k">if</span> (count == <span class="n">0</span>) <span class="k">return</span>;
+        count -= <span class="n">1</span>;
+        <span class="k">if</span> (count == <span class="n">0</span>) <span class="f">notifyAll</span>();
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">await</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (<span class="t">Thread</span>.<span class="f">interrupted</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">InterruptedException</span>();
+        <span class="k">while</span> (count &gt; <span class="n">0</span>) <span class="f">wait</span>();             <span class="c">// check and wait under the same lock, in a loop</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure><p>The monitor version propagates interruption from <code>wait</code> and checks a pre-existing interrupt even if the latch is already open. Entering <code>synchronized</code> itself is not interruptible; use the earlier <code>ReentrantLock</code> version when lock acquisition must be interruptible too.</p></div></div><div class="cq" data-q="build-semaphore-and-latch.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "Why does the wait have to be in a while loop? Give me a concrete interleaving, not just 'spurious wakeups'."</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Take a semaphore with zero permits. Thread T1 calls <code>acquire</code>, sees zero and waits, releasing the lock. A releaser adds a permit, so permits is 1, and signals T1. Before T1 gets the lock back, a third thread T3 calls <code>acquire</code>, takes the lock first, sees 1 and takes the permit, so permits is 0 again. Now T1 reacquires the lock and returns from <code>wait</code>. If the code used <code>if</code>, T1 would decrement anyway: permits becomes minus 1 and two threads hold one permit. With <code>while</code>, T1 re-checks, sees zero and goes back to sleep, and the next release will wake it.</p>
+<p>That is a stolen wakeup, and it happens with ordinary locks that allow barging, even without spurious wakeups. Spurious wakeups are the second reason: Java's condition waits and C++ condition-variable waits permit returns without a corresponding notification. Both mean a wakeup is a hint to re-check the condition under the lock, never permission to proceed.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="build-semaphore-and-latch.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Build me a counting semaphore from a mutex and a condition variable. Explain why each part is necessary."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>One mutex protects a nonnegative count equal to initial permits plus releases minus successful acquires</li><li>Acquire checks and waits in a loop, then decrements under the same lock</li><li>A concrete barging interleaving explains why notification does not reserve a permit</li><li>Release checks overflow, increments, and wakes one waiter for single-permit requests</li><li>Interruption before acquisition leaves the count unchanged; callers release only acquired permits</li><li>Multi-permit requests need broader notification or explicit waiter selection, with separate fairness policy</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use one mutex to protect the permit count and one condition for permit availability. The count stays nonnegative and equals the initial permits plus releases minus successful acquires. Acquire locks, waits while the count is zero, and decrements before unlocking. Waiting releases the mutex and reacquires it before checking again. That loop matters even without spurious wakeups. Suppose a release wakes Alice, but Bob acquires the mutex first and takes the permit. Alice must check again or she will subtract from zero. Release checks for integer overflow, adds one permit, and signals one waiter, because each acquire needs one permit. In Java I would propagate interruption before changing the count, and callers return permits in a finally block only after acquisition succeeded. C++ callers use a scope guard. The semaphore itself has no owner. If requests can take several permits, waking just one unsuitable waiter can strand usable permits. I would broadcast or explicitly select eligible waiters, then add a queue if fairness matters. Waking a thread alone does not reserve its permit.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would a timeout remove a queued request without blocking every later ticket?</span></p></div></div><div class="sq" data-sq="build-semaphore-and-latch.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"My 100 millisecond acquire sometimes takes several hundred milliseconds. What do you check before calling it a bug?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Check whether each wakeup restarts the full duration instead of using one budget</li><li>Use monotonic elapsed time or a fixed steady-clock deadline</li><li>Check the predicate while holding the lock at expiry and leave state unchanged on failure</li><li>Account for initial lock acquisition, lock reacquisition, and scheduler delay</li><li>A timeout is a waiting policy, not a hard real-time return guarantee</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">First I would check whether the implementation restarts a fresh hundred milliseconds after every wakeup. Three late wakeups can stretch that budget towards four hundred milliseconds. I would calculate one deadline on a monotonic clock, or subtract elapsed monotonic time from one original budget. Every wait uses only what remains. At expiry I check the predicate while holding the lock; a permit arriving near the deadline may make acquisition succeed, while failure leaves the count unchanged. Then I would inspect lock contention and scheduling. Our simple monitor can wait past its deadline while acquiring or reacquiring the mutex, and a ready thread may still be delayed by the scheduler. Timed initial locking can bound that part of the attempt, but it does not create a hard return deadline. So I would distinguish an incorrectly renewed budget from legitimate lock or scheduling delay.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What should a zero timeout do when a permit is already available?</span></p></div></div><div class="sq" data-sq="build-semaphore-and-latch.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Why does opening a latch wake everyone, and why can its waiters safely read the results?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Zero is a permanent latch predicate that enables every waiter, so opening broadcasts</li><li>Countdowns and predicate checks share one mutex; notifications alone do not publish data</li><li>Writes before countdown reach successful waiters through the mutex synchronization chain</li><li>A failed timed wait does not promise completed results, and later writes need separate coordination</li><li>Keep C++ synchronization objects alive until every caller has finished</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">A latch reaching zero enables every waiter permanently, so the transition must wake everyone. Waking one can leave the others asleep forever because there may be no later notification. Visibility comes from synchronization, not from the wakeup itself. In our monitor, each worker writes its result before counting down under the common mutex. Unlock and later lock operations form a chain through the countdowns to the waiter's final locked check of zero. That makes those earlier writes visible after a successful wait, so three workers writing ten, twenty and thirty give each waiter a sum of sixty. A timed wait returning false does not promise complete results, and writes after countdown need separate coordination. For C++ I would also keep the latch alive until all callers finish. Notifying under the mutex closes one destruction race, but it does not replace ownership and joining.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Could you reset the count to reuse this latch safely while old waiters are still waking?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-semaphore-from-scratch.html" data-problem="semaphore-from-scratch"><span class="pk">Build a primitive · warm-up</span><b>Semaphore from scratch</b><span class="pst"></span></a><a class="pcard" href="p-countdown-latch-from-scratch.html" data-problem="countdown-latch-from-scratch"><span class="pk">Build a primitive · warm-up</span><b>CountDownLatch from scratch</b><span class="pst"></span></a><a class="pcard" href="p-connection-pool.html" data-problem="connection-pool"><span class="pk">Concurrent systems · medium</span><b>Fair connection pool</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="barriers-and-phasers.html"><span>Previous</span><b>Barriers and phasers</b></a><a class="next" href="build-rw-lock-and-barrier.html"><span>Next</span><b>Build it yourself: read-write lock and reusable barrier</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-recipe">The recipe</a><a href="#a-counting-semaphore">A counting semaphore</a><a href="#a-countdown-latch">A countdown latch</a><a href="#why-the-result-data-is-visible">Why the result data is visible</a><a href="#timeouts-done-right">Timeouts done right</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

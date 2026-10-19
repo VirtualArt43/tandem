@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>System coding theory: Rubrik and Databricks · Theory · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-theory" data-topic="system-coding" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><section class="pagehead"><p class="eyebrow"><a href="practice.html#theory">Theory bank</a> · Topic 17</p><h1>System coding theory: Rubrik and Databricks</h1><p class="hhsub">fsync and durability, group commit, flush and close, shutdown semantics, worker exceptions, interrupts, crawler parallelism, back-pressure, file copies and race testing.</p><div class="filters"><div class="fgroup"><span>Level</span><button type="button" class="chip" data-flevel="core">Core</button><button type="button" class="chip" data-flevel="senior">Senior</button><button type="button" class="chip" data-flevel="stretch">Stretch</button></div><div class="fgroup"><span>Show</span><button type="button" class="chip" data-fopen="1">Unanswered only</button></div></div></section><section class="theory" data-topic="system-coding"><div class="tq cq" data-q="system-coding.t1" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">1</span><span class="lvl lvl-core">Core</span><span class="tag">fsync</span><span class="tag">durability</span><span class="tag">file-io</span><span class="co">Databricks</span></div><div class="qtext">Why is fsync expensive, and what do <code>write</code> and <code>flush</code> on their own guarantee?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Data passes through three layers of buffering on its way to disk:</p>
+<ol>
+<li>Your process's buffer (<code>BufferedOutputStream</code>, <code>std::ofstream</code>, <code>FILE*</code>). <code>flush()</code> only moves this buffer into the kernel with a <code>write</code> system call.</li>
+<li>The kernel page cache. When <code>write</code> returns, the data is in kernel memory: it survives a crash of your process and other processes can read it, but <strong>a power cut or kernel crash loses it</strong>.</li>
+<li>The device, which often has its own volatile write cache.</li>
+</ol>
+<p>The <a class="term" data-term="fsync" href="glossary.html#fsync">fsync</a> call pushes the file's dirty pages and metadata to the device and asks it to flush its cache, returning only when the data is on stable storage (if the device honors flushes). <code>fdatasync</code> skips metadata not needed to read the data back, so it is a little cheaper. A new file also needs an fsync of its directory.</p>
+<p>The cost is real device I/O. As orders of magnitude: tens of microseconds to a few milliseconds on SSDs, 5 to 10 ms or more on spinning disks, against a few microseconds for a <code>write</code> into the page cache. One fsync per event caps a writer at roughly 1,000 events per second at 1 ms each.</p>
+<p>APIs: Java <code>FileChannel.force(true)</code>, or <code>force(false)</code> for data only. C++ has no standard fsync, so call POSIX <code>::fsync(fd)</code>. On macOS, <code>fsync</code> does not flush the drive's cache; <code>fcntl(fd, F_FULLFSYNC)</code> does.</p>
+<p><b>Likely follow up:</b> "Is <code>O_DIRECT</code> durable?" No. It bypasses the page cache, but the data can still sit in the device's cache; durability still needs <code>O_DSYNC</code> or fsync.</p></div></div><div class="tq cq" data-q="system-coding.t2" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">2</span><span class="lvl lvl-core">Core</span><span class="tag">event-writer</span><span class="tag">group-commit</span><span class="tag">futures</span><span class="co">Databricks</span></div><div class="qtext">Many threads call <code>appendEvent(bytes)</code>, which must return only once the event is durable on disk. Walk through your design.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The path interviewers expect, step by step:</p>
+<ol>
+<li>One mutex: lock, write, fsync, unlock. Correct and ordered, but every caller pays a full fsync one after another, so throughput is about one event per fsync.</li>
+<li>A single writer thread that owns the file, fed by a queue. Producers no longer fight over the file, but nothing improves while each event still gets its own fsync.</li>
+<li><strong><a class="term" data-term="group-commit" href="glossary.html#group-commit">Group commit</a></strong>: the writer takes everything queued, writes it all, and calls fsync once for the whole batch.</li>
+<li>A future per event: <code>appendEvent</code> enqueues the bytes with a promise and waits on it; the writer completes every promise in the batch after the fsync returns, or fails them all if the write or fsync failed.</li>
+</ol>
+<figure class="code pair" data-sample="system-coding.t2.1"><figcaption><span class="ctitle">Group commit with a future per event</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="t">void</span> EventWriter::<span class="f">append_event</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">char</span>&gt; data) {
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; durable;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">void</span>&gt; done = durable.<span class="f">get_future</span>();
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lk</span>(m_);
+        pending_.<span class="f">push_back</span>({<span class="t">std</span>::<span class="f">move</span>(data), <span class="t">std</span>::<span class="f">move</span>(durable)});  <span class="c">// queue order is file order</span>
+    }
+    cv_.<span class="f">notify_one</span>();
+    done.<span class="f">get</span>();                                       <span class="c">// returns after fsync, or rethrows</span>
+}
+
+<span class="t">void</span> EventWriter::<span class="f">writer_loop</span>() {                     <span class="c">// the only thread touching the file</span>
+    <span class="k">for</span> (;;) {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;Pending&gt; batch;
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lk</span>(m_);
+            cv_.<span class="f">wait</span>(lk, [&amp;] { <span class="k">return</span> !pending_.<span class="f">empty</span>(); });
+            batch.<span class="f">swap</span>(pending_);                     <span class="c">// take everything queued so far</span>
+        }
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="k">const</span> Pending&amp; p : batch) <span class="f">write_all</span>(fd_, p.data);  <span class="c">// loops on short writes</span>
+            <span class="k">if</span> (::<span class="f">fsync</span>(fd_) != <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">system_error</span>(errno, <span class="t">std</span>::<span class="f">generic_category</span>(), <span class="s">"fsync"</span>);
+            <span class="k">for</span> (Pending&amp; p : batch) p.durable.<span class="f">set_value</span>();
+        } <span class="k">catch</span> (...) {
+            <span class="k">for</span> (Pending&amp; p : batch) p.durable.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">current_exception</span>());
+        }
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">void</span> <span class="f">appendEvent</span>(<span class="t">byte</span>[] data) <span class="k">throws</span> <span class="t">InterruptedException</span>, <span class="t">ExecutionException</span> {
+    <span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt; durable = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        pending.<span class="f">add</span>(<span class="k">new</span> <span class="t">Pending</span>(data, durable));      <span class="c">// queue order is file order</span>
+        notEmpty.<span class="f">signal</span>();
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+    durable.<span class="f">get</span>();                                    <span class="c">// returns only after the fsync</span>
+}
+
+<span class="k">private</span> <span class="k">void</span> <span class="f">writerLoop</span>() {                           <span class="c">// the only thread touching the file</span>
+    <span class="k">while</span> (<span class="k">true</span>) {
+        <span class="t">List</span>&lt;<span class="t">Pending</span>&gt; batch;
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (pending.<span class="f">isEmpty</span>()) notEmpty.<span class="f">awaitUninterruptibly</span>();
+            batch = pending;                          <span class="c">// take everything queued so far</span>
+            pending = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">Pending</span> p : batch) {
+                <span class="t">ByteBuffer</span> buf = <span class="t">ByteBuffer</span>.<span class="f">wrap</span>(p.<span class="f">data</span>());
+                <span class="k">while</span> (buf.<span class="f">hasRemaining</span>()) channel.<span class="f">write</span>(buf);
+            }
+            channel.<span class="f">force</span>(<span class="k">false</span>);                     <span class="c">// one fsync for the whole batch</span>
+            batch.<span class="f">forEach</span>(p -&gt; p.<span class="f">durable</span>().<span class="f">complete</span>(<span class="k">null</span>));
+        } <span class="k">catch</span> (<span class="t">IOException</span> e) {
+            batch.<span class="f">forEach</span>(p -&gt; p.<span class="f">durable</span>().<span class="f">completeExceptionally</span>(e));
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Then bound the queue for back-pressure and add <code>flush</code> and <code>close</code>. Under load, batches grow by themselves, so throughput rises with load while the per-event latency stays at about one or two fsyncs. The <code>catch</code> here only fails the current batch; the next question explains why a real writer must also stop using the file after a failed fsync.</p>
+<p><b>Likely follow up:</b> "Why one writer thread instead of a lock around the file?" It turns contention into batching: concurrent producers become one bigger write and one fsync, which a plain "lock, write, fsync, unlock" cannot do. You can batch under a lock too (leader and follower group commit, where whoever holds the lock fsyncs for everyone queued behind it, as databases do), but the single writer is simpler to get right and keeps the file single-threaded.</p></div></div><div class="tq cq" data-q="system-coding.t3" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">3</span><span class="lvl lvl-senior">Senior</span><span class="tag">durability</span><span class="tag">fsync</span><span class="tag">recovery</span><span class="co">Databricks</span></div><div class="qtext">What exactly can <code>appendEvent</code> promise about durability, and what do you do when fsync fails?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Once its future completes, the event's bytes were written and an fsync covering them returned success. The event survives a process crash, a kernel crash and a power cut, <strong>as long as the device honors cache flushes</strong>. Ordering comes for free: events land in queue order, and because a later fsync covers every earlier write to that file, an acknowledged event implies every event before it is durable too.</p>
+<p>Before acknowledgement there is no promise. After a crash the event may be absent, present, or <strong>partially written</strong>. So frame every record with a length and a checksum (CRC32C is common), and on recovery scan forward and truncate at the first invalid record. Every acknowledged event lies before that point.</p>
+<p>Fsync failure is the trap. You cannot simply retry: on Linux, after a writeback error the kernel may already have marked the pages clean and reports the error once, so a second fsync can succeed although the data never reached the disk. PostgreSQL hit this in 2018 and changed to stop and recover from its <a class="term" data-term="write-ahead-log" href="glossary.html#write-ahead-log">write-ahead log</a> instead. So: fail every future in the batch and every later one on that file, stop writing to it, then crash and recover or rewrite the unacknowledged events into a new file. Never acknowledge an event whose fsync failed.</p>
+<p><b>Likely follow up:</b> "And with replication?" Durability becomes a quorum question: acknowledge after a majority of replicas have it on disk, or, with weaker guarantees and lower latency, in memory on N machines.</p></div></div><div class="tq cq" data-q="system-coding.t4" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">4</span><span class="lvl lvl-senior">Senior</span><span class="tag">batching</span><span class="tag">latency</span><span class="tag">group-commit</span><span class="co">Databricks</span></div><div class="qtext">How big should the writer's batches be, and do you need a timer to flush them?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Usually no timer. Use <strong>natural batching</strong>: whenever the writer is free, it takes everything that is pending. While one fsync runs, new events pile up, and they become the next batch.</p>
+<ul>
+<li>Light load: batches of one event, and latency is one write plus one fsync.</li>
+<li>Heavy load: batches grow automatically until the device's bandwidth is the limit.</li>
+</ul>
+<p>Throughput is roughly batch size divided by (write time plus fsync time). An event's latency is at most about two fsyncs: it may wait for the fsync already running, then for its own.</p>
+<p>A timer that waits to fill a batch (a linger time) adds its full delay to every event when the system is quiet. It is worth it only when bigger writes are much cheaper per byte on the device, and then only as a small cap, never as the only trigger.</p>
+<p>Do add upper bounds: a maximum number of events or bytes per batch, which caps the duration of a single write and the memory held. Double buffering is the usual structure: producers fill buffer k plus 1 while the writer writes and fsyncs buffer k, then the two swap.</p>
+<p><b>Likely follow up:</b> "Two files must stay consistent, such as data and an index." Order the fsyncs (data first, then the index that points into it), or put both into one log, which gives a single ordering point.</p></div></div><div class="tq cq" data-q="system-coding.t5" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">5</span><span class="lvl lvl-core">Core</span><span class="tag">flush</span><span class="tag">close</span><span class="tag">lifecycle</span><span class="co">Databricks</span></div><div class="qtext">Define <code>flush()</code> and <code>close()</code> for the log writer. What must each guarantee, especially when they race with producers?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><code>flush()</code> blocks until <strong>every event submitted before the call</strong> is durable. Implement it by enqueueing a marker with its own future, or by recording the sequence number of the last accepted event and waiting until the writer's durable sequence reaches it. Events submitted after <code>flush</code> started may or may not be included.</p>
+<p><code>close()</code> does four things in order:</p>
+<ol>
+<li>Flip the state to closed under the queue lock, so new <code>appendEvent</code> calls fail fast with an exception.</li>
+<li>Wake the writer, which drains everything already accepted, writes it, fsyncs, and completes the futures.</li>
+<li>Join the writer thread, with a timeout.</li>
+<li>Close the file.</li>
+</ol>
+<p>The directory fsync belongs at creation, not at close: a new file's directory entry is durable only after its directory is fsynced, so do that once, right after creating the file and before acknowledging any event in it.</p>
+<figure class="code single" data-sample="system-coding.t5.1"><figcaption><span class="ctitle">Accept or reject, never a third outcome</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="c">// in appendEvent, under the same lock that close() uses:</span>
+<span class="k">if</span> (closed) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"writer closed"</span>);
+pending.<span class="f">add</span>(<span class="k">new</span> <span class="t">Pending</span>(data, durable));
+
+<span class="k">void</span> <span class="f">close</span>() <span class="k">throws</span> <span class="t">InterruptedException</span>, <span class="t">IOException</span> {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="k">if</span> (closed) <span class="k">return</span>;                <span class="c">// idempotent</span>
+        closed = <span class="k">true</span>;
+        notEmpty.<span class="f">signal</span>();                 <span class="c">// the writer drains what is left, then exits</span>
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+    writer.<span class="f">join</span>();
+    channel.<span class="f">close</span>();
+}
+<span class="c">// writer loop: wait while (pending.isEmpty() &amp;&amp; !closed); exit when closed and drained</span></code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The race that matters: <code>appendEvent</code> against <code>close</code>. Because the closed check and the enqueue happen under the same lock as the state flip, every event is either accepted, and therefore drained before the writer exits, or rejected with an error. There is no event that is accepted and then silently dropped.</p>
+<p><b>Likely follow up:</b> "A second thread calls <code>close</code> while the first is still draining." As written it returns at once; if callers rely on "closed means durable", make it wait on the same termination signal as the first caller.</p></div></div><div class="tq cq" data-q="system-coding.t6" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">6</span><span class="lvl lvl-core">Core</span><span class="tag">shutdown</span><span class="tag">executor</span><span class="co">Rubrik</span></div><div class="qtext">What is the difference between <code>shutdown</code> and <code>shutdownNow</code>, and how do you implement both in a pool you built yourself?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><code>shutdown()</code>: stop accepting new tasks, let every queued task run, and return at once; <code>awaitTermination(timeout)</code> waits for the workers to finish. <code>shutdownNow()</code>: stop accepting, <strong>remove the queued tasks and return them</strong> as a list of work that never started, and interrupt the running workers. That is best effort: a task that ignores interrupts keeps running.</p>
+<p>In your own pool, keep a state under the pool lock: <code>RUNNING</code>, then <code>SHUTDOWN</code> or <code>STOP</code>, then <code>TERMINATED</code>. The worker's "get next task" method encodes the semantics:</p>
+<figure class="code single" data-sample="system-coding.t6.1"><figcaption><span class="ctitle">The worker decides when to exit</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">private</span> <span class="t">Runnable</span> <span class="f">nextTask</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="k">while</span> (queue.<span class="f">isEmpty</span>() &amp;&amp; state == <span class="t">State</span>.RUNNING) notEmpty.<span class="f">await</span>();
+        <span class="k">if</span> (state == <span class="t">State</span>.STOP) <span class="k">return</span> <span class="k">null</span>;          <span class="c">// shutdownNow: exit at once</span>
+        <span class="k">return</span> queue.<span class="f">poll</span>();                            <span class="c">// null here means SHUTDOWN and drained</span>
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}
+
+<span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; <span class="f">shutdownNow</span>() {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        state = <span class="t">State</span>.STOP;
+        <span class="t">List</span>&lt;<span class="t">Runnable</span>&gt; neverRan = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(queue);
+        queue.<span class="f">clear</span>();
+        notEmpty.<span class="f">signalAll</span>();                           <span class="c">// idle workers wake and exit</span>
+        <span class="k">for</span> (<span class="t">Thread</span> w : workers) w.<span class="f">interrupt</span>();         <span class="c">// busy workers get a cancel request</span>
+        <span class="k">return</span> neverRan;
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>shutdown()</code> sets <code>SHUTDOWN</code> and calls <code>signalAll</code>, so idle workers wake, see an empty queue, and exit. <code>submit</code> rejects when the state is not <code>RUNNING</code>. The last worker to exit sets <code>TERMINATED</code> and signals whoever waits in <code>awaitTermination</code>. Here <code>queue</code> is your own ring buffer or list when library queues are banned.</p>
+<p>In C++ there is no interrupt: <code>shutdown_now</code> sets the state, clears the queue, calls <code>notify_all</code>, and requests stop on each task's <code>std::stop_source</code> (or each <code>std::jthread</code>); tasks must check their token.</p>
+<p><b>Likely follow up:</b> "What happens to a <code>submit</code> that races with <code>shutdown</code>?" The state check and the enqueue happen under the same lock, so the task is either queued, and will run, or rejected; never queued after the workers have left.</p></div></div><div class="tq cq" data-q="system-coding.t7" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">7</span><span class="lvl lvl-senior">Senior</span><span class="tag">exceptions</span><span class="tag">executor</span><span class="tag">worker-loop</span><span class="co">Rubrik</span></div><div class="qtext">Which exceptions must the worker loop of a hand-built pool catch, and what do you do with each?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Catching <code>InterruptedException</code> plus <code>Exception</code> is not enough. One Rubrik candidate was marked down for exactly that.</p>
+<ul>
+<li>Anything the task throws, checked or not: record it in that task's future so the submitter sees it on <code>get</code>, and <strong>keep the worker alive</strong>. A pool that loses a worker per failed task slowly dies.</li>
+<li><code>Error</code>s such as <code>OutOfMemoryError</code> or <code>StackOverflowError</code>: <code>catch (Exception e)</code> misses them, the worker dies silently, and the task's future never completes, so its caller hangs forever. Catch <code>Throwable</code> and complete the future exceptionally. Then either keep serving, or rethrow serious VM errors and start a replacement worker. <code>ThreadPoolExecutor</code> shows both halves: for <code>submit</code>, its <code>FutureTask</code> catches <code>Throwable</code> into the future; for <code>execute</code>, the exception kills the worker and the pool starts a replacement.</li>
+<li><code>InterruptedException</code> while waiting for a task: re-check the pool state; exit on <code>STOP</code>, otherwise keep serving.</li>
+<li>An interrupt left over by a task: clear it with <code>Thread.interrupted()</code> before the next task, unless the pool is stopping, so one task's cancellation does not leak into the next.</li>
+</ul>
+<figure class="code single" data-sample="system-coding.t7.1"><figcaption><span class="ctitle">A worker loop that survives its tasks</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">private</span> <span class="k">void</span> <span class="f">workerLoop</span>() {
+    <span class="k">while</span> (<span class="k">true</span>) {
+        <span class="t">Task</span> t;
+        <span class="k">try</span> {
+            t = <span class="f">nextTask</span>();                         <span class="c">// null: the pool is finished with us</span>
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="k">if</span> (<span class="f">isStopping</span>()) <span class="k">return</span>;               <span class="c">// shutdownNow woke us</span>
+            <span class="k">continue</span>;                               <span class="c">// a stray interrupt: keep serving</span>
+        }
+        <span class="k">if</span> (t == <span class="k">null</span>) <span class="k">return</span>;
+        <span class="k">if</span> (!<span class="f">isStopping</span>()) <span class="t">Thread</span>.<span class="f">interrupted</span>();    <span class="c">// do not leak an old interrupt into this task</span>
+        <span class="k">try</span> {
+            t.future.<span class="f">complete</span>(t.callable.<span class="f">call</span>());
+        } <span class="k">catch</span> (<span class="t">Throwable</span> e) {                     <span class="c">// Exception alone misses Errors</span>
+            t.future.<span class="f">completeExceptionally</span>(e);
+            <span class="k">if</span> (e <span class="k">instanceof</span> <span class="t">VirtualMachineError</span> vme) <span class="k">throw</span> vme;  <span class="c">// let this worker die; replace it</span>
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>In C++, wrap each task in <code>try { ... } catch (...) { promise.set_exception(std::current_exception()); }</code>, because an exception escaping the worker's thread function calls <code>std::terminate</code> and kills the process.</p>
+<p><b>Likely follow up:</b> "How does the submitter of a <code>Runnable</code> (not a <code>Callable</code>) learn about failures?" Through the same future, completed with <code>null</code> on success, or through an uncaught-exception hook that you log.</p></div></div><div class="tq cq" data-q="system-coding.t8" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">8</span><span class="lvl lvl-core">Core</span><span class="tag">interruption</span><span class="tag">cancellation</span><span class="tag">java</span><span class="tag">cpp</span><span class="co">Rubrik</span></div><div class="qtext">How should a worker handle <code>InterruptedException</code> and cancellation, in Java and in C++?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>In Java, interruption is a request, not a kill. <code>interrupt()</code> sets a flag; blocking methods (<code>sleep</code>, <code>wait</code>, <code>join</code>, <code>take</code>, <code>await</code>, <code>lockInterruptibly</code>) throw <code>InterruptedException</code> and clear the flag; CPU loops must poll <code>isInterrupted()</code>. The rule: <strong>never swallow it</strong>. Either propagate it, or restore the flag with <code>Thread.currentThread().interrupt()</code> and exit, so the code that owns the thread can see it. Some blocking is not interruptible at all: entering <code>synchronized</code>, <code>lock()</code>, and a classic <code>java.io</code> socket read on a platform thread. For the socket, close it to unblock the reader; for locks, use <code>lockInterruptibly</code> or <code>tryLock</code> with a timeout.</p>
+<p>C++ threads have no interruption. Cancellation is cooperative through <code>std::stop_token</code>, which <code>std::jthread</code> passes to its function, and C++20's <code>std::condition_variable_any</code> can wait on a stop token, so a stop request wakes a blocked worker.</p>
+<figure class="code pair" data-sample="system-coding.t8.1"><figcaption><span class="ctitle">A worker that stops when asked</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code><span class="t">void</span> <span class="f">worker</span>(<span class="t">std</span>::<span class="t">stop_token</span> st) {                 <span class="c">// std::jthread supplies the token</span>
+    <span class="k">for</span> (;;) {
+        <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task;
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span> <span class="f">lk</span>(m_);
+            <span class="c">// cv_ is a std::condition_variable_any: wakes on notify or on a stop request</span>
+            <span class="k">if</span> (!cv_.<span class="f">wait</span>(lk, st, [&amp;] { <span class="k">return</span> !tasks_.<span class="f">empty</span>(); })) <span class="k">return</span>;  <span class="c">// stopped, nothing left</span>
+            task = <span class="t">std</span>::<span class="f">move</span>(tasks_.<span class="f">front</span>());
+            tasks_.<span class="f">pop_front</span>();
+        }
+        <span class="f">task</span>();
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() {
+    <span class="k">try</span> {
+        <span class="k">while</span> (!<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">isInterrupted</span>()) {
+            <span class="t">Runnable</span> task = queue.<span class="f">take</span>();         <span class="c">// throws when interrupted</span>
+            task.<span class="f">run</span>();
+        }
+    } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+        <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();       <span class="c">// restore the flag for the thread's owner</span>
+    }
+    <span class="c">// fall through: the worker exits cleanly</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>That C++ <code>wait</code> returns the predicate's value, so after a stop request it keeps returning tasks until the queue is empty: graceful by default.</p>
+<p><b>Likely follow up:</b> "A task catches <code>InterruptedException</code> and just logs it. What breaks?" <code>shutdownNow</code> and <code>Future.cancel(true)</code> silently fail for that task, and the pool never terminates while it runs.</p></div></div><div class="tq cq" data-q="system-coding.t9" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">9</span><span class="lvl lvl-core">Core</span><span class="tag">crawler</span><span class="tag">io-bound</span><span class="tag">parallelism</span><span class="co">Databricks</span></div><div class="qtext">Why does multithreading speed up a web crawler, and how do you know it will before you write it?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A crawler is <strong>I/O bound</strong>. Each page spends most of its time waiting on DNS, connection and TLS setup, and the server's response, which is tens to hundreds of milliseconds, and very little time parsing, around a millisecond (orders of magnitude). A single thread leaves the CPU idle for nearly all of every fetch. Several threads overlap those waits: while one waits, others fetch.</p>
+<p>How you know: measure the single-threaded version. If wall time is far above CPU time (<code>time</code> shows 100 seconds real against 3 seconds user plus system), the wait-to-compute ratio is high, and up to roughly (1 + wait/compute) threads per core can be useful.</p>
+<p>When threads will not help:</p>
+<ul>
+<li>Parsing or processing is CPU bound: then more threads than cores only adds switching.</li>
+<li>The network link is already saturated.</li>
+<li>Most URLs are on one host that limits you; politeness caps concurrency per host.</li>
+<li>A shared frontier or visited set under one lock becomes the bottleneck.</li>
+<li>Writing pages to one disk becomes the bottleneck.</li>
+</ul>
+<p>Amdahl's law bounds the gain by the serial part, such as the coordination around the shared structures.</p>
+<p><b>Likely follow up:</b> "Threads or asynchronous I/O?" For tens of concurrent fetches, a thread pool is simplest. For thousands, use an event loop or Java virtual threads, which keep blocking code but drop the per-thread cost.</p></div></div><div class="tq cq" data-q="system-coding.t10" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">10</span><span class="lvl lvl-senior">Senior</span><span class="tag">crawler</span><span class="tag">pool-sizing</span><span class="co">Databricks</span></div><div class="qtext">How do you choose the crawler's thread pool size, and how does it relate to the size of the dataset?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The pool size comes from the workload's timing and from external limits, <strong>not from the number of pages</strong>. Little's law: a target of 50 pages per second at 200 ms per fetch needs about 10 fetches in flight. Goetz's formula gives the same idea from the CPU side: cores × (1 + wait/compute).</p>
+<p>The dataset matters in two other ways:</p>
+<ul>
+<li>It bounds useful parallelism. If the frontier at the current depth holds 20 URLs, 200 threads leave 180 idle. A shallow, wide site parallelizes well; a deep, narrow chain does not.</li>
+<li>It sizes the shared state. A visited set of a million URLs at roughly 100 bytes each is about 100 MB (order of magnitude). Far beyond that you need a disk-backed set or a Bloom filter, which accepts rare false positives (some pages skipped).</li>
+</ul>
+<p>External limits usually cap the pool first: per-host politeness (for example, at most two concurrent requests per host), total bandwidth (pages per second × average page size), sockets and file descriptors, memory per thread, and disk write throughput if you store pages. A dedicated writer thread with batching fixes the disk side.</p>
+<p>In practice: make the size configurable, start somewhere like 16 to 64 threads (illustrative), measure throughput against thread count, and stop where the curve flattens.</p>
+<p><b>Likely follow up:</b> "Every URL is on one host." Then the per-host limit is the real cap, and threads beyond it just wait. Spend the effort on politeness and retries instead.</p></div></div><div class="tq cq" data-q="system-coding.t11" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">11</span><span class="lvl lvl-senior">Senior</span><span class="tag">crawler</span><span class="tag">termination</span><span class="tag">visited-set</span><span class="co">Rubrik</span><span class="co">Databricks</span></div><div class="qtext">In a multithreaded crawler, how do you know when the crawl is finished?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>"The queue is empty" is not enough: a worker may be parsing a page and about to add fifty new URLs. Count <strong>outstanding work</strong> instead. Increment a pending counter when a URL is accepted, before it is queued; decrement it after the page is fully processed, which is after its children were accepted and counted. When the counter reaches zero, nothing is queued and nobody is working, so the crawl is done.</p>
+<figure class="code pair" data-sample="system-coding.t11.1"><figcaption><span class="ctitle">Termination by counting outstanding pages</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="t">void</span> Crawler::<span class="f">submit</span>(<span class="t">std</span>::<span class="t">string</span> url, <span class="t">int</span> depth) {
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lk</span>(m_);
+        <span class="k">if</span> (depth &gt; max_depth_ || !visited_.<span class="f">insert</span>(url).second) <span class="k">return</span>;  <span class="c">// atomic check-and-add</span>
+        pending_ += <span class="n">1</span>;                                                   <span class="c">// counted before it can run</span>
+    }
+    pool_.<span class="f">submit</span>([<span class="k">this</span>, url = <span class="t">std</span>::<span class="f">move</span>(url), depth] {
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="k">auto</span>&amp; link : <span class="f">fetch_and_parse</span>(url)) <span class="f">submit</span>(<span class="t">std</span>::<span class="f">move</span>(link), depth + <span class="n">1</span>);
+        } <span class="k">catch</span> (...) {
+            <span class="c">// log it; a failed page still counts as finished</span>
+        }
+        <span class="t">std</span>::<span class="t">lock_guard</span> <span class="f">lk</span>(m_);
+        pending_ -= <span class="n">1</span>;
+        <span class="k">if</span> (pending_ == <span class="n">0</span>) done_.<span class="f">notify_all</span>();                           <span class="c">// the crawl is complete</span>
+    });
+}
+<span class="c">// main: submit(seed, 0); wait on done_ until pending_ == 0; then stop the pool</span></code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="k">private</span> <span class="k">final</span> <span class="t">Set</span>&lt;<span class="t">String</span>&gt; visited = <span class="t">ConcurrentHashMap</span>.<span class="f">newKeySet</span>();
+<span class="k">private</span> <span class="k">final</span> <span class="t">AtomicInteger</span> pending = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+<span class="k">private</span> <span class="k">final</span> <span class="t">CountDownLatch</span> finished = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+
+<span class="k">void</span> <span class="f">submit</span>(<span class="t">String</span> url, <span class="t">int</span> depth) {
+    <span class="k">if</span> (depth &gt; maxDepth || !visited.<span class="f">add</span>(url)) <span class="k">return</span>;   <span class="c">// atomic check-and-add</span>
+    pending.<span class="f">incrementAndGet</span>();                            <span class="c">// counted before it can run</span>
+    pool.<span class="f">execute</span>(() -&gt; {
+        <span class="k">try</span> {
+            <span class="k">for</span> (<span class="t">String</span> link : <span class="f">fetchAndParse</span>(url)) <span class="f">submit</span>(link, depth + <span class="n">1</span>);  <span class="c">// children first</span>
+        } <span class="k">finally</span> {
+            <span class="k">if</span> (pending.<span class="f">decrementAndGet</span>() == <span class="n">0</span>) finished.<span class="f">countDown</span>();      <span class="c">// last one out</span>
+        }
+    });
+}
+<span class="c">// main: submit(seed, 0); finished.await(); pool.shutdown();</span></code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The visited check must be one atomic step: <code>visited.add</code> returns false if the URL was already present, and <code>insert(...).second</code> does the same in C++. A separate <code>contains</code> then <code>add</code> lets two threads crawl the same page.</p>
+<p><b>Likely follow up:</b> "Why decrement in <code>finally</code>?" A failed fetch must still count as finished; otherwise one exception leaves the counter above zero and main waits forever.</p></div></div><div class="tq cq" data-q="system-coding.t12" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">12</span><span class="lvl lvl-senior">Senior</span><span class="tag">backpressure</span><span class="tag">log-writer</span><span class="co">Databricks</span></div><div class="qtext">The log writer's queue is full. Which back-pressure policy do you choose, and why?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The options: block the producer until there is room (with or without a timeout); reject, so the caller decides; drop (oldest, newest, or by level); write synchronously in the calling thread; spill to a secondary buffer on disk.</p>
+<p>Choose the <a class="term" data-term="backpressure" href="glossary.html#backpressure">back-pressure</a> policy by the contract:</p>
+<ul>
+<li>If <code>appendEvent</code> returns only once the event is durable, the caller is already waiting for the disk, so <strong>blocking on a full queue is honest</strong>: it passes the disk's real speed back to the producers.</li>
+<li>If the requirement is that <code>log</code> must not block producers for long, use a bounded wait (<code>offer</code> with a timeout) and then reject with an error the caller can see. Never acknowledge an event and then drop it.</li>
+<li>For best-effort application logs, shed the least valuable first: drop DEBUG and INFO, keep ERROR, and write a summary such as "dropped 1,234 events" into the log so the loss itself is visible.</li>
+</ul>
+<p>Bound the queue in bytes rather than event count, since event sizes vary. Export queue depth, time spent blocked and the number dropped or rejected.</p>
+<p><b>Likely follow up:</b> "Can blocking producers deadlock?" Yes: if the writer thread itself logs through the same writer, it blocks on its own full queue, so the writer must never call <code>appendEvent</code>. Also, producers that block while holding their own locks can stall unrelated threads.</p></div></div><div class="tq cq" data-q="system-coding.t13" data-level="core" data-kind="theory"><div class="cqh"><span class="tqn">13</span><span class="lvl lvl-core">Core</span><span class="tag">testing</span><span class="tag">log-writer</span><span class="tag">races</span><span class="co">Databricks</span></div><div class="qtext">How would you test the log writer for race conditions?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Put the file behind a small interface so a fake can inject delays and failures and record every write and fsync. Then:</p>
+<ol>
+<li>Stress: N producers write M events each, every event tagged with (producer id, sequence number), all started behind a latch. Afterwards, read the output: <strong>every event exactly once</strong>, sequence numbers increasing per producer, and the right total.</li>
+<li>Durability order: with the fake, assert that no future completed before an fsync covering its bytes had returned.</li>
+<li><code>flush</code>: while producers keep appending, call <code>flush</code>; on return, every event accepted before the call must already be covered by an fsync.</li>
+<li><code>close</code> races: close while producers are mid-flight. Every event is either rejected with an exception or present in the file; none is acknowledged and missing; no thread is left blocked (join with a timeout).</li>
+<li>Faults: make fsync fail once, and assert that every future in that batch failed and nothing later was acknowledged.</li>
+</ol>
+<p>Run the suite many times, run the C++ build under ThreadSanitizer, put a timeout on every wait, and use hooks to force nasty interleavings, such as pausing the writer between its write and its fsync while <code>close</code> runs.</p>
+<p><b>Likely follow up:</b> "How do you test crash recovery?" Cut the file at random byte offsets (or kill the process mid-run), run recovery, and check that it keeps a valid prefix containing every acknowledged event.</p></div></div><div class="tq cq" data-q="system-coding.t14" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">14</span><span class="lvl lvl-senior">Senior</span><span class="tag">file-io</span><span class="tag">pread</span><span class="tag">parallel-copy</span><span class="co">Rubrik</span></div><div class="qtext">Copy a large file with <code>pread</code> and <code>pwrite</code> using several threads. Why positional I/O, how do you split the work, and when does it not help?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><code>pread</code> and <code>pwrite</code> take an explicit offset and neither use nor move the file's shared offset, so <strong>many threads can share one descriptor without a lock</strong>. That is <a class="term" data-term="positional-io" href="glossary.html#positional-io">positional I/O</a>. <code>lseek</code> followed by <code>read</code> would race on the shared offset. In Java, <code>FileChannel.read(buffer, position)</code> and <code>write(buffer, position)</code> are the positional equivalents and are safe to call concurrently.</p>
+<p>Split the file into fixed chunks (1 to 8 MB, as an illustrative size) and hand out chunk indices through an atomic counter. For each chunk, loop on <code>pread</code> until the chunk is full or EOF, because short reads are legal, then loop on <code>pwrite</code> until every byte is written. At the end, check every thread's result and fsync the destination; on any error, fail the copy and remove the partial file. Better still, copy to a temporary name, fsync it, <code>rename</code> it into place and fsync the directory, so nobody ever sees a half-written copy under the real name.</p>
+<p>When it does not help:</p>
+<ul>
+<li>One spinning disk: parallel reads at different offsets cause seeks, and one sequential stream with large buffers is faster.</li>
+<li>A slow sequential source, as in Rubrik's floppy-to-SSD follow up: the source is the bottleneck, so read it sequentially in large chunks and turn many small writes into a few large ones.</li>
+</ul>
+<p>It helps on SSDs and NVMe drives (deeper queues), on network storage (it hides latency), and between machines, as in chunked parallel transfer.</p>
+<p><b>Likely follow up:</b> "Resume after a crash?" Record completed chunks in a small manifest, with a checksum per chunk, and redo only the missing ones.</p></div></div><div class="tq cq" data-q="system-coding.t15" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">15</span><span class="lvl lvl-senior">Senior</span><span class="tag">executor</span><span class="tag">timeouts</span><span class="tag">idle-threads</span><span class="co">Rubrik</span></div><div class="qtext">Your hand-built pool now needs per-task timeouts and must reclaim idle threads. How?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><strong>Per-task timeout.</strong> You cannot safely kill a thread, so a timeout has two halves. The caller side: <code>future.get(timeout)</code> throws <code>TimeoutException</code> to whoever waits. The cancellation side: on timeout, call <code>future.cancel(true)</code>, which for a <code>FutureTask</code>-style future interrupts the worker running that task (a <code>CompletableFuture</code> ignores the flag), or <code>request_stop</code> on the task's <code>std::stop_source</code> in C++. A watchdog thread with a priority queue of deadlines can do this for every task. A task that ignores cancellation keeps its worker busy, so count and log it, and optionally start a replacement worker so the pool keeps its capacity.</p>
+<p><strong>Idle reclaim.</strong> Workers above the core size wait for work with a timeout. If the timeout expires with no work, the worker removes itself, and the decrement must happen under the same lock as the check, so the pool never drops below its core size or leaves a just-queued task without a worker.</p>
+<figure class="code single" data-sample="system-coding.t15.1"><figcaption><span class="ctitle">Waiting with a keep-alive</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="t">long</span> nanos = keepAliveNanos;
+<span class="k">while</span> (queue.<span class="f">isEmpty</span>() &amp;&amp; state == <span class="t">State</span>.RUNNING) {
+    <span class="k">if</span> (workerCount &lt;= coreSize) {
+        notEmpty.<span class="f">await</span>();                      <span class="c">// core workers wait without a limit</span>
+    } <span class="k">else</span> <span class="k">if</span> (nanos &gt; <span class="n">0</span>) {
+        nanos = notEmpty.<span class="f">awaitNanos</span>(nanos);
+    } <span class="k">else</span> {
+        workerCount -= <span class="n">1</span>;                      <span class="c">// idle too long and above core: retire</span>
+        <span class="k">return</span> <span class="k">null</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>On the submit side, if no worker is idle and <code>workerCount</code> is below the maximum, start a new worker. This is the <code>keepAliveTime</code> model of <code>ThreadPoolExecutor</code>; <code>allowCoreThreadTimeOut(true)</code> applies it to core threads too. In C++ the timed wait is <code>cv.wait_for</code> with a predicate.</p>
+<p><b>Likely follow up:</b> "Why not let the timed wait loop at zero?" <code>awaitNanos(0)</code> returns immediately, so a non-retiring worker would spin; that is why core workers switch to an untimed wait.</p></div></div><div class="tq cq" data-q="system-coding.t16" data-level="senior" data-kind="theory"><div class="cqh"><span class="tqn">16</span><span class="lvl lvl-senior">Senior</span><span class="tag">dag</span><span class="tag">job-runner</span><span class="tag">failure</span><span class="co">Rubrik</span></div><div class="qtext">Run jobs with dependencies in parallel, and on the first failure stop with nothing left running. What are the tricky parts?</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The state, under one lock: each job's count of unfinished parents, each job's children, a running count, a completed count, and the first failure. Submit every job with no parents. When a job succeeds, decrement each child's count and submit children that reach zero. When a job fails, record the first exception, stop submitting, and cancel the running jobs, which is best effort.</p>
+<p>The tricky parts:</p>
+<ul>
+<li><strong>"Nothing left running" means wait.</strong> <code>execute()</code> must not return on the first failure; it waits until the running count reaches zero, or jobs keep running after it returned.</li>
+<li>A success that lands just after a failure must not schedule children, so check the failed flag under the same lock as the scheduling.</li>
+<li>Termination is a condition: all jobs completed, or failed and running equals zero. Signal a condition or latch exactly then.</li>
+<li>Never block a worker waiting for its children; that is a <a class="term" data-term="thread-starvation-deadlock" href="glossary.html#thread-starvation-deadlock">thread-starvation deadlock</a> in the pool.</li>
+<li>Check for cycles up front, or a cyclic graph never finishes.</li>
+<li>With an API like <code>getDependentTasks(completed)</code>, call it under the lock after each completion and skip jobs already scheduled.</li>
+</ul>
+<p>When executors are banned, this coordinator sits on top of your own pool.</p>
+<p><b>Likely follow up:</b> "Do it with <code>CompletableFuture</code>." Each job's future is <code>allOf</code> its parents' futures, then <code>thenRunAsync</code> the job. Dependents fail automatically, but you must still cancel independent branches and wait for running jobs before reporting.</p></div></div><div class="tq cq" data-q="system-coding.t17" data-level="stretch" data-kind="theory"><div class="cqh"><span class="tqn">17</span><span class="lvl lvl-stretch">Stretch</span><span class="tag">fixed-buffer</span><span class="tag">queues</span><span class="tag">allocation</span><span class="co">Rubrik</span></div><div class="qtext">Implement a FIFO queue inside a fixed buffer with no allocation, then two queues sharing one buffer with minimal waste.</div><textarea class="myans" rows="4" placeholder="Answer the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button><button type="button" class="btn ghost small" data-gotit>I knew this</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>One queue is a <a class="term" data-term="ring-buffer" href="glossary.html#ring-buffer">ring buffer</a>: an array of N slots with <code>head</code>, <code>tail</code> and <code>count</code>. <code>put</code> writes at <code>tail</code> and advances it modulo N; <code>take</code> reads at <code>head</code>. Everything is O(1) with no allocation. For threads, add one lock and two conditions, or, with exactly one producer and one consumer, make <code>head</code> and <code>tail</code> atomics that each side alone writes, using release stores and acquire loads.</p>
+<p>Two queues cannot simply grow from opposite ends like two stacks, because a FIFO's contents travel around the buffer as they are consumed. A fixed split (N/2 each) wastes space whenever one queue is busier.</p>
+<p>The flexible answer: <strong>cut the buffer into fixed-size blocks</strong> (say 64 slots each) with a free list of blocks. Each queue is a linked list of blocks, the next-block index kept in a header slot, so there is still no allocation. Enqueue fills the tail block and takes a fresh block when it is full; dequeue drains the head block and returns it to the free list when empty. Everything stays O(1), and waste per queue is at most about two partly used blocks.</p>
+<p>Concurrency: one lock per queue plus a lock for the free list, always taken after the queue's lock, or one global lock if contention is low.</p>
+<p><b>Likely follow up:</b> "The buffer is 1 GB." The same design works; choose a larger block size so the free list and headers stay small, and keep the head and tail indices as 64-bit offsets.</p></div></div></section></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

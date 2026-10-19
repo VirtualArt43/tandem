@@ -1,0 +1,1420 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>C++ concurrency cheat sheet, with pthreads · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="cpp-cheat-sheet" data-title="C++ concurrency cheat sheet, with pthreads" data-track="core" data-module="core-18" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details open><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet" class=here><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m18">Module 18: The interview room</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 18.3</span><span>38 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>C++ concurrency cheat sheet, with pthreads</h1><p class="lsum">C++ concurrency APIs, their Java counterparts, lifetime and memory-order traps, and pthreads equivalents for C-only rounds.</p><div class="asked"><span>Asked at</span><span class="co">Nvidia</span><span class="co">Databricks</span><span class="co">Microsoft</span><span class="co">Rubrik</span><span class="co">Bloomberg</span></div><div class="prereq"><span>Before this:</span><a href="mutex-basics.html">Mutexes and RAII guards</a><a href="condition-variables.html">Condition variables and monitors</a><a href="memory-orders.html">C++ memory orders: seq_cst, acquire, release and relaxed</a></div></header><article class="prose" id="article">
+<p class="lead">C++ gives you fewer ready-made tools than Java and more ways to hold them wrong. This page is a reference to the core kit: the standard library from C++11 to C++20, the traps that compile but break, and the POSIX threads version for the rounds that allow only C.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A carpenter's apron holds a few tools, each in the same pocket every day, so the hand finds it without looking. This page is your apron: the standard tools by job, the version of C++ each needs, and a column with the Java name, so you can read Shubhi's code and she can read yours.</p>
+<p>The last third is for a narrower but real case: some systems software rounds are reported to be C only, and then the tool is <strong>pthreads</strong>. Same ideas, older names, and a few pieces that macOS simply does not have.</p>
+</div>
+
+<h2 id="threads">Threads</h2>
+<table>
+<thead><tr><th>API</th><th>What it does</th><th>Rule or trap</th><th>Java twin</th></tr></thead>
+<tbody>
+<tr><td><code>std::thread t(f, args...)</code></td><td>Starts <code>f(args...)</code> on a new thread</td><td>The callable and arguments are decay-copied or moved into thread storage; pass <code>std::ref(x)</code> to share. A lambda capturing locals by reference must not outlive them.</td><td><code>new Thread(r).start()</code></td></tr>
+<tr><td><code>t.join()</code>, <code>t.detach()</code>, <code>t.joinable()</code></td><td>Wait for completion; release ownership; does it own a thread?</td><td>Destroying a joinable <code>std::thread</code> calls <code>std::terminate()</code>. Join every thread on every path, including exceptions.</td><td><code>join()</code>; no detach equivalent (daemon controls JVM exit)</td></tr>
+<tr><td><code>std::jthread</code> (C++20)</td><td>If joinable, requests stop and joins in its destructor</td><td>If the callable accepts a leading <code>std::stop_token</code>, the jthread passes it. Destruction can block indefinitely if the worker never exits. C++17 fallback: <code>std::thread</code> with a joining RAII owner and a cooperative stop protocol. For condition waits, guard the stop flag with the wait mutex and notify all waiters.</td><td><code>interrupt()</code> plus join</td></tr>
+<tr><td><code>request_stop()</code>, <code>get_stop_token()</code>, <code>std::stop_token::stop_requested()</code>, <code>std::stop_callback</code> (C++20)</td><td>Cooperative cancellation</td><td>Nothing stops by itself: the thread must check, or wait on <code>std::condition_variable_any</code> with the token</td><td><code>isInterrupted()</code></td></tr>
+<tr><td><code>std::this_thread::sleep_for(d)</code>, <code>sleep_until(t)</code>, <code>yield()</code>, <code>get_id()</code></td><td>Pause, suggest rescheduling, identify</td><td>Sleeping never fixes a race</td><td><code>Thread.sleep</code>, <code>Thread.yield</code></td></tr>
+<tr><td><code>std::thread::hardware_concurrency()</code></td><td>A hint for the number of hardware threads</td><td>May return 0 when unknown</td><td><code>Runtime.getRuntime().availableProcessors()</code></td></tr>
+<tr><td><code>thread_local</code></td><td>One variable per thread</td><td>One instance per thread; block-local dynamic initialization happens on first passage through its declaration. Constructed instances are destroyed at thread exit.</td><td><code>ThreadLocal</code></td></tr>
+</tbody>
+</table>
+
+<p><strong>A thread owner does not transport exceptions.</strong> An exception escaping the callable of either <code>std::thread</code> or <code>std::jthread</code> calls <code>std::terminate()</code>; catch it in the worker and pass an <code>std::exception_ptr</code> or satisfy a promise. Moving transfers thread ownership: move-assigning over a joinable <code>std::thread</code> also terminates, while <code>std::jthread</code> first requests stop and joins its old thread. <code>detach()</code> does not extend the lifetime of captured references.</p>
+
+<h2 id="mutexes-and-lock-guards">Mutexes and lock guards</h2>
+<table>
+<thead><tr><th>API</th><th>What it does</th><th>Rule or trap</th><th>Java twin</th></tr></thead>
+<tbody>
+<tr><td><code>std::mutex</code>: <code>lock</code>, <code>try_lock</code>, <code>unlock</code></td><td>Exclusive lock, not reentrant</td><td>Never call <code>lock</code> and <code>unlock</code> by hand: use a guard. Locking twice from one thread is undefined behavior.</td><td><code>ReentrantLock</code> (reentrant), <code>synchronized</code></td></tr>
+<tr><td><code>std::recursive_mutex</code></td><td>Reentrant</td><td>Usually a sign the design needs rethinking</td><td><code>ReentrantLock</code></td></tr>
+<tr><td><code>std::timed_mutex</code>: <code>try_lock_for(d)</code>, <code>try_lock_until(t)</code></td><td>Attempt acquisition with a timeout</td><td>Prefer a <code>steady_clock</code> deadline; scheduling can delay return beyond it, and timed try operations may fail spuriously</td><td><code>tryLock(t, unit)</code></td></tr>
+<tr><td><code>std::shared_mutex</code> (C++17), <code>std::shared_timed_mutex</code> (C++14)</td><td>Many readers or one writer</td><td>Readers take <code>std::shared_lock</code>, writers <code>std::unique_lock</code>. No atomic upgrade from shared to exclusive; unlock, acquire exclusive, then re-check. No FIFO fairness guarantee.</td><td><code>ReentrantReadWriteLock</code></td></tr>
+<tr><td><code>std::lock_guard&lt;M&gt; g(m)</code> (C++11)</td><td>Locks now, unlocks at scope exit</td><td>Simplest guard; cannot unlock early</td><td><code>synchronized</code> block</td></tr>
+<tr><td><code>std::unique_lock&lt;M&gt; l(m)</code> (C++11)</td><td>Movable guard: <code>std::defer_lock</code>, <code>std::try_to_lock</code>, <code>std::adopt_lock</code>, <code>unlock()</code>, <code>lock()</code>, <code>owns_lock()</code>. Adopt only a lock already owned by this thread.</td><td>Required by <code>std::condition_variable</code></td><td><code>lock()</code> and <code>unlock()</code> in <code>try/finally</code></td></tr>
+<tr><td><code>std::scoped_lock l(m1, m2)</code> (C++17)</td><td>Locks several mutexes with a deadlock-avoidance algorithm</td><td>Convenient for several mutexes; they must be distinct. It does not cure cycles involving other locks already held. C++11 alternative: <code>std::lock(m1, m2)</code> then two <code>lock_guard</code>s with <code>std::adopt_lock</code>.</td><td>a fixed global lock order</td></tr>
+<tr><td><code>std::shared_lock&lt;M&gt; l(sm)</code> (C++14)</td><td>Shared ownership of a <code>shared_mutex</code></td><td>Guard the same state on reads and writes; shared ownership does not permit mutation</td><td><code>readLock()</code></td></tr>
+</tbody>
+</table>
+<div class="box warning">
+<h3>Always name the guard</h3>
+<p><code>std::scoped_lock{m};</code> and <code>std::lock_guard&lt;std::mutex&gt;{m};</code> create a temporary that unlocks at the semicolon, so the next line runs unprotected (a compiler warning is not guaranteed). <code>std::unique_lock&lt;std::mutex&gt;(m);</code> inside a method with a member mutex <code>m</code> is worse: it declares a <em>new</em> empty lock named <code>m</code> that shadows the mutex and locks nothing (clang warns about a vexing parse). Write <code>std::scoped_lock lock(m);</code> every time.</p>
+</div>
+
+<h2 id="condition-variables">Condition variables</h2>
+<table>
+<thead><tr><th>API</th><th>What it does</th><th>Rule or trap</th><th>Java twin</th></tr></thead>
+<tbody>
+<tr><td><code>std::condition_variable</code></td><td>Wait for a state change under a <code>std::unique_lock&lt;std::mutex&gt;</code></td><td>Only works with <code>std::unique_lock&lt;std::mutex&gt;</code></td><td><code>Condition</code>, <code>wait</code>/<code>notify</code></td></tr>
+<tr><td><code>cv.wait(lock, pred)</code></td><td>Equivalent to <code>while (!pred()) cv.wait(lock);</code></td><td>Always use the predicate form: spurious and stolen wakeups</td><td><code>while (!c) cond.await();</code></td></tr>
+<tr><td><code>cv.wait_for(lock, d, pred)</code>, <code>cv.wait_until(lock, t, pred)</code></td><td>Timed waits</td><td>Return the predicate's value: false means timed out with the condition still false. Without a predicate they return <code>std::cv_status::timeout</code> or <code>no_timeout</code>.</td><td><code>awaitNanos</code>, <code>await(t, unit)</code></td></tr>
+<tr><td><code>notify_one()</code>, <code>notify_all()</code></td><td>Wake one or every waiter</td><td>Change the state under the mutex first, or the waiter can miss it (<a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a>). Notifying after unlocking is allowed and can save a context switch.</td><td><code>signal()</code>, <code>signalAll()</code></td></tr>
+<tr><td><code>std::condition_variable_any</code></td><td>Works with any lockable, such as <code>std::shared_lock</code></td><td>C++20 adds <code>wait(lock, stop_token, pred)</code>, which wakes on a stop request and returns the final predicate value, not the reason for waking</td><td></td></tr>
+</tbody>
+</table>
+
+<h2 id="atomics-and-memory-order">Atomics and memory order</h2>
+<table>
+<thead><tr><th>API</th><th>What it does</th><th>Rule or trap</th><th>Java twin</th></tr></thead>
+<tbody>
+<tr><td><code>std::atomic&lt;T&gt;</code>: <code>load</code>, <code>store</code>, <code>exchange</code></td><td>Indivisible operations on this atomic object</td><td>Default order is <code>seq_cst</code>. The primary template requires trivially copyable, copyable and movable <code>T</code>; specializations such as shared pointers have different rules.</td><td><code>AtomicInteger</code>, <code>volatile</code></td></tr>
+<tr><td><code>fetch_add</code>, <code>fetch_sub</code>, <code>fetch_and</code>, <code>fetch_or</code>, <code>fetch_xor</code>, and <code>+=</code>, <code>++</code> on the atomic</td><td>Atomic read-modify-write</td><td>Available by specialization: integer atomics except bool have arithmetic and bitwise operations; pointers have add/subtract, floating atomics have add/subtract since C++20. <code>fetch_*</code> and postfix <code>++</code> return the old value; prefix <code>++</code> and <code>+=</code> return the new one.</td><td><code>getAndAdd</code>, <code>incrementAndGet</code></td></tr>
+<tr><td><code>compare_exchange_weak(expected, desired)</code>, <code>compare_exchange_strong(...)</code></td><td>CAS</td><td>On failure, <code>expected</code> is overwritten with the value observed by the failed operation. <code>weak</code> may fail spuriously: use it in loops, <code>strong</code> for a single attempt.</td><td><code>compareAndSet</code>, <code>compareAndExchange</code></td></tr>
+<tr><td><code>is_lock_free()</code>, <code>is_always_lock_free</code> (C++17)</td><td>Are the operations lock-free?</td><td>Other types may use a hidden lock. Lock-free does not mean one instruction or wait-free.</td><td></td></tr>
+<tr><td><code>std::atomic_flag</code>: <code>test_and_set</code>, <code>clear</code>; C++20 <code>test</code>, <code>wait</code>, <code>notify_one</code>, <code>notify_all</code></td><td>Flag operations are guaranteed lock-free; waiting can block</td><td>The basis of a <a class="term" data-term="spinlock" href="glossary.html#spinlock">spinlock</a></td><td><code>AtomicBoolean</code></td></tr>
+<tr><td><code>a.wait(old)</code>, <code>a.notify_one()</code>, <code>a.notify_all()</code> (C++20)</td><td>Block until the value changes from <code>old</code></td><td>Returns only after observing a value different from <code>old</code>; internal spurious wakeups are hidden. A change away and back can be missed. Store the new value before notifying.</td><td>No exact twin; <code>LockSupport.park</code> can return spuriously</td></tr>
+<tr><td><code>std::atomic_ref&lt;T&gt;</code> (C++20)</td><td>Atomic access to a plain object</td><td>The object must outlive every reference and meet <code>required_alignment</code>. While any atomic_ref exists, all access to that object goes through atomic_refs, even on the same thread.</td><td><code>VarHandle</code></td></tr>
+<tr><td><code>std::atomic&lt;std::shared_ptr&lt;T&gt;&gt;</code> (C++20)</td><td>Atomically swap a shared pointer</td><td>Not in every standard library: the Apple libc++ that builds Tandem lacks it. Fall back to a mutex around the pointer.</td><td><code>AtomicReference</code></td></tr>
+<tr><td><code>alignas(std::hardware_destructive_interference_size)</code> (C++17)</td><td>Implementation-provided spacing for independently hot objects</td><td>Use separate aligned objects to reduce <a class="term" data-term="false-sharing" href="glossary.html#false-sharing">false sharing</a>. The value is implementation-defined, not a portable 64-byte constant or a runtime measurement.</td><td><code>LongAdder</code> pads internally</td></tr>
+</tbody>
+</table>
+<table>
+<thead><tr><th>Memory order</th><th>Guarantees</th><th>Use for</th></tr></thead>
+<tbody>
+<tr><td><code>memory_order_relaxed</code></td><td>Atomicity and a single order per variable; nothing about other variables</td><td>Counters, statistics</td></tr>
+<tr><td><code>memory_order_release</code> (store) with <code>memory_order_acquire</code> (load)</td><td>Writes sequenced before the release happen before accesses sequenced after an acquire that reads from that release or its release sequence</td><td>Publishing data with a flag or pointer; lock implementations</td></tr>
+<tr><td><code>memory_order_acq_rel</code></td><td>Both, on a read-modify-write</td><td>CAS that both consumes and publishes</td></tr>
+<tr><td><code>memory_order_seq_cst</code> (default)</td><td>Acquire for loads, release for stores, both for read-modify-write, plus a total order of seq_cst operations consistent with the C++20 ordering rules</td><td>The default; start here</td></tr>
+<tr><td><code>memory_order_consume</code></td><td>Dependency ordering in C++20; implementations commonly strengthen it to acquire</td><td>Do not use</td></tr>
+</tbody>
+</table>
+<p>A <a class="term" data-term="data-race" href="glossary.html#data-race">data race</a> (conflicting accesses to the same memory location in different threads, at least one non-atomic, with neither happening before the other) is <a class="term" data-term="undefined-behavior" href="glossary.html#undefined-behavior">undefined behavior</a>. <code>volatile</code> is not a synchronization tool in C++. Different <code>std::shared_ptr</code> instances sharing a control block can be changed concurrently; modifying the same instance needs synchronization. Neither case makes the pointed-to object thread-safe. See <a href="memory-orders.html">memory orders</a>.</p>
+
+<h2 id="c-20-synchronizers">C++20 synchronizers</h2>
+<table>
+<thead><tr><th>API</th><th>What it does</th><th>Rule or trap</th><th>Java twin</th></tr></thead>
+<tbody>
+<tr><td><code>std::counting_semaphore&lt;Max&gt; s(n)</code>, <code>std::binary_semaphore</code>: <code>acquire()</code>, <code>release(k)</code>, <code>try_acquire()</code>, <code>try_acquire_for(d)</code>, <code>try_acquire_until(t)</code></td><td>Permits</td><td>Not owned: any thread may release. <code>Max</code> is the least maximum value the implementation must support; <code>s.max()</code> is the actual bound. Never release beyond it. <code>try_acquire</code> may fail spuriously.</td><td><code>Semaphore</code></td></tr>
+<tr><td><code>std::latch l(n)</code>: <code>count_down(k)</code>, <code>wait()</code>, <code>try_wait()</code>, <code>arrive_and_wait(k)</code></td><td>One-shot gate</td><td>Cannot be reset; never decrement below zero</td><td><code>CountDownLatch</code></td></tr>
+<tr><td><code>std::barrier b(n, completion)</code>: <code>arrive_and_wait()</code>, <code>arrive()</code>, <code>wait(token)</code>, <code>arrive_and_drop()</code></td><td>Reusable phases; completion runs at the phase boundary (if nobody waits, whether it runs is implementation-defined in C++20)</td><td>The completion callable must be nothrow-invocable (use a <code>noexcept</code> lambda). Pass an arrival token as <code>wait(std::move(token))</code>.</td><td><code>CyclicBarrier</code>, <code>Phaser</code></td></tr>
+</tbody>
+</table>
+<p>If the interview compiler is C++17, or the interviewer bans these, build them from a mutex and a condition variable: that is <a href="build-semaphore-and-latch.html">build a semaphore and latch</a> and <a href="build-rw-lock-and-barrier.html">build a read-write lock and barrier</a>.</p>
+
+<h2 id="futures-and-one-time-initialization">Futures and one-time initialization</h2>
+<table>
+<thead><tr><th>API</th><th>What it does</th><th>Rule or trap</th><th>Java twin</th></tr></thead>
+<tbody>
+<tr><td><code>std::promise&lt;T&gt;</code>: <code>get_future()</code>, <code>set_value(v)</code>, <code>set_exception(e)</code></td><td>The writing end of a one-shot channel</td><td>Setting twice throws <code>std::future_error</code>. Abandoning an unsatisfied shared state makes its future ready with <code>broken_promise</code>. <code>get_future()</code> is also one-shot; the void specialization uses <code>set_value()</code>.</td><td><code>CompletableFuture.complete</code></td></tr>
+<tr><td><code>std::future&lt;T&gt;</code>: <code>get()</code>, <code>wait()</code>, <code>wait_for(d)</code>, <code>valid()</code>, <code>share()</code></td><td>The reading end</td><td><code>get()</code> consumes the future, even if it rethrows; do not call it on an invalid future. <code>wait_for</code> returns <code>std::future_status::ready</code>, <code>timeout</code> or <code>deferred</code>.</td><td><code>Future.get</code></td></tr>
+<tr><td><code>std::shared_future&lt;T&gt;</code></td><td>Many readers, copyable</td><td>Each copy may call <code>get()</code> repeatedly; referenced results still need protection from mutation</td><td></td></tr>
+<tr><td><code>std::packaged_task&lt;R(Args...)&gt;</code></td><td>A callable plus its future</td><td>The building block of a thread pool's <code>submit</code></td><td><code>FutureTask</code></td></tr>
+<tr><td><code>std::async(std::launch::async, f)</code></td><td>Run <code>f</code> on a new thread, get a future</td><td>Without a policy the library may defer it. Releasing the last reference to an unfinished async-launched state can block. Discarding its temporary future waits at the semicolon; deferred work need not run at all.</td><td><code>CompletableFuture.supplyAsync</code></td></tr>
+<tr><td><code>std::current_exception()</code>, <code>std::rethrow_exception(p)</code>, <code>std::make_exception_ptr(e)</code></td><td>Carry an exception across threads</td><td>How a worker reports failure to a waiter</td><td><code>ExecutionException</code></td></tr>
+<tr><td><code>std::call_once(flag, f)</code> with <code>std::once_flag</code>; a function-local <code>static</code></td><td>Complete initialization once; retry after a throwing attempt</td><td>Function-local static initialization is thread-safe since C++11; later mutations still need synchronization</td><td>holder idiom for initialization, but Java class initialization failure is not retried</td></tr>
+</tbody>
+</table>
+<p>Time: measure elapsed time and deadlines with <code>std::chrono::steady_clock</code> (monotonic), wall time with <code>system_clock</code>. <code>using namespace std::chrono_literals;</code> lets you write <code>50ms</code>.</p>
+
+<p><strong>Ordering is not lifetime.</strong> A release store and an acquire load publish preceding writes only when the acquire observes that release or its release sequence. They do not keep a pointed-to object alive or order later mutations. Loads and atomic waits cannot use <code>release</code> or <code>acq_rel</code>; stores cannot use <code>consume</code>, <code>acquire</code> or <code>acq_rel</code>. CAS failure is a load, so its failure order cannot be <code>release</code> or <code>acq_rel</code>. When a CAS must both consume published state and publish preceding writes, <code>acq_rel</code> on success and <code>acquire</code> on failure is a common choice.</p>
+
+<h2 id="idioms-to-type-from-memory">Idioms to type from memory</h2>
+<p>The tables use Java counterparts for orientation; the pairs below show the same contracts in both languages. The later pthreads snippets deliberately use C syntax. Standard-library names require their own headers: <code>thread</code>, <code>mutex</code>, <code>shared_mutex</code>, <code>condition_variable</code>, <code>atomic</code>, <code>future</code>, <code>semaphore</code>, <code>latch</code>, <code>barrier</code>, <code>stop_token</code>, <code>chrono</code> and <code>new</code> for the interference constants.</p>
+<figure class="code pair" data-sample="cpp-cheat-sheet.1"><figcaption><span class="ctitle">The monitor: predicate waits, a deadline, and close</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> T&gt;
+<span class="k">class</span> Channel {
+<span class="k">public</span>:
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_nothrow_move_constructible_v&lt;T&gt;);
+    <span class="k">explicit</span> <span class="f">Channel</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {
+        <span class="k">if</span> (capacity == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"capacity must be positive"</span>);
+    }
+
+    <span class="t">bool</span> <span class="f">send</span>(T value) {                                       <span class="c">// false once closed</span>
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        notFull_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> closed_ || items_.<span class="f">size</span>() &lt; capacity_; });
+        <span class="k">if</span> (closed_) {
+            <span class="k">return</span> <span class="k">false</span>;
+        }
+        <span class="k">try</span> {
+            items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(value));
+        } <span class="k">catch</span> (...) {
+            notFull_.<span class="f">notify_one</span>();  <span class="c">// pass the available slot to another sender</span>
+            <span class="k">throw</span>;
+        }
+        notEmpty_.<span class="f">notify_one</span>();
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="c">// Waits until an item arrives, the channel closes, or the deadline passes.</span>
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">receiveUntil</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="t">time_point</span> deadline) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (!notEmpty_.<span class="f">wait_until</span>(lock, deadline, [&amp;] { <span class="k">return</span> closed_ || !items_.<span class="f">empty</span>(); })) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;                               <span class="c">// timed out: the predicate is still false</span>
+        }
+        <span class="k">if</span> (items_.<span class="f">empty</span>()) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;                               <span class="c">// closed and drained</span>
+        }
+        T value = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        notFull_.<span class="f">notify_one</span>();
+        <span class="k">return</span> value;
+    }
+
+    <span class="t">void</span> <span class="f">close</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            closed_ = <span class="k">true</span>;
+        }
+        notFull_.<span class="f">notify_all</span>();                                 <span class="c">// wake every waiter so it can see closed_</span>
+        notEmpty_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notFull_, notEmpty_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;                                      <span class="c">// guarded by m_</span>
+    <span class="t">bool</span> closed_ = <span class="k">false</span>;                                      <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">Objects</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">Channel</span>&lt;T&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>(), notEmpty = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;T&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="t">boolean</span> closed;
+
+    <span class="t">Channel</span>(<span class="t">int</span> capacity) {
+        <span class="k">if</span> (capacity &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"capacity must be positive"</span>);
+        <span class="k">this</span>.capacity = capacity;
+    }
+
+    <span class="t">boolean</span> <span class="f">send</span>(T value) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Objects</span>.<span class="f">requireNonNull</span>(value);
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (!closed &amp;&amp; items.<span class="f">size</span>() == capacity) notFull.<span class="f">await</span>();
+            <span class="k">if</span> (closed) <span class="k">return</span> <span class="k">false</span>;
+            items.<span class="f">addLast</span>(value);
+            notEmpty.<span class="f">signal</span>();
+            <span class="k">return</span> <span class="k">true</span>;
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+
+    <span class="c">// deadline is System.nanoTime() plus a short, nonnegative timeout.</span>
+    T <span class="f">receiveUntil</span>(<span class="t">long</span> deadline) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (!closed &amp;&amp; items.<span class="f">isEmpty</span>()) {
+                <span class="t">long</span> left = deadline - <span class="t">System</span>.<span class="f">nanoTime</span>();
+                <span class="k">if</span> (left &lt;= <span class="n">0</span>) <span class="k">return</span> <span class="k">null</span>;
+                notEmpty.<span class="f">awaitNanos</span>(left);
+            }
+            <span class="k">if</span> (items.<span class="f">isEmpty</span>()) <span class="k">return</span> <span class="k">null</span>;
+            T value = items.<span class="f">removeFirst</span>();
+            notFull.<span class="f">signal</span>();
+            <span class="k">return</span> value;
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+
+    <span class="k">void</span> <span class="f">close</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            closed = <span class="k">true</span>;
+            notFull.<span class="f">signalAll</span>();
+            notEmpty.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The channel rejects zero capacity. A closed channel drains existing items, then returns empty; this compact API deliberately uses the same empty result for timeout and closed-and-drained. A production API can return separate statuses. C++ requires nonthrowing moves that do not call back into the channel. Close wakes callers but does not join them: the owner must stop and join all users before destroying the channel.</p>
+<p><strong>The deadline bounds condition waiting, not total method latency.</strong> Both versions can spend longer acquiring or reacquiring the mutex. They return an available item when the final locked check finds one, even if the deadline has just passed. If the contract forbids admission after expiry, check the clock again under the lock before removing an item; scheduling still prevents a guaranteed return time.</p>
+<p>These transfer fragments isolate locking: assume nonnegative amounts, sufficient funds and representable arithmetic. In a financial API validate those conditions while holding both locks, and use these locks for every balance access. Java account ids must be unique to establish a total order.</p>
+<figure class="code pair" data-sample="cpp-cheat-sheet.2"><figcaption><span class="ctitle">Two mutexes at once, C++17 and C++11</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">struct</span> Account {
+    <span class="t">std</span>::<span class="t">mutex</span> m;
+    <span class="t">long</span> balance = <span class="n">0</span>;
+};
+
+<span class="t">void</span> <span class="f">transfer</span>(Account&amp; from, Account&amp; to, <span class="t">long</span> amount) {
+    <span class="k">if</span> (&amp;from == &amp;to) {
+        <span class="k">return</span>;
+    }
+    <span class="t">std</span>::<span class="t">scoped_lock</span> <span class="f">both</span>(from.m, to.m);                       <span class="c">// C++17: deadlock avoidance built in</span>
+    from.balance -= amount;
+    to.balance += amount;
+}
+
+<span class="t">void</span> <span class="f">transferCpp11</span>(Account&amp; from, Account&amp; to, <span class="t">long</span> amount) {
+    <span class="k">if</span> (&amp;from == &amp;to) {
+        <span class="k">return</span>;
+    }
+    <span class="t">std</span>::<span class="f">lock</span>(from.m, to.m);                                   <span class="c">// C++11: lock both, then adopt</span>
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">a</span>(from.m, <span class="t">std</span>::adopt_lock);
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">b</span>(to.m, <span class="t">std</span>::adopt_lock);
+    from.balance -= amount;
+    to.balance += amount;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">class</span> <span class="t">Account</span> {
+    <span class="k">final</span> <span class="t">long</span> id;  <span class="c">// unique, immutable, assigned before publication</span>
+    <span class="t">long</span> balance;
+    <span class="t">Account</span>(<span class="t">long</span> id) { <span class="k">this</span>.id = id; }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">transfer</span>(<span class="t">Account</span> from, <span class="t">Account</span> to, <span class="t">long</span> amount) {
+        <span class="k">if</span> (from == to) <span class="k">return</span>;
+        <span class="t">Account</span> first = from.id &lt; to.id ? from : to;
+        <span class="t">Account</span> second = from.id &lt; to.id ? to : from;
+        <span class="k">synchronized</span> (first) {
+            <span class="k">synchronized</span> (second) {
+                from.balance -= amount;
+                to.balance += amount;
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The worker counts work under one lock; producers must use the same lock and notify after adding work. This fragment only decrements a counter: a real worker removes a task under the lock, then releases the lock before running it. Java interruption is propagated to the caller, which must handle it or restore the flag. The C++ stop check gives stop priority at that check; an already started unit can still finish.</p>
+<p>A stop request does not interrupt arbitrary I/O, and referenced state must outlive the worker. <strong>Stop callbacks can run synchronously:</strong> a successful <code>request_stop()</code> invokes registered callbacks on the requesting thread, and registering after a stop request invokes the callback before its constructor returns. Keep callbacks short and nonthrowing, and do not request stop while holding a mutex that a callback needs.</p>
+<figure class="code pair" data-sample="cpp-cheat-sheet.3"><figcaption><span class="ctitle">A stoppable worker (C++20)</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="c">// Run as: std::jthread w([&amp;](std::stop_token st) { pollUntilStopped(st, m, cv, work); });</span>
+<span class="c">// The jthread's destructor requests stop, which wakes the wait below, then joins.</span>
+<span class="t">void</span> <span class="f">pollUntilStopped</span>(<span class="t">std</span>::<span class="t">stop_token</span> stop, <span class="t">std</span>::<span class="t">mutex</span>&amp; m, <span class="t">std</span>::<span class="t">condition_variable_any</span>&amp; cv, <span class="t">int</span>&amp; work) {
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m);
+    <span class="k">while</span> (cv.<span class="f">wait</span>(lock, stop, [&amp;] { <span class="k">return</span> work &gt; <span class="n">0</span>; })) {
+        <span class="k">if</span> (stop.<span class="f">stop_requested</span>()) <span class="k">return</span>;  <span class="c">// predicate can be true even after stop</span>
+        work -= <span class="n">1</span>;
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">Worker</span> {
+    <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">final</span> <span class="t">Condition</span> available = lock.<span class="f">newCondition</span>();
+    <span class="t">int</span> work;  <span class="c">// producers update this under lock and signal available</span>
+
+    <span class="k">void</span> <span class="f">pollUntilInterrupted</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">for</span> (;;) {
+                <span class="k">if</span> (<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">isInterrupted</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">InterruptedException</span>();
+                <span class="k">while</span> (work == <span class="n">0</span>) available.<span class="f">await</span>();
+                work -= <span class="n">1</span>;
+            }
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code pair" data-sample="cpp-cheat-sheet.4" data-expect="ok"><figcaption><span class="ctitle">Results and exceptions across threads</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">computeInBackground</span>(<span class="t">bool</span> fail) {
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; <span class="t">promise</span>;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; result = <span class="t">promise</span>.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([p = <span class="t">std</span>::<span class="f">move</span>(<span class="t">promise</span>), fail]() <span class="k">mutable</span> {
+        <span class="k">try</span> {
+            <span class="k">if</span> (fail) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"work failed"</span>);
+            p.<span class="f">set_value</span>(<span class="n">6</span> * <span class="n">7</span>);
+        } <span class="k">catch</span> (...) {
+            p.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">current_exception</span>());
+        }
+    });
+    <span class="k">return</span> result.<span class="f">get</span>();  <span class="c">// jthread joins on normal return and on exception</span>
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">if</span> (<span class="f">computeInBackground</span>(<span class="k">false</span>) != <span class="n">42</span>) <span class="k">return</span> <span class="n">1</span>;
+    <span class="k">try</span> {
+        <span class="f">computeInBackground</span>(<span class="k">true</span>);
+        <span class="k">return</span> <span class="n">1</span>;
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"42; worker failure reached caller: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">int</span> <span class="f">computeInBackground</span>(<span class="t">boolean</span> fail) <span class="k">throws</span> <span class="t">InterruptedException</span>, <span class="t">ExecutionException</span> {
+        <span class="k">try</span> (<span class="k">var</span> executor = <span class="t">Executors</span>.<span class="f">newSingleThreadExecutor</span>()) {
+            <span class="k">return</span> executor.<span class="f">submit</span>(() -&gt; {
+                <span class="k">if</span> (fail) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"work failed"</span>);
+                <span class="k">return</span> <span class="n">6</span> * <span class="n">7</span>;
+            }).<span class="f">get</span>();
+        }  <span class="c">// Java 21 close waits for worker termination, including exceptional exits</span>
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">if</span> (<span class="f">computeInBackground</span>(<span class="k">false</span>) != <span class="n">42</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>();
+        <span class="k">try</span> {
+            <span class="f">computeInBackground</span>(<span class="k">true</span>);
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"failure was lost"</span>);
+        } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+            <span class="k">if</span> (!(e.<span class="f">getCause</span>() <span class="k">instanceof</span> <span class="t">IllegalStateException</span>)) <span class="k">throw</span> e;
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"42; worker failure reached caller"</span>);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>In C++17, join this worker before <code>result.get()</code>, or use a joining RAII wrapper, so a rethrown exception never destroys a joinable <code>std::thread</code>. In a pool, a <code>std::packaged_task</code> stores either the result or the exception automatically; enqueue and dequeue it under the queue mutex, move it into a local, release the mutex, and only then run it.</p>
+
+<h2 id="posix-threads-the-c-only-round">POSIX threads: the C-only round</h2>
+<p>Research for this course found reports of India systems software rounds at Nvidia that were C only, alongside small C thread programs (odd and even printing, 1 to N in order). Most pthreads operations return 0 or an error number directly, without setting <code>errno</code>. Exceptions include <code>pthread_self</code> (thread id), <code>pthread_equal</code> (nonzero means equal), <code>pthread_getspecific</code> (pointer), and the successful serial-thread return from <code>pthread_barrier_wait</code>. Most <code>sem_*</code> operations return -1 and set <code>errno</code> on failure; <code>sem_open</code> instead returns <code>SEM_FAILED</code>. Compile and link with <code>-pthread</code>.</p>
+<table>
+<thead><tr><th>Job</th><th>C++</th><th>pthreads</th><th>On macOS</th></tr></thead>
+<tbody>
+<tr><td>Create, join, detach</td><td><code>std::thread</code>, <code>join</code>, <code>detach</code></td><td><code>pthread_create(&amp;tid, NULL, fn, arg)</code> where <code>fn</code> is <code>void *fn(void *)</code>; <code>pthread_join(tid, &amp;result)</code>; <code>pthread_detach(tid)</code>; <code>pthread_self()</code>, <code>pthread_equal(a, b)</code></td><td>Available</td></tr>
+<tr><td>Mutex</td><td><code>std::mutex</code></td><td><code>pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;</code> or <code>pthread_mutex_init(&amp;m, &amp;attr)</code>; <code>pthread_mutex_lock</code>, <code>pthread_mutex_trylock</code> (returns <code>EBUSY</code> when held), <code>pthread_mutex_unlock</code>, <code>pthread_mutex_destroy</code></td><td>Available</td></tr>
+<tr><td>Recursive or error-checking mutex</td><td><code>std::recursive_mutex</code></td><td><code>pthread_mutexattr_init(&amp;attr)</code>, then <code>pthread_mutexattr_settype(&amp;attr, PTHREAD_MUTEX_RECURSIVE)</code> (or <code>PTHREAD_MUTEX_ERRORCHECK</code>, which reports relocking and foreign unlocks); initialize the mutex with the attributes, then <code>pthread_mutexattr_destroy(&amp;attr)</code></td><td>Available</td></tr>
+<tr><td>Timed lock</td><td><code>std::timed_mutex::try_lock_for</code></td><td><code>pthread_mutex_timedlock(&amp;m, &amp;absolute_time)</code></td><td>Missing</td></tr>
+<tr><td>Condition variable</td><td><code>std::condition_variable</code></td><td><code>pthread_cond_t c = PTHREAD_COND_INITIALIZER;</code> <code>pthread_cond_wait(&amp;c, &amp;m)</code> inside a <code>while</code> loop; <code>pthread_cond_signal</code>, <code>pthread_cond_broadcast</code>, <code>pthread_cond_destroy</code></td><td>Available</td></tr>
+<tr><td>Timed wait</td><td><code>wait_until</code></td><td><code>pthread_cond_timedwait(&amp;c, &amp;m, &amp;absolute_time)</code>: an absolute <code>CLOCK_REALTIME</code> time by default, returns <code>ETIMEDOUT</code>. Linux can switch the clock with <code>pthread_condattr_setclock(&amp;a, CLOCK_MONOTONIC)</code>.</td><td>timedwait available; <code>setclock</code> missing (Apple adds <code>pthread_cond_timedwait_relative_np</code>)</td></tr>
+<tr><td>Read-write lock</td><td><code>std::shared_mutex</code></td><td><code>pthread_rwlock_t rw = PTHREAD_RWLOCK_INITIALIZER;</code> <code>pthread_rwlock_rdlock</code>, <code>pthread_rwlock_wrlock</code>, <code>pthread_rwlock_tryrdlock</code>, <code>pthread_rwlock_trywrlock</code>, and one <code>pthread_rwlock_unlock</code> for both</td><td>Available. Reader or writer preference is up to the implementation (glibc prefers readers by default, so writers can starve)</td></tr>
+<tr><td>Barrier</td><td><code>std::barrier</code></td><td><code>pthread_barrier_init(&amp;b, NULL, n)</code>; <code>pthread_barrier_wait(&amp;b)</code> returns <code>PTHREAD_BARRIER_SERIAL_THREAD</code> in exactly one thread and 0 in the others; <code>pthread_barrier_destroy</code></td><td>Missing: build it (below)</td></tr>
+<tr><td>Thread-specific data</td><td><code>thread_local</code></td><td><code>pthread_key_create(&amp;key, destructor)</code>, <code>pthread_setspecific(key, p)</code>, <code>pthread_getspecific(key)</code>, <code>pthread_key_delete</code>; in C11, <code>_Thread_local</code></td><td>Available. Deleting a key does not run its per-thread destructors; finish users before deleting it.</td></tr>
+<tr><td>Run once</td><td><code>std::call_once</code></td><td><code>pthread_once_t once = PTHREAD_ONCE_INIT;</code> <code>pthread_once(&amp;once, init)</code></td><td>Available</td></tr>
+<tr><td>Spinlock</td><td>build one on <code>std::atomic_flag</code></td><td><code>pthread_spin_init</code>, <code>pthread_spin_lock</code>, <code>pthread_spin_unlock</code></td><td>Missing</td></tr>
+<tr><td>Semaphore</td><td><code>std::counting_semaphore</code></td><td>Unnamed: <code>sem_init(&amp;s, 0, n)</code>, <code>sem_wait</code>, <code>sem_trywait</code>, <code>sem_timedwait</code>, <code>sem_post</code>, <code>sem_destroy</code>. Named: <code>sem_open</code>, <code>sem_close</code>, <code>sem_unlink</code>.</td><td><code>sem_init</code> fails with <code>ENOSYS</code> (it compiles, deprecated, then returns -1) and <code>sem_timedwait</code> is missing. Use <code>sem_open</code>, or a mutex plus condition variable semaphore (below)</td></tr>
+<tr><td>Cancellation</td><td><code>std::stop_token</code></td><td><code>pthread_cancel</code> exists; prefer a flag the thread checks</td><td>Available</td></tr>
+</tbody>
+</table>
+
+<p>The C snippets below fail fast on unexpected pthread errors, including partial thread creation; a reusable library would return errors and unwind initialized resources. Assume no <code>pthread_cancel</code>: condition waits are cancellation points, and cancellation-safe C needs cleanup handlers to release a reacquired mutex. Semaphore counts and timeouts must be nonnegative and representable, releases must not overflow the count, and barrier parties must be positive. Destroy synchronization objects only after all callers have finished.</p>
+<figure class="code single" data-sample="cpp-cheat-sheet.5" data-expect="ok"><figcaption><span class="ctitle">Producer and consumer in C with pthreads (plain C that also builds as C++)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80</span><code><span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check_pthread</span>(<span class="t">int</span> rc) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"pthread error: %s\n"</span>, <span class="f">strerror</span>(rc));
+        <span class="f">abort</span>();
+    }
+}
+
+<span class="p">#define CAP 4</span>
+<span class="p">#define ITEMS 1000</span>
+
+<span class="k">static</span> <span class="t">int</span> buf[CAP];
+<span class="k">static</span> <span class="t">int</span> head = <span class="n">0</span>, count = <span class="n">0</span>;                     <span class="c">/* guarded by mu */</span>
+<span class="k">static</span> pthread_mutex_t mu = PTHREAD_MUTEX_INITIALIZER;
+<span class="k">static</span> pthread_cond_t not_full = PTHREAD_COND_INITIALIZER;
+<span class="k">static</span> pthread_cond_t not_empty = PTHREAD_COND_INITIALIZER;
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">put</span>(<span class="t">int</span> v) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;mu));
+    <span class="k">while</span> (count == CAP) {                          <span class="c">/* while, never if */</span>
+        <span class="f">check_pthread</span>(<span class="f">pthread_cond_wait</span>(&amp;not_full, &amp;mu));          <span class="c">/* releases mu while it sleeps */</span>
+    }
+    buf[(head + count) % CAP] = v;
+    count += <span class="n">1</span>;
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_signal</span>(&amp;not_empty));
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;mu));
+}
+
+<span class="k">static</span> <span class="t">int</span> <span class="f">take</span>(<span class="t">void</span>) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;mu));
+    <span class="k">while</span> (count == <span class="n">0</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_cond_wait</span>(&amp;not_empty, &amp;mu));
+    }
+    <span class="t">int</span> v = buf[head];
+    head = (head + <span class="n">1</span>) % CAP;
+    count -= <span class="n">1</span>;
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_signal</span>(&amp;not_full));
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;mu));
+    <span class="k">return</span> v;
+}
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">producer</span>(<span class="t">void</span> *arg) {
+    <span class="t">int</span> id = *(<span class="t">int</span> *)arg;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; ITEMS; i += <span class="n">1</span>) {
+        <span class="f">put</span>(id * ITEMS + i);
+    }
+    <span class="k">return</span> NULL;
+}
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">consumer</span>(<span class="t">void</span> *arg) {
+    <span class="t">long</span> *sum = (<span class="t">long</span> *)arg;                        <span class="c">/* each consumer owns its own slot */</span>
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; ITEMS; i += <span class="n">1</span>) {
+        *sum += <span class="f">take</span>();
+    }
+    <span class="k">return</span> NULL;
+}
+
+<span class="t">int</span> <span class="f">main</span>(<span class="t">void</span>) {
+    pthread_t producers[<span class="n">2</span>], consumers[<span class="n">2</span>];
+    <span class="t">int</span> ids[<span class="n">2</span>] = {<span class="n">0</span>, <span class="n">1</span>};
+    <span class="t">long</span> sums[<span class="n">2</span>] = {<span class="n">0</span>, <span class="n">0</span>};
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_create</span>(&amp;producers[i], NULL, producer, &amp;ids[i]));   <span class="c">/* returns 0 or an error number */</span>
+        <span class="f">check_pthread</span>(<span class="f">pthread_create</span>(&amp;consumers[i], NULL, consumer, &amp;sums[i]));
+    }
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">2</span>; i += <span class="n">1</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_join</span>(producers[i], NULL));
+        <span class="f">check_pthread</span>(<span class="f">pthread_join</span>(consumers[i], NULL));
+    }
+    <span class="t">long</span> expected = <span class="n">0</span>;
+    <span class="k">for</span> (<span class="t">int</span> v = <span class="n">0</span>; v &lt; <span class="n">2</span> * ITEMS; v += <span class="n">1</span>) {
+        expected += v;
+    }
+    <span class="f">printf</span>(<span class="s">"consumed sum %ld, expected %ld\n"</span>, sums[<span class="n">0</span>] + sums[<span class="n">1</span>], expected);
+    <span class="k">return</span> sums[<span class="n">0</span>] + sums[<span class="n">1</span>] == expected ? <span class="n">0</span> : <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="cpp-cheat-sheet.6" data-expect="ok"><figcaption><span class="ctitle">A counting semaphore from a mutex and a condition variable, with a timed acquire (works on macOS)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114</span><code><span class="p">#include &lt;errno.h&gt;</span>
+<span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check_pthread</span>(<span class="t">int</span> rc) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"pthread error: %s\n"</span>, <span class="f">strerror</span>(rc));
+        <span class="f">abort</span>();
+    }
+}
+<span class="p">#include &lt;sched.h&gt;</span>
+<span class="p">#include &lt;time.h&gt;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> {
+    pthread_mutex_t mu;
+    pthread_cond_t cv;
+    <span class="t">int</span> permits;                                    <span class="c">/* guarded by mu */</span>
+} csem;
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">csem_init</span>(csem *s, <span class="t">int</span> permits) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_init</span>(&amp;s-&gt;mu, NULL));
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_init</span>(&amp;s-&gt;cv, NULL));
+    s-&gt;permits = permits;
+}
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">csem_acquire</span>(csem *s) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;mu));
+    <span class="k">while</span> (s-&gt;permits == <span class="n">0</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_cond_wait</span>(&amp;s-&gt;cv, &amp;s-&gt;mu));
+    }
+    s-&gt;permits -= <span class="n">1</span>;
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;mu));
+}
+
+<span class="c">/* Returns the final permit check: a permit racing with timeout may still win. */</span>
+<span class="k">static</span> <span class="t">int</span> <span class="f">csem_try_acquire_ms</span>(csem *s, <span class="t">long</span> ms) {
+    <span class="k">struct</span> timespec deadline;
+    <span class="k">if</span> (<span class="f">clock_gettime</span>(CLOCK_REALTIME, &amp;deadline) != <span class="n">0</span>) <span class="f">abort</span>();       <span class="c">/* timedwait wants an absolute wall clock time */</span>
+    deadline.tv_sec += ms / <span class="n">1000</span>;
+    deadline.tv_nsec += (ms % <span class="n">1000</span>) * <span class="n">1000000L</span>;
+    <span class="k">if</span> (deadline.tv_nsec &gt;= <span class="n">1000000000L</span>) {
+        deadline.tv_sec += <span class="n">1</span>;
+        deadline.tv_nsec -= <span class="n">1000000000L</span>;
+    }
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;mu));
+    <span class="k">while</span> (s-&gt;permits == <span class="n">0</span>) {
+        <span class="t">int</span> rc = <span class="f">pthread_cond_timedwait</span>(&amp;s-&gt;cv, &amp;s-&gt;mu, &amp;deadline);
+        <span class="k">if</span> (rc == ETIMEDOUT) {
+            <span class="k">break</span>;                                  <span class="c">/* out of time: one last look below */</span>
+        }
+        <span class="f">check_pthread</span>(rc);
+    }
+    <span class="t">int</span> got = s-&gt;permits &gt; <span class="n">0</span>;
+    <span class="k">if</span> (got) {
+        s-&gt;permits -= <span class="n">1</span>;
+    }
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;mu));
+    <span class="k">return</span> got;
+}
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">csem_release</span>(csem *s) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;mu));
+    s-&gt;permits += <span class="n">1</span>;
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_signal</span>(&amp;s-&gt;cv));                    <span class="c">/* one permit, one waiter */</span>
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;mu));
+}
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">csem_destroy</span>(csem *s) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_destroy</span>(&amp;s-&gt;cv));
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_destroy</span>(&amp;s-&gt;mu));
+}
+
+<span class="k">static</span> csem pool;
+<span class="k">static</span> pthread_mutex_t stats_mu = PTHREAD_MUTEX_INITIALIZER;
+<span class="k">static</span> <span class="t">int</span> inside = <span class="n">0</span>, most_inside = <span class="n">0</span>;             <span class="c">/* guarded by stats_mu */</span>
+
+<span class="k">static</span> <span class="t">void</span> *<span class="f">worker</span>(<span class="t">void</span> *arg) {
+    (<span class="t">void</span>)arg;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">200</span>; i += <span class="n">1</span>) {
+        <span class="f">csem_acquire</span>(&amp;pool);
+        <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;stats_mu));
+        inside += <span class="n">1</span>;
+        <span class="k">if</span> (inside &gt; most_inside) {
+            most_inside = inside;
+        }
+        <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;stats_mu));
+        <span class="f">sched_yield</span>();                              <span class="c">/* scheduling hint only; no delay or handoff is guaranteed */</span>
+        <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;stats_mu));
+        inside -= <span class="n">1</span>;
+        <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;stats_mu));
+        <span class="f">csem_release</span>(&amp;pool);
+    }
+    <span class="k">return</span> NULL;
+}
+
+<span class="t">int</span> <span class="f">main</span>(<span class="t">void</span>) {
+    <span class="f">csem_init</span>(&amp;pool, <span class="n">2</span>);
+    pthread_t t[<span class="n">6</span>];
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">6</span>; i += <span class="n">1</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_create</span>(&amp;t[i], NULL, worker, NULL));
+    }
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">6</span>; i += <span class="n">1</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_join</span>(t[i], NULL));
+    }
+    <span class="f">printf</span>(<span class="s">"most threads inside at once: %d (never more than the 2 permits)\n"</span>, most_inside);
+    <span class="f">csem_acquire</span>(&amp;pool);
+    <span class="f">csem_acquire</span>(&amp;pool);
+    <span class="t">int</span> got = <span class="f">csem_try_acquire_ms</span>(&amp;pool, <span class="n">50</span>);
+    <span class="f">printf</span>(<span class="s">"try_acquire with no permits left, 50 ms: %s\n"</span>, got ? <span class="s">"got one"</span> : <span class="s">"timed out"</span>);
+    <span class="f">csem_destroy</span>(&amp;pool);
+    <span class="k">return</span> most_inside &gt;= <span class="n">1</span> &amp;&amp; most_inside &lt;= <span class="n">2</span> &amp;&amp; !got ? <span class="n">0</span> : <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The deadline uses <code>CLOCK_REALTIME</code> because that is what <code>pthread_cond_timedwait</code> expects by default, so a wall clock step can stretch or shrink the wait. Mutex acquisition and reacquisition, and scheduling, can also delay the return beyond the deadline; this is not a hard elapsed-time bound. On Linux, set the condition's clock to <code>CLOCK_MONOTONIC</code> and compute the deadline from that clock instead.</p>
+
+<figure class="code single" data-sample="cpp-cheat-sheet.7"><figcaption><span class="ctitle">A reusable barrier, since macOS has no pthread_barrier_t</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45</span><code><span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check_pthread</span>(<span class="t">int</span> rc) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"pthread error: %s\n"</span>, <span class="f">strerror</span>(rc));
+        <span class="f">abort</span>();
+    }
+}
+
+<span class="k">typedef</span> <span class="k">struct</span> {
+    pthread_mutex_t mu;
+    pthread_cond_t cv;
+    <span class="t">int</span> parties, waiting;                           <span class="c">/* guarded by mu */</span>
+    <span class="t">unsigned</span> <span class="t">long</span> generation;                       <span class="c">/* guarded by mu */</span>
+} cbarrier;
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">cbarrier_init</span>(cbarrier *b, <span class="t">int</span> parties) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_init</span>(&amp;b-&gt;mu, NULL));
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_init</span>(&amp;b-&gt;cv, NULL));
+    b-&gt;parties = parties;
+    b-&gt;waiting = <span class="n">0</span>;
+    b-&gt;generation = <span class="n">0</span>;
+}
+
+<span class="c">/* Returns 1 in exactly one thread per round, like PTHREAD_BARRIER_SERIAL_THREAD. */</span>
+<span class="k">static</span> <span class="t">int</span> <span class="f">cbarrier_wait</span>(cbarrier *b) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;b-&gt;mu));
+    <span class="t">unsigned</span> <span class="t">long</span> my_generation = b-&gt;generation;
+    b-&gt;waiting += <span class="n">1</span>;
+    <span class="k">if</span> (b-&gt;waiting == b-&gt;parties) {                 <span class="c">/* last to arrive opens the gate */</span>
+        b-&gt;waiting = <span class="n">0</span>;
+        b-&gt;generation += <span class="n">1</span>;
+        <span class="f">check_pthread</span>(<span class="f">pthread_cond_broadcast</span>(&amp;b-&gt;cv));
+        <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;b-&gt;mu));
+        <span class="k">return</span> <span class="n">1</span>;
+    }
+    <span class="k">while</span> (my_generation == b-&gt;generation) {        <span class="c">/* a new generation means this round is over */</span>
+        <span class="f">check_pthread</span>(<span class="f">pthread_cond_wait</span>(&amp;b-&gt;cv, &amp;b-&gt;mu));
+    }
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;b-&gt;mu));
+    <span class="k">return</span> <span class="n">0</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The generation counter is what makes it reusable: a thread released from round k waits for "the generation changed", not for "waiting is zero", so a fast thread that re-enters for round k+1 cannot be confused with a straggler from round k.</p>
+
+<figure class="code single" data-sample="cpp-cheat-sheet.8"><figcaption><span class="ctitle">Thread-specific data and pthread_once</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check_pthread</span>(<span class="t">int</span> rc) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"pthread error: %s\n"</span>, <span class="f">strerror</span>(rc));
+        <span class="f">abort</span>();
+    }
+}
+
+<span class="k">static</span> pthread_key_t scratch_key;
+<span class="k">static</span> pthread_once_t key_once = PTHREAD_ONCE_INIT;
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">make_key</span>(<span class="t">void</span>) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_key_create</span>(&amp;scratch_key, free));         <span class="c">/* free() runs on non-null values when threads exit normally or by pthread_exit */</span>
+}
+
+<span class="c">/* A 64-byte buffer private to the calling thread. */</span>
+<span class="k">static</span> <span class="t">char</span> *<span class="f">thread_scratch</span>(<span class="t">void</span>) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_once</span>(&amp;key_once, make_key));              <span class="c">/* the key is created exactly once */</span>
+    <span class="t">char</span> *p = (<span class="t">char</span> *)<span class="f">pthread_getspecific</span>(scratch_key);
+    <span class="k">if</span> (p == NULL) {
+        p = (<span class="t">char</span> *)<span class="f">malloc</span>(<span class="n">64</span>);
+        <span class="k">if</span> (p == NULL) <span class="f">abort</span>();
+        <span class="f">check_pthread</span>(<span class="f">pthread_setspecific</span>(scratch_key, p));
+    }
+    <span class="k">return</span> p;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="cpp-cheat-sheet.9"><figcaption><span class="ctitle">A named POSIX semaphore (the kind macOS supports)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="p">#include &lt;errno.h&gt;</span>
+<span class="p">#include &lt;fcntl.h&gt;</span>
+<span class="p">#include &lt;semaphore.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+
+<span class="t">int</span> <span class="f">use_named_semaphore</span>(<span class="t">void</span>) {
+    sem_t *slots = <span class="f">sem_open</span>(<span class="s">"/tandem_slots"</span>, O_CREAT | O_EXCL, <span class="n">0600</span>, <span class="n">3</span>);   <span class="c">/* 3 permits */</span>
+    <span class="k">if</span> (slots == SEM_FAILED) {
+        <span class="f">perror</span>(<span class="s">"sem_open"</span>);
+        <span class="k">return</span> <span class="n">1</span>;
+    }
+    <span class="k">if</span> (<span class="f">sem_unlink</span>(<span class="s">"/tandem_slots"</span>) == -<span class="n">1</span>) {
+        <span class="f">perror</span>(<span class="s">"sem_unlink"</span>);
+        <span class="f">sem_close</span>(slots);
+        <span class="k">return</span> <span class="n">1</span>;
+    }  <span class="c">/* the open handle keeps the semaphore alive */</span>
+    <span class="t">int</span> rc;
+    <span class="k">do</span> { rc = <span class="f">sem_wait</span>(slots); } <span class="k">while</span> (rc == -<span class="n">1</span> &amp;&amp; errno == EINTR);
+    <span class="k">if</span> (rc == -<span class="n">1</span>) {
+        <span class="f">perror</span>(<span class="s">"sem_wait"</span>);
+        <span class="f">sem_close</span>(slots);
+        <span class="k">return</span> <span class="n">1</span>;
+    }
+    <span class="t">int</span> failed = <span class="f">sem_post</span>(slots) == -<span class="n">1</span>;
+    <span class="k">if</span> (failed) <span class="f">perror</span>(<span class="s">"sem_post"</span>);
+    <span class="k">if</span> (<span class="f">sem_close</span>(slots) == -<span class="n">1</span>) { <span class="f">perror</span>(<span class="s">"sem_close"</span>); failed = <span class="n">1</span>; }
+    <span class="k">return</span> failed;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="tools">Tools</h2>
+<ul>
+<li>ThreadSanitizer: compile with <code>-fsanitize=thread -g</code>; it reports observed data races with access stacks. Lock order inversion detection is available on Linux; Apple clang on this Mac does not report those potential deadlocks. AddressSanitizer (<code>-fsanitize=address</code>) catches use after free, which threads make common. See <a href="thread-sanitizer.html">ThreadSanitizer</a>.</li>
+<li>A hung process: in gdb, <code>thread apply all bt</code>; in lldb, <code>bt all</code>. Look for two threads each waiting in a lock call held by the other.</li>
+<li>On supported platforms, commonly Linux, Valgrind's Helgrind and DRD inspect executed accesses without recompiling, with substantial overhead; do not assume they run on this Mac.</li>
+</ul>
+
+<div class="box example">
+<h3>Worked example: close races with a blocked sender</h3>
+<p>A capacity-one channel holds item A. A second sender cannot insert B, so it waits on not-full, releasing the mutex. Closing must reject B but preserve A for a receiver; waking only receivers would leave the sender asleep forever.</p>
+<figure class="timeline"><figcaption>Closing the monitor</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Sender</span><span>Closer</span><span>Receiver</span></div><div class="tl-row"><span class="t">1</span><span class="cell">sees size 1, closed false; waits and releases the mutex</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">locks, sets closed true, unlocks, wakes both wait sets</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">reacquires the mutex, sees closed true, returns false without inserting B</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">locks, sees A despite closed true, removes and returns A</span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">next receive sees closed and empty, returns empty</span></div><div class="tl-note">Close decides admission under the same lock as send; existing items can still drain.</div></div></figure>
+<p>If the sender inserted B before close acquired the mutex, it would be accepted and later drained. Name that decision point. For a timed receive, compute the deadline once; each wakeup consumes the same budget. Neither a deadline nor a notification guarantees prompt scheduling.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Joining only after <code>get()</code>.</strong> A future can rethrow before the join. Use a joining owner, or join first in this one-worker example.</li>
+<li><strong>Assuming a wakeup is permission.</strong> Condition waits re-check a predicate under the lock. Atomic wait instead hides internal spurious wakeups, but can miss a value that changes away and back.</li>
+<li><strong>Stopping while holding the worker's mutex.</strong> A joining destructor can deadlock if the worker needs that mutex to exit. Release it before joining and keep referenced state alive.</li>
+<li><strong>Resetting a timeout after every wakeup.</strong> Reuse one deadline. Cancellation must be part of the wait protocol, not just a flag nobody checks while blocked.</li>
+<li><strong>Confusing lock-free with fast or wait-free.</strong> Measure contention, and separately prove progress and object lifetime before removing a lock.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The C++ reports reward fluency with the basics. A Databricks L4 candidate had to write the durable event writer in full C++ with a mutex, condition variables and <code>std::promise</code> and <code>std::future</code>; a Microsoft L61 candidate answered a multi-producer, multi-consumer question with <code>std::unique_lock</code>, <code>std::mutex</code> and <code>std::condition_variable</code>, then got <code>thread_local</code> questions; Rubrik's debugging round has handed over C++ producer-consumer code; Bloomberg rounds ask mutex versus semaphore and RAII; a Google L4 candidate needed the interviewer's help with C++ thread syntax. Type the monitor from memory, and say which standard each tool needs.</p>
+<blockquote>I will use the predicate form of <code>wait</code>, which loops for me, and a <code>steady_clock</code> deadline with <code>wait_until</code> for the timed version, so spurious wakeups do not restart the budget and wall-clock changes do not change my elapsed-time target. Reacquiring the mutex can still delay return.</blockquote>
+<blockquote><code>std::counting_semaphore</code> is C++20; if this compiler is C++17 or it is off limits, I will build it from a mutex, a condition variable and a count, which is also what I would do in C with pthreads.</blockquote>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>RAII guards always, and always named: <code>std::scoped_lock lock(m);</code>. Join every <code>std::thread</code>, or use <code>std::jthread</code>.</li>
+<li><code>cv.wait(lock, pred)</code> and <code>wait_until(lock, deadline, pred)</code> with <code>steady_clock</code>; change state under the mutex before notifying.</li>
+<li>A data race is undefined behavior; <code>volatile</code> is not synchronization; start with <code>seq_cst</code> and relax only with a reason.</li>
+<li>C++20 adds semaphores, latches, barriers, <code>jthread</code> and stop tokens; know the C++17 builds of each.</li>
+<li>pthreads: most status-returning functions return error numbers directly, waits sit in <code>while</code> loops, and macOS lacks barriers, timed mutex locks, spinlocks and unnamed semaphores.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-cheat-sheet"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-cheat-sheet.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A function creates <code>std::thread t(work);</code> and returns without calling <code>join()</code> or <code>detach()</code>. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The thread keeps running in the background</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The destructor joins the thread</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::terminate()</code> is called, ending the program</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing, if <code>work</code> has already finished</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Destroying a <code>std::thread</code> that is still joinable terminates the program, even if the thread's function has finished, because the thread object still owns that thread until it is joined, detached or moved from. <code>std::jthread</code> (C++20) joins in its destructor instead.</div></div><div class="mcq" data-id="cpp-cheat-sheet.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Assuming thread creation succeeds, what does this line do: <code>std::async(std::launch::async, flushToDisk);</code>, written as a statement on its own?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Starts <code>flushToDisk</code> in the background and returns at once</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Starts <code>flushToDisk</code> on a new thread and then waits for it at the end of the statement, because the temporary future's destructor blocks</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Does nothing until someone calls <code>get()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Fails to compile because the future is discarded</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Here the temporary is the last reference to an async-launched state, so its destruction waits for completion. Explicit <code>launch::async</code> rules out deferral; discarding the future is legal, though it can produce a warning. A promise-backed future does not have this blocking guarantee. The call is effectively synchronous, but a task exception remains in the discarded state rather than reaching the caller: retain the future and call <code>get()</code> to observe failure.</div></div><div class="mcq" data-id="cpp-cheat-sheet.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Inside a method, a developer writes <code>std::unique_lock&lt;std::mutex&gt;(m);</code> intending to lock the member mutex <code>m</code>. What actually happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It locks <code>m</code> until the end of the scope</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It locks <code>m</code> and unlocks it immediately</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It declares a new, empty <code>unique_lock</code> named <code>m</code> that hides the mutex, so nothing is locked</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The parentheses are parsed as a declaration: a variable named <code>m</code> of type <code>unique_lock</code>, default constructed, owning no mutex. Clang warns about the vexing parse but compiles it. Name the guard: <code>std::unique_lock&lt;std::mutex&gt; lock(m);</code>.</div></div><div class="mcq" data-id="cpp-cheat-sheet.q4" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">In C++20, <code>std::atomic&lt;int&gt; counter{3}; int expected = 3;</code> is followed by <code>bool ok = counter.compare_exchange_weak(expected, expected + 1);</code>. With no other writers, which triples <code>ok, expected, counter.load()</code> are permitted by the standard? Select all that apply; print booleans as 0 or 1.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>1, 3, 4</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>0, 3, 3</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>0, 4, 3</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>1, 4, 4</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Success stores 4 in the atomic and leaves <code>expected</code> unchanged at 3. Weak CAS may fail spuriously even when values match; failure loads the observed 3 into <code>expected</code> and leaves the atomic at 3. Neither path stores the desired 4 in <code>expected</code>. With competing writers, a failed CAS supplies an observed value that may immediately become stale; a loop recomputes its desired value and retries without needing an extra load.</div></div><div class="mcq" data-id="cpp-cheat-sheet.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Spot the wait bug in this pthreads consumer fragment. Assume the pthread calls succeed; the surrounding function unlocks <code>mu</code> after removing the item.
+<figure class="code single" data-sample="cpp-cheat-sheet.10"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="f">pthread_mutex_lock</span>(&amp;mu);
+<span class="k">if</span> (count == <span class="n">0</span>) {
+    <span class="f">pthread_cond_wait</span>(&amp;not_empty, &amp;mu);
+}
+<span class="t">int</span> v = buf[head];</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>pthread_cond_wait</code> must be called without holding <code>mu</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The wait must be in a <code>while</code> loop: after a spurious wakeup, or if another consumer took the item first, <code>count</code> can still be 0</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>pthread_cond_signal</code> must be called before waiting</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing; <code>if</code> is fine with pthreads</span></button></li></ol><div class="why" hidden><strong>Why.</strong> POSIX allows spurious wakeups, and with several consumers a woken thread can lose the item to another that took the mutex first. <code>while (count == 0)</code> re-checks every time; an <code>if</code> does not. Holding the mutex while calling <code>pthread_cond_wait</code> is required: the call atomically releases it and begins waiting, then reacquires it before returning. Signalling before waiting neither stores a permit nor fixes the missing predicate check.</div></div><div class="mcq" data-id="cpp-cheat-sheet.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A C program for a round calls <code>sem_init(&amp;s, 0, 3)</code> and runs on a Mac. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It works the same as on Linux</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>sem_init</code> returns -1 with <code>errno</code> set to <code>ENOSYS</code>: unnamed POSIX semaphores are not supported, so use <code>sem_open</code> or a mutex plus condition variable semaphore</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It fails to compile</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It creates a binary semaphore instead</span></button></li></ol><div class="why" hidden><strong>Why.</strong> macOS declares <code>sem_init</code> (deprecated) but does not implement it, so the failure shows up only at run time, and code that ignores the return value then uses an invalid semaphore. Named semaphores via <code>sem_open</code> work, and the mutex plus condition variable build works everywhere.</div></div><div class="mcq" data-id="cpp-cheat-sheet.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>pthread_mutex_lock(&amp;m)</code> returns <code>EDEADLK</code> for a valid error-checking mutex. Where is that error reported?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">In <code>errno</code>, after the call returns -1</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">In the return value itself, which is an error number such as <code>EDEADLK</code>; pthreads functions do not set <code>errno</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Through <code>pthread_getspecific</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It cannot fail</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>pthread_mutex_lock</code> reports this error in its return value, not <code>errno</code> or thread-local storage. Status-returning pthread calls generally use this convention, but identity and data accessors differ. Most semaphore operations return -1 on failure and set <code>errno</code>; <code>sem_open</code> returns <code>SEM_FAILED</code>.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-cheat-sheet.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">In C with pthreads, write a counting semaphore with <code>acquire</code>, <code>release</code> and a timed acquire in milliseconds, using the default condition-variable clock. It must work on macOS. Assume nonnegative, representable counts and timeouts, no overflow on release, and no thread cancellation; explain why the timeout is not a hard return-time guarantee.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-cheat-sheet.11"><figcaption><span class="ctitle">Counting semaphore in C</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66</span><code><span class="p">#include &lt;errno.h&gt;</span>
+<span class="p">#include &lt;pthread.h&gt;</span>
+<span class="p">#include &lt;stdlib.h&gt;</span>
+<span class="p">#include &lt;stdio.h&gt;</span>
+<span class="p">#include &lt;string.h&gt;</span>
+
+<span class="k">static</span> <span class="t">void</span> <span class="f">check_pthread</span>(<span class="t">int</span> rc) {
+    <span class="k">if</span> (rc != <span class="n">0</span>) {
+        <span class="f">fprintf</span>(stderr, <span class="s">"pthread error: %s\n"</span>, <span class="f">strerror</span>(rc));
+        <span class="f">abort</span>();
+    }
+}
+<span class="p">#include &lt;time.h&gt;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> {
+    pthread_mutex_t mu;
+    pthread_cond_t cv;
+    <span class="t">int</span> permits;                                    <span class="c">/* guarded by mu */</span>
+} csem;
+
+<span class="t">void</span> <span class="f">csem_init</span>(csem *s, <span class="t">int</span> permits) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_init</span>(&amp;s-&gt;mu, NULL));
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_init</span>(&amp;s-&gt;cv, NULL));
+    s-&gt;permits = permits;
+}
+
+<span class="t">void</span> <span class="f">csem_acquire</span>(csem *s) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;mu));
+    <span class="k">while</span> (s-&gt;permits == <span class="n">0</span>) {
+        <span class="f">check_pthread</span>(<span class="f">pthread_cond_wait</span>(&amp;s-&gt;cv, &amp;s-&gt;mu));
+    }
+    s-&gt;permits -= <span class="n">1</span>;
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;mu));
+}
+
+<span class="t">int</span> <span class="f">csem_try_acquire_ms</span>(csem *s, <span class="t">long</span> ms) {
+    <span class="k">struct</span> timespec deadline;
+    <span class="k">if</span> (<span class="f">clock_gettime</span>(CLOCK_REALTIME, &amp;deadline) != <span class="n">0</span>) <span class="f">abort</span>();
+    deadline.tv_sec += ms / <span class="n">1000</span>;
+    deadline.tv_nsec += (ms % <span class="n">1000</span>) * <span class="n">1000000L</span>;
+    <span class="k">if</span> (deadline.tv_nsec &gt;= <span class="n">1000000000L</span>) {
+        deadline.tv_sec += <span class="n">1</span>;
+        deadline.tv_nsec -= <span class="n">1000000000L</span>;
+    }
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;mu));
+    <span class="k">while</span> (s-&gt;permits == <span class="n">0</span>) {
+        <span class="t">int</span> rc = <span class="f">pthread_cond_timedwait</span>(&amp;s-&gt;cv, &amp;s-&gt;mu, &amp;deadline);
+        <span class="k">if</span> (rc == ETIMEDOUT) {
+            <span class="k">break</span>;
+        }
+        <span class="f">check_pthread</span>(rc);
+    }
+    <span class="t">int</span> got = s-&gt;permits &gt; <span class="n">0</span>;
+    <span class="k">if</span> (got) {
+        s-&gt;permits -= <span class="n">1</span>;
+    }
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;mu));
+    <span class="k">return</span> got;
+}
+
+<span class="t">void</span> <span class="f">csem_release</span>(csem *s) {
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_lock</span>(&amp;s-&gt;mu));
+    s-&gt;permits += <span class="n">1</span>;
+    <span class="f">check_pthread</span>(<span class="f">pthread_cond_signal</span>(&amp;s-&gt;cv));
+    <span class="f">check_pthread</span>(<span class="f">pthread_mutex_unlock</span>(&amp;s-&gt;mu));
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Points to say: the count is the state and the mutex guards it; waits are in <code>while</code> loops; the timed version computes an absolute deadline once, so repeated wakeups do not restart the budget (wall-clock changes and mutex reacquisition can still extend elapsed time); after a timeout it looks once more, because a permit may have arrived at the last moment; <code>release</code> signals one waiter because one permit can satisfy one waiter. It avoids <code>sem_init</code>, which macOS does not implement.</p></div></div><div class="cq" data-q="cpp-cheat-sheet.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Map a Java <code>ReentrantLock</code> with two <code>Condition</code>s and a <code>Semaphore</code> onto C++20 and onto pthreads, assuming the Java lock is never acquired recursively, and name one behavior that differs.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p><code>ReentrantLock</code> maps to <code>std::mutex</code> held through <code>std::unique_lock</code>, and to <code>pthread_mutex_t</code>. Each <code>Condition</code> maps to a <code>std::condition_variable</code> and to a <code>pthread_cond_t</code>, all used with that one mutex. <code>await</code> is <code>cv.wait(lock, pred)</code> or <code>pthread_cond_wait</code> in a <code>while</code> loop; <code>awaitNanos</code> is <code>wait_until</code> with a <code>steady_clock</code> deadline or <code>pthread_cond_timedwait</code> with an absolute time; <code>signal</code> and <code>signalAll</code> are <code>notify_one</code> and <code>notify_all</code>, or <code>pthread_cond_signal</code> and <code>pthread_cond_broadcast</code>. The <code>Semaphore</code> maps to <code>std::counting_semaphore</code> in C++20 and to <code>sem_t</code> in POSIX, or to a mutex, condition variable and count where those are unavailable (C++17, or macOS for unnamed POSIX semaphores).</p>
+<p>Differences worth naming: <code>ReentrantLock</code> is reentrant and <code>std::mutex</code> is not (relocking it is undefined behavior; a <code>PTHREAD_MUTEX_RECURSIVE</code> mutex is the pthreads equivalent); Java's <code>lockInterruptibly</code> has no direct C++ equivalent, where cancellation is cooperative through <code>std::stop_token</code>; and <code>pthread_cond_timedwait</code> uses a wall clock deadline by default while <code>awaitNanos</code> measures elapsed time.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-cheat-sheet.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"This worker hangs when its owner is destroyed. Walk me through what you would check in the C++ shutdown path."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A joinable jthread requests stop and joins, but stop is cooperative and destruction can block</li><li>Check whether the owner holds a mutex the worker needs before joining</li><li>Check ordinary condition waits and blocking I/O for a cancellation path</li><li>A stop-aware condition_variable_any wait returns the predicate value, so explicitly choose stop versus pending work</li><li>Stop admission, wake waiters, join users, then destroy shared state; define drain or discard</li><li>Test idle shutdown and pending work under a process timeout, and run ThreadSanitizer</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first check what the worker is waiting for and whether shutdown can release that wait. A joining thread owner gives me lifetime management, not guaranteed termination. A joinable <code>std::jthread</code> requests stop and then joins, but the worker must cooperate. If the destructor holds the queue mutex while joining, and the worker needs that mutex to exit, I have created a deadlock. I would release the mutex before joining. Next I would inspect the wait. An ordinary condition variable does not wake merely because a stop token changed. I need a closed flag in the protected predicate and notifications, or a stop-aware condition variable wait. That stop-aware wait returns the predicate value, so pending work can make it return true even after stop. I must explicitly choose whether cancellation wins or accepted work drains. A token also cannot interrupt arbitrary blocking I/O; that needs its own cancellation or timeout mechanism. Finally, the queue, mutex and captured references must stay alive until all users have finished. My sequence is stop admission, publish shutdown, wake waiters, join, then destroy state. I would test both an idle worker and pending work, bound the test process runtime, and use ThreadSanitizer for observed data races.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if shutdown must drain every accepted task, including one that throws?</span></p></div></div><div class="sq" data-sq="cpp-cheat-sheet.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Can I replace this condition-variable wait with C++20 atomic wait? What changes?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Atomic wait fits a condition expressed by one atomic value, while a mutex predicate can cover several fields</li><li>wait(old) returns only after observing a different value and hides internal spurious wakeups</li><li>A transient change away and back can be missed, so use a generation counter when appropriate</li><li>Store the new state before notifying, and use release/acquire if publishing other data</li><li>Atomic wait has no standard timed or stop-token overload in C++20; lifetime still needs a protocol</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I can use atomic wait if one atomic value expresses the condition I need to observe. For a queue whose size and closed flag form one invariant, a mutex and condition variable are usually clearer. Atomic wait takes an old value and returns only after observing a different one. It hides internal spurious wakeups, unlike a raw condition wait. But if a value changes away and back before I observe it, I can miss that transition. A generation counter can represent progress more reliably, provided I address wraparound. The producer stores the new state before notifying. If that state publishes other data, I also need the appropriate release and acquire ordering; notification alone is not the publication mechanism. C++20 atomic wait has no timed or stop-token overload. I would keep the condition-variable design if those requirements matter, and preserve the atomic object's lifetime until every user finishes.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Does seeing the published pointer also guarantee that the pointed-to object remains alive?</span></p></div></div><div class="sq" data-sq="cpp-cheat-sheet.s3" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"You only have C and pthreads on this Mac. Build me a semaphore that can time out, and explain the traps."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Use a nonnegative permit count, mutex and condition variable; macOS sem_init fails with ENOSYS</li><li>Acquire loops while the count is zero, then decrements under the mutex; release increments and signals</li><li>Compute one absolute deadline with the condition variable's clock, and re-check the count even on timeout</li><li>CLOCK_REALTIME can jump, and mutex reacquisition can delay return past the deadline</li><li>Handle pthread return codes directly, unlike semaphore errno conventions; define cancellation and overflow policy</li><li>Join all users before destroying the semaphore and test permit bounds, wakeups and timeout races</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would implement the semaphore with a permit count, a mutex and a condition variable. On this Mac, unnamed POSIX semaphores are unavailable: <code>sem_init</code> reports failure with ENOSYS. Named semaphores are another option, but the monitor implementation also lets me explain timed acquisition. Acquire takes the mutex, waits in a loop while the count is zero, then decrements before unlocking. Release increments under the same mutex and signals a waiter. The count remembers permits; the signal itself does not. For timeout, I compute one absolute deadline before entering the wait loop, using the condition variable's configured clock. The default is realtime, so a clock adjustment can change elapsed waiting time. I do not restart the deadline after a wakeup. Even when timed wait reports timeout, I inspect the count under the mutex once more, because a release may have raced with that timeout. Reacquiring the mutex can also delay return, so I would not promise an exact wall-clock bound. I handle pthread errors from return values directly and define valid counts, overflow and cancellation policy. Finally, all users must finish before destruction. I would test the maximum number inside, blocked acquisition followed by release, empty timeout, and a release racing with expiry.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you provide a monotonic timeout on Linux, and what is different on macOS?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-semaphore-from-scratch.html" data-problem="semaphore-from-scratch"><span class="pk">Build a primitive · warm-up</span><b>Semaphore from scratch</b><span class="pst"></span></a><a class="pcard" href="p-cyclic-barrier-from-scratch.html" data-problem="cyclic-barrier-from-scratch"><span class="pk">Build a primitive · medium</span><b>CyclicBarrier from scratch</b><span class="pst"></span></a><a class="pcard" href="p-read-write-lock.html" data-problem="read-write-lock"><span class="pk">Build a primitive · medium</span><b>Read-write lock, writer preferring</b><span class="pst"></span></a><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-cheat-sheet.html"><span>Previous</span><b>Java concurrency cheat sheet</b></a><a class="next" href="phrasing-bank.html"><span>Next</span><b>Saying it like a senior</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#threads">Threads</a><a href="#mutexes-and-lock-guards">Mutexes and lock guards</a><a href="#condition-variables">Condition variables</a><a href="#atomics-and-memory-order">Atomics and memory order</a><a href="#c-20-synchronizers">C++20 synchronizers</a><a href="#futures-and-one-time-initialization">Futures and one-time initialization</a><a href="#idioms-to-type-from-memory">Idioms to type from memory</a><a href="#posix-threads-the-c-only-round">POSIX threads: the C-only round</a><a href="#tools">Tools</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

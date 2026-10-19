@@ -1,0 +1,538 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Copy, move and move-only types · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-move-semantics" data-title="Copy, move and move-only types" data-track="cpp" data-module="cpp-2" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details open><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics" class=here><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m2">Module 02: Modern C++ every day</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 02.1</span><span>22 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Copy, move and move-only types</h1><p class="lsum">lvalues and rvalues, std::move, move constructors, moved-from objects, and the move-only types of threaded C++: threads, locks, owning pointers and promises.</p><div class="asked"><span>Asked at</span><span class="co">Adobe</span></div><div class="prereq"><span>Before this:</span><a href="cpp-classes-raii.html">Classes, constructors, destructors and RAII</a></div></header><article class="prose" id="article">
+<p class="lead">Threads, locks, futures and owning pointers in C++ can change hands but can never be duplicated. <a class="term" data-term="move-semantics" href="glossary.html#move-semantics">Move semantics</a> is how ownership of a thread, a lock or a result travels between functions and between threads, and it is why handing data to another thread can be both cheap and free of sharing.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>You can photocopy a letter as often as you like. You cannot photocopy the one key the landlord gave you for your flat: you can only hand it over, and after that it is no longer in your pocket. A <strong>copy</strong> duplicates; a <strong>move</strong> hands over and leaves you empty handed.</p>
+<p>Moving is also how you relocate a big library cheaply. Instead of copying every book into a new building, you hand over the keys to the old building. The books never move; only the right to use them does. That is why moving a vector of a million elements costs about as much as moving three pointers.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><code>std::thread</code>, <code>std::jthread</code>, <code>std::unique_lock</code>, <code>std::unique_ptr</code>, <code>std::promise</code>, <code>std::future</code> and <code>std::packaged_task</code> are <strong>move-only</strong>. You store threads in a vector, return them from functions and pass promises into workers by moving them.</li>
+<li><strong>Moving data into a thread transfers ownership</strong>: the thread has it, you do not, so there is nothing to share and nothing to lock. It is the cleanest fix for the dangling reference bugs of the lifetime lesson.</li>
+<li>A moved-from object is still alive. Knowing exactly what state it is in (a moved-from thread is not joinable, a moved-from lock owns nothing) prevents a class of crashes.</li>
+<li>Moving instead of copying keeps critical sections short: pushing a large object into a shared queue under a lock should move a pointer, not copy megabytes.</li>
+<li>At Databricks, one 2025 candidate wrote the durable event writer in C++ with <code>std::promise</code> and <code>std::future</code>, one promise per event. A promise can only be moved, so every one of those hand-offs is a move.</li>
+</ul>
+</div>
+
+<h2 id="copying-is-the-default-and-it-has-a-price">Copying is the default, and it has a price</h2>
+<p>From the values lesson: <code>std::vector&lt;int&gt; b = a;</code> copies every element. That independence is what makes copies safe, and the cost is real: copying a million <code>int</code> values copies about 4 MB and touches every cache line. When the source is about to be thrown away anyway, a temporary or a local you are returning, copying is pure waste. C++11 added a way to say "I am done with this; take its insides".</p>
+
+<h2 id="lvalues-and-rvalues">lvalues and rvalues</h2>
+<p>Every expression has a <a class="term" data-term="value-category" href="glossary.html#value-category">value category</a>. Two questions decide it: does it have an identity (a name, an address you can come back to), and may its resources be stolen?</p>
+<table>
+<thead><tr><th>Category</th><th>Has identity</th><th>Can be moved from</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td>lvalue</td><td>Yes</td><td>Only if you ask with <code>std::move</code></td><td><code>x</code>, <code>v[0]</code>, <code>*p</code>, a call to a function returning <code>T&amp;</code></td></tr>
+<tr><td>xvalue ("expiring")</td><td>Yes</td><td>Yes</td><td><code>std::move(x)</code>, a call to a function returning <code>T&amp;&amp;</code></td></tr>
+<tr><td>prvalue ("pure" temporary)</td><td>No</td><td>Yes</td><td><code>42</code>, <code>a + b</code>, <code>std::string(&quot;hi&quot;)</code>, a call to a function returning <code>T</code> by value</td></tr>
+</tbody>
+</table>
+<p>xvalues and prvalues together are called <strong>rvalues</strong>: things you are allowed to move from. The short version: an lvalue is something with a name you might use again; an rvalue is a temporary nobody else can see, or an object you have declared you are finished with.</p>
+
+<h2 id="rvalue-references-and-overload-resolution">Rvalue references and overload resolution</h2>
+<p>An <a class="term" data-term="rvalue-reference" href="glossary.html#rvalue-reference">rvalue reference</a>, written <code>T&amp;&amp;</code>, binds only to rvalues. Overloading on <code>const T&amp;</code> versus <code>T&amp;&amp;</code> lets a function, or a constructor, pick a cheap path when the argument is expendable. That is exactly how the library chooses between a copy constructor and a move constructor.</p>
+
+<figure class="code single" data-sample="cpp-move-semantics.1" data-expect="ok"><figcaption><span class="ctitle">Which overload runs?</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">void</span> <span class="f">take</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;) { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"take(const std::string&amp;): an lvalue\n"</span>; }
+<span class="t">void</span> <span class="f">take</span>(<span class="t">std</span>::<span class="t">string</span>&amp;&amp;) { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"take(std::string&amp;&amp;): an rvalue\n"</span>; }
+
+<span class="t">void</span> <span class="f">pass_along</span>(<span class="t">std</span>::<span class="t">string</span>&amp;&amp; s) {
+    <span class="f">take</span>(s);              <span class="c">// s has a name, so it is an lvalue, even though its type is std::string&amp;&amp;</span>
+    <span class="f">take</span>(<span class="t">std</span>::<span class="f">move</span>(s));   <span class="c">// to move it on, cast it again</span>
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">string</span> name = <span class="s">"Asha"</span>;
+    <span class="f">take</span>(name);                      <span class="c">// a named variable: lvalue</span>
+    <span class="f">take</span>(<span class="t">std</span>::<span class="t">string</span>(<span class="s">"Ravi"</span>));       <span class="c">// a temporary: rvalue</span>
+    <span class="f">take</span>(<span class="t">std</span>::<span class="f">move</span>(name));           <span class="c">// std::move casts name to an rvalue; nothing has moved yet</span>
+    <span class="f">pass_along</span>(<span class="t">std</span>::<span class="t">string</span>(<span class="s">"Zoya"</span>));
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Look at the last two lines of output. Inside <code>pass_along</code>, the parameter <code>s</code> has type <code>std::string&amp;&amp;</code>, yet <code>take(s)</code> picks the lvalue overload. <strong>A named rvalue reference is itself an lvalue</strong>, because it has a name and you could use it again on the next line. To pass it on as an rvalue you must say <code>std::move</code> again.</p>
+
+<h2 id="std-move-is-a-cast-not-a-move">std::move is a cast, not a move</h2>
+<p><code>std::move(x)</code> does nothing at run time. It is a cast to <code>T&amp;&amp;</code> that says "you may steal from <code>x</code>". The actual move happens later, if and when a move constructor or move assignment receives that rvalue. Two consequences:</p>
+<ul>
+<li>If the type has no move constructor, the rvalue binds to the copy constructor and you get a copy. No error, no warning.</li>
+<li><strong><code>std::move</code> preserves constness.</strong> The cast produces <code>const T&amp;&amp;</code>, which cannot bind to an ordinary move constructor's <code>T&amp;&amp;</code>. A copyable type such as <code>std::string</code> falls back to its <code>const T&amp;</code> copy constructor; a move-only type such as <code>std::unique_ptr</code> cannot be transferred this way and fails to compile.</li>
+</ul>
+
+<figure class="code single" data-sample="cpp-move-semantics.2"><figcaption><span class="ctitle">A move that silently copies</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><code><span class="k">const</span> <span class="t">std</span>::<span class="t">string</span> config = <span class="f">load_config</span>();
+<span class="t">std</span>::<span class="t">string</span> mine = <span class="t">std</span>::<span class="f">move</span>(config);   <span class="c">// compiles, and COPIES: const std::string&amp;&amp; picks the copy constructor</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="writing-a-move-constructor">Writing a move constructor</h2>
+<p>Under the rule of zero you rarely write one: <code>std::vector</code>, <code>std::string</code> and <code>std::unique_ptr</code> members move themselves. You write one when your class owns a raw resource, such as an operating system handle. Here is the canonical shape, a <a class="term" data-term="move-only-type" href="glossary.html#move-only-type">move-only type</a> that owns a file descriptor:</p>
+
+<figure class="code single" data-sample="cpp-move-semantics.3"><figcaption><span class="ctitle">A move-only owner of a file descriptor</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">class</span> FileHandle {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">FileHandle</span>(<span class="t">int</span> fd) : <span class="f">fd_</span>(fd) {}
+    ~<span class="f">FileHandle</span>() {
+        <span class="k">if</span> (fd_ &gt;= <span class="n">0</span>) {
+            ::<span class="f">close</span>(fd_);
+        }
+    }
+
+    <span class="f">FileHandle</span>(<span class="k">const</span> FileHandle&amp;) = <span class="k">delete</span>;              <span class="c">// two owners would close the descriptor twice</span>
+    FileHandle&amp; <span class="k">operator</span>=(<span class="k">const</span> FileHandle&amp;) = <span class="k">delete</span>;
+
+    <span class="f">FileHandle</span>(FileHandle&amp;&amp; other) <span class="k">noexcept</span> : <span class="f">fd_</span>(<span class="t">std</span>::<span class="f">exchange</span>(other.fd_, -<span class="n">1</span>)) {}   <span class="c">// steal, leave -1 behind</span>
+
+    FileHandle&amp; <span class="k">operator</span>=(FileHandle&amp;&amp; other) <span class="k">noexcept</span> {
+        <span class="k">if</span> (<span class="k">this</span> != &amp;other) {
+            <span class="k">if</span> (fd_ &gt;= <span class="n">0</span>) {
+                ::<span class="f">close</span>(fd_);                            <span class="c">// release what this object held</span>
+            }
+            fd_ = <span class="t">std</span>::<span class="f">exchange</span>(other.fd_, -<span class="n">1</span>);
+        }
+        <span class="k">return</span> *<span class="k">this</span>;
+    }
+
+    <span class="t">int</span> <span class="f">get</span>() <span class="k">const</span> { <span class="k">return</span> fd_; }
+
+<span class="k">private</span>:
+    <span class="t">int</span> fd_;                                             <span class="c">// -1 means "owns nothing"</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<ul>
+<li><code>std::exchange(other.fd_, -1)</code> takes the old value and leaves the source owning nothing, so its destructor does no harm.</li>
+<li>Copies are deleted, so the type is move-only, exactly like <code>std::thread</code>.</li>
+<li>Both moves are <code>noexcept</code>. That is not decoration. During reallocation, <code>std::vector</code> can use a nonthrowing move, or fall back to copying a copyable type whose move might throw. If copying is unavailable, it must use the move even if it can throw; a failure can then waive the strong exception guarantee. Mark a move <code>noexcept</code> only when it really cannot throw.</li>
+</ul>
+
+<h2 id="the-moved-from-state">The moved-from state</h2>
+<p>A <a class="term" data-term="moved-from-state" href="glossary.html#moved-from-state">moved-from object</a> is still a live object: its destructor will run, and you may assign it a new value. For standard library types the general promise is <strong>valid but unspecified</strong>: you may call functions with no preconditions (<code>size()</code>, <code>empty()</code>, <code>clear()</code>) and assign to it, but you must not rely on its value. A moved-from <code>std::string</code> is usually empty in practice, and nothing guarantees it.</p>
+<p>The types you use with threads make specific promises, and these are worth memorizing:</p>
+
+<figure class="code single" data-sample="cpp-move-semantics.4" data-expect="ok"><figcaption><span class="ctitle">What moving leaves behind</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="t">std</span>::boolalpha;
+
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t1</span>([] {});
+    <span class="t">std</span>::<span class="t">thread</span> t2 = <span class="t">std</span>::<span class="f">move</span>(t1);                         <span class="c">// the running thread now belongs to t2</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"t1 joinable: "</span> &lt;&lt; t1.<span class="f">joinable</span>() &lt;&lt; <span class="s">", t2 joinable: "</span> &lt;&lt; t2.<span class="f">joinable</span>() &lt;&lt; <span class="s">"\n"</span>;
+    t2.<span class="f">join</span>();
+
+    <span class="k">auto</span> p1 = <span class="t">std</span>::<span class="t">make_unique</span>&lt;<span class="t">int</span>&gt;(<span class="n">42</span>);
+    <span class="k">auto</span> p2 = <span class="t">std</span>::<span class="f">move</span>(p1);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"p1 is "</span> &lt;&lt; (p1 ? <span class="s">"set"</span> : <span class="s">"null"</span>) &lt;&lt; <span class="s">", *p2 = "</span> &lt;&lt; *p2 &lt;&lt; <span class="s">"\n"</span>;
+
+    <span class="t">std</span>::<span class="t">mutex</span> m;
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock1</span>(m);
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; lock2 = <span class="t">std</span>::<span class="f">move</span>(lock1);  <span class="c">// ownership of the lock moves</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"lock1 owns: "</span> &lt;&lt; lock1.<span class="f">owns_lock</span>() &lt;&lt; <span class="s">", lock2 owns: "</span> &lt;&lt; lock2.<span class="f">owns_lock</span>() &lt;&lt; <span class="s">"\n"</span>;
+
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; pr;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; f1 = pr.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; f2 = <span class="t">std</span>::<span class="f">move</span>(f1);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"f1 valid: "</span> &lt;&lt; f1.<span class="f">valid</span>() &lt;&lt; <span class="s">", f2 valid: "</span> &lt;&lt; f2.<span class="f">valid</span>() &lt;&lt; <span class="s">"\n"</span>;
+    pr.<span class="f">set_value</span>(<span class="n">7</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"f2.get() = "</span> &lt;&lt; f2.<span class="f">get</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<table>
+<thead><tr><th>Moved-from type</th><th>Guaranteed state</th></tr></thead>
+<tbody>
+<tr><td><code>std::thread</code>, <code>std::jthread</code></td><td>No thread: <code>joinable()</code> is false. Calling <code>join()</code> on it throws.</td></tr>
+<tr><td><code>std::unique_lock</code></td><td>No mutex and no ownership: <code>owns_lock()</code> is false, and its destructor unlocks nothing.</td></tr>
+<tr><td><code>std::unique_ptr</code></td><td>Null</td></tr>
+<tr><td><code>std::shared_ptr</code></td><td>Empty: null, <code>use_count()</code> is 0</td></tr>
+<tr><td><code>std::future</code></td><td><code>valid()</code> is false; calling <code>get()</code> is undefined behavior</td></tr>
+<tr><td><code>std::promise</code></td><td>No shared state: <code>set_value</code> on it throws</td></tr>
+<tr><td><code>std::string</code>, <code>std::vector</code></td><td>Valid but unspecified: queries such as <code>empty()</code> are safe; satisfy each operation's preconditions, or assign a new value</td></tr>
+</tbody>
+</table>
+
+<h2 id="move-only-types-in-threaded-code">Move-only types in threaded code</h2>
+<p>Each of these is move-only for the same reason: it represents something that must have <strong>exactly one owner</strong>. Two copies of a <code>std::thread</code> would mean two objects that could both join one thread. Two copies of a <code>std::unique_lock</code> would both unlock the mutex.</p>
+<table>
+<thead><tr><th>Type</th><th>Owns</th><th>Why there can be only one</th></tr></thead>
+<tbody>
+<tr><td><code>std::thread</code>, <code>std::jthread</code></td><td>One running thread</td><td>Exactly one object may join or detach it</td></tr>
+<tr><td><code>std::unique_lock</code></td><td>The right to unlock a mutex</td><td>A mutex is unlocked once per lock</td></tr>
+<tr><td><code>std::unique_ptr</code></td><td>One heap object</td><td>Exactly one delete</td></tr>
+<tr><td><code>std::promise</code>, <code>std::packaged_task</code></td><td>The producer end of one result</td><td>A result is set once</td></tr>
+<tr><td><code>std::future</code></td><td>The consumer end of one result</td><td><code>get()</code> can be called once; <code>std::shared_future</code> is the copyable version</td></tr>
+</tbody>
+</table>
+<p>Do not confuse move-only with immovable. <code>std::mutex</code>, <code>std::condition_variable</code> and <code>std::atomic</code> can be <em>neither</em> copied nor moved: other threads refer to them by address, so their address must never change while anyone might use them.</p>
+
+<h2 id="passing-move-only-values-into-threads">Passing move-only values into threads</h2>
+<p>The thread constructor moves its arguments into the new thread's storage when you pass rvalues, so move-only arguments work as long as you <code>std::move</code> them. Here a worker takes ownership of the data and hands its result back through a promise; nothing is shared, so nothing needs a lock.</p>
+
+<figure class="code single" data-sample="cpp-move-semantics.5" data-expect="ok"><figcaption><span class="ctitle">Move the data in, move the result out</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">auto</span> data = <span class="t">std</span>::<span class="t">make_unique</span>&lt;<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;&gt;(<span class="n">1000</span>);
+    <span class="t">std</span>::<span class="f">iota</span>(data-&gt;<span class="f">begin</span>(), data-&gt;<span class="f">end</span>(), <span class="n">1</span>);            <span class="c">// 1, 2, ..., 1000</span>
+
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">long</span>&gt; result;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">long</span>&gt; answer = result.<span class="f">get_future</span>();
+
+    <span class="c">// Both arguments are move-only, so they must be moved into the thread.</span>
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">worker</span>([](<span class="t">std</span>::<span class="t">unique_ptr</span>&lt;<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;&gt; v, <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">long</span>&gt; out) {
+        out.<span class="f">set_value</span>(<span class="t">std</span>::<span class="f">accumulate</span>(v-&gt;<span class="f">begin</span>(), v-&gt;<span class="f">end</span>(), <span class="n">0L</span>));
+    }, <span class="t">std</span>::<span class="f">move</span>(data), <span class="t">std</span>::<span class="f">move</span>(result));
+
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"data after the move: "</span> &lt;&lt; (data ? <span class="s">"still owned here"</span> : <span class="s">"null, the worker owns it"</span>) &lt;&lt; <span class="s">"\n"</span>;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"sum = "</span> &lt;&lt; answer.<span class="f">get</span>() &lt;&lt; <span class="s">"\n"</span>;       <span class="c">// blocks until set_value</span>
+    worker.<span class="f">join</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Writing <code>std::thread worker(fn, data, result)</code> without the moves does not compile, because the thread would have to copy a <code>unique_ptr</code> and a <code>promise</code>. Three more patterns you will use constantly:</p>
+<ul>
+<li>Threads in a container: <code>workers.emplace_back(run, i);</code> constructs in place, and <code>workers.push_back(std::move(t));</code> moves an existing one in.</li>
+<li>Returning a thread from a function: <code>return std::jthread(run);</code> just works.</li>
+<li>Moving into a lambda: <code>[job = std::move(job)] { job-&gt;run(); }</code>, an init capture, covered in <a href="cpp-lambdas-callables.html">the lambdas lesson</a>.</li>
+</ul>
+
+<h2 id="returning-values-elision-implicit-moves-and-the-return-std-m">Returning values: elision, implicit moves, and the return std::move trap</h2>
+<p>Since C++17, returning a prvalue (<code>return Widget(args);</code>) constructs the result directly in the caller's object: <a class="term" data-term="copy-elision" href="glossary.html#copy-elision">copy elision</a> is guaranteed, and no copy or move constructor runs, even for a type that has none. Returning a named local (<code>return local;</code>) may be elided too; if it is not, the local is treated as an rvalue and moved automatically. So <strong><code>return std::move(local);</code> is never needed and is often harmful</strong>: it turns off elision. Clang's <code>-Wall</code> warns: "moving a local object in a return statement prevents copy elision". By-value parameters are moved implicitly too, and since C++20 so are <code>T&amp;&amp;</code> parameters, so they need no <code>std::move</code> either. The exception is returning something that is not a local or a parameter, such as a data member or an element of a container you want to move out; there <code>std::move</code> is right.</p>
+
+<h2 id="moving-keeps-critical-sections-short">Moving keeps critical sections short</h2>
+<p>For shared queues and maps, the rule is: <strong>build the object before you take the lock, move it in under the lock, move it out under the lock, and do the work after you release it</strong>. Moving a <code>std::unique_ptr</code> transfers ownership without copying the payload, and ordinary vector move construction transfers its buffer. Do not assume every move or insertion is constant time: short strings can copy inline storage, allocator differences can require element moves, and queue insertion can allocate. Taking parameters by value ("sink" parameters) puts the caller's copy or move before the function takes the lock.</p>
+
+<figure class="code single" data-sample="cpp-move-semantics.6" data-expect="ok"><figcaption><span class="ctitle">A work queue of move-only tasks</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">struct</span> Task {
+    <span class="t">std</span>::<span class="t">string</span> name;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; payload;                        <span class="c">// imagine megabytes here</span>
+};
+
+<span class="k">class</span> TaskQueue {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">push</span>(<span class="t">std</span>::<span class="t">unique_ptr</span>&lt;Task&gt; task) {          <span class="c">// by value: the caller hands over ownership</span>
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+            q_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(task));           <span class="c">// moves one pointer under the lock, not the payload</span>
+        }
+        cv_.<span class="f">notify_one</span>();
+    }
+
+    <span class="t">std</span>::<span class="t">unique_ptr</span>&lt;Task&gt; <span class="f">pop</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !q_.<span class="f">empty</span>(); });
+        <span class="t">std</span>::<span class="t">unique_ptr</span>&lt;Task&gt; task = <span class="t">std</span>::<span class="f">move</span>(q_.<span class="f">front</span>());   <span class="c">// take ownership out of the queue,</span>
+        q_.<span class="f">pop_front</span>();                                       <span class="c">// then drop the now empty slot</span>
+        <span class="k">return</span> task;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">unique_ptr</span>&lt;Task&gt;&gt; q_;            <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    TaskQueue <span class="t">queue</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">consumer</span>([&amp;<span class="t">queue</span>] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+            <span class="t">std</span>::<span class="t">unique_ptr</span>&lt;Task&gt; t = <span class="t">queue</span>.<span class="f">pop</span>();   <span class="c">// the consumer now owns the task</span>
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"processing "</span> &lt;&lt; t-&gt;name &lt;&lt; <span class="s">" ("</span> &lt;&lt; t-&gt;payload.<span class="f">size</span>() &lt;&lt; <span class="s">" values)\n"</span>;
+        }
+    });
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+        <span class="k">auto</span> task = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Task&gt;(Task{<span class="s">"task "</span> + <span class="t">std</span>::<span class="f">to_string</span>(i), <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;(<span class="n">1000</span>, i)});
+        <span class="t">queue</span>.<span class="f">push</span>(<span class="t">std</span>::<span class="f">move</span>(task));                 <span class="c">// task is null after this line</span>
+    }
+    consumer.<span class="f">join</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Notice the shape of <code>pop</code>: move the front element out, then <code>pop_front</code> the empty shell, then return by value. In C++98 a <code>pop</code> that returned the element could lose it if the copy threw after removal, which is why <code>std::stack::pop</code> returns <code>void</code>. With a <code>noexcept</code> move, returning by value is safe.</p>
+
+<div class="box example">
+<h3>Worked example: a pool that aborts when it resizes</h3>
+<p>A hand-built pool keeps its workers in <code>std::vector&lt;std::thread&gt; workers_</code>. A new <code>resize()</code> replaces worker <code>i</code> with a fresh one, and the program sometimes dies with "terminate called without an active exception" or an abort:</p>
+<figure class="code single" data-sample="cpp-move-semantics.7"><figcaption><span class="ctitle">Replacing a running thread</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><code><span class="t">void</span> Pool::<span class="f">restart_worker</span>(<span class="t">std</span>::<span class="t">size_t</span> i) {
+    workers_[i] = <span class="t">std</span>::<span class="t">thread</span>(&amp;Pool::run, <span class="k">this</span>);   <span class="c">// move assignment into a slot that still holds a thread</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Move assignment into a <code>std::thread</code> that is still joinable calls <code>std::terminate</code>, for the same reason its destructor does: the old thread would be silently abandoned. Whether the old worker is still running does not matter: a thread that has finished its function but was never joined is still joinable. The assignment only "works" when some other path already joined or detached that slot, so in practice the abort is almost certain.</p>
+<figure class="timeline"><figcaption>Move assignment over a live thread</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Pool thread</span><span>Old worker i</span><span>New worker</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell">running its loop</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell">creates a new std::thread for slot i</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">starts running</span></div><div class="tl-row"><span class="t">4</span><span class="cell">workers_[i] = std::move(new thread)</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">5</span><span class="cell bad">slot i is still joinable: std::terminate</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">The old thread was never told to stop, never joined, and the move assignment refuses to drop it.</div></div></figure>
+<p>The fix is to finish the old thread first: signal it to stop, <code>join()</code> it, then assign. Or hold <code>std::jthread</code>s, whose move assignment requests a stop and joins the old thread before taking the new one. Either way, say the rule: <strong>a joinable thread must be joined or detached before its handle is destroyed or overwritten</strong>.</p>
+<figure class="code single" data-sample="cpp-move-semantics.8"><figcaption><span class="ctitle">Fixed: stop and join, then replace</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</span><code><span class="t">void</span> Pool::<span class="f">restart_worker</span>(<span class="t">std</span>::<span class="t">size_t</span> i) {
+    <span class="f">request_stop</span>(i);                               <span class="c">// however this pool signals one worker to exit</span>
+    <span class="k">if</span> (workers_[i].<span class="f">joinable</span>()) {
+        workers_[i].<span class="f">join</span>();
+    }
+    workers_[i] = <span class="t">std</span>::<span class="t">thread</span>(&amp;Pool::run, <span class="k">this</span>);   <span class="c">// safe: the slot no longer holds a running thread</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Ignoring the moved-from contract.</strong> Valid queries such as <code>empty()</code> on a string or <code>joinable()</code> on a thread are allowed. Joining a moved-from thread throws, and calling <code>get()</code> on a moved-from future is undefined behavior.</li>
+<li><strong>Expecting <code>std::move</code> to remove const,</strong> which instead makes ordinary copyable types copy and prevents transferring move-only types.</li>
+<li><strong><code>return std::move(local);</code></strong>, which blocks copy elision.</li>
+<li><strong>Forgetting <code>noexcept</code> on move operations,</strong> so containers copy instead of move when they grow.</li>
+<li><strong>Move-assigning into a joinable <code>std::thread</code></strong>, which terminates the program.</li>
+<li><strong>Moving out of shared data without the lock.</strong> A move modifies the source, so it is a write and races like any other write.</li>
+<li><strong>Believing <code>std::move</code> makes anything thread-safe or atomic.</strong> It is a cast; ownership transfer is safe only when the hand-off itself is synchronized, by thread creation, a mutex, or a promise.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>A 2021 Adobe C++ candidate was grilled on move semantics together with smart pointers, lambdas and mutexes, and the questions come in these shapes: "why is <code>std::thread</code> not copyable?", "how do you return a value from a thread?", "how do you put threads in a vector?", "what state is a moved-from object in?", and as live coding: a queue of move-only tasks, or a promise per request in a writer like Databricks' event writer.</p>
+<blockquote><code>std::thread</code> represents ownership of one running thread, and exactly one object may join it, so it is move-only. I store threads with <code>emplace_back</code>, return them by value, and transfer them with <code>std::move</code>. A moved-from thread is simply not joinable, and assigning over a joinable one terminates the program, so I always join or use <code>std::jthread</code>.</blockquote>
+<blockquote>To get a result out of a thread without sharing a variable, I move a <code>std::promise</code> into the thread and keep its <code>std::future</code>; the worker calls <code>set_value</code>, and <code>get()</code> hands me the value with the right happens-before edge. Large inputs I move in too, so the thread owns them and nothing needs a lock.</blockquote>
+<p>Follow ups: "What does <code>std::move</code> actually do?" (a cast to an rvalue reference, nothing at run time); "Why <code>noexcept</code> on the move constructor?" (so <code>std::vector</code> moves instead of copies during reallocation); "Can <code>std::function</code> hold a lambda that owns a <code>unique_ptr</code>?" (no, <code>std::function</code> requires a copyable target; that is in the lambdas lesson).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Forwarding references.</strong> In a template, <code>T&amp;&amp;</code> with <code>T</code> deduced is not an rvalue reference but a forwarding reference: it binds to anything, and <code>std::forward&lt;T&gt;(x)</code> passes the argument on with its original category. <code>std::thread</code>'s constructor is declared this way, then decay-copies (or moves) every argument into the new thread's storage. That is why rvalues are moved in and lvalues are copied, and why <code>std::ref</code> is needed to share.</p>
+<p><strong>Small buffer effects.</strong> Moving is not always cheaper than copying. A short <code>std::string</code> stored inside the object (the small string optimization) is copied byte by byte even when moved, and a <code>std::array</code> moves element by element. Moving a <code>std::vector</code> or a long string is a pointer swap.</p>
+<p><strong>A move is a write.</strong> Moving out of <code>cache_[key]</code> while another thread reads <code>cache_[key]</code> is a data race on that element, and the reader may see the hollowed-out source. Every move of shared data belongs under the same lock as every other access.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>lvalues have identity; rvalues are temporaries or objects you have given up. A named rvalue reference is an lvalue.</li>
+<li><code>std::move</code> is only a cast. The move happens in a consuming constructor or assignment; constness is preserved, so an ordinary copyable type copies and a move-only type cannot be transferred.</li>
+<li>Moved-from standard types are valid but unspecified; threads become unjoinable, unique locks own nothing, unique pointers are null, futures invalid.</li>
+<li>Threads, unique locks, unique pointers, promises and futures are move-only; mutexes, condition variables and atomics cannot move at all.</li>
+<li>Move data into threads instead of sharing it, mark moves <code>noexcept</code>, never <code>return std::move(local)</code>, and never move-assign over a joinable thread.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-move-semantics"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-move-semantics.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does <code>std::move(x)</code> do when it executes?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing at run time: it is a cast that lets an overload taking <code>T&amp;&amp;</code>, such as a move constructor, be chosen</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It moves <code>x</code>'s contents into a temporary</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It leaves <code>x</code> empty</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It makes the next access to <code>x</code> atomic</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::move</code> is <code>static_cast&lt;T&amp;&amp;&gt;</code>. Only when that rvalue is handed to a move constructor or move assignment does anything move. If nothing consumes it, <code>x</code> is untouched.</div></div><div class="mcq" data-id="cpp-move-semantics.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>const std::string s = std::string(1000, &#x27;x&#x27;); std::string t = std::move(s);</code> What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>t</code> is a copy: <code>std::move</code> on a const object yields <code>const std::string&amp;&amp;</code>, which picks the copy constructor</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>t</code> steals the buffer and <code>s</code> becomes empty</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: you cannot move from a const object</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is undefined behavior</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The move constructor takes <code>std::string&amp;&amp;</code>, which cannot bind to a const rvalue. The copy constructor takes <code>const std::string&amp;</code>, which can. The code compiles, runs, and copies 1,000 characters.</div></div><div class="mcq" data-id="cpp-move-semantics.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>std::thread t1(work); std::thread t2(work); t1 = std::move(t2);</code> What happens on the last line?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>std::terminate</code> is called, because <code>t1</code> is still joinable, even if its thread function has finished</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>t1</code>'s old thread is joined automatically, then <code>t1</code> takes over <code>t2</code>'s thread</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>t1</code>'s old thread is detached and keeps running</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile: threads cannot be move-assigned</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Move assignment to a joinable <code>std::thread</code> terminates the program, just like destroying a joinable one. Join or detach <code>t1</code> first. <code>std::jthread</code>'s move assignment instead requests a stop and joins the old thread.</div></div><div class="mcq" data-id="cpp-move-semantics.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?<figure class="code single" data-sample="cpp-move-semantics.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</span><code><span class="t">void</span> <span class="f">take</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;) { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"L"</span>; }
+<span class="t">void</span> <span class="f">take</span>(<span class="t">std</span>::<span class="t">string</span>&amp;&amp;) { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"R"</span>; }
+
+<span class="t">void</span> <span class="f">pass_along</span>(<span class="t">std</span>::<span class="t">string</span>&amp;&amp; s) {
+    <span class="f">take</span>(s);
+    <span class="f">take</span>(<span class="t">std</span>::<span class="f">move</span>(s));
+}
+
+<span class="t">int</span> <span class="f">main</span>() { <span class="f">pass_along</span>(<span class="t">std</span>::<span class="t">string</span>(<span class="s">"x"</span>)); }</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>LR</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>RR</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>RL</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>LL</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>s</code> has type <code>std::string&amp;&amp;</code>, but as an expression it has a name, so it is an lvalue and picks the <code>const std::string&amp;</code> overload. <code>std::move(s)</code> turns it back into an rvalue.</div></div><div class="mcq" data-id="cpp-move-semantics.q5" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which of these types can be moved but not copied? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>std::thread</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>std::unique_lock&lt;std::mutex&gt;</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::promise&lt;int&gt;</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>std::shared_future&lt;int&gt;</code></span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>std::mutex</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Threads, unique locks and promises each represent a single owner, so they are move-only (as are <code>std::future</code> and <code>std::unique_ptr</code>). <code>std::shared_future</code> exists precisely to be copied. <code>std::mutex</code> can be neither copied nor moved, because other threads find it by its address.</div></div><div class="mcq" data-id="cpp-move-semantics.q6" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>void run(std::unique_ptr&lt;Job&gt; job);</code> and then <code>auto job = std::make_unique&lt;Job&gt;(); std::thread t(run, job);</code>. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It does not compile: the thread would have to copy a <code>unique_ptr</code>; write <code>std::thread t(run, std::move(job));</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The thread receives a copy of the pointer and both share the <code>Job</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The thread receives a null pointer</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It compiles, and <code>job</code> is moved automatically</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::thread</code> copies lvalue arguments into the new thread's storage, and <code>std::unique_ptr</code> cannot be copied. With <code>std::move(job)</code> the pointer is moved in, the thread owns the job, and <code>job</code> is null afterwards.</div></div><div class="mcq" data-id="cpp-move-semantics.q7" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A copyable class has a move constructor that is not marked <code>noexcept</code>. A <code>std::vector</code> of it runs out of capacity during <code>push_back</code>. How are the existing elements transferred to the new buffer?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">They are copied, so that a throwing move cannot leave the vector half moved</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">They are moved, because moving is always faster</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">They are moved, and if a move throws the program terminates</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The vector refuses to grow and throws <code>std::length_error</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>push_back</code> promises the strong exception guarantee. If moves might throw and a copy is available, the vector copies, so it can abandon the new buffer on failure. Mark moves <code>noexcept</code> and reallocation moves instead.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-move-semantics.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">The caller has a large <code>std::vector&lt;int&gt;</code> it no longer needs. Start a worker thread that sums it and get the sum back, without sharing any variable between the threads and without copying the vector.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-move-semantics.10"><figcaption><span class="ctitle">Move in, promise out</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;numeric&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">long</span> <span class="f">sum_in_background</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; data) {   <span class="c">// by value: the caller moves its vector in</span>
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">long</span>&gt; result;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">long</span>&gt; answer = result.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([v = <span class="t">std</span>::<span class="f">move</span>(data)](<span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">long</span>&gt; out) {   <span class="c">// the lambda owns the vector</span>
+        out.<span class="f">set_value</span>(<span class="t">std</span>::<span class="f">accumulate</span>(v.<span class="f">begin</span>(), v.<span class="f">end</span>(), <span class="n">0L</span>));
+    }, <span class="t">std</span>::<span class="f">move</span>(result));                        <span class="c">// the thread owns the promise</span>
+    <span class="k">return</span> answer.<span class="f">get</span>();                          <span class="c">// waits for set_value; the jthread joins on return</span>
+}
+
+<span class="c">// caller: long s = sum_in_background(std::move(big_vector));</span></code></div></pre></div><div class="runout" hidden></div></figure>
+<p>No variable is shared: the vector moves from the caller into the parameter and then into the lambda, the promise moves into the thread, and the caller keeps only the future. Nothing is copied, because every hand-off is a move of a few pointers. <code>get()</code> blocks until the worker calls <code>set_value</code>, and that call happens-before <code>get</code> returns, so the sum is safely visible. (<code>std::async</code> or a <code>std::packaged_task</code> would also work; the promise version shows the moves explicitly.)</p></div></div><div class="cq" data-q="cpp-move-semantics.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "What state is an object in after you move from it?" Answer in general, then for <code>std::thread</code>, <code>std::unique_lock</code>, <code>std::unique_ptr</code>, <code>std::future</code> and <code>std::string</code>.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>In general a moved-from object is still alive and its destructor will run. Standard library types promise "valid but unspecified": I can destroy it, assign it a new value, or call functions with no preconditions, but I must not rely on its value. Some types make precise promises, and the threading ones matter most. A moved-from <code>std::thread</code> or <code>std::jthread</code> represents no thread, so <code>joinable()</code> is false and joining it throws. A moved-from <code>std::unique_lock</code> has no mutex and owns nothing, so its destructor unlocks nothing. A moved-from <code>std::unique_ptr</code> is null. A moved-from <code>std::future</code> is invalid, and calling <code>get()</code> on it is undefined. A moved-from <code>std::string</code> is valid but unspecified: in practice usually empty, but I would assign or clear it before reusing it. For my own types I make moved-from objects cheap to destroy and safe to assign, like a file handle that holds -1.</p></div></div><div class="cq" data-q="cpp-move-semantics.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A teammate writes <code>std::string body = std::move(cache_[key]);</code> inside <code>Cache::take(key)</code>, while another thread calls <code>Cache::peek(key)</code>, which returns a copy of <code>cache_[key]</code>. Both functions lock the same mutex, but <code>take</code> releases the lock before that line to "keep the critical section short". What can go wrong?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Moving out of <code>cache_[key]</code> modifies the stored string: it steals the buffer and leaves the source hollow. Done outside the lock, it is a write racing with <code>peek</code>'s read of the same element: a data race and undefined behavior. In practice <code>peek</code> may copy a half-moved string or read a freed buffer. There is a second problem: <code>cache_[key]</code> itself (an <code>operator[]</code> lookup that can insert) now runs without the lock, racing with any thread that changes the map's structure.</p>
+<p>The fix keeps the move under the lock, which is still cheap because moving a string is a pointer swap: lock, find the entry, move it into a local, erase the entry or mark it taken, unlock, then do the slow work with the local. The general rule: a move is a write, and every access to guarded data, including moves out of it, happens under the guard.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-move-semantics.s1" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"I wrote <code>std::move</code>, but a large string was still copied. What does <code>std::move</code> actually do, and what would you check?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li><code>std::move</code> is a cast to an rvalue reference; the consuming operation determines whether resources move</li><li>Moving from const string selects copying because its ordinary move constructor needs a non-const source</li><li>A user-declared destructor can suppress implicit moves and leave a copy fallback</li><li>A named rvalue-reference parameter is an lvalue expression when passed onward</li><li>A moved-from standard object remains valid; its documented state and operation preconditions govern reuse</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would check overload resolution, because std::move does not move anything by itself. It casts the expression to an rvalue reference; the constructor or assignment that consumes it decides what happens. If the string is const, the cast preserves constness. The ordinary string move constructor cannot bind that source, so the copy constructor is selected. For a wrapper class, I would also check whether a user-declared destructor suppressed its implicit moves and left copying as the fallback. Another trap is forwarding from a parameter declared as an rvalue reference. Its name is still an lvalue expression, so passing it onward without another cast can copy. After a real move, I would follow the type's contract. A string remains valid but its value is unspecified; checking empty is allowed, assuming it is empty is not. The cast enables a choice, not a guarantee of cheap transfer.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why might a vector copy existing elements during reallocation even when their type has a move constructor?</span></p></div></div><div class="sq" data-sq="cpp-move-semantics.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Design a queue that hands large tasks from producers to workers without copying the payload. Where does ownership move, and where do you still need locking?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Represent each task with unique_ptr so ownership is explicit and cannot be copied</li><li>Build the payload before locking and move the owning pointer into the queue under its mutex</li><li>Wait with a predicate, then move the front pointer out and remove its slot under the same mutex</li><li>Process the owned task after unlocking; a noexcept pointer move avoids losing it through a throwing return move</li><li>Moving shared state is a write and does not create a synchronization edge by itself</li><li>Ownership transfer does not eliminate escaped aliases or guarantee allocation-free queue operations</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would queue unique pointers to tasks, so each task has one explicit owner and the payload stays in place. The producer builds the large task before taking the queue mutex, then moves its pointer into the queue while holding that mutex. A successful move leaves the producer's pointer null. The worker waits with a predicate for an available item. Still under the same mutex, it moves the front pointer into a local and removes the empty slot. It then releases the lock and processes the task through its local owner. Moving the pointer is nonthrowing, which also makes returning the removed task safe from a throwing move. The queue itself still needs synchronization: moving out of its front element modifies shared state, and std::move supplies no ordering. I would also check that the producer has not retained a raw pointer and continued using the task. Unique ownership does not erase aliases. Finally, queue insertion may allocate even though the payload move is cheap. For strict allocation limits, I would choose storage that is prepared in advance.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What failure guarantees would change if the queue stored a task type whose move constructor could throw?</span></p></div></div><div class="sq" data-sq="cpp-move-semantics.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Replacing a worker with <code>workers[i] = std::thread(run)</code> terminates the process, even when the old worker has finished. Explain the failure and your replacement protocol."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Move assignment to a joinable std::thread calls terminate</li><li>Finishing the thread function does not make its handle non-joinable</li><li>Signal and wake the old worker as needed, join it, then create and assign the replacement</li><li>Do not join while holding a mutex needed by the worker, and serialize handle management</li><li>Jthread move assignment requests stop and joins the old worker, but stopping remains cooperative</li><li>The replacement starts before assignment, so inline replacement can overlap old and new workers</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The destination handle is still joinable, so thread move assignment calls terminate. Finishing the thread function is not enough: the owner must still join or detach that handle. For an owned worker, I would signal it to stop, wake any blocking wait as required, and join it. Only after the join would I create and assign the replacement. I would release any mutex the old worker needs before joining, and serialize management operations so two callers cannot replace the same slot concurrently. A jthread changes the assignment behavior: it requests a stop and joins the old thread before accepting the new handle. That helps with cleanup, but cancellation is cooperative, so an unresponsive worker can still hang the assignment. There is another timing detail in the original expression. The new thread starts when the right-hand temporary is constructed, before assignment begins. Replacing it inline with a jthread can therefore overlap the old and new workers. If the design requires exactly one active worker for that slot, I would keep stopping, joining and starting as separate ordered steps.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What state is the source thread handle in after a successful move, and what happens if you call <code>join</code> on it?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-future-from-scratch.html" data-problem="future-from-scratch"><span class="pk">Build a primitive · hard</span><b>A future from scratch</b><span class="pst"></span></a><a class="pcard" href="p-durable-log-writer.html" data-problem="durable-log-writer"><span class="pk">Concurrent systems · senior</span><b>Durable log writer with group commit</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-memory-and-object-layout.html"><span>Previous</span><b>Memory and object layout: sizeof, alignment, new and delete</b></a><a class="next" href="cpp-smart-pointers.html"><span>Next</span><b>unique_ptr, shared_ptr and weak_ptr</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#copying-is-the-default-and-it-has-a-price">Copying is the default, and it has a price</a><a href="#lvalues-and-rvalues">lvalues and rvalues</a><a href="#rvalue-references-and-overload-resolution">Rvalue references and overload resolution</a><a href="#std-move-is-a-cast-not-a-move">std::move is a cast, not a move</a><a href="#writing-a-move-constructor">Writing a move constructor</a><a href="#the-moved-from-state">The moved-from state</a><a href="#move-only-types-in-threaded-code">Move-only types in threaded code</a><a href="#passing-move-only-values-into-threads">Passing move-only values into threads</a><a href="#returning-values-elision-implicit-moves-and-the-return-std-m">Returning values: elision, implicit moves, and the return std::move trap</a><a href="#moving-keeps-critical-sections-short">Moving keeps critical sections short</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

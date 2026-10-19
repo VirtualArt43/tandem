@@ -1,0 +1,1126 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Deadlock avoidance and detection · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="deadlock-avoidance-and-detection" data-title="Deadlock avoidance and detection" data-track="core" data-module="core-11" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details open><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection" class=here><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m11">Module 11: Liveness and failure</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 11.2</span><span>34 min</span><span class="lvl lvl-senior">Senior</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Deadlock avoidance and detection</h1><p class="lsum">Trace safe states, detect wait-for cycles, interpret thread dumps, and choose recovery policies without confusing timeouts with proof of deadlock.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Nvidia</span></div><div class="prereq"><span>Before this:</span><a href="deadlock.html">Deadlock: the four conditions and how to break each</a></div></header><article class="prose" id="article">
+<p class="lead">The last lesson prevented deadlock by design. This one covers the other options: avoid it at run time by refusing dangerous requests, or let it happen, find it and break it. Operating systems courses and online assessments test the theory, the Banker's algorithm above all; production systems rely on detection, timeouts and thread dumps.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A bank manager has a limited amount of cash and lends it to builders, each of whom declared up front the most they could ever need. Before handing over money, she asks one question: "if I lend this, is there still some order in which every builder can get the rest of what they declared, finish, and repay?" If yes, she lends. If no, the builder waits, even if the cash is sitting in the safe. That is avoidance.</p>
+<p>Detection is different: a hall monitor walks around now and then, draws an arrow from each person who is waiting to the person they are waiting for, and if the arrows form a loop, sends one person home so the others can move. <strong>Avoidance needs to know the future; detection only needs to look at the present.</strong></p>
+</div>
+
+<h2 id="four-ways-to-handle-deadlock">Four ways to handle deadlock</h2>
+<table>
+<thead><tr><th>Strategy</th><th>Idea</th><th>Where it is used</th></tr></thead>
+<tbody>
+<tr><td>Prevention</td><td>Design so one Coffman condition can never hold: lock ordering, all-at-once acquisition</td><td>Application code: the default (previous lesson)</td></tr>
+<tr><td>Avoidance</td><td>Before granting each request, check that the system stays in a state from which everyone can still finish</td><td>The Banker's algorithm: resource allocators with known maximum demands; textbook and assessment problems</td></tr>
+<tr><td>Detection and recovery</td><td>Let deadlocks form, find the cycle, abort a victim</td><td>Databases</td></tr>
+<tr><td>Ignore it</td><td>Provide no automatic application deadlock recovery; diagnose and restart as needed (often called the "ostrich algorithm")</td><td>General purpose operating systems, for the locks applications take</td></tr>
+</tbody>
+</table>
+
+<h2 id="resource-allocation-graphs">Resource allocation graphs</h2>
+<p>A <a class="term" data-term="resource-allocation-graph" href="glossary.html#resource-allocation-graph">resource allocation graph</a> has a node for each thread and a node for each resource type, with one dot per instance. A <strong>request edge</strong> goes from a thread to a resource it is waiting for; an <strong>assignment edge</strong> goes from a resource instance to the thread holding it. Assume reusable resources, outstanding requests that must be satisfied, and no timeout, cancellation or external reclamation. Then:</p>
+<ul>
+<li>If every resource has <strong>one instance</strong>, a cycle in the graph means deadlock, and no cycle means no deadlock.</li>
+<li>If resources have <strong>several instances</strong>, a cycle is necessary for deadlock but not sufficient.</li>
+</ul>
+<figure class="code single" data-sample="deadlock-avoidance-and-detection.4"><figcaption><span class="ctitle">A cycle that is a deadlock, and one that is not</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code>Single instances:
+  R1 is held by T1, R2 is held by T2
+  T1 requests R2, T2 requests R1
+  Cycle: T1 -&gt; R2 -&gt; T2 -&gt; R1 -&gt; T1        every resource has one instance: deadlock
+
+Several instances:
+  R1 has 2 instances, held by T1 and T3; R2 has 1 instance, held by T2
+  T1 requests R2, T2 requests R1, T3 requests nothing
+  Cycle: T1 -&gt; R2 -&gt; T2 -&gt; R1 -&gt; T1        but T3 can finish and free its R1 instance,
+                                            then T2 gets it, finishes and frees R2,
+                                            then T1 proceeds: no deadlock</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>An online assessment will typically draw one of these and ask "is the system deadlocked?" Check the instance counts before you answer.</p>
+
+<h2 id="avoidance-the-banker-s-algorithm">Avoidance: the Banker's algorithm</h2>
+<p>Dijkstra's <a class="term" data-term="bankers-algorithm" href="glossary.html#bankers-algorithm">banker's algorithm</a> keeps the system in a <a class="term" data-term="safe-state" href="glossary.html#safe-state">safe state</a>: a state from which there is at least one order (a safe sequence) in which every thread can get its declared maximum, finish and release everything. It needs four tables for n threads and m resource types:</p>
+<ul>
+<li><code>Available[m]</code>: free instances of each type right now.</li>
+<li><code>Max[n][m]</code>: the most each thread will ever hold, declared in advance.</li>
+<li><code>Allocation[n][m]</code>: what each thread holds now.</li>
+<li><code>Need = Max - Allocation</code>: what each thread may still ask for.</li>
+</ul>
+<p><strong>The safety check.</strong> Start with <code>Work = Available</code> and no thread finished. Repeatedly find an unfinished thread whose <code>Need</code> fits in <code>Work</code> component by component; pretend it runs to completion and releases everything (<code>Work += Allocation[i]</code>), and mark it finished. Add its original allocation, not its maximum: the extra need is borrowed from Work and then returned, so the net increase is just what it already held. If every thread finishes, the state is safe and the order you found is a safe sequence.</p>
+<p><strong>The request check</strong>, when thread i asks for <code>Request</code>:</p>
+<ol>
+<li>If <code>Request</code> exceeds <code>Need[i]</code>, it is an error: the thread is asking for more than it declared.</li>
+<li>If <code>Request</code> exceeds <code>Available</code>, the thread must wait: there is simply not enough free.</li>
+<li>Otherwise pretend to grant it (<code>Available -= Request</code>, <code>Allocation[i] += Request</code>, <code>Need[i] -= Request</code>) and run the safety check. If the result is safe, grant it; if not, undo the pretend grant and make the thread wait.</li>
+</ol>
+<p>The simple safety check costs O(m &times; n<sup>2</sup>) time and O(m + n) scratch space; the tables use O(m &times; n) space. Completion assumes that a thread given its needs eventually finishes and returns its resources. The algorithm guarantees a feasible completion order, not fair admission of every waiting request.</p>
+
+<div class="box example">
+<h3>Worked example: the Banker's algorithm, step by step</h3>
+<p>Four threads, three resource types A, B and C with 7, 5 and 6 instances in total.</p>
+<table>
+<thead><tr><th>Thread</th><th>Allocation (A B C)</th><th>Max (A B C)</th><th>Need (A B C)</th></tr></thead>
+<tbody>
+<tr><td>P0</td><td>2 0 1</td><td>5 2 2</td><td>3 2 1</td></tr>
+<tr><td>P1</td><td>1 2 0</td><td>2 3 2</td><td>1 1 2</td></tr>
+<tr><td>P2</td><td>2 1 2</td><td>4 2 3</td><td>2 1 1</td></tr>
+<tr><td>P3</td><td>0 1 1</td><td>3 1 4</td><td>3 0 3</td></tr>
+</tbody>
+</table>
+<p>Allocations add up to 5 4 4, so <code>Available</code> is 2 1 2.</p>
+<p><strong>1. Is the current state safe?</strong> Scan the threads in order, repeatedly, starting from Work = 2 1 2:</p>
+<ul>
+<li>P0 needs 3 2 1: A needs 3, only 2 in Work. Skip.</li>
+<li>P1 needs 1 1 2: fits. Work becomes 2 1 2 + 1 2 0 = 3 3 2.</li>
+<li>P2 needs 2 1 1: fits. Work becomes 3 3 2 + 2 1 2 = 5 4 4.</li>
+<li>P3 needs 3 0 3: fits. Work becomes 5 4 4 + 0 1 1 = 5 5 5.</li>
+<li>Second pass: P0 needs 3 2 1: fits now. Work becomes 7 5 6, which equals the totals, a good sanity check.</li>
+</ul>
+<p>Safe, with safe sequence P1, P2, P3, P0.</p>
+<p><strong>2. P3 asks for 2 0 2.</strong> It is within P3's need (3 0 3) and within Available (2 1 2), so pretend to grant it: Available becomes 0 1 0, and P3's need drops to 1 0 1. Safety check from Work = 0 1 0: P0 needs A, P1 needs A, P2 needs A, P3 needs A. Nobody fits. <strong>Unsafe, so the request is denied and P3 waits</strong>, even though the resources were sitting there. This is the step people get wrong: available is not the same as safe.</p>
+<p><strong>3. P1 asks for 1 0 2</strong> (the denied grant was rolled back, so we start from the original state). Within need (1 1 2) and Available (2 1 2). Pretend: Available becomes 1 1 0 and P1's need becomes 0 1 0. From Work = 1 1 0: P1 fits (Work 3 3 2), then P2 (5 4 4), then P3 (5 5 5), then P0 (7 5 6). <strong>Safe, so it is granted.</strong></p>
+<p><strong>4. Two quick ones</strong>, after step 3, with Available at 1 1 0. P0 asks for 3 0 0: within its need, but only 1 A is free, so it simply waits; no safety check is needed. P2 asks for 3 0 0: its need for A is only 2, so this is an error, not a wait.</p>
+</div>
+
+<figure class="code pair" data-sample="deadlock-avoidance-and-detection.1" data-expect="ok"><figcaption><span class="ctitle">The Banker&#x27;s algorithm on the worked example</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</span><code><span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">using</span> Vec = <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;;
+
+Vec available = {<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>};
+<span class="t">std</span>::<span class="t">vector</span>&lt;Vec&gt; maxNeed = {{<span class="n">5</span>, <span class="n">2</span>, <span class="n">2</span>}, {<span class="n">2</span>, <span class="n">3</span>, <span class="n">2</span>}, {<span class="n">4</span>, <span class="n">2</span>, <span class="n">3</span>}, {<span class="n">3</span>, <span class="n">1</span>, <span class="n">4</span>}};
+<span class="t">std</span>::<span class="t">vector</span>&lt;Vec&gt; allocation = {{<span class="n">2</span>, <span class="n">0</span>, <span class="n">1</span>}, {<span class="n">1</span>, <span class="n">2</span>, <span class="n">0</span>}, {<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>}, {<span class="n">0</span>, <span class="n">1</span>, <span class="n">1</span>}};
+
+<span class="t">int</span> <span class="f">need</span>(<span class="t">std</span>::<span class="t">size_t</span> i, <span class="t">std</span>::<span class="t">size_t</span> r) { <span class="k">return</span> maxNeed[i][r] - allocation[i][r]; }
+
+<span class="c">// The safety check: a safe sequence, or nothing if the state is unsafe.</span>
+<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt;&gt; <span class="f">safeSequence</span>() {
+    Vec work = available;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">bool</span>&gt; <span class="f">finished</span>(maxNeed.<span class="f">size</span>(), <span class="k">false</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt; sequence;
+    <span class="t">bool</span> progress = <span class="k">true</span>;
+    <span class="k">while</span> (progress) {
+        progress = <span class="k">false</span>;
+        <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; maxNeed.<span class="f">size</span>(); i += <span class="n">1</span>) {
+            <span class="k">if</span> (finished[i]) <span class="k">continue</span>;
+            <span class="t">bool</span> fits = <span class="k">true</span>;
+            <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> r = <span class="n">0</span>; r &lt; work.<span class="f">size</span>(); r += <span class="n">1</span>) fits = fits &amp;&amp; <span class="f">need</span>(i, r) &lt;= work[r];
+            <span class="k">if</span> (fits) {                                    <span class="c">// i can get its maximum, finish and release all</span>
+                <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> r = <span class="n">0</span>; r &lt; work.<span class="f">size</span>(); r += <span class="n">1</span>) work[r] += allocation[i][r];
+                finished[i] = <span class="k">true</span>;
+                sequence.<span class="f">push_back</span>(i);
+                progress = <span class="k">true</span>;
+            }
+        }
+    }
+    <span class="k">if</span> (sequence.<span class="f">size</span>() != maxNeed.<span class="f">size</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+    <span class="k">return</span> sequence;
+}
+
+<span class="t">std</span>::<span class="t">string</span> <span class="f">names</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">size_t</span>&gt;&amp; sequence) {
+    <span class="t">std</span>::<span class="t">string</span> out;
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i : sequence) out += (out.<span class="f">empty</span>() ? <span class="s">"P"</span> : <span class="s">" P"</span>) + <span class="t">std</span>::<span class="f">to_string</span>(i);
+    <span class="k">return</span> out;
+}
+
+<span class="t">std</span>::<span class="t">string</span> <span class="f">request</span>(<span class="t">std</span>::<span class="t">size_t</span> i, <span class="k">const</span> Vec&amp; req) {
+    <span class="k">if</span> (i &gt;= maxNeed.<span class="f">size</span>() || req.<span class="f">size</span>() != available.<span class="f">size</span>())
+        <span class="k">return</span> <span class="s">"error, invalid thread or vector size"</span>;
+    <span class="k">for</span> (<span class="t">int</span> x : req) <span class="k">if</span> (x &lt; <span class="n">0</span>) <span class="k">return</span> <span class="s">"error, negative request"</span>;
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> r = <span class="n">0</span>; r &lt; req.<span class="f">size</span>(); r += <span class="n">1</span>) {
+        <span class="k">if</span> (req[r] &gt; <span class="f">need</span>(i, r)) <span class="k">return</span> <span class="s">"error, exceeds its declared maximum"</span>;
+    }
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> r = <span class="n">0</span>; r &lt; req.<span class="f">size</span>(); r += <span class="n">1</span>) {
+        <span class="k">if</span> (req[r] &gt; available[r]) {
+            <span class="k">return</span> <span class="s">"must wait, only "</span> + <span class="t">std</span>::<span class="f">to_string</span>(available[<span class="n">0</span>]) + <span class="s">" "</span> + <span class="t">std</span>::<span class="f">to_string</span>(available[<span class="n">1</span>]) + <span class="s">" "</span> +
+                   <span class="t">std</span>::<span class="f">to_string</span>(available[<span class="n">2</span>]) + <span class="s">" available"</span>;
+        }
+    }
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> r = <span class="n">0</span>; r &lt; req.<span class="f">size</span>(); r += <span class="n">1</span>) {      <span class="c">// pretend to grant</span>
+        available[r] -= req[r];
+        allocation[i][r] += req[r];
+    }
+    <span class="k">if</span> (<span class="k">auto</span> sequence = <span class="f">safeSequence</span>()) <span class="k">return</span> <span class="s">"granted, safe sequence "</span> + <span class="f">names</span>(*sequence);
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> r = <span class="n">0</span>; r &lt; req.<span class="f">size</span>(); r += <span class="n">1</span>) {      <span class="c">// unsafe: undo the pretend grant</span>
+        available[r] += req[r];
+        allocation[i][r] -= req[r];
+    }
+    <span class="k">return</span> <span class="s">"denied, the state would be unsafe, so P"</span> + <span class="t">std</span>::<span class="f">to_string</span>(i) + <span class="s">" waits"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"initial state: safe sequence %s\n"</span>, <span class="f">names</span>(*<span class="f">safeSequence</span>()).<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"P3 asks for 2 0 2: %s\n"</span>, <span class="f">request</span>(<span class="n">3</span>, {<span class="n">2</span>, <span class="n">0</span>, <span class="n">2</span>}).<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"P1 asks for 1 0 2: %s\n"</span>, <span class="f">request</span>(<span class="n">1</span>, {<span class="n">1</span>, <span class="n">0</span>, <span class="n">2</span>}).<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"P0 asks for 3 0 0: %s\n"</span>, <span class="f">request</span>(<span class="n">0</span>, {<span class="n">3</span>, <span class="n">0</span>, <span class="n">0</span>}).<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"P2 asks for 3 0 0: %s\n"</span>, <span class="f">request</span>(<span class="n">2</span>, {<span class="n">3</span>, <span class="n">0</span>, <span class="n">0</span>}).<span class="f">c_str</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[] available = {<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>};
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[][] max = {{<span class="n">5</span>, <span class="n">2</span>, <span class="n">2</span>}, {<span class="n">2</span>, <span class="n">3</span>, <span class="n">2</span>}, {<span class="n">4</span>, <span class="n">2</span>, <span class="n">3</span>}, {<span class="n">3</span>, <span class="n">1</span>, <span class="n">4</span>}};
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[][] allocation = {{<span class="n">2</span>, <span class="n">0</span>, <span class="n">1</span>}, {<span class="n">1</span>, <span class="n">2</span>, <span class="n">0</span>}, {<span class="n">2</span>, <span class="n">1</span>, <span class="n">2</span>}, {<span class="n">0</span>, <span class="n">1</span>, <span class="n">1</span>}};
+
+    <span class="k">static</span> <span class="t">int</span> <span class="f">need</span>(<span class="t">int</span> i, <span class="t">int</span> r) { <span class="k">return</span> max[i][r] - allocation[i][r]; }
+
+    <span class="c">// The safety check: a safe sequence, or null if the state is unsafe.</span>
+    <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; <span class="f">safeSequence</span>() {
+        <span class="t">int</span>[] work = available.<span class="f">clone</span>();
+        <span class="t">boolean</span>[] finished = <span class="k">new</span> <span class="t">boolean</span>[max.length];
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; sequence = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="t">boolean</span> progress = <span class="k">true</span>;
+        <span class="k">while</span> (progress) {
+            progress = <span class="k">false</span>;
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; max.length; i += <span class="n">1</span>) {
+                <span class="k">if</span> (finished[i]) <span class="k">continue</span>;
+                <span class="t">boolean</span> fits = <span class="k">true</span>;
+                <span class="k">for</span> (<span class="t">int</span> r = <span class="n">0</span>; r &lt; work.length; r += <span class="n">1</span>) fits &amp;= <span class="f">need</span>(i, r) &lt;= work[r];
+                <span class="k">if</span> (fits) {                                    <span class="c">// i can get its maximum, finish and release all</span>
+                    <span class="k">for</span> (<span class="t">int</span> r = <span class="n">0</span>; r &lt; work.length; r += <span class="n">1</span>) work[r] += allocation[i][r];
+                    finished[i] = <span class="k">true</span>;
+                    sequence.<span class="f">add</span>(i);
+                    progress = <span class="k">true</span>;
+                }
+            }
+        }
+        <span class="k">return</span> sequence.<span class="f">size</span>() == max.length ? sequence : <span class="k">null</span>;
+    }
+
+    <span class="k">static</span> <span class="t">String</span> <span class="f">request</span>(<span class="t">int</span> i, <span class="t">int</span>[] req) {
+        <span class="k">if</span> (i &lt; <span class="n">0</span> || i &gt;= max.length || req.length != available.length)
+            <span class="k">return</span> <span class="s">"error, invalid thread or vector size"</span>;
+        <span class="k">for</span> (<span class="t">int</span> x : req) <span class="k">if</span> (x &lt; <span class="n">0</span>) <span class="k">return</span> <span class="s">"error, negative request"</span>;
+        <span class="k">for</span> (<span class="t">int</span> r = <span class="n">0</span>; r &lt; req.length; r += <span class="n">1</span>) {
+            <span class="k">if</span> (req[r] &gt; <span class="f">need</span>(i, r)) <span class="k">return</span> <span class="s">"error, exceeds its declared maximum"</span>;
+        }
+        <span class="k">for</span> (<span class="t">int</span> r = <span class="n">0</span>; r &lt; req.length; r += <span class="n">1</span>) {
+            <span class="k">if</span> (req[r] &gt; available[r]) <span class="k">return</span> <span class="s">"must wait, only "</span> + <span class="f">text</span>(available) + <span class="s">" available"</span>;
+        }
+        <span class="k">for</span> (<span class="t">int</span> r = <span class="n">0</span>; r &lt; req.length; r += <span class="n">1</span>) {              <span class="c">// pretend to grant</span>
+            available[r] -= req[r];
+            allocation[i][r] += req[r];
+        }
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; sequence = <span class="f">safeSequence</span>();
+        <span class="k">if</span> (sequence != <span class="k">null</span>) <span class="k">return</span> <span class="s">"granted, safe sequence "</span> + <span class="f">names</span>(sequence);
+        <span class="k">for</span> (<span class="t">int</span> r = <span class="n">0</span>; r &lt; req.length; r += <span class="n">1</span>) {              <span class="c">// unsafe: undo the pretend grant</span>
+            available[r] += req[r];
+            allocation[i][r] -= req[r];
+        }
+        <span class="k">return</span> <span class="s">"denied, the state would be unsafe, so P"</span> + i + <span class="s">" waits"</span>;
+    }
+
+    <span class="k">static</span> <span class="t">String</span> <span class="f">text</span>(<span class="t">int</span>[] v) {
+        <span class="t">StringBuilder</span> sb = <span class="k">new</span> <span class="t">StringBuilder</span>();
+        <span class="k">for</span> (<span class="t">int</span> x : v) sb.<span class="f">append</span>(sb.<span class="f">length</span>() == <span class="n">0</span> ? <span class="s">""</span> : <span class="s">" "</span>).<span class="f">append</span>(x);
+        <span class="k">return</span> sb.<span class="f">toString</span>();
+    }
+
+    <span class="k">static</span> <span class="t">String</span> <span class="f">names</span>(<span class="t">List</span>&lt;<span class="t">Integer</span>&gt; sequence) {
+        <span class="t">StringBuilder</span> sb = <span class="k">new</span> <span class="t">StringBuilder</span>();
+        <span class="k">for</span> (<span class="t">int</span> i : sequence) sb.<span class="f">append</span>(sb.<span class="f">length</span>() == <span class="n">0</span> ? <span class="s">"P"</span> : <span class="s">" P"</span>).<span class="f">append</span>(i);
+        <span class="k">return</span> sb.<span class="f">toString</span>();
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"initial state: safe sequence "</span> + <span class="f">names</span>(<span class="f">safeSequence</span>()));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"P3 asks for 2 0 2: "</span> + <span class="f">request</span>(<span class="n">3</span>, <span class="k">new</span> <span class="t">int</span>[]{<span class="n">2</span>, <span class="n">0</span>, <span class="n">2</span>}));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"P1 asks for 1 0 2: "</span> + <span class="f">request</span>(<span class="n">1</span>, <span class="k">new</span> <span class="t">int</span>[]{<span class="n">1</span>, <span class="n">0</span>, <span class="n">2</span>}));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"P0 asks for 3 0 0: "</span> + <span class="f">request</span>(<span class="n">0</span>, <span class="k">new</span> <span class="t">int</span>[]{<span class="n">3</span>, <span class="n">0</span>, <span class="n">0</span>}));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"P2 asks for 3 0 0: "</span> + <span class="f">request</span>(<span class="n">2</span>, <span class="k">new</span> <span class="t">int</span>[]{<span class="n">3</span>, <span class="n">0</span>, <span class="n">0</span>}));
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>initial state: safe sequence P1 P2 P3 P0
+P3 asks for 2 0 2: denied, the state would be unsafe, so P3 waits
+P1 asks for 1 0 2: granted, safe sequence P1 P2 P3 P0
+P0 asks for 3 0 0: must wait, only 1 1 0 available
+P2 asks for 3 0 0: error, exceeds its declared maximum</pre></div><div class="runout" hidden></div></figure>
+
+<p>This is a single-threaded simulation with valid, nonnegative initial tables and totals that fit in <code>int</code>. In a real allocator, <code>request</code>, safety checks and the release path must share one lock; a waiter releases that lock while waiting and rechecks after notification. The code derives <code>Need</code> from the other tables, so it needs no separate update or rollback for <code>Need</code>. And notice what <strong>unsafe</strong> means: not that a deadlock has happened, only that one can no longer be ruled out if every thread asks for its full maximum. That conservatism and the need to know every maximum in advance explain why it is uncommon in general purpose application allocators. This example fixes the participant set; a dynamic allocator can admit new participants only after validating their maximum claims and preserving safety.</p>
+
+<h2 id="detection-find-the-cycle">Detection: find the cycle</h2>
+<p>Detection collapses the resource graph into a <a class="term" data-term="wait-for-graph" href="glossary.html#wait-for-graph">wait-for graph</a>: an edge from T1 to T2 means T1 waits for something T2 holds. With single-instance resources (an exclusive lock is one), <strong>a deadlock is exactly a cycle in this graph</strong>. Finding one is a depth-first search that marks the threads on the current path; reaching a thread that is already on the path closes a cycle.</p>
+
+<figure class="code pair" data-sample="deadlock-avoidance-and-detection.2" data-expect="ok"><figcaption><span class="ctitle">Finding a cycle in a wait-for graph</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">using</span> Graph = <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">int</span>, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;&gt;;   <span class="c">// waitsFor[t]: the threads that t waits for</span>
+
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; <span class="f">visit</span>(<span class="t">int</span> t, <span class="k">const</span> Graph&amp; waitsFor, <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">int</span>, <span class="t">int</span>&gt;&amp; color, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt;&amp; path) {
+    <span class="t">int</span> c = color.<span class="f">count</span>(t) ? color[t] : <span class="n">0</span>;        <span class="c">// 0: unvisited, 1: on the current path, 2: finished</span>
+    <span class="k">if</span> (c == <span class="n">2</span>) <span class="k">return</span> {};                        <span class="c">// explored before: no cycle through t</span>
+    <span class="k">if</span> (c == <span class="n">1</span>) {                                 <span class="c">// t is on the current path: a cycle</span>
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; <span class="f">cycle</span>(<span class="t">std</span>::<span class="f">find</span>(path.<span class="f">begin</span>(), path.<span class="f">end</span>(), t), path.<span class="f">end</span>());
+        cycle.<span class="f">push_back</span>(t);
+        <span class="k">return</span> cycle;
+    }
+    color[t] = <span class="n">1</span>;
+    path.<span class="f">push_back</span>(t);
+    <span class="k">if</span> (<span class="k">auto</span> it = waitsFor.<span class="f">find</span>(t); it != waitsFor.<span class="f">end</span>()) {
+        <span class="k">for</span> (<span class="t">int</span> next : it-&gt;second) {
+            <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; cycle = <span class="f">visit</span>(next, waitsFor, color, path);
+            <span class="k">if</span> (!cycle.<span class="f">empty</span>()) <span class="k">return</span> cycle;
+        }
+    }
+    path.<span class="f">pop_back</span>();
+    color[t] = <span class="n">2</span>;
+    <span class="k">return</span> {};
+}
+
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; <span class="f">findCycle</span>(<span class="k">const</span> Graph&amp; waitsFor) {
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">int</span>, <span class="t">int</span>&gt; color;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; path;
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; entry : waitsFor) {
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; cycle = <span class="f">visit</span>(entry.first, waitsFor, color, path);
+        <span class="k">if</span> (!cycle.<span class="f">empty</span>()) <span class="k">return</span> cycle;
+    }
+    <span class="k">return</span> {};
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Graph waitsFor = {{<span class="n">4</span>, {<span class="n">2</span>}}, {<span class="n">1</span>, {<span class="n">2</span>}}, {<span class="n">2</span>, {<span class="n">3</span>}}, {<span class="n">3</span>, {<span class="n">1</span>}}, {<span class="n">5</span>, {}}};   <span class="c">// T4 waits on the cycle; T5 on nobody</span>
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"cycle:"</span>);
+    <span class="k">for</span> (<span class="t">int</span> t : <span class="f">findCycle</span>(waitsFor)) <span class="t">std</span>::<span class="f">printf</span>(<span class="s">" T%d"</span>, t);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"\n"</span>);
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">HashMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="c">// waitsFor.get(t) lists the threads that t waits for. Returns one cycle, or an empty list.</span>
+    <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; <span class="f">findCycle</span>(<span class="t">Map</span>&lt;<span class="t">Integer</span>, <span class="t">List</span>&lt;<span class="t">Integer</span>&gt;&gt; waitsFor) {
+        <span class="t">Map</span>&lt;<span class="t">Integer</span>, <span class="t">Integer</span>&gt; color = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();   <span class="c">// absent: unvisited, 1: on the current path, 2: finished</span>
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; path = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> start : waitsFor.<span class="f">keySet</span>()) {
+            <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; cycle = <span class="f">visit</span>(start, waitsFor, color, path);
+            <span class="k">if</span> (!cycle.<span class="f">isEmpty</span>()) <span class="k">return</span> cycle;
+        }
+        <span class="k">return</span> <span class="t">List</span>.<span class="f">of</span>();
+    }
+
+    <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; <span class="f">visit</span>(<span class="t">int</span> t, <span class="t">Map</span>&lt;<span class="t">Integer</span>, <span class="t">List</span>&lt;<span class="t">Integer</span>&gt;&gt; waitsFor, <span class="t">Map</span>&lt;<span class="t">Integer</span>, <span class="t">Integer</span>&gt; color, <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; path) {
+        <span class="t">int</span> c = color.<span class="f">getOrDefault</span>(t, <span class="n">0</span>);
+        <span class="k">if</span> (c == <span class="n">2</span>) <span class="k">return</span> <span class="t">List</span>.<span class="f">of</span>();                     <span class="c">// explored before: no cycle through t</span>
+        <span class="k">if</span> (c == <span class="n">1</span>) {                                     <span class="c">// t is on the current path: a cycle</span>
+            <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; cycle = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(path.<span class="f">subList</span>(path.<span class="f">indexOf</span>(t), path.<span class="f">size</span>()));
+            cycle.<span class="f">add</span>(t);
+            <span class="k">return</span> cycle;
+        }
+        color.<span class="f">put</span>(t, <span class="n">1</span>);
+        path.<span class="f">add</span>(t);
+        <span class="k">for</span> (<span class="t">int</span> next : waitsFor.<span class="f">getOrDefault</span>(t, <span class="t">List</span>.<span class="f">of</span>())) {
+            <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; cycle = <span class="f">visit</span>(next, waitsFor, color, path);
+            <span class="k">if</span> (!cycle.<span class="f">isEmpty</span>()) <span class="k">return</span> cycle;
+        }
+        path.<span class="f">remove</span>(path.<span class="f">size</span>() - <span class="n">1</span>);
+        color.<span class="f">put</span>(t, <span class="n">2</span>);
+        <span class="k">return</span> <span class="t">List</span>.<span class="f">of</span>();
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Map</span>&lt;<span class="t">Integer</span>, <span class="t">List</span>&lt;<span class="t">Integer</span>&gt;&gt; waitsFor = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+        waitsFor.<span class="f">put</span>(<span class="n">4</span>, <span class="t">List</span>.<span class="f">of</span>(<span class="n">2</span>));                      <span class="c">// T4 waits for T2, but is not in the cycle</span>
+        waitsFor.<span class="f">put</span>(<span class="n">1</span>, <span class="t">List</span>.<span class="f">of</span>(<span class="n">2</span>));
+        waitsFor.<span class="f">put</span>(<span class="n">2</span>, <span class="t">List</span>.<span class="f">of</span>(<span class="n">3</span>));
+        waitsFor.<span class="f">put</span>(<span class="n">3</span>, <span class="t">List</span>.<span class="f">of</span>(<span class="n">1</span>));
+        waitsFor.<span class="f">put</span>(<span class="n">5</span>, <span class="t">List</span>.<span class="f">of</span>());                       <span class="c">// T5 waits for nobody</span>
+        <span class="t">StringBuilder</span> out = <span class="k">new</span> <span class="t">StringBuilder</span>(<span class="s">"cycle:"</span>);
+        <span class="k">for</span> (<span class="t">int</span> t : <span class="f">findCycle</span>(waitsFor)) out.<span class="f">append</span>(<span class="s">" T"</span>).<span class="f">append</span>(t);
+        <span class="t">System</span>.out.<span class="f">println</span>(out);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>cycle: T1 T2 T3 T1</pre></div><div class="runout" hidden></div></figure>
+
+<p>The graph must be a consistent snapshot: synchronize its ownership and wait records, or revalidate a reported cycle before acting. The example returns one cycle, possibly rotated depending on traversal order. T4 is blocked behind the cycle but is not a cycle member; aborting T4 would not release any lock needed by T1, T2 or T3.</p>
+<p>With V threads and E edges, Java's hash-map implementation takes expected O(V + E) time; C++'s ordered maps take O((V + E) log V). Auxiliary state and recursion use O(V) space. Dense integer ids with arrays give O(V + E) worst-case traversal time. For very deep graphs use an explicit DFS stack; use strongly connected components to identify all cyclic groups, rather than stopping at one cycle.</p>
+<p>For multiple-instance resources, start Work at Available and use <strong>current outstanding requests</strong> instead of maximum remaining needs. Repeatedly let a process whose request fits finish and add its allocation to Work. Processes holding no resources can initially be marked finished because they cannot contribute to resource deadlock; remaining unfinished holders form the set that cannot complete under this check. This detects a current allocation problem, whereas Banker's asks about possible future maximum demands.</p>
+<p>Choose <strong>when to run detection</strong>: on each wait (quick discovery, more work), periodically, or only after a wait lasts a while, as PostgreSQL does. Recovering one cycle may leave other cycles, so detect again after victim cleanup.</p>
+
+<h3>Detecting at the moment of waiting, like a database lock manager</h3>
+<p>For exclusive resources with one owner, unique transaction ids and one sequential caller per transaction, each transaction has at most one outgoing wait. The check is then simpler: before blocking, follow the chain "who holds the lock I want, what is that holder waiting for, who holds that" and see whether it leads back to you. If it does, waiting would close a cycle, so the requester becomes the victim, rolls back and releases everything. Serialize the check, wait registration and ownership changes under one manager lock so two requests cannot both miss the new edge. This prevents cycles in the managed resource graph, not in arbitrary callbacks or external systems.</p>
+
+<figure class="code pair" data-sample="deadlock-avoidance-and-detection.3" data-expect="ok"><figcaption><span class="ctitle">A lock manager that refuses to deadlock</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;latch&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+
+<span class="k">class</span> LockManager {
+<span class="k">public</span>:
+    <span class="c">// Returns false if waiting would close a cycle: the caller is the victim.</span>
+    <span class="t">bool</span> <span class="f">acquire</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; txn, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; resource) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (<span class="f">heldByOther</span>(txn, resource) &amp;&amp; <span class="f">wouldDeadlock</span>(txn, resource)) <span class="k">return</span> <span class="k">false</span>;
+        waitsFor_[txn] = resource;
+        cv_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> !<span class="f">heldByOther</span>(txn, resource); });
+        waitsFor_.<span class="f">erase</span>(txn);
+        owner_[resource] = txn;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">void</span> <span class="f">releaseAll</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; txn) {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            <span class="t">std</span>::<span class="f">erase_if</span>(owner_, [&amp;](<span class="k">const</span> <span class="k">auto</span>&amp; entry) { <span class="k">return</span> entry.second == txn; });
+        }
+        cv_.<span class="f">notify_all</span>();                              <span class="c">// waiters re-check their resources</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">bool</span> <span class="f">heldByOther</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; txn, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; resource) <span class="k">const</span> {
+        <span class="k">auto</span> it = owner_.<span class="f">find</span>(resource);
+        <span class="k">return</span> it != owner_.<span class="f">end</span>() &amp;&amp; it-&gt;second != txn;
+    }
+
+    <span class="c">// Follow the chain: who holds the resource, what that holder waits for, who holds that, ...</span>
+    <span class="t">bool</span> <span class="f">wouldDeadlock</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; txn, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; resource) <span class="k">const</span> {
+        <span class="k">auto</span> holder = owner_.<span class="f">find</span>(resource);
+        <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> steps = <span class="n">0</span>; holder != owner_.<span class="f">end</span>() &amp;&amp; steps &lt;= waitsFor_.<span class="f">size</span>(); steps += <span class="n">1</span>) {
+            <span class="k">if</span> (holder-&gt;second == txn) <span class="k">return</span> <span class="k">true</span>;    <span class="c">// the chain leads back to us: a cycle</span>
+            <span class="k">auto</span> wanted = waitsFor_.<span class="f">find</span>(holder-&gt;second);
+            <span class="k">if</span> (wanted == waitsFor_.<span class="f">end</span>()) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// that holder is running, not waiting</span>
+            holder = owner_.<span class="f">find</span>(wanted-&gt;second);
+        }
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">string</span>&gt; owner_;      <span class="c">// resource -&gt; transaction holding it</span>
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">string</span>&gt; waitsFor_;   <span class="c">// transaction -&gt; resource it waits for</span>
+};
+
+<span class="k">struct</span> TransactionLocks {
+    LockManager&amp; locks;
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; txn;
+    <span class="f">TransactionLocks</span>(LockManager&amp; manager, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; id) : <span class="f">locks</span>(manager), <span class="f">txn</span>(id) {}
+    <span class="f">TransactionLocks</span>(<span class="k">const</span> TransactionLocks&amp;) = <span class="k">delete</span>;
+    TransactionLocks&amp; <span class="k">operator</span>=(<span class="k">const</span> TransactionLocks&amp;) = <span class="k">delete</span>;
+    ~<span class="f">TransactionLocks</span>() { locks.<span class="f">releaseAll</span>(txn); }
+};
+
+<span class="t">std</span>::<span class="t">string</span> <span class="f">transaction</span>(LockManager&amp; locks, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; txn, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; first,
+                        <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; second, <span class="t">std</span>::<span class="t">latch</span>&amp; bothHoldOne) {
+    TransactionLocks <span class="f">cleanup</span>(locks, txn);
+    locks.<span class="f">acquire</span>(txn, first);
+    bothHoldOne.<span class="f">arrive_and_wait</span>();                     <span class="c">// make sure each holds one row before asking for the other</span>
+    <span class="t">bool</span> ok = locks.<span class="f">acquire</span>(txn, second);
+    <span class="k">return</span> ok ? <span class="s">"committed"</span> : <span class="s">"was chosen as the deadlock victim and rolled back"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    LockManager locks;
+    <span class="t">std</span>::<span class="t">latch</span> <span class="f">bothHoldOne</span>(<span class="n">2</span>);
+    <span class="t">std</span>::<span class="t">string</span> outcome1, outcome2;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t1</span>([&amp;] { outcome1 = <span class="f">transaction</span>(locks, <span class="s">"T1"</span>, <span class="s">"row-A"</span>, <span class="s">"row-B"</span>, bothHoldOne); });
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t2</span>([&amp;] { outcome2 = <span class="f">transaction</span>(locks, <span class="s">"T2"</span>, <span class="s">"row-B"</span>, <span class="s">"row-A"</span>, bothHoldOne); });
+    t1.<span class="f">join</span>();
+    t2.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"T1 %s; T2 %s\n"</span>, outcome1.<span class="f">c_str</span>(), outcome2.<span class="f">c_str</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</span><code><span class="k">import</span> java.util.<span class="t">HashMap</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+
+<span class="k">class</span> <span class="t">LockManager</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; owner = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();      <span class="c">// resource -&gt; transaction holding it</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; waitsFor = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();   <span class="c">// transaction -&gt; resource it waits for</span>
+
+    <span class="c">// Returns false if waiting would close a cycle: the caller is the victim.</span>
+    <span class="k">synchronized</span> <span class="t">boolean</span> <span class="f">acquire</span>(<span class="t">String</span> txn, <span class="t">String</span> resource) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (<span class="f">heldByOther</span>(txn, resource) &amp;&amp; <span class="f">wouldDeadlock</span>(txn, resource)) <span class="k">return</span> <span class="k">false</span>;
+        waitsFor.<span class="f">put</span>(txn, resource);
+        <span class="k">try</span> {
+            <span class="k">while</span> (<span class="f">heldByOther</span>(txn, resource)) <span class="f">wait</span>();
+        } <span class="k">finally</span> {
+            waitsFor.<span class="f">remove</span>(txn);
+        }
+        owner.<span class="f">put</span>(resource, txn);
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">releaseAll</span>(<span class="t">String</span> txn) {
+        owner.<span class="f">values</span>().<span class="f">removeIf</span>(t -&gt; t.<span class="f">equals</span>(txn));
+        <span class="f">notifyAll</span>();                                   <span class="c">// waiters re-check their resources</span>
+    }
+
+    <span class="k">private</span> <span class="t">boolean</span> <span class="f">heldByOther</span>(<span class="t">String</span> txn, <span class="t">String</span> resource) {
+        <span class="t">String</span> holder = owner.<span class="f">get</span>(resource);
+        <span class="k">return</span> holder != <span class="k">null</span> &amp;&amp; !holder.<span class="f">equals</span>(txn);
+    }
+
+    <span class="c">// Follow the chain: who holds the resource, what that holder waits for, who holds that, ...</span>
+    <span class="k">private</span> <span class="t">boolean</span> <span class="f">wouldDeadlock</span>(<span class="t">String</span> txn, <span class="t">String</span> resource) {
+        <span class="t">String</span> holder = owner.<span class="f">get</span>(resource);
+        <span class="k">for</span> (<span class="t">int</span> steps = <span class="n">0</span>; holder != <span class="k">null</span> &amp;&amp; steps &lt;= waitsFor.<span class="f">size</span>(); steps += <span class="n">1</span>) {
+            <span class="k">if</span> (holder.<span class="f">equals</span>(txn)) <span class="k">return</span> <span class="k">true</span>;      <span class="c">// the chain leads back to us: a cycle</span>
+            <span class="t">String</span> wanted = waitsFor.<span class="f">get</span>(holder);
+            holder = wanted == <span class="k">null</span> ? <span class="k">null</span> : owner.<span class="f">get</span>(wanted);
+        }
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">LockManager</span> locks = <span class="k">new</span> <span class="t">LockManager</span>();
+        <span class="t">CountDownLatch</span> bothHoldOne = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">2</span>);
+        <span class="t">String</span>[] outcome = <span class="k">new</span> <span class="t">String</span>[<span class="n">2</span>];
+        <span class="t">Thread</span> t1 = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; outcome[<span class="n">0</span>] = <span class="f">transaction</span>(locks, <span class="s">"T1"</span>, <span class="s">"row-A"</span>, <span class="s">"row-B"</span>, bothHoldOne), <span class="s">"txn-1"</span>);
+        <span class="t">Thread</span> t2 = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; outcome[<span class="n">1</span>] = <span class="f">transaction</span>(locks, <span class="s">"T2"</span>, <span class="s">"row-B"</span>, <span class="s">"row-A"</span>, bothHoldOne), <span class="s">"txn-2"</span>);
+        t1.<span class="f">start</span>(); t2.<span class="f">start</span>();
+        t1.<span class="f">join</span>(); t2.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"T1 "</span> + outcome[<span class="n">0</span>] + <span class="s">"; T2 "</span> + outcome[<span class="n">1</span>]);
+    }
+
+    <span class="k">static</span> <span class="t">String</span> <span class="f">transaction</span>(<span class="t">LockManager</span> locks, <span class="t">String</span> txn, <span class="t">String</span> first, <span class="t">String</span> second, <span class="t">CountDownLatch</span> bothHoldOne) {
+        <span class="k">try</span> {
+            locks.<span class="f">acquire</span>(txn, first);
+            bothHoldOne.<span class="f">countDown</span>();
+            bothHoldOne.<span class="f">await</span>();                       <span class="c">// make sure each holds one row before asking for the other</span>
+            <span class="t">boolean</span> ok = locks.<span class="f">acquire</span>(txn, second);
+            <span class="k">return</span> ok ? <span class="s">"committed"</span> : <span class="s">"was chosen as the deadlock victim and rolled back"</span>;
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            <span class="k">return</span> <span class="s">"was interrupted"</span>;
+        } <span class="k">finally</span> {
+            locks.<span class="f">releaseAll</span>(txn);                     <span class="c">// release on success, victim selection and interruption</span>
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>T1 committed; T2 was chosen as the deadlock victim and rolled back</pre></div><div class="runout" hidden></div></figure>
+
+<p>Which transaction becomes the victim depends on which one asked second, but there is always exactly one: the requests are serialized by the manager's lock, so the first request sees no cycle and waits, and the second sees the chain lead back to itself. Under the stated one-caller, exclusive-lock assumptions, a new owner is running rather than waiting, and each new wait is checked under the same mutex. Reacquiring a resource already owned by that transaction is idempotent, not reference counted; <code>releaseAll</code> relinquishes all its resources. The demo changes no database rows: its rollback message models victim selection and lock release, not an implemented undo log.</p>
+
+<p>The C++ sample uses C++20 <code>std::latch</code> and <code>std::erase_if</code>. For C++17, use the mutex, counter and predicate-wait latch described in <a href="deadlock.html">deadlock</a>, and erase matching map entries in an iterator loop, assigning the iterator returned by <code>erase</code>. A production lock manager also needs deadlines, bounded queues and failure cleanup; shared locks and lock upgrades require a graph with multiple blockers.</p>
+
+<h2 id="detecting-deadlocks-in-a-running-program">Detecting deadlocks in a running program</h2>
+<p>For locks inside one process, the tool is the <a class="term" data-term="thread-dump" href="glossary.html#thread-dump">thread dump</a>. In Java 21, <code>jstack -l PID</code> or <code>jcmd PID Thread.print -l</code> prints platform-thread stacks and lock details; <code>kill -3 PID</code> requests a dump to the process output. The JVM detects cycles of object monitors and ownable synchronizers such as <code>ReentrantLock</code>, not every <code>java.util.concurrent</code> dependency. Here is a dump of a frozen transfer program like the one in the last lesson, trimmed:</p>
+<figure class="code single" data-sample="deadlock-avoidance-and-detection.5"><figcaption><span class="ctitle">What jstack prints for a monitor deadlock (Java 21)</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code>"transfer-1" #28 [26883] prio=5 os_prio=31 cpu=0.17ms elapsed=1.72s tid=0x0000000be712aa00 nid=26883 waiting for monitor entry
+   java.lang.Thread.State: BLOCKED (on object monitor)
+    at Main.transfer(Main.java:12)
+    - waiting to lock &lt;0x000000052f815d90&gt; (a Main$Account)
+    - locked &lt;0x000000052f815d78&gt; (a Main$Account)
+    at Main.lambda$main$0(Main.java:20)
+
+"transfer-2" #29 [26371] prio=5 os_prio=31 cpu=0.09ms elapsed=1.72s tid=0x0000000be712b100 nid=26371 waiting for monitor entry
+   java.lang.Thread.State: BLOCKED (on object monitor)
+    at Main.transfer(Main.java:12)
+    - waiting to lock &lt;0x000000052f815d78&gt; (a Main$Account)
+    - locked &lt;0x000000052f815d90&gt; (a Main$Account)
+    at Main.lambda$main$1(Main.java:21)
+
+Found one Java-level deadlock:
+=============================
+"transfer-1":
+  waiting to lock monitor 0x0000000be740cc40 (object 0x000000052f815d90, a Main$Account),
+  which is held by "transfer-2"
+
+"transfer-2":
+  waiting to lock monitor 0x0000000be740cd20 (object 0x000000052f815d78, a Main$Account),
+  which is held by "transfer-1"
+
+Found 1 deadlock.</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>How to read it: each thread's state is <code>BLOCKED (on object monitor)</code>; its stack shows the lock it holds (<code>- locked &lt;...d78&gt;</code>) and the one it wants (<code>- waiting to lock &lt;...d90&gt;</code>); match the addresses across threads and the cycle is plain, and the summary at the end spells it out. With <code>ReentrantLock</code> the threads show as <code>WAITING (parking)</code> with <code>- parking to wait for &lt;...&gt; (a java.util.concurrent.locks.ReentrantLock$NonfairSync)</code>, and the summary says <code>waiting for ownable synchronizer ..., which is held by &quot;worker-2&quot;</code>. Name your threads: a cycle between <code>transfer-1</code> and <code>transfer-2</code> explains itself; one between <code>pool-3-thread-7</code> and <code>pool-3-thread-2</code> does not.</p>
+
+<div class="only only-java"><span class="otag">Java</span>
+<p>The same check is available through <code>ThreadMXBean.findDeadlockedThreads()</code> for platform threads; <code>findMonitorDeadlockedThreads()</code> covers monitors only. These calls are for diagnostics and can be expensive, so measure the overhead before polling frequently. A <code>null</code> result means no supported cycle was found, not that the program is live.</p>
+<figure class="code single" data-sample="deadlock-avoidance-and-detection.6" data-expect="ok"><figcaption><span class="ctitle">A watchdog that finds a deadlock from inside the JVM</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</span><code><span class="k">import</span> java.lang.management.<span class="t">ManagementFactory</span>;
+<span class="k">import</span> java.lang.management.<span class="t">ThreadInfo</span>;
+<span class="k">import</span> java.lang.management.<span class="t">ThreadMXBean</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Object</span> a = <span class="k">new</span> <span class="t">Object</span>(), b = <span class="k">new</span> <span class="t">Object</span>();
+        <span class="t">CountDownLatch</span> bothHoldOne = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">2</span>);
+        <span class="f">startDaemon</span>(<span class="s">"transfer-1"</span>, a, b, bothHoldOne);
+        <span class="f">startDaemon</span>(<span class="s">"transfer-2"</span>, b, a, bothHoldOne);
+        <span class="t">ThreadMXBean</span> mx = <span class="t">ManagementFactory</span>.<span class="f">getThreadMXBean</span>();
+        <span class="k">for</span> (<span class="t">int</span> check = <span class="n">0</span>; check &lt; <span class="n">30</span>; check += <span class="n">1</span>) {           <span class="c">// bounded polling for this demo</span>
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">50</span>);
+            <span class="t">long</span>[] ids = mx.<span class="f">findDeadlockedThreads</span>();           <span class="c">// monitors and ReentrantLock-style locks</span>
+            <span class="k">if</span> (ids == <span class="k">null</span>) <span class="k">continue</span>;
+            <span class="k">for</span> (<span class="t">ThreadInfo</span> info : mx.<span class="f">getThreadInfo</span>(ids)) {
+                <span class="k">if</span> (info == <span class="k">null</span>) <span class="k">continue</span>;
+                <span class="t">System</span>.out.<span class="f">println</span>(info.<span class="f">getThreadName</span>() + <span class="s">" is "</span> + info.<span class="f">getThreadState</span>()
+                        + <span class="s">", waiting for a lock held by "</span> + info.<span class="f">getLockOwnerName</span>());
+            }
+            <span class="k">return</span>;                                            <span class="c">// the deadlocked threads are daemons and die with the JVM</span>
+        }
+        <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"expected the deliberately created deadlock"</span>);
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">startDaemon</span>(<span class="t">String</span> name, <span class="t">Object</span> first, <span class="t">Object</span> second, <span class="t">CountDownLatch</span> bothHoldOne) {
+        <span class="t">Thread</span> t = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">synchronized</span> (first) {
+                bothHoldOne.<span class="f">countDown</span>();
+                <span class="k">try</span> {
+                    bothHoldOne.<span class="f">await</span>();                       <span class="c">// deterministic ownership of both first locks</span>
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                    <span class="k">return</span>;
+                }
+                <span class="k">synchronized</span> (second) {
+                    <span class="t">System</span>.out.<span class="f">println</span>(name + <span class="s">" finished"</span>);
+                }
+            }
+        }, name);
+        t.<span class="f">setDaemon</span>(<span class="k">true</span>);
+        t.<span class="f">start</span>();
+    }
+
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Java 21's <code>ThreadMXBean</code> does not detect cycles involving virtual threads. Pool starvation, futures, condition predicates, semaphores and remote calls also need application dependency analysis. For virtual-thread stacks use <code>jcmd PID Thread.dump_to_file -format=json /tmp/threads.json</code>; in Java 21 that dump omits lock ownership details and does not supply automatic deadlock detection. For a stalled pool, combine stacks with active worker counts, queue depth and the tasks needed to complete each future.</p>
+</div>
+
+<div class="only only-cpp"><span class="otag">C++</span>
+<p>Standard C++ has no built-in deadlock detector. Dump every stack with <code>thread apply all bt</code> in <code>gdb</code> or <code>bt all</code> in <code>lldb</code>; on macOS use <code>sample PID</code>, and on Linux <code>eu-stack -p PID</code> is another option. Look for mutex waits, which may appear as <code>__psynch_mutexwait</code> on macOS or futex waits on Linux. Caller frames locate acquisition sites, but portable <code>std::mutex</code> exposes no owner query, so a stack alone may not identify every owner.</p>
+<p>Debug wrappers that record owners and attempted acquisitions can make the dependency graph explicit. Some Linux ThreadSanitizer runtimes support potential lock order inversion detection; this Mac's Apple clang runtime does not. Such checks only cover observed operations, and a clean run proves neither absence of deadlocks nor correct handling of futures and queues.</p>
+</div>
+
+<h2 id="timeouts-bound-waits-then-recover">Timeouts: bound waits, then recover</h2>
+<p>A <strong>timeout is suspicion, not proof</strong>: the dependency may just be slow. Use Java <code>tryLock(long, TimeUnit)</code> or <code>Future.get(long, TimeUnit)</code>, C++ <code>std::timed_mutex::try_lock_for</code> or <code>std::future::wait_for</code>, and RPC deadlines where failure is recoverable. C++ <code>future::get()</code> has no timed overload; test <code>wait_for</code> for <code>std::future_status::ready</code> before calling it, and handle <code>deferred</code> separately.</p>
+<p>Use one overall deadline, measured with <code>System.nanoTime()</code> or <code>std::chrono::steady_clock</code>, so nested waits and retries consume one budget. A timeout does not release already held locks, roll back partial updates or cancel the task behind a future. Cleanup must do that explicitly, using <code>finally</code> or RAII, cooperative cancellation and a bounded retry policy. A future from <code>std::async(std::launch::async, ...)</code> can still block in its destructor, so timing out <code>wait_for</code> does not necessarily bound the enclosing scope.</p>
+<p>Across services, propagated deadlines and cancellation are common ways to limit a stall; distributed deadlock detection also exists, so deadlines are not the only possible strategy. Choose deadlines from the request budget and measured latency distribution, and back off with jitter after releasing resources. OS scheduling can delay a timed call's return, so these are not hard real-time guarantees.</p>
+
+<h2 id="how-databases-detect-deadlocks-and-choose-a-victim">How databases detect deadlocks and choose a victim</h2>
+<p>Databases are the main users of detection, because they can do what a program cannot: <strong>roll a transaction back</strong>. Two transactions that lock rows in opposite orders deadlock exactly like two threads:</p>
+<ul>
+<li><strong>PostgreSQL</strong> lets a lock wait run for <code>deadlock_timeout</code> (1 second by default) before it checks for a cycle, because the check is relatively expensive and most lock waits end sooner. If it finds one, it aborts a transaction with <code>ERROR: deadlock detected</code> (SQLSTATE 40P01), and its documentation says plainly that which transaction is aborted is difficult to predict and should not be relied upon.</li>
+<li><strong>MySQL InnoDB</strong> enables deadlock detection by default and rolls back a victim, preferring small transactions, where size is the number of rows inserted, updated or deleted (error 1213). On very high concurrency the detection itself can become a bottleneck, so some systems turn it off and rely on <code>innodb_lock_wait_timeout</code> (50 seconds by default) instead.</li>
+<li><strong>SQL Server</strong> runs a lock monitor that searches for cycles every 5 seconds by default, more often once it has found some, and chooses the victim by <code>DEADLOCK_PRIORITY</code> and then by which transaction is cheapest to roll back (error 1205).</li>
+</ul>
+<figure class="code single" data-sample="deadlock-avoidance-and-detection.7"><figcaption><span class="ctitle">A PostgreSQL deadlock report (row locks appear as waits on the other transaction)</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code>ERROR:  deadlock detected
+DETAIL:  Process 9012 waits for ShareLock on transaction 5531; blocked by process 9013.
+Process 9013 waits for ShareLock on transaction 5530; blocked by process 9012.
+HINT:  See server log for query details.</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Victim policy is engine-specific: work to undo, priority and fairness can influence it, but no universal rule picks the cheapest or youngest transaction. InnoDB lock wait timeouts normally roll back only the waiting statement, whereas detected deadlocks roll back the transaction; application recovery must explicitly end any remaining transaction before retrying. Two classic timestamp schemes go further and prevent cycles outright, by letting waits go in only one direction of age:</p>
+<table>
+<thead><tr><th>Scheme</th><th>Older transaction asks for a lock a younger one holds</th><th>Younger transaction asks for a lock an older one holds</th></tr></thead>
+<tbody>
+<tr><td>Wait-die</td><td>The older one waits</td><td>The younger one dies: it aborts and restarts later with its original timestamp</td></tr>
+<tr><td>Wound-wait</td><td>The older one wounds the younger: the holder aborts</td><td>The younger one waits</td></tr>
+</tbody>
+</table>
+<p>Both schemes keep the original timestamp on restart, with a unique tie-breaker if timestamps tie. Under fair scheduling, finite transaction work and eventual completion of older transactions, this prevents repeated restarts from making a transaction permanently young. A wounded holder must finish rollback before a conflicting grant is usable. The rule for application code is to <strong>design retries explicitly</strong>. Catch the deadlock error, roll back, back off with jitter, and run the whole transaction again; and touch rows in a consistent order (for example by primary key) to reduce deadlocks. Re-run the whole transaction from fresh reads, with bounded retries; emails, payments and other external effects need idempotency or an outbox so retry does not duplicate them.</p>
+
+<h2 id="why-a-program-cannot-recover-the-way-a-database-does">Why a program cannot recover the way a database does</h2>
+<p>A database can abort a victim because it tracks transactional changes and has a rollback protocol. An ordinary thread has no automatic undo log, and killing it is unsafe: Java deprecated <code>Thread.stop</code> long ago because it released monitors with objects half updated, and in Java 21 it always throws <code>UnsupportedOperationException</code>; standard C++ has no forced thread-termination API. So inside a process, detection is for <strong>diagnosis</strong>: dump the threads, alert, restart the process, and fix the lock order. Recovery belongs in the design: interruptible or timed waits, cleanup and rollback on paths that can safely fail. Cooperative cancellation can then recover some stalls; it cannot rescue an arbitrary monitor or mutex cycle.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Treating unsafe as deadlocked.</strong> An unsafe state only means the algorithm can no longer guarantee that everyone finishes.</li>
+<li><strong>Granting because the resources are available.</strong> Step 2 of the worked example: available but unsafe means wait.</li>
+<li><strong>Skipping the "request exceeds need" check</strong>, or forgetting to undo the pretend grant when the result is unsafe.</li>
+<li><strong>Declaring deadlock from a cycle in a multi-instance graph.</strong> Check whether some thread outside the cycle can still free an instance.</li>
+<li><strong>Not retrying transactions on deadlock errors</strong>, or retrying immediately without backoff.</li>
+<li><strong>Lock timeouts shorter than normal waits.</strong> They fire under ordinary load and the retries add more load.</li>
+<li><strong>Diagnosing from one thread dump.</strong> Take two or three, a few seconds apart: unchanged stacks are a clue, not proof. An idle worker or a busy loop can appear in the same frame repeatedly. Confirm ownership and dependency edges; an explicit lock cycle in one consistent dump is already strong evidence.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Rubrik reports describe assessments with about ten MCQs on multithreading and operating systems. One report describes resource allocation policies before a bathroom scheduling problem; that is not evidence of a specific Banker's question. Nvidia system software interviews ask about deadlock conditions and avoidance. Practise a Banker's table, a resource allocation graph, and then "how would you detect it in production?"</p>
+<blockquote>There are three ways to deal with deadlock. Prevention removes a Coffman condition by design, and in application code I use it: lock ordering. Avoidance, like the Banker's algorithm, checks each request against a safe state, but it needs every thread's maximum in advance and is too conservative for general use. Detection lets deadlocks happen and breaks them: a database builds the wait-for graph, finds a cycle and rolls back a victim according to its policy. Inside a process I cannot roll back a thread, so detection there means dependency diagnosis from dumps; timeouts support recovery only with explicit cleanup.</blockquote>
+<p>Follow ups: "trace the Banker's algorithm on this table", "is this graph deadlocked?", "what does jstack show for a deadlock?", "how does PostgreSQL or MySQL pick the victim?", "explain wait-die and wound-wait", and "what should application code do when it gets a deadlock error?"</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Prevention (by design), avoidance (Banker's, safe states), detection and recovery (wait-for graph cycles), or ignore and restart.</li>
+<li>Single-instance resources: a cycle is a deadlock. Several instances: a cycle is only a warning.</li>
+<li>Banker's: request within need, then within available, then pretend and run the safety check; available is not the same as safe, and unsafe is not the same as deadlocked.</li>
+<li>Detection is a cycle search in the wait-for graph, run on each wait, periodically, or after a wait has lasted a while.</li>
+<li>Java 21 detects supported platform-thread lock cycles; C++ needs stack inspection and owner information. Neither approach automatically detects every application dependency. Timeouts need cleanup and cancellation.</li>
+<li>Databases abort a victim and expect the application to retry the whole transaction; an ordinary thread has no automatic rollback, so design cooperative recovery or diagnose and restart.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="deadlock-avoidance-and-detection"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="deadlock-avoidance-and-detection.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two resource types. Available = (1, 1). P0 holds (1, 0) with maximum (2, 2); P1 holds (0, 1) with maximum (1, 2); P2 holds (1, 1) with maximum (2, 1). The state is safe (sequence P1, P2, P0). P0 now asks for (1, 0). What does the Banker's algorithm do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Grants it: (1, 0) is available</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Denies it and makes P0 wait: after the grant, Available would be (0, 1) and no thread's remaining need would fit</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Rejects it as an error: it exceeds P0's maximum</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Grants it, because P0 holds the fewest resources</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The request is within P0's need (1, 2) and within Available. Pretend to grant: Available (0, 1), P0's need becomes (0, 2). Then P0 needs 2 of B but only 1 is free, P1 needs (1, 1) and P2 needs (1, 0), and both need an A that is not there. No remaining maximum need fits, so no safe sequence exists: deny and wait. Availability alone is insufficient; the request is within the maximum, and allocation size is not the admission rule.</div></div><div class="mcq" data-id="deadlock-avoidance-and-detection.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A resource allocation graph has a cycle. When can you conclude that the system is deadlocked?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always: a cycle is a deadlock</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When every resource in the cycle has a single instance</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only if the cycle has more than two threads</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Never: graphs cannot show deadlocks</span></button></li></ol><div class="why" hidden><strong>Why.</strong> With single-instance resources, a cycle and a deadlock are the same thing. With several instances, a thread outside the cycle may hold an instance it will release, breaking the wait; then the cycle is necessary but not sufficient. Two threads are enough for a cycle; graph structure and resource counts, not a minimum of three threads, determine the result.</div></div><div class="mcq" data-id="deadlock-avoidance-and-detection.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The Banker's algorithm says the system is in an unsafe state. What does that mean?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The system is deadlocked</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Deadlock is possible if threads ask for their declared maximums, but has not necessarily happened, and may never happen</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Some thread has exceeded its declared maximum</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">There are no free resources at all</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Safe means a completion order is guaranteed to exist. Unsafe means that guarantee is gone: if every thread did ask for its maximum, some could be stuck forever. Threads often finish without asking for their maximum, so an unsafe state can resolve on its own. No exceeded claim or zero-availability condition is implied: unsafety is a failed completion-order proof.</div></div><div class="mcq" data-id="deadlock-avoidance-and-detection.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why does PostgreSQL wait for <code>deadlock_timeout</code> (1 second by default) before checking a waiting transaction for a deadlock?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">To give the other transaction time to commit, which always resolves deadlocks</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The cycle check is relatively expensive and most lock waits end quickly, so checking only long waits saves work at the cost of finding real deadlocks a little later</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because deadlocks cannot be detected until a second has passed</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">To let the operating system break the deadlock first</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A real deadlock never resolves on its own, but nearly all lock waits are ordinary short waits behind a running transaction. Checking every wait immediately would waste work on those; delaying the check saves work. A cycle can be detected immediately in principle; waiting does not allow the OS or a member of an unbroken cycle to resolve it automatically.</div></div><div class="mcq" data-id="deadlock-avoidance-and-detection.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Under wound-wait, an older transaction T1 requests a lock held by a younger transaction T2. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">T1 waits for T2 to finish normally, without selecting a victim</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">T1 aborts and restarts with a new timestamp</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">T2 is selected for abort; after its rollback releases the lock, T1 can acquire it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Both transactions abort</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Wound-wait lets older transactions take what they need from younger ones; a younger requester waits for an older holder. Waits therefore only go from younger to older, so no cycle can form. Wait-die permits the older requester to wait; wound-wait instead selects the younger holder. Neither aborts both, and restarts retain the original timestamp.</div></div><div class="mcq" data-id="deadlock-avoidance-and-detection.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A database recovers from a deadlock by rolling back a victim. Why can't a Java or C++ program automatically do the same to an arbitrary deadlocked thread?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It can: interrupting the thread releases its locks</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">There is no undo log for a thread's changes, and killing a thread that holds locks is unsafe (Java 21's <code>Thread.stop()</code> throws; standard C++ has no forced thread-termination API), so the practical answer is to diagnose, restart and fix the code</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Because the JVM and the OS do not know which locks a thread holds</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because deadlocked threads are using the CPU</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A thread blocked on a monitor or a <code>std::mutex</code> does not respond to interruption, and forcibly stopping it would leave the objects it was changing half updated. The JVM does know which monitors a thread holds; that is how jstack finds the cycle. It cannot automatically undo arbitrary changes. Interruptible locking with application cleanup can enable cooperative recovery, but plain monitor entry is not interruptible. CPU usage is not the obstacle.</div></div><div class="mcq" data-id="deadlock-avoidance-and-detection.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Two Java 21 platform threads deadlock while using untimed <code>lock()</code> on two <code>ReentrantLock</code>s. What does <code>jstack -l PID</code> show once both are parked?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Both threads BLOCKED (on object monitor), and no deadlock report, because only monitors are checked</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both threads WAITING (parking) in <code>AbstractQueuedSynchronizer</code>, and a "Found one Java-level deadlock" report naming the ownable synchronizers and their holders</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Both threads RUNNABLE</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Both threads TIMED_WAITING</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>ReentrantLock</code> parks waiting threads, so they show as WAITING (parking), not BLOCKED. The JVM's deadlock search covers these "ownable synchronizers" as well as monitors, so the report still appears, phrased as "waiting for ownable synchronizer ..., which is held by ...".</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="deadlock-avoidance-and-detection.c1" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">Two resource types, A and B, with 6 and 4 instances. P0 holds (1, 1) with maximum (3, 2); P1 holds (2, 0) with maximum (3, 3); P2 holds (1, 1) with maximum (4, 2). (a) Is the state safe? (b) P1 asks for (0, 2): grant or wait? (c) Starting again from the original state, P0 asks for (1, 1): grant or wait? Show your work.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Available is (6, 4) minus the allocations (4, 2), which is (2, 2). Needs are P0 (2, 1), P1 (1, 3) and P2 (3, 1).</p>
+<p>(a) From Work = (2, 2): P0's need (2, 1) fits, so Work becomes (3, 3); P1's need (1, 3) fits, Work (5, 3); P2's need (3, 1) fits, Work (6, 4), equal to the totals. Safe, with sequence P0, P1, P2.</p>
+<p>(b) (0, 2) is within P1's need (1, 3) and within Available (2, 2). Pretend to grant: Available (2, 0), P1's need (1, 1). From Work = (2, 0): P0 needs 1 of B, P1 needs 1 of B, P2 needs 1 of B, and there is no B. Unsafe, so P1 waits and the pretend grant is undone.</p>
+<p>(c) (1, 1) is within P0's need (2, 1) and within Available (2, 2). Pretend: Available (1, 1), P0 holds (2, 2) and needs (1, 0). From Work = (1, 1): P0 fits, Work becomes (3, 3); P1's need (1, 3) fits, Work (5, 3); P2's need (3, 1) fits, Work (6, 4). Safe, so the request is granted.</p></div></div><div class="cq" data-q="deadlock-avoidance-and-detection.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">Two services write to PostgreSQL. Service A moves money from account 7 to account 9 in one transaction (update row 7, then row 9); service B moves money from 9 to 7 (update row 9, then row 7). Under load, both see <code>ERROR: deadlock detected</code> a few times an hour, and those requests fail. Explain what is happening and what you would change.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Each transaction takes a row lock when it updates a row and holds it until commit. When A has updated row 7 and B has updated row 9, A's update of row 9 waits for B and B's update of row 7 waits for A: a cycle, exactly the two-thread transfer deadlock, one level down. PostgreSQL notices after its deadlock timeout and aborts one of them with SQLSTATE 40P01, and the service turns that into a failed request. Two changes. First, make deadlocks rare: have every transaction touch rows in one consistent order, for example by locking the account rows it needs in ascending id order at the start (<code>SELECT id FROM accounts WHERE id IN (7, 9) ORDER BY id FOR UPDATE</code>), which breaks circular wait just like lock ordering in code. Second, make the remaining ones harmless: treat 40P01 (and serialization failures) as retryable, roll back, wait a short random backoff, and re-run the whole transaction a bounded number of times before failing. I would also keep transactions short, with no network calls inside them, because the longer locks are held the more likely a cycle becomes.</p></div></div><div class="cq" data-q="deadlock-avoidance-and-detection.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "Prevention, avoidance or detection: which would you use in application code, in a database, and in an operating system, and why?"</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>In application code, prevention: I control the code, so I impose a lock order, take multiple locks with a deadlock-safe protocol, and never hold a lock across calls I do not control. That costs almost nothing at run time and needs no knowledge of the future. Avoidance like the Banker's algorithm does not fit, because threads cannot declare their maximum needs up front and the check is conservative and runs on every request. In a database, detection and recovery: transactions lock rows in an order chosen by user queries, so one global application lock order is not always enforceable; the engine tracks transactional changes, builds a wait-for graph, finds a cycle, rolls back a selected victim and let the application retry. In a general purpose operating system, mostly neither for user locks: the kernel prevents deadlock in its own code with strict lock ordering, but it does not run avoidance or detection for the mutexes applications take; it leaves those to the applications. Avoidance mainly appears in systems with fixed, known workloads, and in exams. Timeouts are a recovery policy, not evidence that a cycle exists.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="deadlock-avoidance-and-detection.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"The resources are available, but your Banker rejects the request. Walk me through why that can be correct."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Availability is an immediate capacity check; safety requires a completion order for all declared maxima</li><li>Check request against remaining need, then available resources</li><li>Tentatively update available, allocation and derived need under one allocator lock</li><li>Trace Work and explain why simulated completion adds Allocation, not Max</li><li>Grant only if every participant can finish; otherwise restore state and wait</li><li>Distinguish unsafe from already deadlocked and state the known-maxima limitation</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Availability is necessary, but it is not enough. Banker grants a request only if the resulting state still has an order in which every participant could obtain its declared maximum and finish. I first check that the request stays within the caller's remaining need, then within the currently available resources. I tentatively grant it and run the safety check under the allocator's lock. Work starts at the new available vector. Whenever an unfinished participant's remaining need fits, I pretend it finishes and add its current allocation back to Work. I add allocation, not maximum, because the extra resources it temporarily borrows are returned too. If everyone can finish, I commit the grant. If nobody else fits before all participants finish, I restore the tables and make the requester wait. For example, handing out the last A may leave every participant needing another A, even though the request itself fitted. That is unsafe, not necessarily already deadlocked: some participants might finish below their maximum. The tradeoff is that Banker needs credible maximum claims in advance and can delay requests conservatively.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would your test change if you wanted to detect a current multi-instance deadlock rather than avoid a future one?</span></p></div></div><div class="sq" data-sq="deadlock-avoidance-and-detection.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Production has stopped completing requests, but the Java deadlock detector returns null. Does that rule out deadlock? What is your next move?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A null result excludes only supported detected cycles, not every liveness failure</li><li>State Java 21 platform-thread, monitor and ownable-synchronizer limits</li><li>Collect stacks plus lock owners, pool saturation, queue depth and future dependencies</li><li>Build a consistent dependency graph and distinguish a cycle from ordinary waiting</li><li>Explain C++ owner-instrumentation limits and the role of repeated observations</li><li>Use deadlines with cleanup; do not forcibly terminate an arbitrary lock holder</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">No. A null result means that detector found no cycle it supports. In Java 21, <code>ThreadMXBean</code> detects platform-thread cycles involving monitors and ownable synchronizers. It does not detect cycles involving virtual threads, or infer which queued task will complete a future. I would capture platform-thread stacks with lock details, and use the virtual-thread dump facility when relevant. I would also collect active worker counts, queue depth and the tasks responsible for completing blocked requests. Then I would connect each wait to the owner or producer that can satisfy it. Eight parents waiting for children queued behind them can be a deadlock even with no mutex cycle. For a lock cycle, I need consistent ownership and wait edges; a thread parked in one stack frame alone proves little. Repeated captures help distinguish ordinary waits from persistent dependencies, but do not replace that graph. In C++, stack traces locate waits, while owner instrumentation may be needed because standard mutexes expose no owner query. For recovery I would use existing cooperative cancellation and cleanup paths if they are safe. A deadline only ends a wait; it does not roll back changes or release other locks automatically. Without a safe recovery path, I would capture evidence, restart and fix the dependency.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What could still block after a C++ future wait has timed out?</span></p></div></div><div class="sq" data-sq="deadlock-avoidance-and-detection.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"PostgreSQL aborts one of our money transfers as a deadlock victim. How would you stop that becoming a failed or duplicated payment?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Describe opposite row-lock acquisition and PostgreSQL selecting a victim</li><li>Acquire account rows in a stable order and keep transactions short</li><li>Roll back and retry the entire transaction with fresh reads and a bounded deadline</li><li>Keep external side effects idempotent or behind an outbox</li><li>Distinguish a deadlock error from a generic timeout and avoid relying on victim choice</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would combine consistent row-lock ordering with a bounded retry policy for the entire transaction. Two transfers can lock their source rows first, then each wait for the other's destination row. PostgreSQL detects the cycle and aborts a victim; I would not depend on which transaction loses. I would lock both account rows in ascending immutable id order before validating balances and applying the transfer. I would keep that transaction short and avoid remote calls while holding the locks. If a deadlock error still occurs, I would roll back and retry from fresh reads, with jitter, a retry limit and one overall deadline. Retrying only the failed statement is not enough because the transaction was aborted. Database rollback also does not undo an email or an external payment already sent. Those effects need an idempotency key or a transactional outbox so another attempt cannot duplicate them. Finally, I would classify errors carefully: a deadlock error establishes a detected cycle, whereas a generic timeout could mean ordinary overload. The retry budget must prevent recovery traffic from making that overload worse.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How does InnoDB's default handling of a lock wait timeout differ from its handling of a detected deadlock?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-fix-the-transfer-deadlock.html" data-problem="fix-the-transfer-deadlock"><span class="pk">Bug hunts · medium</span><b>Fix the transfers that freeze</b><span class="pst"></span></a><a class="pcard" href="p-dining-philosophers.html" data-problem="dining-philosophers"><span class="pk">Ordering puzzles · medium</span><b>The dining philosophers</b><span class="pst"></span></a><a class="pcard" href="p-debug-the-cinema.html" data-problem="debug-the-cinema"><span class="pk">Bug hunts · senior</span><b>Debug the cinema</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="deadlock.html"><span>Previous</span><b>Deadlock: the four conditions and how to break each</b></a><a class="next" href="livelock-and-starvation.html"><span>Next</span><b>Livelock, starvation and fairness</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#four-ways-to-handle-deadlock">Four ways to handle deadlock</a><a href="#resource-allocation-graphs">Resource allocation graphs</a><a href="#avoidance-the-banker-s-algorithm">Avoidance: the Banker&#x27;s algorithm</a><a href="#detection-find-the-cycle">Detection: find the cycle</a><a href="#detecting-deadlocks-in-a-running-program">Detecting deadlocks in a running program</a><a href="#timeouts-bound-waits-then-recover">Timeouts: bound waits, then recover</a><a href="#how-databases-detect-deadlocks-and-choose-a-victim">How databases detect deadlocks and choose a victim</a><a href="#why-a-program-cannot-recover-the-way-a-database-does">Why a program cannot recover the way a database does</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

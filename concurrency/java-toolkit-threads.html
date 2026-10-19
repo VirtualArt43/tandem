@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The toolkit: Thread, Runnable, Callable and virtual threads · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-toolkit-threads" data-title="The toolkit: Thread, Runnable, Callable and virtual threads" data-track="java" data-module="java-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details open><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads" class=here><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m5">Module 05: The concurrency toolkit</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.1</span><span>30 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The toolkit: Thread, Runnable, Callable and virtual threads</h1><p class="lsum">Create and own Java threads, read their lifecycle APIs, handle cancellation and failures, and choose virtual threads and thread-local state deliberately.</p><div class="prereq"><span>Before this:</span><a href="java-classes-interfaces.html">Classes, interfaces and inheritance</a><a href="java-lambdas-functional.html">Lambdas, functional interfaces and method references</a><a href="java-exceptions.html">Exceptions, InterruptedException and try-with-resources</a><a href="java-time-units.html">Time: nanoTime, Duration and TimeUnit</a></div></header><article class="prose" id="article">
+<p class="lead">You can know Java syntax and still run work on the wrong thread, return before a worker finishes, or lose a request's context. Read every thread API as a contract about who executes, who waits, and who owns the outcome.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A job card describes work; a person carries it out. Writing another card does not hire another person, and handing someone a card does not mean they have finished. You must also decide how to ask them to stop, collect their answer, and hear about a failure.</p>
+<p>A private locker belongs to the person, not the next job they pick up. Leave yesterday's paperwork inside and today's job may use the wrong customer's details. That is the trap behind thread-local request context.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<p>These APIs appear in every worker, test driver and concurrent LLD exercise. <strong>Separate the task from its execution and lifetime.</strong> A class implementing <code>Runnable</code> describes behaviour; its owner decides whether to call it directly, start a thread, or submit it to an executor.</p>
+<p>The <a href="java-lambdas-functional.html">lambda lesson</a> teaches captures and task interfaces, and <a href="java-exceptions.html">the exception lesson</a> teaches propagation and restoration. Here you practise their thread APIs. Keep broader design rules in <a href="java-oop-principles.html">composition and SOLID</a> and <a href="java-oop-design-for-lld.html">LLD design</a>.</p>
+</div>
+
+<h2 id="api-card-tasks-and-platform-threads">API card: tasks and platform threads</h2>
+<p><code>Thread</code>, <code>Runnable</code> and <code>ThreadLocal</code> are in <code>java.lang</code>; <code>Callable</code> and executor types are in <code>java.util.concurrent</code>. A <a class="term" data-term="thread" href="glossary.html#thread">thread</a> is an execution context. A task object is ordinary Java behaviour, not a running thread.</p>
+<table>
+<thead><tr><th>Type and main API</th><th>One line contract</th></tr></thead>
+<tbody>
+<tr><td><code>Runnable.run()</code></td><td>Returns <code>void</code>, declares no checked exceptions; calling it is synchronous.</td></tr>
+<tr><td><code>Callable&lt;V&gt;.call()</code></td><td>Returns <code>V</code>, may throw <code>Exception</code>; calling it is also synchronous.</td></tr>
+<tr><td><code>new Thread(task, name)</code></td><td>Creates an unstarted platform thread with a <code>Runnable</code> task.</td></tr>
+<tr><td><code>t.start()</code></td><td>Schedules this thread once; a second start throws <code>IllegalThreadStateException</code>.</td></tr>
+<tr><td><code>t.run()</code></td><td>Direct platform-thread call invokes its task on the caller; direct virtual-thread call does nothing.</td></tr>
+<tr><td><code>t.join()</code></td><td>Caller waits for the started thread to terminate; returns no result or task exception.</td></tr>
+<tr><td><code>t.join(ms)</code>, <code>t.join(ms, ns)</code></td><td>Timed wait returning <code>void</code>; inspect <code>isAlive()</code> afterwards; an all-zero timeout means indefinite.</td></tr>
+<tr><td><code>t.join(duration)</code></td><td>Returns whether termination was observed; a nonpositive duration only checks; rejects an unstarted thread.</td></tr>
+<tr><td><code>t.isAlive()</code>, <code>t.getState()</code></td><td>Inspect lifecycle; false means unstarted or terminated, and state is a diagnostic snapshot.</td></tr>
+<tr><td><code>Thread.currentThread()</code></td><td>Returns the executing thread.</td></tr>
+<tr><td><code>Thread.sleep(ms)</code>, <code>Thread.sleep(duration)</code></td><td>Pauses the caller interruptibly, retaining held locks and establishing no interthread ordering.</td></tr>
+<tr><td><code>t.interrupt()</code></td><td>Requests interruption of <code>t</code>; never forcibly ends ordinary Java computation.</td></tr>
+<tr><td><code>t.isInterrupted()</code></td><td>Reads <code>t</code>'s interrupt status without clearing it.</td></tr>
+<tr><td><code>Thread.interrupted()</code></td><td>Reads and clears the caller's interrupt status.</td></tr>
+<tr><td><code>t.getName()</code>, <code>t.setName(name)</code>, <code>t.threadId()</code></td><td>Access a diagnostic name or its unique, fixed identifier; prefer <code>threadId()</code> to deprecated <code>getId()</code>.</td></tr>
+<tr><td><code>t.setDaemon(boolean)</code>, <code>t.isDaemon()</code></td><td>Set daemon status before starting a platform thread, or inspect it.</td></tr>
+<tr><td><code>t.setPriority(n)</code>, <code>t.getPriority()</code></td><td>Platform priority uses 1 to 10, subject to thread-group limits; it guarantees no execution order.</td></tr>
+<tr><td><code>Thread.yield()</code>, <code>Thread.onSpinWait()</code></td><td>Scheduling or spin-loop hints; neither waits for another task nor publishes its writes.</td></tr>
+</tbody>
+</table>
+
+<h2 id="create-the-task-then-start-its-thread">Create the task, then start its thread</h2>
+<p>Here are an implementing class, a lambda, and a <code>Thread</code> subclass. The overrides are public because <code>Runnable.run()</code> is public. Prefer the first two for application work: they keep the task reusable and leave the class free to extend a domain base class. See <a href="java-inheritance-and-polymorphism.html">overriding and polymorphism</a> for the OOP rules.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.1" data-expect="ok"><figcaption><span class="ctitle">Three task forms and the thread that executes each</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">void</span> <span class="f">report</span>(<span class="t">String</span> task) {
+        <span class="t">System</span>.out.<span class="f">println</span>(task + <span class="s">" on "</span> + <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>());
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">PrintJob</span> <span class="k">implements</span> <span class="t">Runnable</span> {
+        <span class="a">@Override</span>
+        <span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() {
+            <span class="f">report</span>(<span class="s">"class task"</span>);
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">PrintThread</span> <span class="k">extends</span> <span class="t">Thread</span> {
+        <span class="t">PrintThread</span>() {
+            <span class="k">super</span>(<span class="s">"subclass-worker"</span>);
+        }
+
+        <span class="a">@Override</span>
+        <span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() {
+            <span class="f">report</span>(<span class="s">"subclass task"</span>);
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">setName</span>(<span class="s">"caller"</span>);
+        <span class="t">Thread</span> a = <span class="k">new</span> <span class="t">Thread</span>(<span class="k">new</span> <span class="t">PrintJob</span>(), <span class="s">"class-worker"</span>);
+        a.<span class="f">run</span>();
+        a.<span class="f">start</span>();
+        a.<span class="f">join</span>();
+        <span class="t">Thread</span> b = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; <span class="f">report</span>(<span class="s">"lambda task"</span>), <span class="s">"lambda-worker"</span>);
+        b.<span class="f">start</span>();
+        b.<span class="f">join</span>();
+        <span class="t">Thread</span> c = <span class="k">new</span> <span class="t">PrintThread</span>();
+        c.<span class="f">start</span>();
+        c.<span class="f">join</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The lines are <code>class task on caller</code>, <code>class task on class-worker</code>, <code>lambda task on lambda-worker</code>, then <code>subclass task on subclass-worker</code>. Direct <code>run()</code> did not start <code>a</code>, so its later <code>start()</code> is legal. After that start, the same <code>Thread</code> can never be restarted, even after termination.</p>
+<p>The joins deliberately serialize this demonstration. To overlap independent work, start all workers first and then join them. <code>start()</code> does not promise that the child executes before the caller's next statement. Never start a thread from a constructor that exposes a partly initialized <code>this</code>; see <a href="safe-publication.html">safe publication</a>.</p>
+<p><strong><code>start()</code> also publishes the caller's earlier writes.</strong> They <a class="term" data-term="happens-before" href="glossary.html#happens-before">happen-before</a> the worker's actions, even for ordinary fields. Construction alone does not provide that handoff, and writes made after <code>start()</code> need their own synchronization if the worker reads them concurrently.</p>
+<p>The lifecycle names are <code>NEW</code>, <code>RUNNABLE</code>, <code>BLOCKED</code>, <code>WAITING</code>, <code>TIMED_WAITING</code> and <code>TERMINATED</code>. <code>RUNNABLE</code> does not prove a thread is currently on a CPU. <code>BLOCKED</code> specifically means waiting to acquire a monitor; waiting for a <code>ReentrantLock</code> commonly appears as <code>WAITING</code> or <code>TIMED_WAITING</code>. Do not coordinate by polling <code>getState()</code>; <a href="thread-states.html">thread states</a> explains these snapshots.</p>
+
+<h2 id="join-is-a-wait-not-a-cancellation-policy">Join is a wait, not a cancellation policy</h2>
+<p>A <a class="term" data-term="join" href="glossary.html#join">join</a> waits in the calling thread. Detecting a started worker's termination makes its writes visible through happens-before. A timed join that returns while the worker is alive gives no completion guarantee. Follow <a href="creating-threads.html">creating and joining threads</a> and <a href="happens-before.html">happens-before</a> for the full argument.</p>
+<p>This example uses <code>CountDownLatch(1)</code> as a test gate: <code>await()</code> waits until <code>countDown()</code> opens it. The worker cannot finish before the timeout, without relying on a lucky sleep. The <a href="java-toolkit-collections-and-synchronizers.html">synchronizer toolkit</a> teaches the latch itself.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.2" data-expect="ok"><figcaption><span class="ctitle">A timeout leaves the worker alive</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="k">import</span> java.time.<span class="t">Duration</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">CountDownLatch</span> release = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">int</span>[] result = {<span class="n">0</span>};
+        <span class="t">Thread</span> worker = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                release.<span class="f">await</span>();
+                result[<span class="n">0</span>] = <span class="n">42</span>;
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"result-worker"</span>);
+        worker.<span class="f">start</span>();
+        <span class="k">try</span> {
+            worker.<span class="f">join</span>(<span class="n">10</span>);
+            <span class="t">boolean</span> alive = worker.<span class="f">isAlive</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"alive after timed join: "</span> + alive);
+            <span class="t">boolean</span> finished = worker.<span class="f">join</span>(<span class="t">Duration</span>.ZERO);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"finished with zero budget: "</span> + finished);
+            <span class="k">if</span> (!alive || finished) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"gate did not hold worker"</span>);
+        } <span class="k">finally</span> {
+            release.<span class="f">countDown</span>();
+            worker.<span class="f">join</span>();
+        }
+        <span class="k">if</span> (result[<span class="n">0</span>] != <span class="n">42</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"missing result"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"result after completion: "</span> + result[<span class="n">0</span>]);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The answers are <code>true</code>, <code>false</code>, and <code>42</code>. Only the final completed join justifies reading the result. Opening the gate in <code>finally</code> prevents an interrupted first wait from stranding the worker.</p>
+<p><strong><code>join(0)</code> waits indefinitely, but <code>join(Duration.ZERO)</code> does not wait.</strong> The older overloads return immediately on an unstarted thread; the <code>Duration</code> overload throws <code>IllegalThreadStateException</code>. Joining yourself indefinitely deadlocks. Scheduling can delay return, and repeated waits need a remaining budget; see <a href="java-time-units.html">Java time units</a>.</p>
+<p>Do not join while holding an unrelated application lock the worker needs to finish. The caller keeps holding that lock while waiting, so caller and worker can wait for each other forever.</p>
+
+<h2 id="sleep-and-the-three-interrupt-methods">Sleep and the three interrupt methods</h2>
+<p><a class="term" data-term="interruption" href="glossary.html#interruption">Interruption</a> is a request the target must cooperate with. <code>worker.interrupt()</code> targets the worker; <code>Thread.interrupted()</code> targets whoever executes that statement. Even the legal but misleading spelling <code>worker.interrupted()</code> still tests and clears the caller, because the method is static.</p>
+<p><code>sleep</code> and a blocking <code>join</code> throw <code>InterruptedException</code> in the waiting caller and clear its status. Interrupting a thread waiting in <code>worker.join()</code> does not interrupt <code>worker</code>. The <a href="java-exceptions.html">exception lesson</a> covers propagation versus restoration; <a href="interruption-and-cancellation.html">cooperative cancellation</a> covers blocking APIs and shutdown design.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.3" data-expect="ok"><figcaption><span class="ctitle">Read, consume, and restore an interrupt</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">boolean</span>[] observed = <span class="k">new</span> <span class="t">boolean</span>[<span class="n">5</span>];
+        <span class="t">Thread</span> probe = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="t">Thread</span> self = <span class="t">Thread</span>.<span class="f">currentThread</span>();
+            self.<span class="f">interrupt</span>();
+            observed[<span class="n">0</span>] = self.<span class="f">isInterrupted</span>();
+            observed[<span class="n">1</span>] = <span class="t">Thread</span>.<span class="f">interrupted</span>();
+            observed[<span class="n">2</span>] = self.<span class="f">isInterrupted</span>();
+            self.<span class="f">interrupt</span>();
+            <span class="k">try</span> {
+                <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">1</span>);
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                observed[<span class="n">3</span>] = self.<span class="f">isInterrupted</span>();
+                self.<span class="f">interrupt</span>();
+                observed[<span class="n">4</span>] = self.<span class="f">isInterrupted</span>();
+            }
+        }, <span class="s">"interrupt-probe"</span>);
+        probe.<span class="f">start</span>();
+        probe.<span class="f">join</span>();
+        <span class="t">String</span> actual = java.util.<span class="t">Arrays</span>.<span class="f">toString</span>(observed);
+        <span class="k">if</span> (!actual.<span class="f">equals</span>(<span class="s">"[true, true, false, false, true]"</span>)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(actual);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(actual);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The sleep is an API probe, not coordination: the pending interrupt makes it throw. A normal sleep pauses the caller, may oversleep, releases no held lock, and does not publish writes. Write static calls with <code>Thread</code>, not an instance, to make their target clear.</p>
+<p>A CPU loop must inspect its status between bounded pieces of work. Restoring the flag and repeatedly retrying an interruptible wait can create a hot failure loop; restoring and exiting is the usual <code>Runnable</code> boundary. Do not use obsolete <code>stop</code>, <code>suspend</code> or <code>resume</code> as lifecycle control; in Java 21 they throw <code>UnsupportedOperationException</code>.</p>
+<p>Waiting to enter <code>synchronized</code> is not interruptible. Interrupting a thread blocked in an <code>InterruptibleChannel</code> operation closes the channel and throws <code>ClosedByInterruptException</code>, but arbitrary blocking calls need not respond. Use a supported timeout or cancellation mechanism, and retain ownership until termination is confirmed; another interrupt cannot force uncooperative code to finish.</p>
+
+<h2 id="names-priorities-and-daemon-status">Names, priorities and daemon status</h2>
+<p>A <a class="term" data-term="daemon-thread" href="glossary.html#daemon-thread">daemon thread</a> does not keep the JVM alive. When all started non-daemon threads terminate, normal shutdown can begin; remaining daemon work has no completion or <code>finally</code> guarantee. Set platform daemon status before start. With <code>new Thread(...)</code>, daemon status and priority come from the creator, with priority capped by the thread group's maximum.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.4" data-expect="ok"><figcaption><span class="ctitle">A daemon can still be joined explicitly</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span> reporter = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="t">Thread</span> self = <span class="t">Thread</span>.<span class="f">currentThread</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(self.<span class="f">getName</span>() + <span class="s">" daemon="</span> + self.<span class="f">isDaemon</span>());
+        }, <span class="s">"metrics-reporter"</span>);
+        reporter.<span class="f">setDaemon</span>(<span class="k">true</span>);
+        reporter.<span class="f">setPriority</span>(<span class="t">Thread</span>.NORM_PRIORITY);
+        reporter.<span class="f">start</span>();
+        reporter.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"reporter completed"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>metrics-reporter daemon=true</code> precedes <code>reporter completed</code> because the caller waits. Removing the join makes completion uncertain. Daemon status alone is unsuitable for owning a durable log flush.</p>
+<p><code>MIN_PRIORITY</code>, <code>NORM_PRIORITY</code> and <code>MAX_PRIORITY</code> are 1, 5 and 10. Priorities cannot guarantee order, fairness or progress. Names help <a href="thread-dumps.html">thread dumps</a>; priorities and <code>yield()</code> cannot repair races. See <a href="thread-local-daemon-sleep.html">daemon, sleep and priority mechanics</a>.</p>
+
+<h2 id="api-card-virtual-threads-results-and-context">API card: virtual threads, results and context</h2>
+<table>
+<thead><tr><th>Type and main API</th><th>One line contract</th></tr></thead>
+<tbody>
+<tr><td><code>Thread.ofPlatform()</code>, <code>Thread.ofVirtual()</code></td><td>Choose the kind of thread builder.</td></tr>
+<tr><td><code>builder.name(name)</code>, <code>builder.name(prefix, start)</code></td><td>Configure a name or numbered names for created threads.</td></tr>
+<tr><td><code>builder.unstarted(task)</code>, <code>builder.start(task)</code></td><td>Create without starting, or create and schedule a <code>Runnable</code>.</td></tr>
+<tr><td><code>builder.factory()</code></td><td>Build a <code>ThreadFactory</code> that creates unstarted threads with these settings.</td></tr>
+<tr><td><code>builder.uncaughtExceptionHandler(handler)</code></td><td>Configure the failure callback for created threads.</td></tr>
+<tr><td><code>builder.inheritInheritableThreadLocals(false)</code></td><td>Disable copying inheritable thread-local values from the constructing thread.</td></tr>
+<tr><td><code>Thread.startVirtualThread(task)</code>, <code>t.isVirtual()</code></td><td>Start a virtual thread directly, or inspect its kind.</td></tr>
+<tr><td><code>Executors.newVirtualThreadPerTaskExecutor()</code></td><td>Create an executor starting a fresh virtual thread per task, without a thread-count bound.</td></tr>
+<tr><td><code>executor.submit(callable)</code>, <code>Future&lt;V&gt;.get()</code></td><td>Schedule a result-producing task, then await its value or wrapped failure.</td></tr>
+<tr><td><code>ExecutorService.close()</code></td><td>Stop accepting work and await termination; try-with-resources calls it automatically.</td></tr>
+<tr><td><code>new ThreadLocal&lt;T&gt;()</code>, <code>ThreadLocal.withInitial(supplier)</code></td><td>Create a per-thread slot, initially null or lazily supplied on first <code>get()</code>.</td></tr>
+<tr><td><code>local.get()</code>, <code>local.set(value)</code>, <code>local.remove()</code></td><td>Access, replace or erase the caller's slot; after removal, <code>get()</code> initializes again.</td></tr>
+<tr><td><code>ThreadLocal.initialValue()</code></td><td>Override the initialization hook when not using <code>withInitial</code>.</td></tr>
+<tr><td><code>InheritableThreadLocal&lt;T&gt;.childValue(parentValue)</code></td><td>Creation-time inheritance hook, returning the same reference by default.</td></tr>
+<tr><td><code>t.setUncaughtExceptionHandler(h)</code>, <code>t.getUncaughtExceptionHandler()</code></td><td>Install or inspect a thread's failure callback.</td></tr>
+<tr><td><code>Thread.setDefaultUncaughtExceptionHandler(h)</code>, <code>Thread.getDefaultUncaughtExceptionHandler()</code></td><td>Set or inspect the fallback reached through the thread-group handler chain.</td></tr>
+<tr><td><code>Thread.UncaughtExceptionHandler.uncaughtException(t, error)</code></td><td>Callback on the dying thread when a throwable escapes its execution.</td></tr>
+</tbody>
+</table>
+
+<h2 id="virtual-threads-change-cost-not-correctness">Virtual threads change cost, not correctness</h2>
+<p>A <a class="term" data-term="virtual-thread" href="glossary.html#virtual-thread">virtual thread</a> is scheduled by the runtime on a <a class="term" data-term="carrier-thread" href="glossary.html#carrier-thread">carrier platform thread</a>. It has the familiar stack and interrupt API. <code>Thread.currentThread()</code> returns the virtual thread, not its carrier. These APIs are final in Java 21 and need no preview features.</p>
+<p>A <code>Thread.Builder</code> is mutable and not thread-safe. Its <code>factory()</code> produces a thread-safe <code>ThreadFactory</code> for concurrent creators; each <code>newThread(task)</code> call still returns an unstarted thread.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.5" data-expect="ok"><figcaption><span class="ctitle">A named virtual thread with an explicit owner</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">boolean</span>[] flags = <span class="k">new</span> <span class="t">boolean</span>[<span class="n">2</span>];
+        <span class="t">Thread</span> worker = <span class="t">Thread</span>.<span class="f">ofVirtual</span>().<span class="f">name</span>(<span class="s">"virtual-worker"</span>).<span class="f">unstarted</span>(() -&gt; {
+            <span class="t">Thread</span> self = <span class="t">Thread</span>.<span class="f">currentThread</span>();
+            flags[<span class="n">0</span>] = self.<span class="f">isVirtual</span>();
+            flags[<span class="n">1</span>] = self.<span class="f">isDaemon</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(self.<span class="f">getName</span>());
+        });
+        worker.<span class="f">setPriority</span>(<span class="t">Thread</span>.MAX_PRIORITY);
+        worker.<span class="f">start</span>();
+        worker.<span class="f">join</span>();
+        <span class="k">if</span> (!flags[<span class="n">0</span>] || !flags[<span class="n">1</span>] || worker.<span class="f">getPriority</span>() != <span class="t">Thread</span>.NORM_PRIORITY) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"unexpected virtual thread properties"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"virtual=true daemon=true priority="</span> + worker.<span class="f">getPriority</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>Thread.ofVirtual().name(&quot;virtual-worker&quot;).start(task)</code> combines construction and start. Virtual threads are always daemon threads with fixed priority 5; valid priority changes are ignored and <code>setDaemon(false)</code> is forbidden. Without a supplied name, their name is empty.</p>
+<p>Virtual threads help when many tasks wait for supported blocking I/O. They do not add cores, make shared objects safe, or accelerate a single calculation. Prefer bounded CPU parallelism for compute-heavy work; see <a href="cpu-vs-io-bound.html">CPU versus I/O work</a>.</p>
+
+<h2 id="callable-on-a-virtual-thread-per-task">Callable on a virtual thread per task</h2>
+<p>Neither <code>Callable.call()</code> nor <code>Runnable.run()</code> chooses another thread. There is no <code>Thread(Callable)</code> constructor. This program calls a task directly and through an executor; its result identifies the execution policy. Interface syntax and checked exceptions stay in <a href="java-lambdas-functional.html">the task-interface lesson</a>.</p>
+<p>Without an executor, wrap a callable in <code>FutureTask&lt;V&gt;</code>, which implements both <code>Runnable</code> and <code>Future&lt;V&gt;</code>. Pass the wrapper to a <code>Thread</code>, start it, and use the wrapper's <code>get()</code> for its result or <code>ExecutionException</code>; the owner still manages the thread's lifetime.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.6" data-expect="ok"><figcaption><span class="ctitle">The same Callable, two execution policies</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20</span><code><span class="k">import</span> java.util.concurrent.<span class="t">Callable</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">Callable</span>&lt;<span class="t">Boolean</span>&gt; task = () -&gt; <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">isVirtual</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"direct call is virtual: "</span> + task.<span class="f">call</span>());
+        <span class="k">try</span> (<span class="k">var</span> executor = <span class="t">Executors</span>.<span class="f">newVirtualThreadPerTaskExecutor</span>()) {
+            <span class="t">Future</span>&lt;<span class="t">Boolean</span>&gt; kind = executor.<span class="f">submit</span>(task);
+            <span class="t">Callable</span>&lt;<span class="t">Integer</span>&gt; calculation = () -&gt; <span class="n">6</span> * <span class="n">7</span>;
+            <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; answer = executor.<span class="f">submit</span>(calculation);
+            <span class="t">boolean</span> virtual = kind.<span class="f">get</span>();
+            <span class="t">int</span> value = answer.<span class="f">get</span>();
+            <span class="k">if</span> (!virtual || value != <span class="n">42</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"wrong outcome"</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"submitted call is virtual: "</span> + virtual);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"answer: "</span> + value);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Run as an ordinary Java program, this prints <code>false</code>, <code>true</code>, then <code>42</code>. Both tasks are submitted before either result is awaited. The tasks do not print, so unnamed executor threads do not obscure the output.</p>
+<p>The executor creates new virtual threads rather than reusing a fixed set. Closing waits, but supplies neither a deadline nor automatic failure reporting. An uncooperative task can delay closure indefinitely. Future results and cancellation belong in <a href="java-toolkit-executors-and-futures.html">the executor and future toolkit</a> and <a href="futures-and-promises.html">futures and promises</a>.</p>
+<p>If interrupted while waiting, <code>close()</code> requests shutdown as with <code>shutdownNow()</code>, continues waiting for active tasks, and restores the caller's interrupt status before returning. It does not throw <code>InterruptedException</code>, so interrupting the owner does not guarantee a prompt exit from try-with-resources.</p>
+<p><strong>Cheap threads do not make dependencies unlimited.</strong> Limit database or remote-call concurrency with permits and bound admitted work; do not pool virtual threads merely to reuse them. Follow <a href="semaphores.html">semaphores</a> and <a href="backpressure-and-load-shedding.html">backpressure</a>.</p>
+<p>On Java 21, blocking inside <code>synchronized</code> or certain native execution can cause <a class="term" data-term="pinning" href="glossary.html#pinning">pinning</a>: the virtual thread cannot release its carrier. This is version-specific guidance. The <a href="virtual-threads-and-coroutines.html">core virtual-thread lesson</a> covers scheduling and newer JVM differences; <a href="java-toolkit-synchronized.html">monitors</a> and <a href="java-toolkit-locks.html">explicit locks</a> cover locking choices.</p>
+<p>Pinning threatens scalability, not mutual exclusion. For frequent, long blocking operations inside a monitor, consider shortening the protected region or using <code>ReentrantLock</code>; short in-memory synchronized sections do not need blanket replacement.</p>
+
+<h2 id="threadlocal-belongs-to-the-thread-not-the-request">ThreadLocal belongs to the thread, not the request</h2>
+<p><a class="term" data-term="thread-local" href="glossary.html#thread-local">Thread-local storage</a> gives each thread a separate slot behind the same key. Use it for context across a call stack; prefer parameters when they make ownership clearer. A slot does not clone its value: storing the same mutable object in several slots still shares it.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.7" data-expect="ok"><figcaption><span class="ctitle">Two requests on one worker, with cleanup after failure</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">ThreadLocal</span>&lt;<span class="t">String</span>&gt; request = <span class="t">ThreadLocal</span>.<span class="f">withInitial</span>(() -&gt; <span class="s">"none"</span>);
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">serve</span>(<span class="t">String</span> id, <span class="t">boolean</span> fail) {
+        request.<span class="f">set</span>(id);
+        <span class="k">try</span> {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>() + <span class="s">" request="</span> + request.<span class="f">get</span>());
+            <span class="k">if</span> (fail) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"rejected"</span>);
+        } <span class="k">finally</span> {
+            request.<span class="f">remove</span>();
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        request.<span class="f">set</span>(<span class="s">"caller-context"</span>);
+        <span class="t">Thread</span> worker = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"worker initial="</span> + request.<span class="f">get</span>());
+            <span class="k">try</span> {
+                <span class="f">serve</span>(<span class="s">"A"</span>, <span class="k">true</span>);
+            } <span class="k">catch</span> (<span class="t">IllegalStateException</span> e) {
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"A failed"</span>);
+            }
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"before B="</span> + request.<span class="f">get</span>());
+            <span class="f">serve</span>(<span class="s">"B"</span>, <span class="k">false</span>);
+        }, <span class="s">"request-worker"</span>);
+        <span class="k">try</span> {
+            worker.<span class="f">start</span>();
+            worker.<span class="f">join</span>();
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"caller still="</span> + request.<span class="f">get</span>());
+        } <span class="k">finally</span> {
+            request.<span class="f">remove</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The worker starts with <code>none</code>, A fails, and the context before B is again <code>none</code>. The caller still sees <code>caller-context</code>. These sequential jobs reproduce the reuse that makes stale context dangerous in pools.</p>
+<p><code>remove()</code> affects only the caller's slot; cleanup in the submitter cannot clear a worker's slot. <code>set(null)</code> leaves an initialized null value, whereas removal permits initialization again. Clean request context in <code>finally</code> to avoid retaining old context and large objects.</p>
+<p>This cleanup assumes <code>serve</code> owns the outer request boundary. If a nested operation temporarily replaces an existing context, save and restore the previous value in <code>finally</code>; unconditional removal would erase the outer operation's context.</p>
+<p>Ordinary thread locals are not inherited. With inheritance enabled, <code>InheritableThreadLocal</code> transfers values at child creation, not task submission, and by default shares the value reference. It is not general pool context propagation. Virtual threads support their own slots, but expensive per-thread caches multiply with task count. Continue with <a href="confinement-and-thread-local.html">confinement and thread-local state</a>.</p>
+
+<h2 id="install-an-uncaught-exception-handler-before-start">Install an uncaught exception handler before start</h2>
+<p>An <a class="term" data-term="uncaught-exception-handler" href="glossary.html#uncaught-exception-handler">uncaught exception handler</a> observes failure on the dying thread. It cannot resume the failed task and should be small and reliable. A per-thread handler takes precedence; otherwise the thread group handles failure, normally delegating towards the default handler or printing a trace.</p>
+
+<figure class="code single" data-sample="java-toolkit-threads.8" data-expect="ok"><figcaption><span class="ctitle">Join observes termination; a handler records why</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Throwable</span>[] failure = <span class="k">new</span> <span class="t">Throwable</span>[<span class="n">1</span>];
+        <span class="t">Thread</span> worker = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"bad record"</span>);
+        }, <span class="s">"import-worker"</span>);
+        worker.<span class="f">setUncaughtExceptionHandler</span>((thread, error) -&gt; failure[<span class="n">0</span>] = error);
+        worker.<span class="f">start</span>();
+        worker.<span class="f">join</span>();
+        <span class="k">if</span> (!(failure[<span class="n">0</span>] <span class="k">instanceof</span> <span class="t">IllegalStateException</span>)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"failure was not recorded"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(worker.<span class="f">getName</span>() + <span class="s">" failed: "</span> + failure[<span class="n">0</span>].<span class="f">getMessage</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Termination follows handler completion, so the completed join makes this single handler's write visible. Many concurrently reporting workers need a suitable shared collection or synchronization policy. Submitted tasks normally capture failure in their futures before this boundary; see <a href="exceptions-in-threads.html">exceptions inside threads</a>.</p>
+
+<div class="box example">
+<h3>Worked example: the request timed out, but the worker kept running</h3>
+<p>A handler starts a worker, calls <code>worker.join(100)</code>, and returns a timeout response. The worker later writes to shared request state. <strong>The timeout ended the wait, not the work.</strong> Check termination, then apply the operation's cancellation policy.</p>
+<figure class="timeline"><figcaption>One timeout, two independent lifetimes</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Caller</span><span>Worker</span></div><div class="tl-row"><span class="t">1</span><span class="cell">starts W</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">begins work</span></div><div class="tl-row"><span class="t">3</span><span class="cell">waits in timed join</span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">4</span><span class="cell risk">timeout expires; W is still alive</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell">calls W.interrupt() to request cancellation</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell">observes interruption at an interruptible wait or explicit check</span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell">cleans up and returns</span></div><div class="tl-row good"><span class="t">8</span><span class="cell good">a later join observes termination</span><span class="cell empty"></span></div><div class="tl-note">A stop request and confirmed termination are separate events.</div></div></figure>
+<p>Request interruption if supported and allow a separately bounded cleanup wait. If termination remains unconfirmed, report that and retain ownership; do not pretend the worker stopped. Unbounded cleanup would defeat the response deadline. Define how late results are rejected before sharing request state; <a href="java-toolkit-putting-it-together.html">putting the toolkit together</a> makes this a class contract.</p>
+</div>
+
+<div class="box note">
+<h3>Java 21 reference points</h3>
+<p>Check overload details in the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.html">Thread API</a>, builder configuration in <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Thread.Builder.html">Thread.Builder</a>, and slot initialization in <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/ThreadLocal.html">ThreadLocal</a>. Oracle's <a href="https://docs.oracle.com/en/java/javase/21/core/virtual-threads.html">Java 21 virtual-thread guide</a> documents the resource and pinning guidance.</p>
+<p>The <a href="https://docs.oracle.com/javase/specs/jls/se21/html/jls-17.html#jls-17.4.5">Java memory model</a> defines the start and termination visibility edges. The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ExecutorService.html#close()">executor close contract</a> specifies its interruption policy, and <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/FutureTask.html">FutureTask</a> supplies the callable-to-runnable adapter.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Equating a task with a thread.</strong> Direct <code>run()</code> or <code>call()</code> is synchronous; choose execution explicitly.</li>
+<li><strong>Assuming timeout means completion.</strong> Inspect termination and separately decide whether to request cancellation.</li>
+<li><strong>Testing interruption destructively.</strong> Use <code>isInterrupted()</code> to observe; consume the caller's status with <code>Thread.interrupted()</code> only deliberately.</li>
+<li><strong>Using daemon status, priority or sleep to guarantee an outcome.</strong> Await the event with a completion or synchronization mechanism.</li>
+<li><strong>Caching expensive resources per virtual thread.</strong> Borrow from a bounded resource pool and release reliably.</li>
+<li><strong>Clearing context on the submitter.</strong> Cleanup belongs on the thread holding the slot, even after failure.</li>
+<li><strong>Expecting <code>join()</code> to report failure.</strong> Record failures or inspect the future.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Expect code-reading questions about which thread executes a line, followed by ownership questions: who waits, who cancels, and who sees failure? In LLD, separate your domain task from its execution policy.</p>
+<blockquote>Starting schedules execution once; joining observes termination. A timed wait and an interrupt request each leave me responsible for discovering whether the work actually stopped.</blockquote>
+<blockquote>I choose virtual threads for many blocking tasks, retain a limit around scarce dependencies, and define result collection, cancellation and context cleanup.</blockquote>
+<p>Follow ups include interrupted joiners, failed request cleanup and Java 21 pinning. Shared-state fixes belong in <a href="java-toolkit-volatile-and-atomics.html">volatile and atomics</a>; changing thread type does not supply them.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A task describes work; <code>start()</code> or an executor chooses concurrent execution. A <code>Thread</code> starts at most once.</li>
+<li>A join timeout neither stops work nor reports failure; confirm termination before reading its completed result.</li>
+<li><code>interrupt()</code> requests; <code>isInterrupted()</code> observes; static <code>interrupted()</code> observes and clears the caller.</li>
+<li>Virtual threads make waiting cheaper; CPU capacity, shared-state rules and resource limits still apply.</li>
+<li>Thread-local context needs cleanup on its owning thread, and failures need an observation path.</li>
+<li>Names aid diagnosis. Daemon status, priority and sleep cannot replace lifecycle ownership.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-toolkit-threads"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-toolkit-threads.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Main names itself <code>caller</code>, creates <code>Thread t = new Thread(() -&gt; System.out.println(Thread.currentThread().getName()), &quot;worker&quot;)</code>, then calls <code>t.run(); t.start(); t.join(); t.start();</code>. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It prints <code>caller</code>, then <code>worker</code>, then throws <code>IllegalThreadStateException</code>.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It prints <code>worker</code> three times because termination permits restart.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The first start throws because run already started the thread.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It prints <code>caller</code> twice because run permanently binds the task to main.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Direct platform-thread <code>run()</code> executes on the caller without changing the start lifecycle. The first <code>start()</code> is legal; the second is forbidden even after termination.</div></div><div class="mcq" data-id="java-toolkit-threads.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A started worker cannot terminate until a gate opens. Nobody has opened it. Which zero-timeout call immediately reports that it has not terminated?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>worker.join(0)</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>worker.join(0, 0)</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>worker.join(java.time.Duration.ZERO)</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>worker.join()</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> The <code>Duration</code> overload returns <code>false</code> without waiting. The older all-zero overloads and <code>join()</code> mean indefinite waiting, so they cannot act as zero-budget polls.</div></div><div class="mcq" data-id="java-toolkit-threads.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">With no other interrupts arriving, what does this print?
+<figure class="code single" data-sample="java-toolkit-threads.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">Thread</span> self = <span class="t">Thread</span>.<span class="f">currentThread</span>();
+self.<span class="f">interrupt</span>();
+<span class="t">System</span>.out.<span class="f">println</span>(self.<span class="f">isInterrupted</span>() + <span class="s">" "</span> + <span class="t">Thread</span>.<span class="f">interrupted</span>()
+        + <span class="s">" "</span> + self.<span class="f">isInterrupted</span>());</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>true false false</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>true true false</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>true true true</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>false true false</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Operands are evaluated in order. The instance query preserves the set flag, the static query returns true and clears it, and the last query sees false.</div></div><div class="mcq" data-id="java-toolkit-threads.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Given <code>Callable&lt;Integer&gt; task = () -&gt; 42;</code>, which statement compiles and requests executor execution? Assume the imports and a live executor are present.</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>new Thread(task).start();</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>task.call();</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>Future&lt;Integer&gt; result = executor.submit(task);</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>task.start();</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Submitting a <code>Callable</code> returns a future for scheduled work. Direct <code>call()</code> is synchronous and requires checked-exception handling; <code>Thread</code> has no <code>Callable</code> constructor and <code>Callable</code> has no <code>start()</code> method.</div></div><div class="mcq" data-id="java-toolkit-threads.q5" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which statements about Java 21 virtual threads are true? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">They are daemon threads with fixed priority 5.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>Thread.currentThread()</code> inside their task identifies the virtual thread.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The per-task executor automatically limits database concurrency to the carrier count.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Blocking inside <code>synchronized</code> always lets them unmount from their carrier.</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Identity and fixed properties are API guarantees. Carrier count is not a database admission limit, and blocking inside <code>synchronized</code> can pin a carrier on Java 21.</div></div><div class="mcq" data-id="java-toolkit-threads.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Main submits A to a single-thread executor. A sets <code>local</code>, a <code>ThreadLocal&lt;String&gt;</code>, to <code>&quot;A&quot;</code> and throws; its future captures the failure, so the worker survives. Main then calls <code>local.remove()</code> and submits B, which reads <code>local</code> on the same worker. What can B see?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always the initializer's value, because main removed the key.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A's old value, because main only removed its own slot.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A compile error because a <code>ThreadLocal</code> cannot be shared.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Null, because throwing clears thread-local values.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Operations act on the executing thread's slot. The future captures A's exception without clearing that slot, and B reads <code>&quot;A&quot;</code>. Sharing a <code>ThreadLocal</code> key is legal; main's removal cannot reset the worker's value. Put cleanup in <code>finally</code> on the worker's request boundary.</div></div><div class="mcq" data-id="java-toolkit-threads.q7" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A daemon thread throws. Its installed handler records the failure and returns. Main is non-daemon and successfully joins it. Which statement is correct?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Join throws the worker's exception.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The JVM abandons the daemon solely because it is daemon, even while main waits.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Join returns normally after the handler completes; inspect the recorded failure separately.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The handler automatically restarts the task.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Main keeps the JVM alive during its wait. The handler is part of termination, but join has no task-exception channel and a handler cannot resume the failed task.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-toolkit-threads.c1" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A request owner calls <code>worker.join(100)</code>, reads a plain result field, and returns. On timeout it adds <code>worker.interrupt()</code> and immediately reuses the request object. Identify the independent mistakes and correct the contract.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The void join does not report completion: check <code>isAlive()</code> or the <code>join(Duration)</code> boolean. Reading the plain field while work continues has no completion visibility guarantee. <code>interrupt()</code> only requests cancellation, so immediate object reuse can overlap the old worker's writes.</p>
+<p>Give each task private result ownership, read after confirmed termination or through a future, and define cancellation checkpoints. On timeout request cancellation if supported, allow a separately bounded cleanup budget, and report whether termination was confirmed. Do not reuse worker-owned state until safe; reject late results explicitly. If the joining caller is interrupted, propagate or restore its status at a boundary and separately decide what happens to the child.</p></div></div><div class="cq" data-q="java-toolkit-threads.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A service stores a request id and database connection in ThreadLocals on 20 reused workers. You propose virtual threads per request. What changes, and what remains the request owner's responsibility?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Each virtual thread has its own slots, so a small request id can accompany its synchronous call stack. Clean it in <code>finally</code> and explicitly propagate context across execution boundaries. Do not allocate a connection per virtual thread: borrow from a bounded connection pool and return it on every path.</p>
+<p>The owner still collects success or failure, defines cancellation and timeouts, awaits required completion, and bounds admitted work. Virtual threads do not make mutable shared objects safe. CPU-heavy stages need appropriate parallelism, and Java 21 code needs review for long blocking operations while pinned. Execution cost changes; ownership contracts remain.</p></div></div><div class="cq" data-q="java-toolkit-threads.c3" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Use ordinary <code>int</code> fields to pass 21 into one named worker and read its doubled result after it finishes. Write the handoff without <code>volatile</code> or a lock. Explain why moving the input assignment after <code>start()</code> breaks the argument.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The caller's input write precedes <code>start()</code>, so the worker sees it. The worker's output write precedes observed termination, so a completed <code>join()</code> publishes the result back. No thread modifies either field concurrently with its reader.</p>
+<figure class="code single" data-sample="java-toolkit-threads.10" data-expect="ok"><figcaption><span class="ctitle">Plain fields with a start and join handoff</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">int</span> input;
+    <span class="k">static</span> <span class="t">int</span> output;
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span> worker = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; output = input * <span class="n">2</span>, <span class="s">"doubling-worker"</span>);
+        input = <span class="n">21</span>;
+        worker.<span class="f">start</span>();
+        worker.<span class="f">join</span>();
+        <span class="k">if</span> (output != <span class="n">42</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"handoff failed"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(output);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Moving <code>input = 21</code> after <code>start()</code> introduces an unordered read and write. The worker could read the initial zero instead; joining later cannot repair that earlier input race. A join that times out while the worker is alive also cannot justify reading <code>output</code>.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="java-toolkit-threads.s1" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Walk me through <code>Runnable</code>, <code>Callable</code> and <code>Thread</code>. Why would you implement an interface instead of extending <code>Thread</code>?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Runnable and Callable describe tasks; Thread supplies an execution lifecycle</li><li>Runnable returns void without checked exceptions; Callable returns a value and may throw Exception</li><li>Direct run or call is synchronous; start schedules a thread once</li><li>Composition lets tasks be tested directly and scheduled by different owners</li><li>Completion and failure need joins plus reporting, or futures</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I separate the work from the mechanism that runs it. A Runnable describes a task with no return value and no declared checked exceptions. A Callable can return a value and throw a checked exception. Neither interface starts anything: calling run or call directly executes on the caller. A Thread gives a Runnable an execution lifecycle, and start schedules that thread once. Extending Thread works, but it couples a domain task to one execution mechanism and uses its single class inheritance slot. I prefer a task object that I can test directly, give to a platform thread, or submit to an executor. Then the owner chooses how to collect completion and failure. With a raw thread I join and report failures separately; with a Callable I submit it and inspect the future. That keeps task behaviour separate from lifecycle policy.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What happens if you call run, then start, then join, then start again on one platform thread?</span></p></div></div><div class="sq" data-sq="java-toolkit-threads.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Our request timed out after a join, but its worker kept changing state. What would you check and fix?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A timed join limits the caller's wait and does not stop the worker</li><li>Inspect isAlive after the void overload or the Duration overload's boolean</li><li>Interrupt requests cancellation and needs a cooperative task</li><li>Interruption of a joining caller does not cancel the worker</li><li>Bound cleanup separately and retain ownership if termination remains unconfirmed</li><li>Reuse or read result state only after safe completion or an explicit late-result policy</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The timeout only ended the caller's wait. It did not stop the worker, so I would first check whether the code wrongly treats a timed join as completion. After the void overload I check isAlive; with the Duration overload I inspect its boolean. If the work is no longer wanted, I request interruption and check that the task actually cooperates, either through interruptible waits or explicit checks between bounded pieces of work. I also distinguish cancellation of the worker from interruption of the caller while it is joining. The latter ends the caller's wait and does not automatically cancel the worker. Next I give cleanup a separate bounded budget. If termination is still unconfirmed, I report that honestly and retain ownership rather than claiming the worker stopped. Finally, I stop reusing state that the old worker may still touch. I collect a private result after safe completion or define a policy that rejects late results. That fixes both the lifetime bug and the unsafe result access.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What if the task never checks interruption and blocks in an API that does not respond to it?</span></p></div></div><div class="sq" data-sq="java-toolkit-threads.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Would you switch this blocking request service to virtual threads, and what would you review first?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Choose virtual threads for many waiting tasks, not added CPU capacity</li><li>Use a virtual thread per task and own completion, failure and cancellation</li><li>Bound scarce dependencies and admitted work independently of thread cost</li><li>Review Java 21 pinning during blocking synchronized or native execution</li><li>Review ThreadLocal cleanup and avoid expensive per-thread resource caches</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would consider virtual threads if the service has many requests waiting on blocking I/O. They reduce the cost of waiting; they do not add CPU capacity or make shared state safe. I would use a virtual thread per task and keep an explicit owner for results, failure and cancellation. An executor scoped with try with resources helps await termination, but its close can still wait indefinitely for uncooperative work. Next I would preserve a limit on database connections and remote calls, and bound admitted requests. Cheap threads must not become unlimited pressure on a dependency. Since this service runs Java 21, I would inspect long blocking operations inside synchronized regions or native execution for carrier pinning. Finally I would review thread locals. A small request id is reasonable with clear cleanup, but an expensive connection per virtual thread would multiply resource usage. I would borrow that connection from a bounded pool and return it reliably. Then I would measure the actual workload before claiming a throughput improvement.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">If each request is pure CPU work, what execution policy would you choose instead?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-parallel-reduce.html" data-problem="parallel-reduce"><span class="pk">Executors and async · medium</span><b>Parallel reduce</b><span class="pst"></span></a><a class="pcard" href="p-executor-wait-for-all.html" data-problem="executor-wait-for-all"><span class="pk">Executors and async · medium</span><b>Executor with wait for all</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-broken-shutdown.html" data-problem="fix-the-broken-shutdown"><span class="pk">Bug hunts · hard</span><b>Fix the broken shutdown</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-oop-design-for-lld.html"><span>Previous</span><b>Design patterns for LLD and machine coding rounds</b></a><a class="next" href="java-toolkit-synchronized.html"><span>Next</span><b>The toolkit: synchronized, wait and notify</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#api-card-tasks-and-platform-threads">API card: tasks and platform threads</a><a href="#create-the-task-then-start-its-thread">Create the task, then start its thread</a><a href="#join-is-a-wait-not-a-cancellation-policy">Join is a wait, not a cancellation policy</a><a href="#sleep-and-the-three-interrupt-methods">Sleep and the three interrupt methods</a><a href="#names-priorities-and-daemon-status">Names, priorities and daemon status</a><a href="#api-card-virtual-threads-results-and-context">API card: virtual threads, results and context</a><a href="#virtual-threads-change-cost-not-correctness">Virtual threads change cost, not correctness</a><a href="#callable-on-a-virtual-thread-per-task">Callable on a virtual thread per task</a><a href="#threadlocal-belongs-to-the-thread-not-the-request">ThreadLocal belongs to the thread, not the request</a><a href="#install-an-uncaught-exception-handler-before-start">Install an uncaught exception handler before start</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

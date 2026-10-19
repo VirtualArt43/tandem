@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Thread-safe caches: LRU, TTL and single-flight · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="concurrent-caches" data-title="Thread-safe caches: LRU, TTL and single-flight" data-track="core" data-module="core-10" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details open><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches" class=here><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m10">Module 10: Concurrent data structures</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 10.4</span><span>31 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Thread-safe caches: LRU, TTL and single-flight</h1><p class="lsum">Making an LRU cache thread-safe without the classic holes, scaling it, expiring entries, and sharing overlapping loads and failures per key.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Microsoft</span><span class="co">Apple</span><span class="co">Confluent</span><span class="co">Uber</span><span class="co">LinkedIn</span></div><div class="prereq"><span>Before this:</span><a href="concurrent-hash-maps.html">Concurrent hash maps</a><a href="futures-and-promises.html">Futures and promises</a></div></header><article class="prose" id="article">
+<p class="lead">"Now make your LRU cache thread-safe" appears in Microsoft, Apple, Confluent and Rubrik reports; LinkedIn reports include thread-safe cache variants too. Two traps recur in the design: a successful LRU lookup updates recency, and a slow load must not hold the cache lock.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A small office fridge holds ten items, and a whiteboard next to it lists them from most recently used to least. Whenever someone takes the milk, they move "milk" to the top of the list. So even "just looking" changes the whiteboard, and if two people rewrite it at the same moment, it ends up wrong. One marker pen, passed from hand to hand, fixes that.</p>
+<p>When the milk runs out and five people notice at once, you do not want five people walking to the shop. The first one goes; the other four wait for them to come back. <strong>One trip per missing item, however many people noticed.</strong> That second idea is called single-flight, and it is what stops a cache miss from turning into a stampede on your database.</p>
+</div>
+
+<h2 id="a-cache-hit-updates-recency">A cache hit updates recency</h2>
+<p>An <a class="term" data-term="lru-cache" href="glossary.html#lru-cache">LRU cache</a> is a hash map for lookups plus a doubly linked list in recency order. <code>get</code> finds the entry and moves it to the front of the list; <code>put</code> inserts at the front and, when the cache is over capacity, evicts the entry at the back. With bounded key/value costs, both take expected O(1) work, excluding lock waiting; hash collisions and allocation can cost more.</p>
+<p>The trap is in the word "get". Moving a node rewrites several links, so a <code>get</code> mutates shared state exactly like a <code>put</code>. A <a class="term" data-term="read-write-lock" href="glossary.html#read-write-lock">read-write lock</a> with <code>get</code> under the read lock lets several threads rewire the list at once:</p>
+
+<figure class="timeline"><figcaption>Two gets that both hold only a read lock</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>get(B)</span><span>get(C)</span><span>Recency list</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">front, A, B, C, back</span></div><div class="tl-row"><span class="t">2</span><span class="cell">reads B&#x27;s neighbours: A before, C after</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">reads C&#x27;s neighbours: B before, back after</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">unlinks B: A.next = C, C.prev = A</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">unlinks C: B.next = back, back.prev = B</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell">moves B to the front</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell">moves C to the front</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">8</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">back.prev now points at B, which sits near the front</span></div><div class="tl-row bad"><span class="t">9</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">the next eviction throws out a just-used entry, and walking back from the end skips entries</span></div><div class="tl-note">A shared lock let two writers in. In C++, this data race is undefined behavior, not a guaranteed list outcome.</div></div></figure>
+
+<p>The precise statement is: <strong>a recency-updating cache hit needs exclusive access to the list</strong>. A miss, <code>size()</code> or an explicit <code>peek</code> can be read-only, but still needs synchronization with writers. The simple design below uses one mutex for every operation.</p>
+
+<h2 id="why-a-concurrent-map-is-not-enough">Why a concurrent map is not enough</h2>
+<p>The next idea is to make each piece thread-safe: a <code>ConcurrentHashMap</code> for the index and a concurrent deque for the order. Each structure is now safe, but the cache's invariant spans both of them and the capacity: <strong>"the list holds exactly the keys in the map, in recency order, and there are at most capacity of them."</strong> Two thread-safe parts do not make that whole atomic:</p>
+<ul>
+<li>Two <code>put</code>s can make stale capacity decisions, then both try to remove the same eldest key, leaving too many entries; separate list and map removals can also diverge.</li>
+<li>A <code>get</code> moves key K to the front while a <code>put</code> is evicting K: the map and the list now disagree about whether K is cached.</li>
+<li>Removing a node from the middle of a concurrent deque is O(n) anyway.</li>
+</ul>
+<p>This is the lesson from <a class="term" data-term="atomicity" href="glossary.html#atomicity">atomicity</a>: one invariant, one lock. The map, the list and the size are one invariant, so one <a class="term" data-term="mutex" href="glossary.html#mutex">mutex</a> guards all three.</p>
+
+<h2 id="the-one-lock-lru">The one-lock LRU</h2>
+<p>In Java, <code>LinkedHashMap</code> already is a map plus a recency list: construct it with <code>accessOrder = true</code> and override <code>removeEldestEntry</code>. In C++, a <code>std::list</code> holds the entries in recency order and an <code>unordered_map</code> maps each key to its list iterator, so <code>splice</code> can move an entry to the front in O(1).</p>
+
+<figure class="code pair" data-sample="concurrent-caches.1" data-expect="ok"><figcaption><span class="ctitle">An LRU cache with one lock, hammered by four threads</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;list&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;random&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> K, <span class="k">class</span> V&gt;
+<span class="k">class</span> LruCache {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">LruCache</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;V&gt; <span class="f">get</span>(<span class="k">const</span> K&amp; key) {                    <span class="c">// a write: it reorders the list</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it == index_.<span class="f">end</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+        order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);   <span class="c">// move to the front in O(1)</span>
+        <span class="k">return</span> it-&gt;second-&gt;second;                           <span class="c">// a copy, made under the lock</span>
+    }
+
+    <span class="t">void</span> <span class="f">put</span>(<span class="k">const</span> K&amp; key, V value) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it != index_.<span class="f">end</span>()) {
+            it-&gt;second-&gt;second = <span class="t">std</span>::<span class="f">move</span>(value);
+            order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);
+            <span class="k">return</span>;
+        }
+        order_.<span class="f">emplace_front</span>(key, <span class="t">std</span>::<span class="f">move</span>(value));
+        <span class="k">try</span> {
+            index_.<span class="f">emplace</span>(key, order_.<span class="f">begin</span>());
+        } <span class="k">catch</span> (...) {
+            order_.<span class="f">pop_front</span>();                            <span class="c">// allocation failure must not orphan a node</span>
+            <span class="k">throw</span>;
+        }
+        <span class="k">if</span> (index_.<span class="f">size</span>() &gt; capacity_) {                     <span class="c">// evict the least recently used</span>
+            index_.<span class="f">erase</span>(order_.<span class="f">back</span>().first);
+            order_.<span class="f">pop_back</span>();
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">size_t</span> <span class="f">size</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> index_.<span class="f">size</span>();
+    }
+
+    <span class="t">bool</span> <span class="f">consistent</span>() {                                      <span class="c">// the invariant, checked under the lock</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (order_.<span class="f">size</span>() != index_.<span class="f">size</span>() || index_.<span class="f">size</span>() &gt; capacity_) <span class="k">return</span> <span class="k">false</span>;
+        <span class="k">for</span> (<span class="k">auto</span> it = order_.<span class="f">begin</span>(); it != order_.<span class="f">end</span>(); ++it) {
+            <span class="k">auto</span> found = index_.<span class="f">find</span>(it-&gt;first);
+            <span class="k">if</span> (found == index_.<span class="f">end</span>() || found-&gt;second != it) <span class="k">return</span> <span class="k">false</span>;
+        }
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+<span class="k">private</span>:
+    <span class="k">using</span> Order = <span class="t">std</span>::<span class="t">list</span>&lt;<span class="t">std</span>::<span class="t">pair</span>&lt;K, V&gt;&gt;;                <span class="c">// front = most recently used</span>
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    Order order_;                                            <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;K, <span class="k">typename</span> Order::iterator&gt; index_;  <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity = <span class="n">16</span>;
+    LruCache&lt;<span class="t">int</span>, <span class="t">int</span>&gt; <span class="f">cache</span>(capacity);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; failures{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;cache, &amp;failures, t] {
+            <span class="t">std</span>::mt19937 <span class="f">rng</span>(t + <span class="n">1</span>);                         <span class="c">// a private generator per thread</span>
+            <span class="t">std</span>::uniform_int_distribution&lt;<span class="t">int</span>&gt; <span class="f">pick</span>(<span class="n">0</span>, <span class="n">49</span>);
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">20000</span>; i += <span class="n">1</span>) {
+                <span class="t">int</span> key = <span class="f">pick</span>(rng);
+                <span class="k">auto</span> value = cache.<span class="f">get</span>(key);
+                <span class="k">if</span> (!value) cache.<span class="f">put</span>(key, key * <span class="n">10</span>);
+                <span class="k">else</span> <span class="k">if</span> (*value != key * <span class="n">10</span>) failures += <span class="n">1</span>;
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    <span class="k">if</span> (failures.<span class="f">load</span>() != <span class="n">0</span> || !cache.<span class="f">consistent</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"cache invariant failed"</span>);
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"size %zu (capacity %zu), list and map agree: %s\n"</span>, cache.<span class="f">size</span>(), capacity,
+                cache.<span class="f">consistent</span>() ? <span class="s">"yes"</span> : <span class="s">"no"</span>);
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</span><code><span class="k">import</span> java.util.<span class="t">LinkedHashMap</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ThreadLocalRandom</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="k">class</span> <span class="t">LruCache</span>&lt;K, V&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">LinkedHashMap</span>&lt;K, V&gt; map;                       <span class="c">// guarded by this</span>
+
+    <span class="t">LruCache</span>(<span class="t">int</span> capacity) {
+        <span class="k">if</span> (capacity &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"negative capacity"</span>);
+        <span class="c">// accessOrder = true: every get moves the entry to the most recent end</span>
+        <span class="k">this</span>.map = <span class="k">new</span> <span class="t">LinkedHashMap</span>&lt;&gt;(<span class="n">16</span>, <span class="n">0.75f</span>, <span class="k">true</span>) {
+            <span class="a">@Override</span>
+            <span class="k">protected</span> <span class="t">boolean</span> <span class="f">removeEldestEntry</span>(<span class="t">Map</span>.<span class="t">Entry</span>&lt;K, V&gt; eldest) {
+                <span class="k">return</span> <span class="f">size</span>() &gt; capacity;                        <span class="c">// evict the least recently used</span>
+            }
+        };
+    }
+
+    <span class="k">synchronized</span> V <span class="f">get</span>(K key) { <span class="k">return</span> map.<span class="f">get</span>(key); }           <span class="c">// a write: it reorders the list</span>
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">put</span>(K key, V value) { map.<span class="f">put</span>(key, value); }
+    <span class="k">synchronized</span> <span class="t">int</span> <span class="f">size</span>() { <span class="k">return</span> map.<span class="f">size</span>(); }
+
+    <span class="k">synchronized</span> <span class="t">boolean</span> <span class="f">consistent</span>(<span class="t">int</span> capacity) {              <span class="c">// walk the recency list, compare with the map</span>
+        <span class="t">int</span> walked = <span class="n">0</span>;
+        <span class="k">for</span> (K ignored : map.<span class="f">keySet</span>()) walked += <span class="n">1</span>;
+        <span class="k">return</span> walked == map.<span class="f">size</span>() &amp;&amp; walked &lt;= capacity;
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">final</span> <span class="t">int</span> capacity = <span class="n">16</span>;
+        <span class="t">LruCache</span>&lt;<span class="t">Integer</span>, <span class="t">Integer</span>&gt; cache = <span class="k">new</span> <span class="t">LruCache</span>&lt;&gt;(capacity);
+        <span class="t">AtomicInteger</span> failures = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">Thread</span>[] ts = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">4</span>];
+        <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+            ts[t] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="t">ThreadLocalRandom</span> rnd = <span class="t">ThreadLocalRandom</span>.<span class="f">current</span>();
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">20_000</span>; i += <span class="n">1</span>) {
+                    <span class="t">int</span> key = rnd.<span class="f">nextInt</span>(<span class="n">50</span>);
+                    <span class="t">Integer</span> v = cache.<span class="f">get</span>(key);
+                    <span class="k">if</span> (v == <span class="k">null</span>) cache.<span class="f">put</span>(key, key * <span class="n">10</span>);         <span class="c">// a miss: load and insert</span>
+                    <span class="k">else</span> <span class="k">if</span> (v != key * <span class="n">10</span>) failures.<span class="f">incrementAndGet</span>();
+                }
+            }, <span class="s">"client-"</span> + t);
+            ts[t].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : ts) t.<span class="f">join</span>();
+        <span class="k">if</span> (failures.<span class="f">get</span>() != <span class="n">0</span> || !cache.<span class="f">consistent</span>(capacity))
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"cache invariant failed"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"size "</span> + cache.<span class="f">size</span>() + <span class="s">" (capacity "</span> + capacity + <span class="s">"), list and map agree: "</span>
+                + (cache.<span class="f">consistent</span>(capacity) ? <span class="s">"yes"</span> : <span class="s">"no"</span>));
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>size 16 (capacity 16), list and map agree: yes</pre></div><div class="runout" hidden></div></figure>
+
+<p>Three details are graded. <code>get</code> returns a <strong>copy made under the lock</strong> (in Java the cached objects should be immutable, so handing out the reference is safe). The critical section includes hashing, allocation, value copying and list updates, so <strong>keep that work bounded</strong>: no backend loading, logging or eviction listeners. And the miss path here is a check-then-act (two threads may both miss and both insert the same value), which is harmless for a pure function but becomes a stampede when the load is a database call. That is the single-flight section below.</p>
+<p>The examples allow capacity zero, which retains nothing; Java rejects a negative capacity. Keys must have stable hashing and equality, and values should be immutable or safely copied. Use non-null Java values when <code>null</code> means a miss.</p>
+<p>For the C++ templates, assume hash/equality and destructors do not throw, and value assignment preserves a valid object on failure. New-node insertion rolls back the list if index insertion fails. <code>get</code> returns a value, never an iterator or reference that eviction could invalidate. User-defined hash, equality and value operations must not reenter the cache while its lock is held.</p>
+<p><strong>The lock gives a sequential order.</strong> A hit takes effect at its recency update, a miss at its protected lookup, and <code>put</code> after insertion or replacement and any eviction. Capacity may be exceeded transiently inside that private critical section, but another cache operation cannot observe it. Test eviction order separately from concurrent stress; an intact list alone does not prove correct LRU behavior.</p>
+
+<h2 id="making-it-scale">Making it scale</h2>
+<p>Start with the one-lock implementation and measure its throughput and tail latency. When profiling shows the lock is hot, these are the steps, in order:</p>
+<ol>
+<li><strong>Shrink the critical section.</strong> Build values before taking the lock; standard map operations still hash and compare keys under it, so keep those functions cheap; run eviction callbacks after releasing it (an <a class="term" data-term="open-call" href="glossary.html#open-call">open call</a>).</li>
+<li><strong>Segment by key.</strong> N independent LRU caches, each with its own lock and a share of the total capacity, picked by a stable nonnegative hash modulo N. Distribute any capacity remainder explicitly. Uniform traffic can spread across the locks, but a hot key still serializes on one shard; there is no guaranteed N-fold speedup. The price: eviction is per segment, so a hot segment may evict an entry that a single global LRU would have kept. A Meta candidate designing a single-machine memcache was praised for exactly this: one shard per core so locks rarely collide.</li>
+<li><strong>Make recency best effort.</strong> First acquire the value safely through a concurrent map or a locked shard and retain its lifetime. Then try a separate policy lock; if it is busy, skip only the recency update. You cannot read the ordinary map or its list node after failing its data lock. Sampling recency updates has the same safety requirement. Redis takes a similar shortcut: it approximates LRU by sampling a few keys and evicting the oldest of the sample.</li>
+<li><strong>Buffer policy updates, as Caffeine does.</strong> Its concurrent map supports data lookup while buffered access events update eviction policy in batches. Read events can be dropped under contention; write events must be preserved. Maintenance drains the buffers under a policy lock, usually through an executor, with fallback paths under pressure. Its Window TinyLFU policy combines recency with frequency-based admission. This separates data correctness from approximate eviction order; it is not a promise that every operation is nonblocking or that capacity is exact at every instant.</li>
+</ol>
+
+<h2 id="expiring-entries">Expiring entries</h2>
+<p>A <a class="term" data-term="time-to-live" href="glossary.html#time-to-live">time to live</a> cache stores an expiry time with every entry, and <code>get</code> treats an expired entry as a miss. First choose the contract: expire after a successful write or load, or extend the deadline on every access. The examples use expiry after write; reading refreshes LRU recency but not TTL. Two rules make it correct:</p>
+<ul>
+<li><strong>Use a monotonic clock</strong> (<code>System.nanoTime()</code>, <code>std::chrono::steady_clock</code>). Wall clock time jumps when NTP corrects it or someone changes it, which would expire everything at once or nothing for an hour.</li>
+<li><strong>Expiry is a write.</strong> Removing the expired entry happens under the same lock as everything else.</li>
+</ul>
+
+<figure class="code pair" data-sample="concurrent-caches.2"><figcaption><span class="ctitle">A get that respects the TTL</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="c">// Inside a cache whose values are struct Entry { V value; std::chrono::steady_clock::time_point expiresAt; }.</span>
+<span class="t">std</span>::<span class="t">optional</span>&lt;V&gt; <span class="f">get</span>(<span class="k">const</span> K&amp; key) {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    <span class="k">auto</span> it = map_.<span class="f">find</span>(key);
+    <span class="k">if</span> (it == map_.<span class="f">end</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+    <span class="k">if</span> (<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() &gt;= it-&gt;second.expiresAt) {   <span class="c">// expired: a miss</span>
+        map_.<span class="f">erase</span>(it);
+        <span class="k">return</span> <span class="t">std</span>::nullopt;
+    }
+    <span class="k">return</span> it-&gt;second.value;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="c">// Inside a cache whose values are record Entry&lt;V&gt;(V value, long expiresAtNanos), guarded by lock.</span>
+V <span class="f">get</span>(K key) {
+    lock.<span class="f">lock</span>();
+    <span class="k">try</span> {
+        <span class="t">Entry</span>&lt;V&gt; e = map.<span class="f">get</span>(key);
+        <span class="k">if</span> (e == <span class="k">null</span>) <span class="k">return</span> <span class="k">null</span>;
+        <span class="k">if</span> (<span class="t">System</span>.<span class="f">nanoTime</span>() - e.<span class="f">expiresAtNanos</span>() &gt;= <span class="n">0</span>) {   <span class="c">// expired; subtract, because nanoTime can wrap</span>
+            map.<span class="f">remove</span>(key);
+            <span class="k">return</span> <span class="k">null</span>;
+        }
+        <span class="k">return</span> e.<span class="f">value</span>();
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>For Java deadline subtraction, use a positive TTL and compare intervals shorter than 2<sup>63</sup> nanoseconds; do not persist or compare <code>nanoTime</code> values across JVMs. C++ deadline addition must fit the clock's representable range. Expiry means the entry is expired at the protected time check, not that it stays live until the caller finishes using the returned value.</p>
+<p>Lazy expiry on read leaves memory held by entries nobody asks for again. Reclaim it in one of three ways: on each write, check a few of the oldest entries and drop the expired ones (a fixed TTL after write needs a separate write-order queue, moved on every replacement; access order is not expiry order); run a cleaner that waits until the earliest expiry, wakes when an earlier deadline is added, removes entries under synchronization and is stopped and joined by <code>close()</code>; or, for many different TTLs, use a timer wheel, which is what Caffeine does for variable expiration. Decide too whether <code>size()</code> counts expired entries that have not been removed yet, and say so.</p>
+
+<h2 id="sharing-one-in-progress-load-per-key-single-flight">Sharing one in-progress load per key: single-flight</h2>
+<p>A popular key expires. Within a millisecond, 500 request threads miss it, and all 500 call the database for the same row. That is a <a class="term" data-term="cache-stampede" href="glossary.html#cache-stampede">cache stampede</a>, and it can take down a database that normally sees only the cache's misses. The two tempting fixes are both wrong:</p>
+<ul>
+<li><strong>Load while holding the cache lock.</strong> Now every miss, for every key, waits behind one slow database call, and a lock is held across I/O.</li>
+<li><strong><code>computeIfAbsent(key, loader)</code> on a <code>ConcurrentHashMap</code>.</strong> Its atomic computation is useful for short local work. A slow loader can block competing updates in the same bin, including unrelated colliding keys; the mapping function must not modify this map. Ordinary retrievals generally do not acquire that bin lock.</li>
+</ul>
+<p>The right fix is <a class="term" data-term="single-flight" href="glossary.html#single-flight">single-flight</a>: <strong>put a future in the map before doing the work</strong>. The first thread to miss installs a future atomically, releases every lock, runs the load, and completes the future. Other callers that join that flight find the future and wait on it. Once a pure single-flight removes the completed flight, a later caller can load again: this is not a global exactly-once guarantee. The atomic install decides one winner per key, and the load never runs under a lock.</p>
+
+<p>The runnable example is a small memoizing cache: it retains successful futures, so all eight requests share one result even if some threads start late. It removes failed flights for retry. It has no capacity limit, expiry or invalidation yet; a pure single-flight would also remove successful flights after publishing their result elsewhere.</p>
+<p>Callers must use stable keys and loaders with the same meaning for a given key, because only the winning loader runs. The C++ example requires copyable values and nonthrowing hash/equality functions. Cached values must be immutable or safely copied; a shared future does not make its result's mutable contents thread-safe.</p>
+
+<figure class="code pair" data-sample="concurrent-caches.3" data-expect="ok"><figcaption><span class="ctitle">Eight requests share one cached load</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> K, <span class="k">class</span> V&gt;
+<span class="k">class</span> SingleFlightCache {
+<span class="k">public</span>:
+    V <span class="f">get</span>(<span class="k">const</span> K&amp; key, <span class="k">const</span> <span class="t">std</span>::<span class="t">function</span>&lt;<span class="f">V</span>(<span class="k">const</span> K&amp;)&gt;&amp; loader) {
+        <span class="t">std</span>::<span class="t">shared_future</span>&lt;V&gt; result;
+        <span class="t">std</span>::<span class="t">promise</span>&lt;V&gt; <span class="t">promise</span>;
+        <span class="t">bool</span> leader = <span class="k">false</span>;
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            <span class="k">auto</span> it = entries_.<span class="f">find</span>(key);
+            <span class="k">if</span> (it != entries_.<span class="f">end</span>()) {
+                result = it-&gt;second;
+            } <span class="k">else</span> {
+                result = <span class="t">promise</span>.<span class="f">get_future</span>().<span class="f">share</span>();
+                entries_.<span class="f">emplace</span>(key, result);
+                leader = <span class="k">true</span>;
+            }
+        }                                                        <span class="c">// never load or wait under this lock</span>
+        <span class="k">if</span> (leader) {
+            <span class="k">try</span> {
+                <span class="t">promise</span>.<span class="f">set_value</span>(<span class="f">loader</span>(key));                  <span class="c">// keep successful futures as cache entries</span>
+            } <span class="k">catch</span> (...) {
+                <span class="t">promise</span>.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">current_exception</span>());
+                <span class="f">forget</span>(key);                                    <span class="c">// no other path replaces entries here</span>
+            }
+        }
+        <span class="k">return</span> result.<span class="f">get</span>();                                    <span class="c">// copy outside the completion try/catch</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">forget</span>(<span class="k">const</span> K&amp; key) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        entries_.<span class="f">erase</span>(key);                                         <span class="c">// only the leader erases its own entry</span>
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;K, <span class="t">std</span>::<span class="t">shared_future</span>&lt;V&gt;&gt; entries_;          <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    SingleFlightCache&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">string</span>&gt; flights;
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; loads{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; go;
+    <span class="t">std</span>::<span class="t">shared_future</span>&lt;<span class="t">void</span>&gt; start = go.<span class="f">get_future</span>().<span class="f">share</span>();
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">results</span>(<span class="n">8</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;, i] {
+            start.<span class="f">wait</span>();                                             <span class="c">// release the requests; scheduling may stagger them</span>
+            results[i] = flights.<span class="f">get</span>(<span class="s">"user:42"</span>, [&amp;](<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; k) {
+                loads += <span class="n">1</span>;
+                <span class="k">return</span> <span class="s">"profile of "</span> + k;
+            });
+        });
+    }
+    go.<span class="f">set_value</span>();
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+    <span class="k">if</span> (loads.<span class="f">load</span>() != <span class="n">1</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"duplicate load"</span>);
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; result : results) {
+        <span class="k">if</span> (result != <span class="s">"profile of user:42"</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">logic_error</span>(<span class="s">"wrong result"</span>);
+    }
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"8 requests, %d load(s), first result: %s\n"</span>, loads.<span class="f">load</span>(), results[<span class="n">0</span>].<span class="f">c_str</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</span><code><span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ConcurrentHashMap</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.function.<span class="t">Function</span>;
+
+<span class="k">class</span> <span class="t">SingleFlightCache</span>&lt;K, V&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ConcurrentHashMap</span>&lt;K, <span class="t">CompletableFuture</span>&lt;V&gt;&gt; entries = <span class="k">new</span> <span class="t">ConcurrentHashMap</span>&lt;&gt;();
+
+    V <span class="f">get</span>(K key, <span class="t">Function</span>&lt;K, V&gt; loader) {
+        <span class="t">CompletableFuture</span>&lt;V&gt; mine = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+        <span class="t">CompletableFuture</span>&lt;V&gt; existing = entries.<span class="f">putIfAbsent</span>(key, mine);   <span class="c">// one atomic winner per key</span>
+        <span class="k">if</span> (existing != <span class="k">null</span>) <span class="k">return</span> existing.<span class="f">join</span>();                     <span class="c">// pending or already cached</span>
+        <span class="k">try</span> {
+            V value = loader.<span class="f">apply</span>(key);                                  <span class="c">// the load runs outside any lock</span>
+            mine.<span class="f">complete</span>(value);
+            <span class="k">return</span> value;
+        } <span class="k">catch</span> (<span class="t">RuntimeException</span> | <span class="t">Error</span> e) {
+            mine.<span class="f">completeExceptionally</span>(e);                                <span class="c">// every waiter sees the failure</span>
+            entries.<span class="f">remove</span>(key, mine);                                   <span class="c">// failed loads can be retried</span>
+            <span class="k">throw</span> e;
+        }
+    }
+}
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">SingleFlightCache</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; flights = <span class="k">new</span> <span class="t">SingleFlightCache</span>&lt;&gt;();
+        <span class="t">AtomicInteger</span> loads = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">CountDownLatch</span> start = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">1</span>);
+        <span class="t">String</span>[] results = <span class="k">new</span> <span class="t">String</span>[<span class="n">8</span>];
+        <span class="t">Thread</span>[] ts = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">8</span>];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> id = i;
+            ts[i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    start.<span class="f">await</span>();                                        <span class="c">// release the requests; scheduling may stagger them</span>
+                    results[id] = flights.<span class="f">get</span>(<span class="s">"user:42"</span>, k -&gt; {
+                        loads.<span class="f">incrementAndGet</span>();
+                        <span class="k">return</span> <span class="s">"profile of "</span> + k;
+                    });
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"request-"</span> + i);
+            ts[i].<span class="f">start</span>();
+        }
+        start.<span class="f">countDown</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> t : ts) t.<span class="f">join</span>();
+        <span class="k">if</span> (loads.<span class="f">get</span>() != <span class="n">1</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"duplicate load"</span>);
+        <span class="k">for</span> (<span class="t">String</span> result : results) {
+            <span class="k">if</span> (!<span class="s">"profile of user:42"</span>.<span class="f">equals</span>(result)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"wrong result"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"8 requests, "</span> + loads.<span class="f">get</span>() + <span class="s">" load(s), first result: "</span> + results[<span class="n">0</span>]);
+    }
+
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>8 requests, 1 load(s), first result: profile of user:42</pre></div><div class="runout" hidden></div></figure>
+
+<p>The design choices, each of which an interviewer may probe:</p>
+<ul>
+<li><strong>The future goes in before the work starts.</strong> Inserting the <em>result</em> after loading would leave the whole load time as a race window.</li>
+<li><strong>Failure is shared, then forgotten.</strong> All waiters get the same exception (<code>join</code> wraps it in a <code>CompletionException</code>; <code>shared_future::get</code> rethrows it), and the entry is removed so a request after cleanup can retry instead of failing forever. Some systems cache not-found results or transient failures briefly (negative caching) to protect a struggling backend; that is a deliberate choice with its own TTL.</li>
+<li><strong>Remove only your own future.</strong> Java's two-argument <code>remove(key, mine)</code> is a compare-and-remove. This minimal cache never replaces a pending entry, so key-only removal would suffice here, as in the C++ version. If invalidation or replacement is added, an old loader must not delete a newer flight; C++ would then need a flight object or generation token to check too.</li>
+<li><strong>Combine it with the cache.</strong> If flights and cached values use separate maps, recheck the value cache after winning a flight: a caller can pause after a miss until an earlier flight has filled the cache and disappeared. Store the value before completing and removing your flight. Keeping completed futures, as in this demo, avoids that gap. Production implementations also need bounded capacity, expiry and a generation check if invalidation can race with filling.</li>
+</ul>
+<p><strong>Timeouts belong to callers and to the backend.</strong> Java <code>join()</code> has no timeout and is not interruptible; use <code>get(timeout, unit)</code> for a caller deadline and propagate <code>InterruptedException</code>. Do not call <code>orTimeout</code> on the shared future: it completes that same future exceptionally for everyone. Use a dependent copy for a caller-specific stage. C++ waiters can use <code>shared_future::wait_for</code> or <code>wait_until</code>, then <code>get</code> if ready; this does not cancel the loader. The leader executes the loader synchronously here, so a future timeout alone cannot bound its backend call.</p>
+<p>A loader that recursively requests its own key waits on its own unfinished future; dependency cycles between keys can deadlock too. Define recursion as unsupported or detect it. Bound active distinct-key loads with admission control, since one flight per key does not protect the backend from a million different keys. Acquire any backend permit outside the map lock, release it on failure, and do not let one waiter's cancellation cancel work other callers still need.</p>
+
+<div class="box example">
+<h3>Worked example: Rubrik's two-tier refresh</h3>
+<p>A Rubrik senior system coding question (from a question bank, so treat the wording as approximate) asks for a local cache on each service instance in front of a shared cache: on a miss or expiry, only one thread per instance may refresh the local copy of a key, and only one thread across all instances may refresh the shared entry; everyone else waits and reuses the new value.</p>
+<ol>
+<li><strong>Inside one instance:</strong> single-flight per key, exactly as above. Ten threads missing <code>user:42</code> become one refresh.</li>
+<li><strong>Across instances:</strong> the in-process map cannot see other machines, so the winner of each local flight tries to take a short lease in the shared cache (for example a "refreshing" marker written only if absent, with an expiry of a few seconds). The instance that gets the lease reloads from the source and writes the shared entry; the others wait with a deadline and retry the shared lookup. Serving stale values would require a different, explicitly agreed contract.</li>
+<li><strong>Failure handling:</strong> the lease expires on its own if its holder dies, so another instance can take over. A holder that stalls past its lease (a long GC pause) must not overwrite a newer value: make the shared store reject writes from an older version or fencing token, as in <a href="distributed-locks-and-fencing.html">distributed locks and fencing</a>. Expiry can let two loaders overlap; fencing protects accepted writes, not exactly-once backend execution.</li>
+<li><strong>Say the trade-off:</strong> the reported wait-and-reuse contract adds refresh latency. A stale-while-refreshing variant can reduce that latency only with an explicit maximum stale age and failure policy; a hung refresh does not give a finite bound by itself. The <a href="thundering-herd.html">thundering herd lesson</a> shows how to refresh early so the window is rarely visible.</li>
+</ol>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>A read lock for <code>get</code>.</strong> LRU gets move nodes. Use one exclusive lock, or a design (segments, buffered reads) where recency updates are synchronized separately. Sharded exact LRU still locks each shard on hits.</li>
+<li><strong>Two thread-safe structures and no common lock.</strong> A concurrent map plus a concurrent list cannot keep the map, the list and the size consistent.</li>
+<li><strong>Loading inside the lock</strong>, or I/O inside <code>computeIfAbsent</code>. Use single-flight with the load outside every lock.</li>
+<li><strong>Losing the failure path.</strong> If the loader throws and the future is never completed, existing waiters can remain blocked forever, and future callers too if the unfinished entry remains installed. Complete exceptionally and remove the entry in a <code>finally</code> or <code>catch</code>.</li>
+<li><strong>Wall-clock TTLs.</strong> Use a monotonic clock.</li>
+<li><strong>Mutable cached values.</strong> Callers that modify a cached object modify everyone's copy. Cache immutable values or return copies.</li>
+<li><strong>Callbacks under the lock.</strong> An eviction listener that calls back into the cache, or takes another lock, can deadlock. Collect evicted entries and notify after unlocking.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>A common two-step question is: implement an LRU (sometimes with TTL), then "make it thread-safe", sometimes "then distributed". Confluent has asked it for LRU and LFU, Uber as a cache with expiry under concurrent requests, Microsoft's Azure Storage with TTL, and LinkedIn with a sharp twist: for each lock you add, name the race it prevents.</p>
+<blockquote>A cache hit updates recency, so a shared read lock is insufficient. I will guard the map, the list and capacity with one mutex, keeping hashing and value work short. Misses never load under that lock: they go through a single-flight map of futures, so callers joining the same flight share one load and a failure is reported to all of them and not cached. If the lock becomes the bottleneck, I would shard into N independent LRUs and accept approximate global recency; in production Java I would use Caffeine, which buffers policy updates to reduce contention. I would measure tail latency and hit rate, rather than promise a fixed speedup.</blockquote>
+<blockquote>The lock prevents three races: two gets rewiring the same list nodes, an eviction removing an entry that a concurrent get is moving, and a second insert pushing the size above capacity before the first one evicts.</blockquote>
+<p>Follow ups: "why not a read-write lock?", "how would you scale this to 64 cores?", "the load takes two seconds; what happens to other requests?", "how do you expire entries nobody reads?", "two levels of cache, one refresher across the fleet?" and "what is wrong with <code>computeIfAbsent</code> here?"</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>The stale set race.</strong> A reader misses, loads row R from the database (value 1), and is delayed. A writer updates R to 2 and deletes the cache entry. The delayed reader now writes value 1 into the cache, where it stays until it expires. Invalidation alone cannot prevent this. Fixes: retain a per-key version or generation even after invalidation, and atomically reject an older fill; comparing only with a cached value is insufficient if invalidation removed that value; or hand out a token on a miss that a later invalidation cancels, so the stale write is rejected. Facebook's memcache paper (NSDI 2013) describes such tokens, called leases, for this race and for stampedes.</p>
+<p><strong>Admission matters as much as eviction.</strong> LRU lets a one-off scan of a million keys flush every hot entry. TinyLFU admission compares estimated frequencies before admitting a newcomer to the main cache. Plain LFU chooses a least-frequently-used victim but need not reject a cold newcomer, so eviction and admission are distinct choices. If an interviewer asks for LFU, the concurrency story is the same: the frequency counters and the eviction structure form one invariant under one lock, or are updated in buffered batches.</p>
+<p><strong>Capacity and tests.</strong> An entry-count limit does not bound bytes when values vary in size. Track entry weights under the same invariant, reject or bypass an oversized value, and evict until the total fits. Count hits and misses with striped or per-thread counters if exact instantaneous totals are unnecessary. For tests, control time rather than sleeping through TTLs, force overlapping same-key loads with gates, check different-key progress, failure and retry, and pause a fill across invalidation to verify that an old generation cannot repopulate the cache.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A successful recency-updating LRU <code>get</code> mutates shared order. Read-write locks with gets under the read lock are a classic bug.</li>
+<li>The map, the recency list and the size are one invariant: one lock, kept short. Thread-safe parts do not make a thread-safe cache.</li>
+<li>Scale with segments, best-effort recency, or Caffeine-style buffered reads, and say what each costs.</li>
+<li>TTL: expiry time per entry on a monotonic clock, expired entries are misses, and something must eventually reclaim them.</li>
+<li>Single-flight: install a future atomically before loading, load outside every lock, share failures, remove only your own future.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="concurrent-caches"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="concurrent-caches.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An LRU cache uses a read-write lock: <code>get</code> takes the read lock and <code>put</code> takes the write lock. What goes wrong under load?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: gets do not change the map</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Writers starve, but the cache stays correct</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Several gets can rewire the same list links concurrently, risking corruption; in C++ this data race is undefined behavior</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Gets block each other, so it is merely slow</span></button></li></ol><div class="why" hidden><strong>Why.</strong> An LRU hit updates recency, which writes shared links. A read lock admits multiple such writers rather than excluding them, even if a particular run happens to look correct. Writer starvation is a separate possible problem, not the only one. Use exclusive protection for each list, including inside a shard, or a correctly synchronized buffered policy.</div></div><div class="mcq" data-id="concurrent-caches.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A correct one-lock LRU has capacity 2. After <code>put(A, 10)</code> then <code>put(B, 20)</code>, two threads concurrently call <code>get(A)</code> and <code>put(C, 30)</code>. After both join, what can printing <code>get(B)</code> produce? Print <code>MISS</code> if absent; there are no other operations.</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always 20</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Always MISS</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">20 or MISS, depending on which concurrent operation takes effect first</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">30, because C can reuse B's list node</span></button></li></ol><div class="why" hidden><strong>Why.</strong> If <code>get(A)</code> goes first, A becomes most recent and inserting C evicts B, so the final read misses. If C is inserted first, it evicts A; the subsequent <code>get(A)</code> misses without changing recency, and B remains with value 20. Correct locking permits both serial orders, but never returns another key's value.</div></div><div class="mcq" data-id="concurrent-caches.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Assume 500 callers join the same pending flight before it completes, the successful loader takes 200 ms, and scheduling overhead is negligible. How many loads run, and roughly when are results available?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">500 times; about 200 ms each</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">500 times, one after another; up to 100 seconds for the last caller</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Once; all 500 get the same result after about 200 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Once; the first caller waits 200 ms and the other 499 get null</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The first caller installs a future and runs the load; the other 499 find the future and wait on it. Everyone gets the result when the one load finishes. Without single-flight the database would see 500 identical queries at once: a cache stampede.</div></div><div class="mcq" data-id="concurrent-caches.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why should a TTL cache compute expiry with <code>System.nanoTime()</code> or <code>steady_clock</code> rather than wall clock time?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Monotonic clocks are more precise</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Wall clock time can jump forwards or backwards (NTP corrections, manual changes), which would expire everything at once or keep stale entries far too long</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Wall clock reads need a lock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Monotonic clocks are the same on every machine</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Expiry is about elapsed time, and only a monotonic clock is guaranteed never to go backwards. Their origins are arbitrary: Java <code>nanoTime</code> values are meaningful only as differences within one JVM. They do not promise better precision, synchronized machine clocks or immunity from overflow; the deadline calculation must respect the clock's range.</div></div><div class="mcq" data-id="concurrent-caches.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the demonstrated cache, which does not cache failures, the load for K throws while 30 callers wait on that flight. What should happen after completion and cleanup?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The 30 waiters keep waiting until a later load succeeds</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The error is cached for K forever, so the database is protected</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">All 30 waiters receive the error, the in-flight entry for K is removed, and the next request starts a fresh load</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The first waiter retries the load on behalf of the others</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Completing the future exceptionally releases every waiter with the same error, and removing the entry lets the next caller try again. Never leave a future uncompleted: waiters would hang forever. Caching the failure is only acceptable briefly and deliberately (negative caching with a short TTL).</div></div><div class="mcq" data-id="concurrent-caches.q6" data-a="2" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Suppose invalidation replaces a Java cache's old pending future with a new flight before the old loader fails. Why must old-loader cleanup use <code>entries.remove(key, mine)</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is faster</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The one-argument form throws if the key is absent</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It removes the entry only if it is still our future; the one-argument form could remove a newer flight that another thread started after ours finished, letting duplicate loads through</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The one-argument form does not complete the future</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>remove(key, value)</code> is an atomic compare-and-remove. In this extended design, invalidation can replace the entry before old-loader cleanup. The minimal sample has no replacement API, so this race cannot occur there yet. Deleting someone else's in-flight future means the next caller starts yet another load.</div></div><div class="mcq" data-id="concurrent-caches.q7" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>In the C++ single-flight, why does the map hold <code>std::shared_future&lt;V&gt;</code> rather than <code>std::future&lt;V&gt;</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>std::future</code> cannot carry exceptions</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Many waiters need the same result: a <code>std::future</code> is move-only and its <code>get</code> can be called once, while copies of a <code>shared_future</code> can each call <code>get</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>shared_future</code> is faster</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>std::future</code> cannot be stored in a map</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each waiter copies the <code>shared_future</code> out of the map under the lock and calls <code>get</code> on its own copy after releasing it. A plain <code>std::future</code> would let only one caller retrieve the value. Both kinds carry exceptions set with <code>set_exception</code>.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="concurrent-caches.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Extend a thread-safe LRU cache with a TTL: <code>put(key, value)</code> stores the value with an expiry of now plus a fixed TTL, and <code>get</code> treats an expired entry as a miss and removes it. Write the class in your language.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="concurrent-caches.4"><figcaption><span class="ctitle">An LRU cache with a fixed TTL</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;list&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;unordered_map&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> K, <span class="k">class</span> V&gt;
+<span class="k">class</span> TtlLruCache {
+    <span class="k">using</span> Clock = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>;
+    <span class="k">struct</span> Entry {
+        K key;
+        V value;
+        Clock::<span class="t">time_point</span> expiresAt;
+    };
+    <span class="k">using</span> Order = <span class="t">std</span>::<span class="t">list</span>&lt;Entry&gt;;                                <span class="c">// front = most recently used</span>
+
+<span class="k">public</span>:
+    <span class="f">TtlLruCache</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity, Clock::<span class="t">duration</span> ttl) : <span class="f">capacity_</span>(capacity), <span class="f">ttl_</span>(ttl) {
+        <span class="k">if</span> (ttl &lt;= Clock::<span class="t">duration</span>::<span class="f">zero</span>()) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"nonpositive TTL"</span>);
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;V&gt; <span class="f">get</span>(<span class="k">const</span> K&amp; key) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it == index_.<span class="f">end</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+        <span class="k">if</span> (Clock::<span class="f">now</span>() &gt;= it-&gt;second-&gt;expiresAt) {               <span class="c">// expired: remove and report a miss</span>
+            order_.<span class="f">erase</span>(it-&gt;second);
+            index_.<span class="f">erase</span>(it);
+            <span class="k">return</span> <span class="t">std</span>::nullopt;
+        }
+        order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);
+        <span class="k">return</span> it-&gt;second-&gt;value;
+    }
+
+    <span class="t">void</span> <span class="f">put</span>(<span class="k">const</span> K&amp; key, V value) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">auto</span> now = Clock::<span class="f">now</span>();
+        <span class="k">if</span> (now &gt; Clock::<span class="t">time_point</span>::<span class="f">max</span>() - ttl_) <span class="k">throw</span> <span class="t">std</span>::<span class="f">overflow_error</span>(<span class="s">"TTL too large"</span>);
+        <span class="k">auto</span> expires = now + ttl_;
+        <span class="k">auto</span> it = index_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it != index_.<span class="f">end</span>()) {
+            it-&gt;second-&gt;value = <span class="t">std</span>::<span class="f">move</span>(value);
+            it-&gt;second-&gt;expiresAt = expires;
+            order_.<span class="f">splice</span>(order_.<span class="f">begin</span>(), order_, it-&gt;second);
+            <span class="k">return</span>;
+        }
+        order_.<span class="f">push_front</span>(Entry{key, <span class="t">std</span>::<span class="f">move</span>(value), expires});
+        <span class="k">try</span> {
+            index_.<span class="f">emplace</span>(key, order_.<span class="f">begin</span>());
+        } <span class="k">catch</span> (...) {
+            order_.<span class="f">pop_front</span>();                            <span class="c">// allocation failure must not orphan a node</span>
+            <span class="k">throw</span>;
+        }
+        <span class="k">if</span> (index_.<span class="f">size</span>() &gt; capacity_) {
+            index_.<span class="f">erase</span>(order_.<span class="f">back</span>().key);
+            order_.<span class="f">pop_back</span>();
+        }
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="k">const</span> Clock::<span class="t">duration</span> ttl_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    Order order_;                                                  <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;K, <span class="k">typename</span> Order::iterator&gt; index_;       <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="k">import</span> java.util.<span class="t">LinkedHashMap</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+
+<span class="k">class</span> <span class="t">TtlLruCache</span>&lt;K, V&gt; {
+    <span class="k">private</span> <span class="k">record</span> <span class="t">CacheEntry</span>&lt;V&gt;(V value, <span class="t">long</span> expiresAtNanos) {}
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">long</span> ttlNanos;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">LinkedHashMap</span>&lt;K, <span class="t">CacheEntry</span>&lt;V&gt;&gt; map;                 <span class="c">// guarded by this</span>
+
+    <span class="t">TtlLruCache</span>(<span class="t">int</span> capacity, <span class="t">long</span> ttlNanos) {
+        <span class="k">if</span> (capacity &lt; <span class="n">0</span> || ttlNanos &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"invalid capacity or TTL"</span>);
+        <span class="k">this</span>.ttlNanos = ttlNanos;
+        <span class="k">this</span>.map = <span class="k">new</span> <span class="t">LinkedHashMap</span>&lt;&gt;(<span class="n">16</span>, <span class="n">0.75f</span>, <span class="k">true</span>) {         <span class="c">// access order: get refreshes recency</span>
+            <span class="a">@Override</span>
+            <span class="k">protected</span> <span class="t">boolean</span> <span class="f">removeEldestEntry</span>(<span class="t">Map</span>.<span class="t">Entry</span>&lt;K, <span class="t">CacheEntry</span>&lt;V&gt;&gt; eldest) {
+                <span class="k">return</span> <span class="f">size</span>() &gt; capacity;
+            }
+        };
+    }
+
+    <span class="k">synchronized</span> V <span class="f">get</span>(K key) {
+        <span class="t">CacheEntry</span>&lt;V&gt; e = map.<span class="f">get</span>(key);
+        <span class="k">if</span> (e == <span class="k">null</span>) <span class="k">return</span> <span class="k">null</span>;
+        <span class="k">if</span> (<span class="t">System</span>.<span class="f">nanoTime</span>() - e.<span class="f">expiresAtNanos</span>() &gt;= <span class="n">0</span>) {       <span class="c">// expired: remove and report a miss</span>
+            map.<span class="f">remove</span>(key);
+            <span class="k">return</span> <span class="k">null</span>;
+        }
+        <span class="k">return</span> e.<span class="f">value</span>();
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">put</span>(K key, V value) {
+        map.<span class="f">put</span>(key, <span class="k">new</span> <span class="t">CacheEntry</span>&lt;&gt;(value, <span class="t">System</span>.<span class="f">nanoTime</span>() + ttlNanos));
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Expiry uses the monotonic clock, removal of an expired entry happens under the same lock as every other change, and the LRU logic is unchanged. This is lazy expiry after write: reads update recency but do not extend the TTL. Entries nobody reads again may remain until capacity eviction, and insertion may evict a live LRU entry while an expired entry elsewhere remains. A cleaner must scan all entries incrementally or maintain a separate expiry structure; it cannot stop at the first live node in recency order. The Java deadline arithmetic assumes comparisons span less than 2<sup>63</sup> nanoseconds. The generic type restrictions of the earlier LRU apply here too.</p></div></div><div class="cq" data-q="concurrent-caches.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Your one-lock LRU now serves 2 million gets a second on a 64-core machine with a 95 percent hit rate, and profiling shows threads queueing on the lock. What do you change, in what order, and what does each change cost?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>First I would measure lock hold time and remove backend calls, logging and eviction listeners from it. Hashing, allocation and value copying still occur inside these standard containers, so I would measure those too. Next I would try independent shards with a fixed total capacity budget and a stable shard function. That trades exact global LRU for local LRU and can waste capacity under skew; 64 shards do not guarantee 64 times less contention.</p>
+<p>If policy updates remain hot, I would separate safe value lookup from approximate recency. A concurrent map or a locked data shard must still protect lookup and value lifetime; failing a policy <code>try_lock</code> permits skipping recency, not reading an unprotected map. Buffered or sampled events can lower contention, but I would measure the hit-rate change and backend load. At the stated workload even a one-percentage-point hit-rate drop adds 20,000 misses per second. In production Java I would evaluate Caffeine's buffered policy and admission rather than promise a universal improvement. In C++ I would keep the same separation and define how delayed events handle already-evicted nodes.</p></div></div><div class="cq" data-q="concurrent-caches.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">After a database outage, some requests to a service hang forever, even after the database recovers. The cache uses a hand-written single-flight: <code>existing = entries.putIfAbsent(key, mine); if (existing != null) return existing.join(); V v = loader.apply(key); mine.complete(v); entries.remove(key); return v;</code> Explain and fix it.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>When the loader throws (as it does during the outage), the method exits through the exception before <code>mine.complete(v)</code> and before <code>entries.remove(key)</code>. The future stays in the map, never completed. Every caller that was already waiting on it blocks forever in <code>join</code>, and every later caller for that key finds the same uncompleted future and blocks too, even after the database recovers, because nothing ever removes it. The fix is to make completion and cleanup unconditional: wrap the load in try, catch <code>RuntimeException | Error</code> for this <code>Function</code> loader and call <code>mine.completeExceptionally(e)</code> so waiters are released with the error, and move the removal into a finally block using <code>entries.remove(key, mine)</code> so only our own future is removed. For caller deadlines I would replace <code>join</code> with timed <code>get</code>, propagating interruption, or apply a timeout to a dependent copy. <code>orTimeout</code> mutates the shared future and would fail every waiter, so it is not a caller-local timeout. The synchronous leader also needs a backend deadline or an explicitly managed asynchronous loader; a waiter timeout does not cancel that work.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="concurrent-caches.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Your LRU works with one thread. Make it thread-safe, then tell me what you would change if the lock became hot."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A cache hit changes recency, so a shared read lock is insufficient</li><li>One mutex protects membership, recency and capacity together</li><li>Return an owned value and keep backend loading outside the lock</li><li>Shard only after measuring, accepting per-shard eviction and skew</li><li>Separate safe data lookup from optional policy updates before skipping recency</li><li>Measure latency and hit rate instead of assuming a shard-count speedup</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would start with one mutex protecting the map, recency list and capacity together. A cache hit moves an entry, so it is a write to the list even though the method is called get. A shared read lock would let several threads rewrite those links at once. I return a copied value or immutable owned object, never a list reference that eviction could invalidate. The lock covers lookup and the policy update; backend loading and eviction listeners run outside it. Hashing, allocation and copying still have a cost inside that section. If measurements show contention, I would shard by a stable key hash and split the capacity budget. That gives per-shard LRU, so skew can waste capacity and a hot key remains a bottleneck. If policy updates still dominate, I would separate safe value access from approximate recency events. Skipping a policy update is acceptable; reading an ordinary map after failing its lock is not. I would compare latency, hit rate and backend load before accepting the change, without assuming a speedup equal to the shard count.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would your capacity invariant change if entries had very different sizes?</span></p></div></div><div class="sq" data-sq="concurrent-caches.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"A popular key expires and hundreds of callers miss. Design the load path, including failures, timeouts and invalidation."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Atomically install a per-key future before starting the load</li><li>Run the loader outside map locks and let followers await the same result</li><li>Publish cached success before flight removal and recheck after winning a separate flight</li><li>Complete failures and remove only the matching flight so later calls can retry</li><li>Keep caller deadlines separate from the shared future and bound backend work</li><li>Reject stale fills with a retained generation and address recursive loads</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would atomically install a future for the key before starting the load. The winner loads outside the map lock, and followers await the same future, so unrelated keys can progress. If cached values and flights live in separate maps, the winner rechecks the value cache: another load may have finished between its original miss and winning this flight. It stores a successful value before completing and removing the flight. Alternatively, the cache can retain successful futures, with an explicit eviction policy. On failure I complete the future exceptionally and remove only my flight, releasing existing waiters and allowing a later retry. A caller deadline should stop that caller waiting, not fail the shared result for everyone. In Java I use timed get or a dependent future, not <code>orTimeout</code> on the shared future. The loader needs its own backend deadline because waiting less does not stop the work. For invalidation, I retain a generation and accept a fill only if that generation still matches; deleting the cached value alone loses that protection. I also reject recursive same-key loads, which would wait on their own result, and bound active distinct-key loads so many different misses cannot overwhelm the backend.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What happens if a loader pauses past a distributed refresh lease and then tries to publish?</span></p></div></div><div class="sq" data-sq="concurrent-caches.s3" data-seconds="65"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 65 s</span></div><div class="qtext">"Users see expired values and memory keeps growing. What do you check in a TTL cache?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Define expire-after-write versus expire-after-access and the freshness instant</li><li>Use a monotonic clock and check expiry under synchronization</li><li>Separate logical expiry from physical reclamation</li><li>Use expiry ordering or a complete incremental scan rather than assuming LRU order</li><li>Bound storage and make cleaner shutdown and deadline changes explicit</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first clarify whether TTL starts at write time or extends on every access, and whether freshness is checked at lookup or promised for longer. For the usual lookup contract, I use a monotonic clock and check the deadline while protecting the entry. An expired entry is a miss even if it is still physically stored. That distinction explains the memory symptom: lazy expiry only cleans keys that are requested again. I would add bounded capacity and scheduled or incremental cleanup. For expiry after write, the recency list is not sorted by deadline, because reads move entries without changing their expiry. A cleaner therefore needs a separate expiry order or a scan that eventually covers every entry. I would also check that new earlier deadlines wake the cleaner and that shutdown wakes and joins it. Tests would inject a controllable clock and cover the exact expiry boundary, replacements and unread expired entries.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Can a value become expired after get checks its deadline but before the caller receives it?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-safe-lru-cache.html" data-problem="thread-safe-lru-cache"><span class="pk">Thread-safe structures · medium</span><b>Thread-safe LRU cache</b><span class="pst"></span></a><a class="pcard" href="p-ttl-cache.html" data-problem="ttl-cache"><span class="pk">Thread-safe structures · medium</span><b>TTL cache with a cleaner thread</b><span class="pst"></span></a><a class="pcard" href="p-single-flight-cache.html" data-problem="single-flight-cache"><span class="pk">Thread-safe structures · hard</span><b>Single-flight cache</b><span class="pst"></span></a><a class="pcard" href="p-cached-chunk-reader.html" data-problem="cached-chunk-reader"><span class="pk">Concurrent systems · hard</span><b>Cached chunk reader over slow storage</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="copy-on-write-and-snapshots.html"><span>Previous</span><b>Copy-on-write and immutable snapshots</b></a><a class="next" href="concurrent-iteration.html"><span>Next</span><b>Iterating while others write</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#a-cache-hit-updates-recency">A cache hit updates recency</a><a href="#why-a-concurrent-map-is-not-enough">Why a concurrent map is not enough</a><a href="#the-one-lock-lru">The one-lock LRU</a><a href="#making-it-scale">Making it scale</a><a href="#expiring-entries">Expiring entries</a><a href="#sharing-one-in-progress-load-per-key-single-flight">Sharing one in-progress load per key: single-flight</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

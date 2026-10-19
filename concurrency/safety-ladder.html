@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The safety ladder · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="safety-ladder" data-title="The safety ladder" data-track="core" data-module="core-13" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details open><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder" class=here><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m13">Module 13: Patterns for thread safety</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 13.1</span><span>30 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The safety ladder</h1><p class="lsum">Six ways to make shared state safe, from not sharing it to lock-free code, and how to pick one for each piece of state.</p><div class="asked"><span>Asked at</span><span class="co">Google</span><span class="co">Uber</span><span class="co">LinkedIn</span></div><div class="prereq"><span>Before this:</span><a href="lost-update.html">The lost update: read, modify, write</a><a href="invariants-and-critical-sections.html">Invariants, critical sections and finding shared state</a><a href="safe-publication.html">Safe publication, immutability and final fields</a></div></header><article class="prose" id="article">
+<p class="lead">When an interviewer says "now make it thread-safe", first identify the state and the rules it must preserve. Walk down a ladder: can it avoid being shared, can it be immutable, can one thread own it, can a proven structure hold it, and which lock guards any remaining invariant?</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Think of how an office handles shared things. Everyone has a personal notebook, so nobody fights over notebooks. The leave policy is a printed sheet on the notice board: hundreds read it, nobody writes on it, and a new version replaces the old sheet whole. Petty cash is touched only by the accountant; everyone else hands her a slip. Visitor badges come from a system the building bought, which already handles two receptionists at once. The meeting room has one booking sheet with a pen on a string. And somewhere there is a clever self-organizing system that one engineer built and nobody else understands.</p>
+<p>That list runs from safest to riskiest, and <strong>the further down you go, the more ways there are to get it wrong</strong>. A good engineer uses the highest step that fits each thing, and goes lower only when the higher step truly cannot work.</p>
+</div>
+
+<h2 id="the-six-rungs">The six rungs</h2>
+<table>
+<thead><tr><th>Rung</th><th>The idea</th><th>Java</th><th>C++</th><th>What can still go wrong</th></tr></thead>
+<tbody>
+<tr><td>1. Do not share</td><td>Each thread has its own copy; combine at the end</td><td>Locals, per-request objects, per-thread partial results</td><td>The same; locals and per-thread containers merged after <code>join</code></td><td>A reference escapes to another thread</td></tr>
+<tr><td>2. Share immutably</td><td>Shared, but nobody can change it after it is built</td><td>Records and <code>final</code> fields, swapped whole through a <code>volatile</code> or atomic reference</td><td><code>const</code> objects behind <code>std::shared_ptr&lt;const T&gt;</code>, swapped whole</td><td>Hidden mutable parts; unsafe publication</td></tr>
+<tr><td>3. One owner</td><td>One thread accesses mutable state; others send it messages</td><td>A single thread draining a queue</td><td>The same with a mutex-guarded queue and a condition variable</td><td>The owner becomes a bottleneck</td></tr>
+<tr><td>4. Delegate</td><td>A proven concurrent structure holds the state</td><td><code>ConcurrentHashMap</code> with <code>merge</code> and <code>compute</code>, <code>BlockingQueue</code>, <code>LongAdder</code>, atomics</td><td><code>std::atomic</code>; there is no standard concurrent map or queue, so use a tested wrapper or vetted library</td><td>Compound actions across two calls or two structures</td></tr>
+<tr><td>5. Synchronize</td><td>A lock guards each invariant</td><td><code>synchronized</code>, <code>ReentrantLock</code>, read-write locks</td><td><code>std::mutex</code> with RAII guards, <code>std::shared_mutex</code></td><td>Deadlock, contention, forgetting the lock on one path</td></tr>
+<tr><td>6. Custom lock-free algorithms</td><td>Guarantee system-wide progress even if one participant stalls</td><td>Proven compare-and-set algorithms</td><td><code>compare_exchange_weak</code> algorithms with appropriate memory orders and lock-free underlying atomics</td><td>ABA, memory reclamation, ordering, starvation</td></tr>
+</tbody>
+</table>
+<p>Higher rungs can remove whole classes of races. <a class="term" data-term="thread-confinement" href="glossary.html#thread-confinement">Truly confined state</a> cannot race; safely published immutable state does not change underneath readers; state accessed only by its owner has no concurrent accesses. This is a <strong>design preference, not a formal ranking of guarantees</strong>: a clear monitor with one lock is often an excellent answer, and a single-owner design can still fail through unsafe messages or an unbounded queue.</p>
+
+<h2 id="how-to-pick-a-rung-for-one-piece-of-state">How to pick a rung for one piece of state</h2>
+<p>Do not pick a rung for a class. Pick one for each invariant and all the state it covers, working through these questions in order:</p>
+<ol>
+<li><strong>Does it need to be shared at all?</strong> Per-request scratch data, buffers, partial results: keep them confined to one thread. Rung 1.</li>
+<li><strong>Can each published version stay unchanged?</strong> Configuration, routing tables, lookup data: build it, freeze it, and replace it whole when it changes. Rung 2.</li>
+<li><strong>Can one thread own access to the mutable state?</strong> An append-only log, a writer that batches to disk, state with complex invariants and modest write rates: give it an owner. Rung 3.</li>
+<li><strong>Does a proven structure's single operation cover the whole invariant?</strong> A counter, a cache of independent entries, a work queue: delegate. Be honest about compound actions: if the invariant spans two calls or two structures, this rung does not fit. Rung 4.</li>
+<li><strong>Otherwise, what exactly is the invariant, and which one lock covers it?</strong> Rung 5, with the lock guarding everything the invariant mentions and nothing else.</li>
+<li><strong>Is that lock measurably the bottleneck, or is nonblocking progress a requirement?</strong> Consider rung 6 only with a correctness and progress argument. One atomic word is a useful simple case, not a requirement of all lock-free algorithms.</li>
+</ol>
+
+<h2 id="the-boundary-matters-as-much-as-the-state">The boundary matters as much as the state</h2>
+<p><strong>A local variable is not proof of confinement.</strong> A local reference can point to a shared list, and a callback can capture and expose a local buffer. Keep mutable aliases inside the owner, or transfer ownership through a synchronized queue and stop accessing the object on the sending side. In a thread pool, a thread-local value belongs to a worker, not a request; clear request-specific data when the task ends.</p>
+<p><strong>One writer is not enough if readers access its mutable state directly.</strong> Route reads through the owner too, or publish immutable snapshots. A correctly synchronized queue publishes writes made before enqueueing; it does not make later sender mutations safe. Bound the mailbox, define rejection and shutdown, and say whether an acknowledgement means queued, applied, or durable.</p>
+<p>Immutability must extend to reachable mutable data. Java records provide final component fields, but a record containing a list needs a defensive copy and immutable elements. In C++, <code>std::shared_ptr&lt;const T&gt;</code> restricts access through that handle; it does not stop another mutable alias, a mutable member, or a pointer inside <code>T</code> from changing data.</p>
+
+<h2 id="rung-2-up-close-why-immutable-beats-careful">Rung 2 up close: why immutable beats careful</h2>
+<p>Here is the kind of state that tempts people into locks: a range with a low and a high value that must stay one apart. The writer updates the fields one by one; readers check the invariant.</p>
+
+<figure class="code pair" data-sample="safety-ladder.1" data-expect="race"><figcaption><span class="ctitle">A shared mutable range, updated field by field</span><span class="cnote bad">has a deliberate race</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">struct</span> Range { <span class="t">int</span> lo = <span class="n">0</span>; <span class="t">int</span> hi = <span class="n">1</span>; };                 <span class="c">// writers keep hi == lo + 1, field by field</span>
+Range range;                                              <span class="c">// shared and mutable: the bug</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; readerRunning{<span class="k">false</span>}, done{<span class="k">false</span>};
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">writer</span>([&amp;] {
+        <span class="k">while</span> (!readerRunning.<span class="f">load</span>()) <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>();   <span class="c">// start with the reader, so the two overlap</span>
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">20000</span>; i += <span class="n">1</span>) {
+            range.lo = i;                                  <span class="c">// a reader can look between these two writes</span>
+            range.hi = i + <span class="n">1</span>;
+        }
+        done = <span class="k">true</span>;
+    });
+    readerRunning = <span class="k">true</span>;
+    <span class="t">long</span> reads = <span class="n">0</span>, torn = <span class="n">0</span>;
+    <span class="k">do</span> {
+        <span class="t">int</span> lo = range.lo;
+        <span class="t">int</span> hi = range.hi;
+        <span class="k">if</span> (hi != lo + <span class="n">1</span>) torn += <span class="n">1</span>;
+        reads += <span class="n">1</span>;
+    } <span class="k">while</span> (!done.<span class="f">load</span>());
+    writer.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; reads &lt;&lt; <span class="s">" reads, torn reads seen: "</span> &lt;&lt; torn &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">Range</span> { <span class="t">int</span> lo = <span class="n">0</span>; <span class="t">int</span> hi = <span class="n">1</span>; }        <span class="c">// writers keep hi == lo + 1, field by field</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Range</span> range = <span class="k">new</span> <span class="t">Range</span>();               <span class="c">// shared and mutable: the bug</span>
+    <span class="k">static</span> <span class="k">volatile</span> <span class="t">boolean</span> readerRunning = <span class="k">false</span>;
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span> writer = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">while</span> (!readerRunning) <span class="t">Thread</span>.<span class="f">onSpinWait</span>();    <span class="c">// start with the reader, so the two overlap</span>
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">200_000</span>; i += <span class="n">1</span>) {
+                range.lo = i;                              <span class="c">// a reader can look between these two writes</span>
+                range.hi = i + <span class="n">1</span>;
+            }
+        }, <span class="s">"writer"</span>);
+        writer.<span class="f">start</span>();
+        readerRunning = <span class="k">true</span>;
+        <span class="t">long</span> reads = <span class="n">0</span>, torn = <span class="n">0</span>;
+        <span class="k">do</span> {
+            <span class="t">int</span> lo = range.lo;
+            <span class="t">int</span> hi = range.hi;
+            <span class="k">if</span> (hi != lo + <span class="n">1</span>) torn += <span class="n">1</span>;
+            reads += <span class="n">1</span>;
+        } <span class="k">while</span> (writer.<span class="f">isAlive</span>());
+        writer.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(reads + <span class="s">" reads, torn reads seen: "</span> + torn);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>1832 reads, torn reads seen: 41</pre></div><div class="runout" hidden></div></figure>
+
+<p>In Java a reader can see the new low and the old high. These are inconsistent pairs, not torn individual <code>int</code> reads. The output is illustrative: Java may observe no inconsistent pair in a particular run. In C++ the unsynchronized accesses cause a data race and undefined behaviour, so the language does not restrict the result to such pairs; ThreadSanitizer can expose the race even if the count is zero.</p>
+<p>You could fix this with one lock around the whole pair update and the whole pair read. Another choice is an <a class="term" data-term="immutable-object" href="glossary.html#immutable-object">immutable object</a> published as one snapshot: each reader captures the reference once and then reads that version. This simplifies the invariant, but allocation, copying and reference counting have costs; <strong>it is not automatically faster than a lock</strong>.</p>
+
+<figure class="code pair" data-sample="safety-ladder.2" data-expect="ok"><figcaption><span class="ctitle">An immutable range, swapped whole</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">struct</span> Range {
+    <span class="k">const</span> <span class="t">int</span> lo;                                          <span class="c">// immutable once built</span>
+    <span class="k">const</span> <span class="t">int</span> hi;
+};
+
+<span class="k">class</span> RangeHolder {
+<span class="k">public</span>:
+    <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> Range&gt; <span class="f">get</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);              <span class="c">// held only long enough to copy the pointer</span>
+        <span class="k">return</span> current_;
+    }
+
+    <span class="t">void</span> <span class="t">set</span>(<span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> Range&gt; next) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        current_ = <span class="t">std</span>::<span class="f">move</span>(next);
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> Range&gt; current_ = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> Range&gt;(Range{<span class="n">0</span>, <span class="n">1</span>});   <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    RangeHolder holder;
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; readerRunning{<span class="k">false</span>}, done{<span class="k">false</span>};
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">writer</span>([&amp;] {
+        <span class="k">while</span> (!readerRunning.<span class="f">load</span>()) <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>();   <span class="c">// start with the reader, so the two overlap</span>
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">20000</span>; i += <span class="n">1</span>) {
+            holder.<span class="t">set</span>(<span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> Range&gt;(Range{i, i + <span class="n">1</span>}));   <span class="c">// build it fully, then publish it</span>
+        }
+        done = <span class="k">true</span>;
+    });
+    readerRunning = <span class="k">true</span>;
+    <span class="t">long</span> reads = <span class="n">0</span>, torn = <span class="n">0</span>;
+    <span class="k">while</span> (!done.<span class="f">load</span>()) {
+        <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> Range&gt; r = holder.<span class="f">get</span>();     <span class="c">// a snapshot nobody can change</span>
+        <span class="k">if</span> (r-&gt;hi != r-&gt;lo + <span class="n">1</span>) torn += <span class="n">1</span>;
+        reads += <span class="n">1</span>;
+    }
+    writer.<span class="f">join</span>();
+    <span class="f">assert</span>(torn == <span class="n">0</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; reads &lt;&lt; <span class="s">" reads, torn reads seen: "</span> &lt;&lt; torn &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Range</span>(<span class="t">int</span> lo, <span class="t">int</span> hi) { }                      <span class="c">// immutable: final fields, no setters</span>
+    <span class="k">static</span> <span class="k">volatile</span> <span class="t">Range</span> range = <span class="k">new</span> <span class="t">Range</span>(<span class="n">0</span>, <span class="n">1</span>);        <span class="c">// one reference, replaced whole</span>
+    <span class="k">static</span> <span class="k">volatile</span> <span class="t">boolean</span> readerRunning = <span class="k">false</span>;
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span> writer = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">while</span> (!readerRunning) <span class="t">Thread</span>.<span class="f">onSpinWait</span>();    <span class="c">// start with the reader, so the two overlap</span>
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">200_000</span>; i += <span class="n">1</span>) {
+                range = <span class="k">new</span> <span class="t">Range</span>(i, i + <span class="n">1</span>);               <span class="c">// build it fully, then publish it in one write</span>
+            }
+        }, <span class="s">"writer"</span>);
+        writer.<span class="f">start</span>();
+        readerRunning = <span class="k">true</span>;
+        <span class="t">long</span> reads = <span class="n">0</span>, torn = <span class="n">0</span>;
+        <span class="k">while</span> (writer.<span class="f">isAlive</span>()) {
+            <span class="t">Range</span> r = range;                               <span class="c">// read the reference once: a snapshot</span>
+            <span class="k">if</span> (r.<span class="f">hi</span>() != r.<span class="f">lo</span>() + <span class="n">1</span>) torn += <span class="n">1</span>;
+            reads += <span class="n">1</span>;
+        }
+        writer.<span class="f">join</span>();
+        <span class="k">if</span> (torn != <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"inconsistent snapshot"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(reads + <span class="s">" reads, torn reads seen: "</span> + torn);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>5911 reads, torn reads seen: 0</pre></div><div class="runout" hidden></div></figure>
+
+<p>Two details make it work. The object is fully built before any other thread can see it, and the reference uses <a class="term" data-term="safe-publication" href="glossary.html#safe-publication">safe publication</a>: a <code>volatile</code> field in Java gives the reader a happens-before edge to everything the writer did before the write (see <a href="safe-publication.html">safe publication</a>). In C++ the shared pointer itself is shared state, so it needs protection; the mutex is held only to copy the pointer, never while reading the range. The shared pointer also keeps an old snapshot alive for as long as a reader holds it, which is what makes "replace whole" safe in a language without a garbage collector.</p>
+
+<div class="only only-cpp"><span class="otag">C++</span><p>C++20 specifies <code>std::atomic&lt;std::shared_ptr&lt;T&gt;&gt;</code>, but Tandem's installed Apple libc++ does not provide it. The mutex example also works in C++17. The older <code>std::atomic_load</code> and <code>std::atomic_store</code> overloads for <code>shared_ptr</code> are available here and deprecated in C++20; neither those overloads nor the C++20 specialization promise lock-free operations.</p></div>
+
+<p>Capture one snapshot per logical operation. Reading <code>range</code> separately for <code>lo</code> and <code>hi</code> can mix two valid versions. With multiple writers, immutable snapshots alone do not prevent lost updates: two writers can derive replacements from the same old version and overwrite each other's change. Serialize read-modify-publish with a writer lock, or use a CAS loop that recomputes from the latest snapshot.</p>
+
+<div class="box example">
+<h3>Worked example: one class, five rungs</h3>
+<p>A URL shortener service is a single class used by every request thread. "Make it thread-safe." Instead of a lock on every method, classify each field:</p>
+<table>
+<thead><tr><th>State</th><th>How it is used</th><th>Rung</th><th>Concretely</th></tr></thead>
+<tbody>
+<tr><td>Parse buffer for the incoming request</td><td>Used within one request</td><td>1. Do not share</td><td>A local or per-request field with no escaping mutable aliases</td></tr>
+<tr><td>Config: limits and feature flags</td><td>Read on every request, changed by an admin a few times a day</td><td>2. Immutable</td><td>An immutable config object behind a volatile or atomic reference, replaced whole</td></tr>
+<tr><td>Audit log written to a file in order</td><td>Appended by every request; order matters; disk is slow</td><td>3. One owner</td><td>Requests put entries on a bounded queue; one writer thread owns the file</td></tr>
+<tr><td>Short code to long URL map; hit counters</td><td>Independent entries; counters only ever added to</td><td>4. Delegate</td><td><code>ConcurrentHashMap.putIfAbsent</code> for new codes, <code>LongAdder</code> for hits; in C++, a mutex-guarded map wrapper and relaxed atomics</td></tr>
+<tr><td>A small cache of hot links with LRU eviction</td><td>Every lookup moves an entry, so even a read is a write; the map and the recency order must agree</td><td>5. Synchronize</td><td>One lock around the map and the list together</td></tr>
+</tbody>
+</table>
+<p>Nothing here needs rung 6. A request can retain an older config until it finishes; there is no one-version staleness bound. The audit log adds a queue hop, counters and map bins can contend, and the cache lock serializes cache operations. Sharding that cache reduces contention but gives per-shard recency and capacity, rather than one exact global LRU order.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Adding locks without naming the invariant.</strong> One shared lock around related methods can be a correct monitor. Separate locks for coupled fields are wrong, and two individually locked calls still do not form an atomic transaction. Explain why each critical section is needed.</li>
+<li><strong>Immutable in name only.</strong> A <code>final</code> field that points to a mutable list, a getter that returns the internal array, a <code>const</code> pointer to non-const data: the reference cannot change, the contents can.</li>
+<li><strong>Publishing through a plain field.</strong> A changing plain reference can remain stale in Java; concurrently replacing and reading an ordinary C++ pointer is a data race. Java can publish through <code>volatile</code>, an atomic reference, a lock or a concurrent collection. C++ needs a suitable atomic or synchronization protocol; C++ <code>volatile</code> does not publish between threads.</li>
+<li><strong>Two safe calls, one unsafe sequence.</strong> <code>containsKey</code> then <code>put</code> on a <code>ConcurrentHashMap</code> is a check-then-act. Use the single atomic call (<code>putIfAbsent</code>, <code>computeIfAbsent</code>, <code>merge</code>).</li>
+<li><strong>Two safe structures, one invariant.</strong> A concurrent map plus an atomic size counter that must agree can disagree between the two updates. One invariant needs one lock, or one owner.</li>
+<li><strong>Starting at rung 6.</strong> Lock-free code without a measured bottleneck and a proof is a liability. Most systems never need it.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The "now make it thread-safe" follow up appears after ordinary coding questions at many companies. A 2025 Google L5 report shows the bar: asked to handle a per-user counter map in a multithreaded setting, the candidate listed <code>ConcurrentHashMap</code>, <code>AtomicInteger</code> and <code>synchronized</code> yet got No Hire, and concluded afterwards that the interviewer wanted reasoning about specific races and guarantees, not a list of tools. LinkedIn interviewers have asked candidates to give an example race for each lock they add, and to walk through the interleaving in which two threads both see 99 of 100. An Uber Bangalore interviewer on Blind (2021) complained that candidates "put synchronization everywhere".</p>
+<blockquote>Before adding locks, let me classify the state and its invariants. The request buffer stays confined. The config becomes an immutable snapshot published safely. For metrics I can use an adder; an exact quota needs an atomic conditional update. Independent map entries can use a concurrent map operation, or a tested locked wrapper in C++. The LRU order and the map must agree, so those two share one lock. I will explain the race it prevents, then measure where contention remains.</blockquote>
+<p>Follow ups to expect: "Which race does this lock prevent?" (name the interleaving). "What if reads dominate?" (a snapshot or a read-write lock). "Where is the contention now?" "Can you remove that lock?" (sharding, an owner thread, or, with evidence, an atomic).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>The ownership ideas extend across machines, but the guarantees do not transfer automatically.</strong> Partitioning reduces sharing; immutable versions simplify reads; one leader can order a partition's writes. Failover still needs an ownership protocol that prevents stale leaders from writing, such as fencing enforced by the storage layer. Database transactions require the right isolation level. Optimistic transactions and convergent replicated data types are separate concepts, not the distributed meaning of lock-free progress.</p>
+<p><strong>Safety and progress are separate.</strong> A CAS loop can preserve an invariant while starving one caller. Lock-free means system-wide progress, while wait-free bounds each operation's own steps; neither means no contention or no scheduler delays. In C++, check the atomic type's <code>is_lock_free()</code> and account for allocation, reclamation and callbacks before claiming the whole operation is lock-free. See <a href="progress-guarantees.html">progress guarantees</a>.</p>
+<p>Measure throughput, tail latency and allocations before changing the design. Locks, immutable copying and queue hops all have workload-dependent costs. A short critical section can still wait behind a descheduled holder, so its size is not a wall-clock latency guarantee.</p>
+<p><strong>Rung 4 in C++ is thinner than in Java.</strong> The C++ standard library has atomics but no concurrent map or queue. "Delegate" in C++ usually means a small class you write once, test under ThreadSanitizer and reuse, or a vetted third-party library, and in an interview it usually means rung 5 behind a clean interface.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>The ladder: do not share, share immutably, one owner, delegate, synchronize, lock-free only with evidence.</li>
+<li>Pick a rung per invariant and all the state it covers, not once for the entire class.</li>
+<li>Immutable values swapped whole beat careful field by field updates: readers get a snapshot that cannot tear.</li>
+<li>Concurrent collections protect single calls; invariants across calls or structures need one lock or one owner.</li>
+<li>In the interview, classify the state first, then name the race each lock prevents.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="safety-ladder"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="safety-ladder.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A pair starts at <code>(0, 1)</code>. A writer sets low to 1, then high to 2. Each field uses a Java <code>volatile int</code> or a C++ <code>std::atomic&lt;int&gt;</code> with default ordering. A reader reads low, then high and prints the pair. Which statement is correct?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Only consistent pairs, because each write is a single instruction</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">An inconsistent pair, such as <code>(1, 1)</code>, can be printed</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only the old pair until the writer finishes</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Reading between the updates throws an exception</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The writer can set low to 1, the reader can read both fields as 1, then the writer can set high to 2. Atomic individual fields prevent data races here, but do not make the pair an atomic snapshot. Consistent old and new pairs are possible too; neither consistency nor seeing only the old pair is guaranteed, and these operations do not throw. Capture one safely published immutable snapshot, or lock the whole pair.</div></div><div class="mcq" data-id="safety-ladder.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An owner keeps changing a list and returns a read-only view: <code>Collections.unmodifiableList(items)</code> in Java, or <code>const std::vector&lt;int&gt;&amp;</code> in C++. Is that view a safe snapshot for concurrent readers?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Yes: it is unmodifiable</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: the returned reference cannot modify the list</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No: the owner still changes the same storage, so concurrent traversal is unsafe</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No, but only because copying would be faster</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Read-only access through one reference does not stop another reference from mutating the object. In Java this can produce inconsistent observations or ConcurrentModificationException, which is not guaranteed; in C++ concurrent vector mutation and traversal can be a data race. Copy under the owner's lock and publish the copy safely. Java's <code>List.copyOf</code> is shallow, so mutable elements also need attention. Speed is unrelated to this correctness issue.</div></div><div class="mcq" data-id="safety-ladder.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which is the simplest rung for a scratch buffer used by one request thread, with no escaping aliases?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Do not share: keep it local to the request</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Delegate: a concurrent buffer</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Synchronize: a lock around the buffer</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">One owner: a parser thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The stated absence of escaping aliases makes the buffer confined, so it needs no synchronization. A concurrent buffer, a lock or a dedicated parser thread would add machinery without protecting any actual sharing. Merely declaring a reference local would not suffice if it pointed to shared storage.</div></div><div class="mcq" data-id="safety-ladder.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A map has individually thread-safe lookup and insert operations. Two threads check that key <code>k</code> is absent, load a value, then insert it. There is no lock covering that sequence. What is true?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is safe because both calls are thread-safe</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both threads can see the key missing and both load and put, so the value can be loaded twice and overwritten</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It deadlocks</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The map can be corrupted internally</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Both absence checks can finish before either insertion, so both loaders run and the second insertion can overwrite the first value. The map's own structure remains safe; this sequence need not deadlock. Java's <code>ConcurrentHashMap.computeIfAbsent</code> makes a per-key computation atomic; keep its callback short because other updates may block. A C++ wrapper can provide the equivalent operation under its lock. For slow I/O, publish an in-progress future and load outside the map lock.</div></div><div class="mcq" data-id="safety-ladder.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A cache uses an individually thread-safe map and atomic size counter. It must keep size equal to the entry count and at most 1,000. For distinct absent keys, each insertion checks <code>size &lt; 1000</code>, increments size, then inserts, using separate operations. What is the problem?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">None: both structures are thread-safe</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The invariant spans two structures, so between the two updates other threads can see them disagree and both pass the size check</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">An atomic integer cannot count to 1,000</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A thread-safe map automatically enforces a maximum size</span></button></li></ol><div class="why" hidden><strong>Why.</strong> At size 999, both callers can pass the check and then increment to 1,001. Independently, the counter differs from the map between an increment and its insertion. Neither atomic counters nor thread-safe maps combine the operations or supply a capacity policy. Put check, count and insert under one lock, including readers that require a consistent pair, or give them one owner.</div></div><div class="mcq" data-id="safety-ladder.q6" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>A global <code>const Config* current</code> is replaced by a writer while readers do <code>current-&gt;limit</code>, with no synchronization or lifetime protocol. What is wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing, because Config is const</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The pointer itself has a data race, and safe reclamation of old configs also needs a protocol</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only that it leaks memory</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is fine on x86 because pointer writes are atomic</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Even an immutable object's pointer is mutable shared state when it is replaced. Hardware-atomic pointer writes on x86 do not repair a C++ data race, and leaking the old object would not fix publication. Synchronize the holder with a mutex or suitable atomic operation. A <code>std::shared_ptr&lt;const Config&gt;</code> snapshot can retain the old object's lifetime, but concurrent access to the same shared-pointer holder still needs synchronization.</div></div><div class="mcq" data-id="safety-ladder.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A <code>Config(int limit)</code> record is fully constructed without escaping and stored in <code>static Config current = new Config(100);</code>. Later a writer replaces this plain, non-volatile field. Readers repeatedly capture the reference and call <code>limit()</code>. What can go wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: records are immutable, so publication does not matter</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Readers may keep seeing the old reference indefinitely, because nothing guarantees the new reference becomes visible to them</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Readers may see a record with some fields from the old config and some from the new one</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws ConcurrentModificationException</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Proper construction gives this final primitive field initialization safety once a reader obtains the record, but does not ensure that readers discover a later replacement of the plain field. They can retain the old reference. One captured record cannot mix fields from different objects, and no collection iteration is involved. Use <code>volatile</code> or <code>AtomicReference</code> for the changing holder; records with mutable components need additional care.</div></div><div class="mcq" data-id="safety-ladder.q8" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">When is moving from a lock to lock-free code (rung 6) justified?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Whenever performance matters</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When the class has more than one field</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">When measured contention or a required progress guarantee justifies it, and you can establish correctness, lifetime safety and the claimed progress</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Never; lock-free code is always wrong</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Performance concerns alone and field count do not establish a benefit. Lock-free algorithms can be correct and useful, so "never" is also wrong. Measure, identify the linearization point, and justify progress and reclamation. A one-word rate limiter is a simpler starting point than a linked structure. A CAS instruction alone does not prove the whole operation lock-free.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="safety-ladder.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A leaderboard service keeps: a map from player id to score, a sorted top 10 that must always match the scores, a request counter for metrics, a config with the scoring rules, and a per-request JSON builder. Classify each piece onto a rung and justify it, then say where the contention will be.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The JSON builder is used inside one request, so it stays local: rung 1, no synchronization. The scoring config is read on every update and changed rarely, so it is an immutable object behind an atomic or volatile reference, replaced whole: rung 2; each request captures one version; decide explicitly whether older in-flight requests may finish under those rules. The request counter is for metrics, so <code>LongAdder</code> in Java or a relaxed atomic in C++ fits rung 4. <code>LongAdder.sum()</code> is not an atomic snapshot during updates and cannot enforce an exact admission limit.</p>
+<p>The score map and the top 10 must agree with each other, so the invariant spans two structures. Two options. Rung 5: one lock guards both, and every score update changes the map and adjusts the top 10 under that lock. Or rung 3: a single writer thread owns both and applies updates from a queue, and it publishes an immutable copy of the top 10 after each change. A top-10 reader sees one completed version; an operation requiring scores and top 10 together must use the same snapshot or query the owner. With many concurrent updates the single lock (or the single writer) is the contention point. Sharding by player id and merging shard top tens can reduce contention, but independently sampled shards do not form an exact global snapshot during updates. Preserve the stated consistency requirement with a coordinated snapshot or global ordering, or explicitly relax it. Within one consistent snapshot, every global top-ten player must appear in its shard's top ten, using the same tie-break rule.</p></div></div><div class="cq" data-q="safety-ladder.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">In about ninety seconds, explain the safety ladder to an interviewer and say why you prefer the higher rungs.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>When I make something thread-safe, I go through the state one piece at a time and use the highest step that fits. First, can it avoid being shared, as locals or per-thread copies? Then, can it be immutable and replaced whole when it changes? Then, can one thread own all the changes while others send it messages? Then, does a proven concurrent structure cover the invariant in one operation, like a concurrent map's merge or an atomic adder? Only then do I use a lock, one per invariant, with the smallest critical section. Lock-free code comes last, only with evidence that its cost is justified and a correctness and progress argument. I prefer the higher steps because they make whole classes of bugs impossible rather than just unlikely: truly confined data cannot race, safely published immutable snapshots stay stable, and owner-confined data has no competing accesses, while every lock I add is something that can deadlock, be forgotten on one path, or become a bottleneck.</p></div></div><div class="cq" data-q="safety-ladder.c3" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a config holder: many threads call <code>get()</code> on every request; an admin calls <code>update(change)</code> that builds a new config from the current one. Concurrent updates must not lose each other's changes. Readers must not wait for the change function to run. Explain whether the implementation also guarantees nonblocking reads.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="safety-ladder.3" data-expect="ok"><figcaption><span class="ctitle">A config holder: immutable snapshots, safe concurrent updates</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49</span><code><span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">struct</span> Config {
+    <span class="k">const</span> <span class="t">int</span> maxUsers;
+    <span class="k">const</span> <span class="t">bool</span> betaEnabled;
+};
+
+<span class="k">class</span> ConfigHolder {
+<span class="k">public</span>:
+    <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> Config&gt; <span class="f">get</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(pointerLock_);     <span class="c">// held only to copy the pointer</span>
+        <span class="k">return</span> current_;
+    }
+
+    <span class="t">void</span> <span class="f">update</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">function</span>&lt;<span class="f">Config</span>(<span class="k">const</span> Config&amp;)&gt;&amp; change) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">writers</span>(updateLock_);   <span class="c">// writers take turns, so no update is lost</span>
+        <span class="k">auto</span> next = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> Config&gt;(<span class="f">change</span>(*<span class="f">get</span>()));   <span class="c">// build outside the pointer lock</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(pointerLock_);
+        current_ = <span class="t">std</span>::<span class="f">move</span>(next);
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> pointerLock_;
+    <span class="t">std</span>::<span class="t">mutex</span> updateLock_;
+    <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;<span class="k">const</span> Config&gt; current_ = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="k">const</span> Config&gt;(Config{<span class="n">100</span>, <span class="k">false</span>});   <span class="c">// guarded by pointerLock_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    ConfigHolder holder;
+    <span class="k">auto</span> work = [&amp;] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">1000</span>; i += <span class="n">1</span>) {
+            holder.<span class="f">update</span>([](<span class="k">const</span> Config&amp; c) {
+                <span class="k">return</span> Config{c.maxUsers + <span class="n">1</span>, !c.betaEnabled};
+            });
+        }
+    };
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">a</span>(work), <span class="f">b</span>(work);
+    a.<span class="f">join</span>(); b.<span class="f">join</span>();
+    <span class="k">auto</span> c = holder.<span class="f">get</span>();
+    <span class="f">assert</span>(c-&gt;maxUsers == <span class="n">2100</span> &amp;&amp; !c-&gt;betaEnabled);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"maxUsers = "</span> &lt;&lt; c-&gt;maxUsers &lt;&lt; <span class="s">", betaEnabled = "</span>
+              &lt;&lt; <span class="t">std</span>::boolalpha &lt;&lt; c-&gt;betaEnabled &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicReference</span>;
+<span class="k">import</span> java.util.function.<span class="t">UnaryOperator</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Config</span>(<span class="t">int</span> maxUsers, <span class="t">boolean</span> betaEnabled) { }       <span class="c">// immutable</span>
+
+    <span class="k">static</span> <span class="k">class</span> <span class="t">ConfigHolder</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicReference</span>&lt;<span class="t">Config</span>&gt; current = <span class="k">new</span> <span class="t">AtomicReference</span>&lt;&gt;(<span class="k">new</span> <span class="t">Config</span>(<span class="n">100</span>, <span class="k">false</span>));
+
+        <span class="t">Config</span> <span class="f">get</span>() {
+            <span class="k">return</span> current.<span class="f">get</span>();                               <span class="c">// volatile read semantics; no application lock</span>
+        }
+
+        <span class="k">void</span> <span class="f">update</span>(<span class="t">UnaryOperator</span>&lt;<span class="t">Config</span>&gt; change) {
+            current.<span class="f">updateAndGet</span>(change);                       <span class="c">// a CAS loop: retries if another update won</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">ConfigHolder</span> holder = <span class="k">new</span> <span class="t">ConfigHolder</span>();
+        <span class="t">Runnable</span> work = () -&gt; {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">1000</span>; i += <span class="n">1</span>) {
+                holder.<span class="f">update</span>(c -&gt; <span class="k">new</span> <span class="t">Config</span>(c.<span class="f">maxUsers</span>() + <span class="n">1</span>, !c.<span class="f">betaEnabled</span>()));
+            }
+        };
+        <span class="t">Thread</span> a = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"admin-a"</span>), b = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"admin-b"</span>);
+        a.<span class="f">start</span>(); b.<span class="f">start</span>(); a.<span class="f">join</span>(); b.<span class="f">join</span>();
+        <span class="t">Config</span> c = holder.<span class="f">get</span>();
+        <span class="k">if</span> (c.<span class="f">maxUsers</span>() != <span class="n">2100</span> || c.<span class="f">betaEnabled</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(c);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"maxUsers = "</span> + c.<span class="f">maxUsers</span>() + <span class="s">", betaEnabled = "</span> + c.<span class="f">betaEnabled</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Readers get an immutable snapshot with a volatile-semantics atomic read (Java) or a pointer copy under a short mutex (C++), then inspect it without locks. C++ readers can block on that mutex; even <code>std::atomic&lt;std::shared_ptr&lt;T&gt;&gt;</code> would not guarantee lock freedom. The requirement here is that readers do not acquire the writer lock or wait for the change callback. In Java, <code>updateAndGet</code> applies the change function in a compare-and-set loop, so if two admins update at once, the loser re-applies its change to the winner's result and nothing is lost; the change function must therefore have no side effects, because it may run more than once. In C++ the writers are serialized by their own lock, which keeps the function from running twice, and the new config is built before the short pointer swap. The C++ callback must not call <code>update()</code> recursively because its writer mutex is non-recursive; it may call <code>get()</code>. Both languages require a valid, fully built replacement. A reader may retain an older config for its entire request, so confirm whether that is acceptable, especially for permission revocation. Two atomic reads still would not provide a consistent pair of versions.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="safety-ladder.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"You have a request buffer, a live configuration, some metrics, and an LRU cache. How would you make the service thread-safe?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Classify the invariants before choosing primitives</li><li>Keep the request buffer confined, including all mutable aliases</li><li>Publish immutable configuration snapshots safely and capture one per request</li><li>Use metrics adders only when an exact concurrent snapshot is unnecessary</li><li>Guard the cache map and recency order with one lock and identify the race</li><li>Measure remaining contention before changing the design</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would choose a policy for each invariant, rather than one policy for the whole service. The request buffer stays with its request thread, and I make sure no callback or shared field exposes it. The configuration becomes an immutable snapshot. I publish replacements safely and capture one version at the start of a request, so related settings agree. If two administrators update it, I serialize their updates or use a retrying compare and set, otherwise one change could overwrite another. For approximate metrics, an adder is suitable. I would not use its live sum for an exact quota. The LRU cache is different: its map and recency list must describe the same entries, so one lock protects both, including lookups that move an entry. Otherwise a lookup can move an entry while eviction removes it. Finally I measure the actual contention. The cache lock, counters, or allocation could dominate. Sharding is an option, but I would state that it changes global LRU into per-shard LRU.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if every request must use the latest permissions immediately after an admin update completes?</span></p></div></div><div class="sq" data-sq="safety-ladder.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Both fields are atomic, yet readers sometimes see an impossible pair. Why, and what would you change?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Atomic fields do not make a multi-field snapshot atomic</li><li>Give a concrete interleaving producing an inconsistent pair</li><li>Choose a lock around the whole invariant or one immutable snapshot</li><li>Explain safe publication and lifetime in Java and C++</li><li>Capture the holder once and coordinate read-modify-publish updates</li><li>Distinguish a short mutex from a nonblocking progress guarantee</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Atomicity of each field does not give atomicity of the pair. Suppose the pair starts at zero and one. The writer changes the low value to one, the reader reads both fields as one, and only then does the writer change the high value to two. There is no data race on the atomic fields, but the relationship is broken. I can use one lock around both writes and both reads. For read-heavy configuration, I can instead construct an immutable pair and publish one reference to it. The reader captures that reference once. Reading the holder twice could mix versions again. In Java I would use a volatile reference or an atomic reference. In C++ the holder needs synchronization, and shared ownership keeps old snapshots alive. A short mutex around that pointer is correct, but readers can still block. If writers derive a new value from the old one, I also serialize that transformation or retry it with compare and set. Immutability alone does not prevent lost updates.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">If you replace the pointer lock with an atomic shared pointer, have you proved the whole operation lock-free?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-snapshot-kv-store.html" data-problem="snapshot-kv-store"><span class="pk">Thread-safe structures · hard</span><b>Key-value store with snapshots</b><span class="pst"></span></a><a class="pcard" href="p-thread-safe-lru-cache.html" data-problem="thread-safe-lru-cache"><span class="pk">Thread-safe structures · medium</span><b>Thread-safe LRU cache</b><span class="pst"></span></a><a class="pcard" href="p-hit-counter.html" data-problem="hit-counter"><span class="pk">Thread-safe structures · medium</span><b>Thread-safe hit counter</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="rate-limiters.html"><span>Previous</span><b>Thread-safe rate limiters</b></a><a class="next" href="confinement-and-thread-local.html"><span>Next</span><b>Confinement and thread-local state</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-six-rungs">The six rungs</a><a href="#how-to-pick-a-rung-for-one-piece-of-state">How to pick a rung for one piece of state</a><a href="#the-boundary-matters-as-much-as-the-state">The boundary matters as much as the state</a><a href="#rung-2-up-close-why-immutable-beats-careful">Rung 2 up close: why immutable beats careful</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

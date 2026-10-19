@@ -1,0 +1,936 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Exceptions, noexcept and exception safety · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-exceptions" data-title="Exceptions, noexcept and exception safety" data-track="cpp" data-module="cpp-2" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details open><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions" class=here><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m2">Module 02: Modern C++ every day</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 02.7</span><span>32 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Exceptions, noexcept and exception safety</h1><p class="lsum">Unwind safely with RAII, preserve invariants on failure, use noexcept accurately, and deliver worker exceptions through futures.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Databricks</span></div><div class="prereq"><span>Before this:</span><a href="cpp-classes-raii.html">Classes, constructors, destructors and RAII</a><a href="cpp-move-semantics.html">Copy, move and move-only types</a><a href="cpp-lambdas-callables.html">Lambdas, captures and callables</a></div></header><article class="prose" id="article">
+<p class="lead">In threaded code an exception is never just an error. It is a jump out of the middle of whatever the thread was doing, often out of the middle of a critical section, and every other thread inherits whatever state that jump leaves behind.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A restaurant kitchen has one key to the spice store. A cook takes the key, trips on the way out and is rushed to hospital. If the key goes to hospital in the cook's pocket, the whole kitchen stops: everyone waits for a key that will never come back. A sensible kitchen ties the key to the store's door on a spring, so it snaps back however the cook leaves. That spring is RAII.</p>
+<p>The spring returns the key, but it does not tidy the store. If the cook fell halfway through moving jars from one shelf to another, the next cook finds the shelves half moved. Deciding what state the store must be in when someone leaves suddenly is exception safety. And if a cook in another kitchen fails at a dish you are waiting for, someone has to walk over and tell you; otherwise you stand at the counter forever.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><strong>A throw skips a manual <code>unlock()</code>.</strong> If nothing later unlocks the <a class="term" data-term="mutex" href="glossary.html#mutex">mutex</a>, other threads that need it remain blocked. <a class="term" data-term="raii" href="glossary.html#raii">RAII</a> guards (<code>std::lock_guard</code>, <code>std::unique_lock</code>, <code>std::scoped_lock</code>) unlock during <a class="term" data-term="stack-unwinding" href="glossary.html#stack-unwinding">stack unwinding</a>.</li>
+<li><strong>Unlocking can expose a half-done update.</strong> The guard releases the lock but does not roll anything back. Threads that subsequently acquire the same mutex can observe the state your function left. <a class="term" data-term="exception-safety" href="glossary.html#exception-safety">exception safety</a> is how you decide what that state may be.</li>
+<li><strong>Exceptions do not cross threads on their own.</strong> One that escapes a thread's function calls <code>std::terminate</code> and kills the whole process. A worker must catch everything and hand failures to whoever is waiting, through a future or an <a class="term" data-term="exception-ptr" href="glossary.html#exception-ptr">std::exception_ptr</a>.</li>
+<li><strong>It is asked.</strong> Rubrik interviewers asked what happens when a task throws inside a hand-built thread pool, and graded which exceptions a pool catches; their job-runner questions require the first failure to stop everything. A Databricks L4 candidate wrote the event writer in C++ with <code>std::promise</code> and <code>std::future</code>, the same channel that carries errors.</li>
+</ul>
+</div>
+
+<h2 id="throw-try-and-catch">throw, try and catch</h2>
+<p>You throw an object, usually one derived from <code>std::exception</code>, and the nearest dynamically enclosing <code>try</code> with a matching <code>catch</code> handles it. Catch by const reference to avoid slicing, and use <code>throw;</code> with no operand to rethrow the current exception. Handlers are tried in source order: derived types before base types, and <code>catch (...)</code> last. Calling <code>throw;</code> with no currently handled exception terminates the process.</p>
+
+<table>
+<thead><tr><th>Type</th><th>Thrown for</th></tr></thead>
+<tbody>
+<tr><td><code>std::runtime_error</code>, <code>std::system_error</code></td><td>runtime failures; thread creation and mutex locking can report underlying system failures through <code>std::system_error</code></td></tr>
+<tr><td><code>std::logic_error</code>, <code>std::invalid_argument</code>, <code>std::out_of_range</code></td><td>bugs and bad input; <code>vector::at</code> and <code>map::at</code> throw <code>std::out_of_range</code></td></tr>
+<tr><td><code>std::bad_alloc</code></td><td>an allocation failed; container insertion can throw it when allocation is needed</td></tr>
+<tr><td><code>std::future_error</code></td><td>misuse of a promise or future, such as setting a value twice</td></tr>
+<tr><td><code>std::bad_optional_access</code>, <code>std::bad_variant_access</code></td><td><code>value()</code> on an empty optional, <code>std::get</code> of the wrong alternative</td></tr>
+</tbody>
+</table>
+
+<h2 id="stack-unwinding-destructors-run-on-the-way-out">Stack unwinding: destructors run on the way out</h2>
+<p>As control unwinds to a matching handler, fully constructed automatic objects in scopes being exited are destroyed in reverse construction order. If no handler is found, <code>std::terminate</code> is called, and whether the stack was unwound first is implementation defined. Do not rely on cleanup on a termination path.</p>
+<p>If a constructor throws, the object's own destructor does not run, but its fully constructed bases and members are destroyed. That is why resources belong in RAII members. An ordinary raw pointer member does not release a resource merely because the containing constructor failed.</p>
+
+<figure class="code single" data-sample="cpp-exceptions.1" data-expect="ok"><figcaption><span class="ctitle">Destructors run in reverse order as the exception leaves</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">struct</span> Tracer {                       <span class="c">// prints when it is created and destroyed</span>
+    <span class="t">std</span>::<span class="t">string</span> name;
+    <span class="k">explicit</span> <span class="f">Tracer</span>(<span class="t">std</span>::<span class="t">string</span> n) : <span class="f">name</span>(<span class="t">std</span>::<span class="f">move</span>(n)) { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"acquire "</span> &lt;&lt; name &lt;&lt; <span class="s">"\n"</span>; }
+    ~<span class="f">Tracer</span>() { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"release "</span> &lt;&lt; name &lt;&lt; <span class="s">"\n"</span>; }
+};
+
+<span class="t">void</span> <span class="f">writeRecord</span>(<span class="t">int</span> id) {
+    Tracer <span class="f">file</span>(<span class="s">"file handle"</span>);
+    Tracer <span class="f">lock</span>(<span class="s">"lock"</span>);
+    <span class="k">if</span> (id &lt; <span class="n">0</span>) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"bad id "</span> + <span class="t">std</span>::<span class="f">to_string</span>(id));
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"wrote record "</span> &lt;&lt; id &lt;&lt; <span class="s">"\n"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">try</span> {
+        <span class="f">writeRecord</span>(<span class="n">1</span>);
+        <span class="f">writeRecord</span>(-<span class="n">5</span>);
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"never printed\n"</span>;
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {      <span class="c">// catch by const reference</span>
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"caught: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The second call prints "release lock" and "release file handle" before "caught": <strong>guards in the scopes being exited are released before the handler runs</strong>. A <code>std::lock_guard</code> unlocks in exactly that way. If the catch is inside the guard's scope, however, the guard remains alive and still holds the lock.</p>
+
+<h3>What happens without the guard</h3>
+<p>Here is the same withdrawal written with manual <code>lock()</code> and <code>unlock()</code>. It is shown only to explain why you never write it. Press Run: it hangs.</p>
+
+<figure class="code single" data-sample="cpp-exceptions.2" data-expect="deadlock"><figcaption><span class="ctitle">A throw between lock() and unlock()</span><span class="cnote bad">deadlocks on purpose</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">std</span>::<span class="t">mutex</span> accountMutex;
+<span class="t">int</span> balance = <span class="n">100</span>;   <span class="c">// guarded by accountMutex</span>
+
+<span class="t">void</span> <span class="f">withdraw</span>(<span class="t">int</span> amount) {
+    accountMutex.<span class="f">lock</span>();                                   <span class="c">// manual locking, to show why not</span>
+    <span class="k">if</span> (amount &gt; balance) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"insufficient funds"</span>);    <span class="c">// the unlock below never runs</span>
+    }
+    balance -= amount;
+    accountMutex.<span class="f">unlock</span>();
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">try</span> {
+        <span class="f">withdraw</span>(<span class="n">500</span>);
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"main caught: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;   <span class="c">// flush: the program is about to hang</span>
+    }
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">auditor</span>([] {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(accountMutex);     <span class="c">// waits forever: main still owns it</span>
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"auditor sees "</span> &lt;&lt; balance &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;
+    });
+    auditor.<span class="f">join</span>();   <span class="c">// main waits for the auditor, the auditor waits for the mutex</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>The lock leaves with the exception</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Main thread</span><span>Auditor thread</span><span>accountMutex</span></div><div class="tl-row"><span class="t">1</span><span class="cell">locks accountMutex</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">owned by main</span></div><div class="tl-row"><span class="t">3</span><span class="cell">throws before unlock(); the catch in main handles it</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">still owned by main, and no code path will ever unlock it</span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell">tries to lock accountMutex and blocks</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell">joins the auditor and blocks</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Each thread waits for the other. With a <code>std::lock_guard</code>, the unwinding would have unlocked it.</div></div></figure>
+
+<p>Replace the first line of <code>withdraw</code> with <code>std::lock_guard&lt;std::mutex&gt; lock(accountMutex);</code>, delete the <code>unlock()</code>, and the program prints "main caught: insufficient funds" and then "auditor sees 100". The same applies to every early <code>return</code> and every <code>break</code>: a guard covers all of them, hand-written unlocks cover only the paths you remembered.</p>
+
+<h2 id="the-three-exception-safety-guarantees">The three exception safety guarantees</h2>
+<p>RAII releases the lock during ordinary unwinding, but says nothing about the state you leave behind. Other threads can observe that state once they acquire the same mutex. Each operation should document its guarantee:</p>
+<table>
+<thead><tr><th>Guarantee</th><th>If it throws</th><th>Examples</th></tr></thead>
+<tbody>
+<tr><td>Nothrow</td><td>no exception escapes; cleanup operations must still meet their contract</td><td>valid calls to <code>std::mutex::unlock</code>, condition variable <code>notify_one</code> and <code>notify_all</code>; suitably designed destructors, swaps and moves</td></tr>
+<tr><td>Strong (commit or roll back)</td><td>the state is exactly as before the call</td><td><code>std::vector::push_back</code> when the element can be moved without throwing or can be copied; copy-and-swap assignment</td></tr>
+<tr><td>Basic</td><td>no leaks and every <a class="term" data-term="invariant" href="glossary.html#invariant">invariant</a> still holds, but the state may have changed</td><td>a batch operation documented to retain completed items while preserving all container invariants</td></tr>
+</tbody>
+</table>
+<p>Below basic there is "no guarantee": you cannot assume the object is usable. Claiming basic safety while leaving an invariant broken is a bug; an API may also document weaker behavior for particular throwing element types. A strong guarantee covers the documented state, not arbitrary external effects such as an email already sent.</p>
+<p>The technique that gives you the strong guarantee is to <strong>do everything that can throw first, then commit with steps that cannot throw</strong>. Compare two orders for a transfer that must keep a journal in step with the balances:</p>
+
+<p>In these member-function fragments, <code>balances_</code> is a <code>std::map&lt;int, long&gt;</code> of nonnegative balances and <code>journal_</code> is a <code>std::vector&lt;Entry&gt;</code>, where <code>Entry</code> contains only two <code>int</code> IDs and a <code>long</code> amount. Every reader and writer uses <code>m_</code>. Include <code>&lt;limits&gt;</code>, <code>&lt;map&gt;</code>, <code>&lt;mutex&gt;</code>, <code>&lt;stdexcept&gt;</code> and <code>&lt;vector&gt;</code>; validate the amount and overflow before changing state.</p>
+
+<figure class="code single" data-sample="cpp-exceptions.3"><figcaption><span class="ctitle">Throwing after the commit breaks the invariant (bug)</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="t">void</span> <span class="f">transfer</span>(<span class="t">int</span> from, <span class="t">int</span> to, <span class="t">long</span> amount) {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    <span class="k">if</span> (amount &lt;= <span class="n">0</span> || from == to) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid transfer"</span>);
+    }
+    <span class="t">long</span>&amp; source = balances_.<span class="f">at</span>(from);   <span class="c">// at() throws std::out_of_range for a bad id</span>
+    <span class="t">long</span>&amp; target = balances_.<span class="f">at</span>(to);
+    <span class="k">if</span> (source &lt; amount || target &gt; <span class="t">std</span>::numeric_limits&lt;<span class="t">long</span>&gt;::<span class="f">max</span>() - amount) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"balance limit"</span>);
+    }
+    source -= amount;
+    target += amount;
+    journal_.<span class="f">push_back</span>(Entry{from, to, amount});   <span class="c">// may throw std::bad_alloc after the money moved</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="cpp-exceptions.4"><figcaption><span class="ctitle">Everything that can throw happens before the commit</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="t">void</span> <span class="f">transfer</span>(<span class="t">int</span> from, <span class="t">int</span> to, <span class="t">long</span> amount) {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    <span class="k">if</span> (amount &lt;= <span class="n">0</span> || from == to) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid transfer"</span>);
+    }
+    <span class="t">long</span>&amp; source = balances_.<span class="f">at</span>(from);             <span class="c">// may throw: nothing has changed yet</span>
+    <span class="t">long</span>&amp; target = balances_.<span class="f">at</span>(to);
+    <span class="k">if</span> (source &lt; amount || target &gt; <span class="t">std</span>::numeric_limits&lt;<span class="t">long</span>&gt;::<span class="f">max</span>() - amount) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"balance limit"</span>);
+    }
+    journal_.<span class="f">push_back</span>(Entry{from, to, amount});   <span class="c">// the only step that allocates, done first</span>
+    source -= amount;                              <span class="c">// cannot throw</span>
+    target += amount;                              <span class="c">// cannot throw</span>
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>In the first version, if <code>push_back</code> cannot allocate, the guard unlocks during unwinding and every other thread now sees money moved with no journal entry. In the second, a failed <code>push_back</code> leaves everything as it was, and once it succeeds the remaining steps cannot fail.</p>
+
+<div class="box note">
+<h3>Why std::queue::pop returns void</h3>
+<p>A value-returning pop can remove an element and then fail while transferring its result, losing that element. Separating <code>front()</code> from <code>pop()</code> lets sequential callers copy successfully before removing. A concurrent queue must combine those steps under one lock; <code>T item = std::move(items_.front()); items_.pop_front(); return item;</code> avoids this failure when <code>T</code> has nonthrowing move construction and destruction. Do not rely on optional copy elision to make a throwing return safe.</p>
+</div>
+
+<h2 id="noexcept">noexcept</h2>
+<p><a class="term" data-term="noexcept" href="glossary.html#noexcept">noexcept</a> promises that no exception escapes a function. It may throw and catch internally, but an exception attempting to leave calls <code>std::terminate</code> instead of reaching an outside handler. Unwinding before that termination is implementation defined. A destructor without an explicit exception specification is normally nonthrowing, but a potentially throwing base or member destructor can make it potentially throwing too.</p>
+<p>Even a destructor declared <code>noexcept(false)</code> terminates if an exception escapes it while it is being invoked for stack unwinding. Throwing and catching a second exception entirely inside that destructor is allowed; the problem is letting it escape. Put fallible cleanup in an explicit <code>close()</code> or <code>commit()</code> that can report failure, and keep destructor cleanup nonthrowing.</p>
+<p>During vector reallocation, a possibly throwing move could modify old elements before failing. When copying is available, libc++ <strong>copies instead of moving</strong> to preserve the strong guarantee. If <code>T</code> is move-only and its move can throw, the vector must use that move, and a failure can leave unspecified effects; <code>noexcept</code> is not required for compilation.</p>
+
+<figure class="code single" data-sample="cpp-exceptions.5" data-expect="ok"><figcaption><span class="ctitle">noexcept decides whether a growing vector copies or moves</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> copies = <span class="n">0</span>;
+<span class="t">int</span> moves = <span class="n">0</span>;
+
+<span class="k">struct</span> Task {
+    <span class="t">std</span>::<span class="t">string</span> name;
+    <span class="k">explicit</span> <span class="f">Task</span>(<span class="t">std</span>::<span class="t">string</span> n) : <span class="f">name</span>(<span class="t">std</span>::<span class="f">move</span>(n)) {}
+    <span class="f">Task</span>(<span class="k">const</span> Task&amp; other) : <span class="f">name</span>(other.name) { copies += <span class="n">1</span>; }
+    <span class="f">Task</span>(Task&amp;&amp; other) : <span class="f">name</span>(<span class="t">std</span>::<span class="f">move</span>(other.name)) { moves += <span class="n">1</span>; }   <span class="c">// not marked noexcept</span>
+};
+
+<span class="k">struct</span> SafeTask {
+    <span class="t">std</span>::<span class="t">string</span> name;
+    <span class="k">explicit</span> <span class="f">SafeTask</span>(<span class="t">std</span>::<span class="t">string</span> n) : <span class="f">name</span>(<span class="t">std</span>::<span class="f">move</span>(n)) {}
+    <span class="f">SafeTask</span>(<span class="k">const</span> SafeTask&amp; other) : <span class="f">name</span>(other.name) { copies += <span class="n">1</span>; }
+    <span class="f">SafeTask</span>(SafeTask&amp;&amp; other) <span class="k">noexcept</span> : <span class="f">name</span>(<span class="t">std</span>::<span class="f">move</span>(other.name)) { moves += <span class="n">1</span>; }
+};
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="t">void</span> <span class="f">grow</span>(<span class="k">const</span> <span class="t">char</span>* label) {
+    copies = <span class="n">0</span>;
+    moves = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;T&gt; tasks;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i += <span class="n">1</span>) {
+        tasks.<span class="f">emplace_back</span>(<span class="s">"task "</span> + <span class="t">std</span>::<span class="f">to_string</span>(i));   <span class="c">// built in place: only regrowth copies or moves</span>
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; label &lt;&lt; <span class="s">": "</span> &lt;&lt; copies &lt;&lt; <span class="s">" copies, "</span> &lt;&lt; moves &lt;&lt; <span class="s">" moves while growing\n"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    grow&lt;Task&gt;(<span class="s">"move constructor without noexcept"</span>);
+    grow&lt;SafeTask&gt;(<span class="s">"move constructor marked noexcept"</span>);
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>If capacity grows through 1, 2, 4 and 8, there are seven relocations; the growth policy and counts are implementation dependent. Each relocation of <code>Task</code> copies its string, which need not allocate for a short string. Mark a move <code>noexcept</code> only when no exception can escape, or default it and let the compiler infer its specification from the members.</p>
+<p>The operator <code>noexcept(expression)</code> checks whether an expression is potentially throwing without evaluating it. Generic code can write <code>Box(Box&amp;&amp;) noexcept(std::is_nothrow_move_constructible_v&lt;T&gt;)</code> when its body only move-constructs a <code>T</code>; include <code>&lt;type_traits&gt;</code>. <code>std::move_if_noexcept</code> selects a const reference for copying when moving may throw and copying is available. A nonthrowing declaration alone does not prove rollback or successful completion: it may terminate if the promise is violated.</p>
+<p>For the threading library itself: <code>unlock()</code>, <code>notify_one()</code> and <code>notify_all()</code> do not throw. <code>std::thread</code>'s constructor and <code>std::mutex::lock()</code> may throw <code>std::system_error</code> when the OS refuses (out of threads, for example), which matters when a pool starts its workers. <code>std::promise::set_value</code> throws <code>std::future_error</code> if the promise was already satisfied.</p>
+
+<h2 id="exceptions-and-threads">Exceptions and threads</h2>
+<p>An exception travels up the call stack of the thread that threw it, and no further. Three rules follow.</p>
+
+<h3>Rule 1: an exception that escapes a thread function kills the process</h3>
+<p>If the function you gave to <code>std::thread</code> lets an exception out, <code>std::terminate</code> is called. It is not delivered to <code>join()</code>, and wrapping the <code>std::thread</code> construction in a <code>try</code> does not catch it. On macOS with libc++ the program dies with:</p>
+<figure class="code single" data-sample="cpp-exceptions.6"><figcaption><span class="ctitle">libc++ on macOS</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><code>libc++abi: terminating due to uncaught exception of type std::runtime_error: disk full</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Diagnostics vary by runtime and version. The default terminate handler aborts the process, including the other threads; a custom terminate handler cannot resume normal execution. <strong>Catch task failures inside the worker</strong>, or use an adapter such as <code>std::packaged_task</code> that stores them. The error-reporting path must itself be reliable; merely adding <code>catch (...)</code> does not make mutex or allocation failures recoverable.</p>
+
+<h3>Rule 2: unwinding past a joinable std::thread also kills the process</h3>
+<p>A <code>std::thread</code> that is still joinable when destroyed calls <code>std::terminate</code>, even if its function has already finished. An exception makes that easy to trigger: you start a thread, the next line throws, and unwinding destroys the object before you join. C++20's <a class="term" data-term="jthread" href="glossary.html#jthread">std::jthread</a> requests stop and joins when destroyed while joinable:</p>
+
+<figure class="code single" data-sample="cpp-exceptions.7" data-expect="ok"><figcaption><span class="ctitle">std::jthread joins during unwinding</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">void</span> <span class="f">prepareReport</span>() {
+    <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"config missing"</span>);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">try</span> {
+        <span class="t">std</span>::<span class="t">jthread</span> <span class="f">indexer</span>([] {
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">20</span>));   <span class="c">// pretend to work</span>
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"indexer finished\n"</span>;
+        });
+        <span class="f">prepareReport</span>();   <span class="c">// throws while the indexer is still running</span>
+        <span class="c">// With std::thread here, leaving the scope with a joinable thread would call std::terminate.</span>
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"caught: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;   <span class="c">// runs after the jthread joined during unwinding</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>"indexer finished" prints before "caught", because the <code>jthread</code> is destroyed, and therefore joined, while the exception unwinds the <code>try</code> block. In C++17, wrap the <code>std::thread</code> in your own small RAII class whose destructor joins, or catch, join and rethrow by hand.</p>
+<p><code>jthread</code> does not catch exceptions from its function and does not forcibly cancel work. A task that ignores its stop request can delay destruction indefinitely. Do not destroy a joining owner on its own worker thread or while holding a lock that worker needs to finish.</p>
+
+<h3>Rule 3: to report a failure to another thread, ship it</h3>
+<p><code>std::current_exception()</code>, called inside a <code>catch</code>, returns a <code>std::exception_ptr</code> retaining the handled exception or a copy. <code>std::rethrow_exception(p)</code> rethrows the captured exception at the receiving call site; do not rely on exception-object identity. Outside exception handling <code>current_exception()</code> returns null, and passing a null pointer to <code>rethrow_exception</code> is undefined behavior.</p>
+
+<figure class="code single" data-sample="cpp-exceptions.8" data-expect="ok"><figcaption><span class="ctitle">Carrying a worker&#x27;s exception to main</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">parsePort</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; text) {
+    <span class="k">for</span> (<span class="t">char</span> c : text) {
+        <span class="k">if</span> (c &lt; <span class="s">'0'</span> || c &gt; <span class="s">'9'</span>) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"not a number: "</span> + text);
+        }
+    }
+    <span class="k">return</span> <span class="t">std</span>::<span class="f">stoi</span>(text);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">exception_ptr</span> error;    <span class="c">// written by the worker, read by main after join</span>
+    <span class="t">int</span> port = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">worker</span>([&amp;error, &amp;port] {
+        <span class="k">try</span> {
+            port = <span class="f">parsePort</span>(<span class="s">"80a"</span>);
+        } <span class="k">catch</span> (...) {
+            error = <span class="t">std</span>::<span class="f">current_exception</span>();   <span class="c">// capture whatever was thrown</span>
+        }
+    });
+    worker.<span class="f">join</span>();               <span class="c">// join makes the worker's writes visible to main</span>
+
+    <span class="k">try</span> {
+        <span class="k">if</span> (error) {
+            <span class="t">std</span>::<span class="f">rethrow_exception</span>(error);       <span class="c">// report the captured failure in main</span>
+        }
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"port "</span> &lt;&lt; port &lt;&lt; <span class="s">"\n"</span>;
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::invalid_argument&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"worker failed: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Reading <code>error</code> in <code>main</code> needs no lock only because <code>join()</code> comes first: everything the worker did <a class="term" data-term="happens-before" href="glossary.html#happens-before">happens-before</a> <code>join()</code> returns. If several workers can fail at once, the shared <code>exception_ptr</code> needs a mutex, as in the worked example below.</p>
+<p>Futures package this mechanism. A <code>std::promise</code> supplies a value or an exception to its shared state, and the associated future's <code>get()</code> rethrows a stored exception. <code>std::packaged_task</code> and <code>std::async</code> capture callable failures for you. A deferred <code>std::async</code> call may execute in the thread that waits rather than a new worker.</p>
+
+<figure class="code single" data-sample="cpp-exceptions.9" data-expect="ok"><figcaption><span class="ctitle">promise, packaged_task and future carry exceptions</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</span><code><span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">fetchSize</span>(<span class="t">int</span> fileId) {
+    <span class="k">if</span> (fileId == <span class="n">13</span>) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"file 13 is corrupt"</span>);
+    }
+    <span class="k">return</span> fileId * <span class="n">100</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="c">// 1. std::promise: you decide what goes into the future</span>
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; <span class="t">promise</span>;
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; first = <span class="t">promise</span>.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([&amp;<span class="t">promise</span>] {
+        <span class="k">try</span> {
+            <span class="t">promise</span>.<span class="f">set_value</span>(<span class="f">fetchSize</span>(<span class="n">13</span>));
+        } <span class="k">catch</span> (...) {
+            <span class="t">promise</span>.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">current_exception</span>());   <span class="c">// ship the failure to the waiter</span>
+        }
+    });
+    <span class="k">try</span> {
+        <span class="t">int</span> size = first.<span class="f">get</span>();                                 <span class="c">// rethrows the worker's exception here</span>
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"size "</span> &lt;&lt; size &lt;&lt; <span class="s">"\n"</span>;
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"get() rethrew: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+    worker.<span class="f">join</span>();
+
+    <span class="c">// 2. std::packaged_task: the try and catch are built in</span>
+    <span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="t">int</span>(<span class="t">int</span>)&gt; <span class="f">task</span>(fetchSize);
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; second = task.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">runner</span>(<span class="t">std</span>::<span class="f">move</span>(task), <span class="n">7</span>);
+    <span class="t">int</span> size = second.<span class="f">get</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"size "</span> &lt;&lt; size &lt;&lt; <span class="s">"\n"</span>;
+    runner.<span class="f">join</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>A failure crosses threads through a future</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Worker thread</span><span>Shared state</span><span>Main thread</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">calls first.get() and blocks</span></div><div class="tl-row"><span class="t">2</span><span class="cell">fetchSize(13) throws</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">catch (...) calls set_exception(current_exception())</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">4</span><span class="cell empty"></span><span class="cell good">now holds the exception, and is ready</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">get() wakes and rethrows the same exception</span></div><div class="tl-note">An uncaught worker failure terminates; swallowing it leaves get() waiting until the promise becomes ready or is abandoned.</div></div></figure>
+
+<p>If a promise with an unsatisfied shared state is destroyed, it makes that state ready with <code>std::future_error(std::future_errc::broken_promise)</code>. The waiter then learns that the producer abandoned the result, rather than waiting forever. Prefer explicitly completing accepted work with its actual result or error. <code>set_exception</code> requires a non-null exception pointer and an unsatisfied valid state; it can itself throw <code>std::future_error</code> on misuse.</p>
+<p><code>future.wait()</code> waits for readiness but does not rethrow the stored task failure; <code>get()</code> does and consumes an ordinary future's state, even on that failure. Do not call <code>get()</code> twice. Use <code>std::shared_future</code> when several observers need to read one shared result.</p>
+
+<h2 id="exceptions-inside-a-worker-loop">Exceptions inside a worker loop</h2>
+<p>A pool worker runs other people's code. If one task throws and nothing catches it, the worker's thread function ends with an exception: <code>std::terminate</code>, and the whole service is gone. The rule for every worker loop is:</p>
+<ul>
+<li>Run tasks outside the queue lock and capture their exceptions with a <code>catch (...)</code> or a packaged task.</li>
+<li>Deliver the failure to the submitter: store the task as a <code>std::packaged_task</code> so its future receives the exception automatically, or set the exception on the task's promise.</li>
+<li>Keep the worker alive and take the next task. A dead worker silently shrinks the pool.</li>
+</ul>
+<p>This is exactly the follow up a Rubrik interviewer raised on a hand-built pool (an exception thrown inside a task), and the one-line answer is: <em>each worker catches everything around each task, the failure goes into that task's future, and the worker moves on</em>.</p>
+
+<div class="box example">
+<h3>Worked example: the first failure stops the job runner</h3>
+<p>Rubrik's job-runner reports include stopping on the first failure. Define the boundary precisely: here, claiming an index under a mutex admits a job. Recording the first error under that same mutex closes admission. Already admitted jobs may still begin their function bodies or finish; arbitrary running C++ code cannot be forcibly stopped safely. This example handles independent jobs; dependency scheduling is a separate layer.</p>
+<figure class="code single" data-sample="cpp-exceptions.10" data-expect="ok"><figcaption><span class="ctitle">First recorded failure closes admission, then all workers join</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69</span><code><span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> JobRunner {
+<span class="k">public</span>:
+    <span class="c">// Admission and first-error recording use the same mutex. All state belongs to this run.</span>
+    <span class="t">void</span> <span class="f">run</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt;&amp; jobs, <span class="t">int</span> workers) {
+        <span class="k">if</span> (workers &lt;= <span class="n">0</span>) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"workers must be positive"</span>);
+        }
+        <span class="t">std</span>::<span class="t">mutex</span> <span class="t">mutex</span>;
+        <span class="t">std</span>::<span class="t">size_t</span> next = <span class="n">0</span>;
+        <span class="t">std</span>::<span class="t">exception_ptr</span> firstError;
+        <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; threads;   <span class="c">// destroyed before the state they reference</span>
+        <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; workers; w += <span class="n">1</span>) {
+            threads.<span class="f">emplace_back</span>([&amp;] {
+                <span class="k">while</span> (<span class="k">true</span>) {
+                    <span class="t">std</span>::<span class="t">size_t</span> i;
+                    {
+                        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(<span class="t">mutex</span>);
+                        <span class="k">if</span> (firstError || next == jobs.<span class="f">size</span>()) {
+                            <span class="k">return</span>;
+                        }
+                        i = next;
+                        next += <span class="n">1</span>;         <span class="c">// this job is now admitted</span>
+                    }
+                    <span class="k">try</span> {
+                        jobs[i]();         <span class="c">// user code runs outside the lock</span>
+                    } <span class="k">catch</span> (...) {
+                        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(<span class="t">mutex</span>);
+                        <span class="k">if</span> (!firstError) {
+                            firstError = <span class="t">std</span>::<span class="f">current_exception</span>();
+                        }
+                        <span class="k">return</span>;
+                    }
+                }
+            });
+        }
+        <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) {
+            t.<span class="f">join</span>();
+        }
+        <span class="k">if</span> (firstError) {                   <span class="c">// all worker writes happen before these joins return</span>
+            <span class="t">std</span>::<span class="f">rethrow_exception</span>(firstError);
+        }
+    }
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; jobs;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">20</span>; i += <span class="n">1</span>) {
+        jobs.<span class="f">push_back</span>([i] {
+            <span class="k">if</span> (i == <span class="n">5</span>) {
+                <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"job 5 failed: disk full"</span>);
+            }
+        });
+    }
+    JobRunner runner;
+    <span class="k">try</span> {
+        runner.<span class="f">run</span>(jobs, <span class="n">4</span>);
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"all jobs succeeded\n"</span>;
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"runner stopped: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>A separate atomic stop check would have a gap: A reads false, B records failure, then A claims another job. Here the mutex orders both admission and error recording. "First" means first recorded under that mutex, not earliest throw by wall-clock time. A <a class="term" data-term="stop-token" href="glossary.html#stop-token">std::stop_token</a> can request that already admitted jobs cooperate in cancellation, but cannot force them to stop.</p>
+<p>Every invocation has fresh state, and zero workers is rejected. <code>jthread</code> ownership also joins previously created workers if a later thread construction fails; that startup exception propagates after cleanup, though those workers may have performed work. The example assumes functioning synchronization primitives and jobs that eventually finish. Rethrowing happens only after joins, outside the mutex.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Manual <code>lock()</code> and <code>unlock()</code> around code that can throw.</strong> A skipped unlock can strand every waiter. Use a guard.</li>
+<li><strong>Assuming the guard also restores the state.</strong> It only unlocks. Order the work so everything that can throw happens before the commit.</li>
+<li><strong>Letting a task exception escape its thread function.</strong> <code>std::terminate</code>, not a failed <code>join()</code>. Capture it inside the worker or use a packaged task.</li>
+<li><strong>Throwing while a <code>std::thread</code> is still joinable.</strong> Unwinding destroys it and calls <code>std::terminate</code>. Use <code>std::jthread</code>, or join before anything can throw.</li>
+<li><strong><code>catch (...) {}</code> in a worker that swallows the error.</strong> The worker survives but the caller never learns the task failed. Put the exception in the task's future or record it.</li>
+<li><strong>Catching by value.</strong> <code>catch (std::exception e)</code> copies and slices a derived exception down to the base. Catch by <code>const&amp;</code>, and rethrow with <code>throw;</code>, not <code>throw e;</code>.</li>
+<li><strong>Abandoning a promise accidentally.</strong> The waiter gets <code>broken_promise</code>, losing the original failure context. Complete accepted tasks explicitly, including cancellation, when possible.</li>
+<li><strong>Marking a function <code>noexcept</code> while allowing an exception to escape.</strong> That converts recoverable propagation into <code>std::terminate</code>.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Exceptions arrive as follow ups to a concurrency design: "what if the task throws?", "what if <code>doWork()</code> throws while you hold the lock?", "how does the caller of <code>submit</code> find out?", "how does your job runner stop on the first failure?". The interviewer wants to hear that you thought about every path out of a critical section and out of a thread.</p>
+<blockquote>Every lock in my code is a guard, so an exception unlocks it during unwinding. That doesn't roll back state, so inside the critical section I do everything that can throw first, and only then commit with steps that can't fail. That way other threads never see a half-applied update.</blockquote>
+<blockquote>Nothing may escape a worker thread, because an uncaught exception in a thread calls <code>std::terminate</code>. Each worker catches everything around each task, puts the exception into that task's future through the <code>packaged_task</code> or the promise, and moves on to the next task. The submitter sees the original exception when it calls <code>get()</code>.</blockquote>
+<p>Follow ups to expect: "What happens if you destroy a joinable <code>std::thread</code>?" (<code>std::terminate</code>; use <code>std::jthread</code>), "Why does <code>vector</code> copy your tasks when it grows?" (the move constructor is not <code>noexcept</code>), and "What if two workers fail at the same time?" (first error wins under a lock, the rest are dropped or logged).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Codebases without exceptions.</strong> Some systems compile with <code>-fno-exceptions</code> and return status values. C++23's <code>std::expected&lt;T, E&gt;</code> is one value-or-error representation, unavailable in C++20. Choosing that representation does not by itself make allocations or library operations nonthrowing; the project must define its failure policy. Accepted work still needs a result or error delivered to its waiter.</p>
+<p><strong>What a throw costs.</strong> Apple clang on this 64-bit target uses table-based exception handling: normal entry to a <code>try</code> does not register a dynamic handler. That does not mean exceptions are free: metadata, code size and optimization effects remain, and an actual throw searches for a handler and performs cleanup. Measure on the target; use exceptions for failures rather than routine control flow in a hot loop.</p>
+<p><strong>Scope guards that know why they run.</strong> <code>std::uncaught_exceptions()</code> (C++17, <code>&lt;exception&gt;</code>) returns this thread's count of exceptions not yet caught. A scope guard records a baseline at construction and checks for an increase at destruction; testing only for nonzero can mistake an outer unwind for a new failure. Rollback must not throw, and a fallible commit belongs in an explicit operation.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Unwinding destroys fully constructed automatic objects in exited scopes in reverse order. RAII cleanup is not guaranteed on termination paths.</li>
+<li>A guard unlocks; it does not roll back. Do everything that can throw first, then commit with nothrow steps, so other threads never see half an update.</li>
+<li><code>noexcept</code> is a promise enforced by <code>std::terminate</code>; on move constructors it helps vector choose how to relocate elements safely.</li>
+<li>An exception that escapes a thread function, or unwinding past a joinable <code>std::thread</code>, terminates the process.</li>
+<li>Carry failures across threads with <code>std::exception_ptr</code>, <code>std::promise::set_exception</code>, or <code>std::packaged_task</code>, and rethrow where someone can handle them.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-exceptions"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-exceptions.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>process()</code> creates <code>Tracer a(&quot;db&quot;); Tracer b(&quot;lock&quot;);</code> and then throws. Each <code>Tracer</code> prints its name in its destructor, and <code>main</code> catches the exception and prints "caught". What is printed?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>caught</code>, then <code>db</code>, then <code>lock</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>db</code>, <code>lock</code>, then <code>caught</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>lock</code>, <code>db</code>, then <code>caught</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only <code>caught</code>: destructors do not run when an exception is thrown</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Unwinding destroys locals in reverse order of construction, and it finishes before the handler runs. So <code>lock</code> (constructed last) is destroyed first, then <code>db</code>, then the catch block prints. This ordering is what makes lock guards release on the way out.</div></div><div class="mcq" data-id="cpp-exceptions.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>void f() { m.lock(); check(); m.unlock(); }</code>. <code>m</code> is a <code>std::mutex</code>; <code>check()</code> throws and the caller catches it. The owning thread stays alive and never unlocks <code>m</code>. With no system failure, what happens to another thread that calls <code>m.lock()</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It gets the lock: the exception released it</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It blocks forever: the mutex is still owned by the thread that threw, and nothing will unlock it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws <code>std::system_error</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The runtime detects the abandoned lock and unlocks it</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A plain <code>std::mutex</code> has no idea an exception happened. <code>unlock()</code> was simply skipped, so the mutex stays owned. With <code>std::lock_guard&lt;std::mutex&gt; lock(m);</code> the destructor would unlock it during unwinding.</div></div><div class="mcq" data-id="cpp-exceptions.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What happens here?<figure class="code single" data-sample="cpp-exceptions.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code><span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>([] { <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"boom"</span>); });
+<span class="k">try</span> {
+    t.<span class="f">join</span>();
+} <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"caught "</span> &lt;&lt; e.<span class="f">what</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It prints <code>caught boom</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>join()</code> returns normally and the exception is lost</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The exception escapes the thread's function, so <code>std::terminate</code> aborts the whole process</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks: <code>join()</code> waits for a thread that died</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Exceptions never cross to the joining thread. An exception that leaves a thread's initial function calls <code>std::terminate</code>. To deliver it, catch it inside the thread and pass it on with <code>std::exception_ptr</code> or <code>std::promise::set_exception</code>.</div></div><div class="mcq" data-id="cpp-exceptions.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>std::thread worker(index); loadConfig(); worker.join();</code>. Thread construction succeeds and <code>index</code> does not throw. <code>loadConfig()</code> throws, and the caller has a matching catch handler. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The caller catches it, and <code>worker</code> keeps running in the background</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The caller catches it after <code>worker</code> is joined automatically</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::terminate</code> is called: unwinding destroys <code>worker</code> while it is still joinable</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>worker</code> is detached automatically</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::thread</code>'s destructor calls <code>std::terminate</code> if the thread is joinable, and the exception skips the <code>join()</code>. <code>std::jthread</code> joins in its destructor instead, so with it the caller would catch the exception after the indexing finished.</div></div><div class="mcq" data-id="cpp-exceptions.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">On the lesson's libc++ toolchain, a <code>std::vector&lt;Task&gt;</code> reallocates. <code>Task</code> has a usable copy constructor and a user-written move constructor with no <code>noexcept</code> specification. How are existing elements relocated?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Moved, because moving is cheaper</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Copied, because the vector keeps <code>push_back</code> strongly exception safe and a move that might throw could leave elements split across two buffers</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Moved, then copied back if a move throws</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile without <code>noexcept</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> libc++ uses the selection expressed by <code>std::move_if_noexcept</code>: copy when a move may throw and copying is available, so old elements remain intact on failure. If copying is unavailable it can move even without <code>noexcept</code>, with weaker guarantees if that move throws. Moving then copying back is not reliable rollback because rollback may also fail.</div></div><div class="mcq" data-id="cpp-exceptions.q6" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which deliver a task exception to another thread? Assume one worker writes <code>p</code>, the promise is valid and unsatisfied, and its matching future is used. Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>catch (...) { p = std::current_exception(); }</code> in the worker, then <code>std::rethrow_exception(p)</code> in main after <code>join()</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>promise.set_exception(std::current_exception())</code> inside the worker's catch handler, then <code>future.get()</code> in the waiter</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Running the function as a <code>std::packaged_task</code> and calling <code>get()</code> on its future</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Wrapping the <code>std::thread</code> constructor call in a <code>try</code> block</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">Calling <code>join()</code> inside a <code>try</code> block</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>exception_ptr</code>, promises and packaged tasks transport the failure to a receiving call that rethrows it. A <code>try</code> around construction catches constructor failures, such as callable-copy or thread-creation failures. A <code>try</code> around <code>join()</code> can catch join errors, but neither catches exceptions escaping the worker's function, which trigger <code>std::terminate</code>.</div></div><div class="mcq" data-id="cpp-exceptions.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Inside a <code>std::lock_guard</code>, <code>transfer</code> changes balances without overflow, then appends to a journal. The append throws <code>std::bad_alloc</code> without changing the journal, and an outside caller catches it. What can a reader acquiring the same mutex next observe?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing changed: the lock guard rolls back the balances</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The lock is released during unwinding and the balances have moved with no journal entry, so the invariant between them is broken</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The mutex stays locked, so no thread sees anything</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The program terminates, because <code>bad_alloc</code> cannot be caught</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A guard unlocks; it never undoes your writes. The fix is ordering: append to the journal first (the only step that can throw), then change the balances with operations that cannot fail. <code>std::bad_alloc</code> is an ordinary exception and can be caught.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-exceptions.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a single-thread <code>Worker</code> with <code>template &lt;typename F&gt; auto submit(F f)</code> that returns a <code>std::future</code> of <code>f</code>'s result. A task that throws must not kill the worker; its exception must come out of the future's <code>get()</code>. The destructor finishes queued tasks and joins.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-exceptions.12" data-expect="ok"><figcaption><span class="ctitle">A worker whose futures carry exceptions</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">class</span> Worker {
+<span class="k">public</span>:
+    <span class="f">Worker</span>() : <span class="f">thread_</span>([<span class="k">this</span>] { <span class="f">loop</span>(); }) {}
+
+    ~<span class="f">Worker</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            stopping_ = <span class="k">true</span>;
+        }
+        cv_.<span class="f">notify_one</span>();
+        thread_.<span class="f">join</span>();                     <span class="c">// runs the tasks already queued, then exits</span>
+    }
+
+    <span class="k">template</span> &lt;<span class="k">typename</span> F&gt;
+    <span class="k">auto</span> <span class="f">submit</span>(F f) -&gt; <span class="t">std</span>::<span class="t">future</span>&lt;<span class="k">decltype</span>(<span class="f">f</span>())&gt; {
+        <span class="k">using</span> R = <span class="k">decltype</span>(<span class="f">f</span>());
+        <span class="k">auto</span> task = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="f">R</span>()&gt;&gt;(<span class="t">std</span>::<span class="f">move</span>(f));
+        <span class="t">std</span>::<span class="t">future</span>&lt;R&gt; result = task-&gt;<span class="f">get_future</span>();
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            tasks_.<span class="f">emplace_back</span>([task] { (*task)(); });   <span class="c">// the packaged_task catches f's exceptions</span>
+        }
+        cv_.<span class="f">notify_one</span>();
+        <span class="k">return</span> result;
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">loop</span>() {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task;
+            {
+                <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+                cv_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> stopping_ || !tasks_.<span class="f">empty</span>(); });
+                <span class="k">if</span> (tasks_.<span class="f">empty</span>()) {
+                    <span class="k">return</span>;                 <span class="c">// stopping and drained</span>
+                }
+                task = <span class="t">std</span>::<span class="f">move</span>(tasks_.<span class="f">front</span>());
+                tasks_.<span class="f">pop_front</span>();
+            }
+            <span class="f">task</span>();                         <span class="c">// packaged_task captures the user callable's failure</span>
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; tasks_;   <span class="c">// guarded by m_</span>
+    <span class="t">bool</span> stopping_ = <span class="k">false</span>;                     <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">thread</span> thread_;                        <span class="c">// last: starts after the members it uses</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; later;
+    {
+        Worker worker;
+        <span class="k">auto</span> failed = worker.<span class="f">submit</span>([]() -&gt; <span class="t">int</span> { <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"task failed"</span>); });
+        later = worker.<span class="f">submit</span>([] { <span class="k">return</span> <span class="n">42</span>; });
+        <span class="k">try</span> {
+            failed.<span class="f">get</span>();
+        } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp; e) {
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+        }
+    }                                       <span class="c">// drains and joins before later is read</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"next task: "</span> &lt;&lt; later.<span class="f">get</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>std::packaged_task</code> is move-only and C++20 <code>std::function</code> needs a copyable callable, so a <code>shared_ptr</code> lets a small copyable lambda own it. Each valid packaged task is invoked exactly once: user exceptions go into its future and the loop continues. <code>submit</code> can itself throw before accepting the task, for example on allocation failure.</p>
+<p>The owner must finish all submissions before destruction, and destroy the worker from another thread. Tasks must eventually return and must not wait for another task queued behind them on this single worker. As with the other examples, synchronization primitives are assumed to function; this is task-error handling, not recovery from a broken runtime.</p></div></div><div class="cq" data-q="cpp-exceptions.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">The interviewer asks: "In your blocking queue, what happens if the element's copy throws while <code>push</code> holds the lock?" Answer as you would out loud.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The guard releases the lock as control unwinds out of its scope. Single-element insertion at the end of a deque has no effects on the deque if allocation or element construction throws, so the queue remains usable. I notify consumers only after successful insertion; consumers still recheck their predicate because wakeups may be spurious. This guarantee covers queue state, not a caller's argument altered by a throwing move.</p>
+<p>For pop I require nonthrowing move construction and destruction, covering extraction, removal and return. Assigning into <code>T&amp; out</code> before removal is not a universal fix: a throwing move assignment can mutate the queued source. A carefully specified copy-out can preserve the queue while leaving <code>out</code> changed, or the queue can transfer an owning handle such as <code>std::unique_ptr&lt;T&gt;</code> with a nonthrowing move.</p></div></div><div class="cq" data-q="cpp-exceptions.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">This crashes the whole service when one file name is empty. Why, and how do you fix it?<figure class="code single" data-sample="cpp-exceptions.13"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="t">void</span> <span class="f">processAll</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&amp; files) {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; workers;
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; f : files) {
+        <span class="k">if</span> (f.<span class="f">empty</span>()) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"empty file name"</span>);
+        }
+        workers.<span class="f">emplace_back</span>([&amp;f] { <span class="f">process</span>(f); });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; w : workers) {
+        w.<span class="f">join</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>If the third name is empty, two threads are already running when the exception is thrown. Unwinding destroys <code>workers</code>, which destroys two joinable <code>std::thread</code> objects, and each destructor calls <code>std::terminate</code>. The throw meant for the caller kills the process instead. There is a second hazard: if <code>process(f)</code> itself throws inside a worker, that also terminates the process.</p>
+<p>Fixes: validate every input before starting any thread; use <code>std::vector&lt;std::jthread&gt;</code>, whose destructors join, so an exception waits for the running workers and then propagates; and wrap the body of each worker in <code>try { process(f); } catch (...) { /* store std::current_exception() under a mutex */ }</code>, then rethrow the first stored error after the joins. With <code>jthread</code>, the references to <code>f</code> stay valid too, because the threads are joined before <code>files</code> can go away.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-exceptions.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"You used a lock guard around a balance transfer. Are you now exception safe if appending to the journal throws?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>RAII releases the mutex during unwinding but does not restore balances</li><li>Changing balances before a failed journal append breaks the balance-journal invariant</li><li>Define basic safety versus the strong guarantee for the operation's state</li><li>Validate IDs, amount and overflow, append safely, then commit with nonthrowing updates</li><li>All observers use the same mutex; external side effects need their own protocol</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The lock guard gives me cleanup, but it does not give the transfer an exception guarantee by itself. If I change both balances and then journal allocation fails, the guard unlocks during unwinding. The next reader taking that mutex can see money moved with no journal record. That breaks the invariant even though there is no leaked lock.
+I would state the guarantee explicitly. Basic safety means no leaks and valid invariants after failure. Strong safety means the operation leaves its documented state unchanged on failure. For this in-memory transfer, I would validate the account IDs, positive amount, available funds and destination overflow first. Then I would append the trivial journal entry, relying on the vector insertion's strong guarantee. Once that succeeds, the checked integer updates cannot throw, so they form the commit.
+Every reader must take the same mutex to avoid observing the intermediate state. This reasoning covers the in-memory state. If journaling means writing to an external service, I need a transaction or recovery protocol; a lock guard cannot undo an external side effect.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What happens to an object's resources if its constructor throws before the object is fully constructed?</span></p></div></div><div class="sq" data-sq="cpp-exceptions.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"A task in your pool throws. How does the submitter learn about it, and what changes if the first failure should stop the whole batch?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>An exception escaping a thread function terminates; join does not transport it</li><li>Capture each task failure with packaged_task or a promise and exception_ptr</li><li>Future get rethrows the failure while the worker can continue; wait only observes readiness</li><li>For batch failure, serialize work admission and first-error recording under one mutex</li><li>Already admitted work may run; cancellation is cooperative and first means first recorded</li><li>Join all workers before reporting failure and use RAII ownership for partial startup</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would capture the exception inside the worker and deliver it through that task's future. An exception escaping the thread function terminates the process; joining does not transport it back. A packaged task already captures failures from its callable. With a manual promise, I catch everything and set the current exception on the shared state. The submitter's get then rethrows it, while the worker can take another task. Waiting alone only observes readiness.
+Stopping a batch is a different policy. I would protect job admission and the first stored exception with one mutex. Under that mutex, a worker either claims the next job or observes failure and exits. The first handler to record an error closes admission. A separate atomic flag checked before claiming work leaves a gap where another job can be admitted after failure.
+I would explicitly allow already admitted jobs to finish, even if their function bodies have not started yet. Stopping those jobs requires cooperative cancellation, not killing their threads. I then join every worker before rethrowing the recorded failure to the caller. RAII thread ownership also handles an exception while creating later workers. Finally, the reporting path itself must not silently swallow errors or leave accepted futures pending indefinitely.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">If two tasks throw almost simultaneously, which exception is the first one your API promises to report?</span></p></div></div><div class="sq" data-sq="cpp-exceptions.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Why is vector copying my tasks during growth, and should I fix it by putting noexcept on every move constructor?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Copying preserves old elements when moving could throw and copying is available</li><li>Noexcept promises no exception escapes; violation terminates instead of propagating</li><li>Mark or infer noexcept only when member operations support that promise</li><li>A move-only type with a throwing move still works but can lose the strong guarantee</li><li>Capacity growth and relocation counts are implementation dependent</li><li>Destructors must not let a new exception escape during unwinding</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would inspect the move constructor's exception specification before changing anything. During growth, vector relocates existing elements. If moving might throw and copying is available, copying preserves the original elements until relocation succeeds. A move that changes several source objects before failing would make rollback much harder.
+Noexcept promises that no exception escapes the function. It is not a request to suppress errors: violating it calls terminate instead of propagating to the caller. I would mark a move noexcept only after checking every operation it performs, or default the move so its members determine the specification. Generic wrappers can use a conditional noexcept based on the contained type.
+If the type is move-only, vector can still use a potentially throwing move. The tradeoff is weaker exception guarantees if that move fails. Exact relocation counts depend on the implementation's capacity growth policy. I would also check cleanup: a destructor invoked during unwinding must not let another exception escape. A fallible close operation should report errors explicitly, while destruction provides reliable cleanup rather than a second failure.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Can a noexcept function legally call code that throws, if it catches the exception internally?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-future-from-scratch.html" data-problem="future-from-scratch"><span class="pk">Build a primitive · hard</span><b>A future from scratch</b><span class="pst"></span></a><a class="pcard" href="p-executor-wait-for-all.html" data-problem="executor-wait-for-all"><span class="pk">Executors and async · medium</span><b>Executor with wait for all</b><span class="pst"></span></a><a class="pcard" href="p-thread-pool-from-scratch.html" data-problem="thread-pool-from-scratch"><span class="pk">Executors and async · hard</span><b>Thread pool from scratch</b><span class="pst"></span></a><a class="pcard" href="p-dependency-job-runner.html" data-problem="dependency-job-runner"><span class="pk">Executors and async · hard</span><b>Dependency-aware job runner</b><span class="pst"></span></a><a class="pcard" href="p-single-flight-cache.html" data-problem="single-flight-cache"><span class="pk">Thread-safe structures · hard</span><b>Single-flight cache</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-vocabulary-types.html"><span>Previous</span><b>optional, pair, tuple, string_view and friends</b></a><a class="next" href="cpp-chrono.html"><span>Next</span><b>std::chrono: durations, clocks and deadlines</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#throw-try-and-catch">throw, try and catch</a><a href="#stack-unwinding-destructors-run-on-the-way-out">Stack unwinding: destructors run on the way out</a><a href="#the-three-exception-safety-guarantees">The three exception safety guarantees</a><a href="#noexcept">noexcept</a><a href="#exceptions-and-threads">Exceptions and threads</a><a href="#exceptions-inside-a-worker-loop">Exceptions inside a worker loop</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Semaphores: permits as a resource limit · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="semaphores" data-title="Semaphores: permits as a resource limit" data-track="core" data-module="core-8" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details open><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores" class=here><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m8">Module 08: Synchronizers</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 08.1</span><span>23 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Semaphores: permits as a resource limit</h1><p class="lsum">Use permits to limit concurrency or signal between threads, with correct cleanup, timeouts, fairness and memory visibility in Java and C++20.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">LinkedIn</span><span class="co">Microsoft</span><span class="co">Nvidia</span><span class="co">Google</span></div><div class="prereq"><span>Before this:</span><a href="mutex-basics.html">Mutexes and RAII guards</a><a href="condition-variables.html">Condition variables and monitors</a></div></header><article class="prose" id="article">
+<p class="lead">A semaphore is a counter of permits with a waiting room. It is the right tool for "at most N at a time", the core of the answer to "how do you stop a slow database from taking down your whole service?", and the subject of one of the most common theory questions of all: mutex versus semaphore.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A small parking lot has a board at the entrance: "12 spaces free". A car may enter only if the number is above zero, and entering lowers it by one. When any car leaves, the number goes up and a waiting car may enter. The attendant does not care which car leaves; any departure frees a space.</p>
+<p>That is a semaphore: <strong>a count of free permits, a rule that you wait when it is zero, and no notion of who holds which permit</strong>. That last part, "anyone can give a permit back", is what makes it different from a lock.</p>
+</div>
+
+<h2 id="what-a-semaphore-is">What a semaphore is</h2>
+<p>Edsger Dijkstra introduced the <a class="term" data-term="semaphore" href="glossary.html#semaphore">semaphore</a> in the 1960s with two operations, named P and V after Dutch words. Today they are called <code>acquire</code> and <code>release</code> (also wait and signal, down and up):</p>
+<ul>
+<li><strong>acquire:</strong> if the count is above zero, lower it by one and continue; otherwise block until it is above zero, then lower it.</li>
+<li><strong>release:</strong> raise the count by one; when a permit becomes available, an acquirer can take it.</li>
+</ul>
+<p>Both update the count atomically. A <strong>counting semaphore</strong> normally starts at a nonnegative count N within the API's supported range. A <a class="term" data-term="binary-semaphore" href="glossary.html#binary-semaphore">binary semaphore</a> is used with a count of 0 or 1. Two different jobs use the same machinery:</p>
+<ul>
+<li><strong>Limiting:</strong> start at N, acquire before using a scarce resource, release after. At most N threads are inside at once.</li>
+<li><strong>Signalling:</strong> start at 0, the waiting thread acquires, the signalling thread releases. The waiter passes only after the signal, and a signal sent before anyone waits is remembered as a permit.</li>
+</ul>
+<p>Both languages also give the semaphore memory effects: everything a thread did before <code>release</code> <a class="term" data-term="happens-before" href="glossary.html#happens-before">happens-before</a> everything another thread does after the <code>acquire</code> that took that permit. So a semaphore can safely hand data from one thread to another.</p>
+
+<h2 id="the-apis">The APIs</h2>
+<div class="only only-java"><span class="otag">Java</span>
+<p><strong><code>java.util.concurrent.Semaphore</code>.</strong> <code>new Semaphore(permits)</code> or <code>new Semaphore(permits, fair)</code>. The useful methods:</p>
+<ul>
+<li><code>acquire()</code> blocks and is interruptible (throws <code>InterruptedException</code> and clears interrupt status); <code>acquireUninterruptibly()</code> keeps waiting but preserves interrupt status on return; <code>acquire(n)</code> takes n permits atomically, all or nothing.</li>
+<li><code>tryAcquire()</code> takes a permit only if one is free right now. <code>tryAcquire(timeout, unit)</code> waits up to the timeout and returns <code>false</code> if none arrived.</li>
+<li><code>release()</code> and <code>release(n)</code> add permits. There is <strong>no capacity fixed by the initial count and no ownership check</strong>: extra releases can raise the count above where it started. The representation is bounded by <code>Integer.MAX_VALUE</code>; OpenJDK 21 throws <code>Error</code> on permit overflow.</li>
+<li><code>availablePermits()</code> is a snapshot for monitoring, not a check followed by acquisition. <code>drainPermits()</code> is a mutation: it atomically sets the count to zero and returns the old count, even if negative. Do not use it merely to inspect availability.</li>
+<li>The initial count may even be negative: <code>new Semaphore(-2)</code> needs three one-permit releases before the first <code>acquire()</code> can succeed.</li>
+</ul>
+<p><strong>Fairness.</strong> By default the semaphore allows <a class="term" data-term="barging" href="glossary.html#barging">barging</a>: a new caller can take a permit ahead of queued waiters. With <code>fair = true</code>, FIFO ordering applies at internal queueing points, not necessarily to invocation, return or work-completion order. Fair admission prevents repeated overtaking, at a possible throughput cost; it cannot make a stalled holder release. Untimed <code>tryAcquire()</code> ignores fairness; <code>tryAcquire(0, TimeUnit.SECONDS)</code> respects it and checks interruption.</p>
+</div>
+<div class="only only-cpp"><span class="otag">C++</span>
+<p><strong>C++20 <code>std::counting_semaphore&lt;LeastMaxValue&gt;</code> and <code>std::binary_semaphore</code></strong> (an alias for <code>std::counting_semaphore&lt;1&gt;</code>), in <code>&lt;semaphore&gt;</code>. The template argument is a lower bound on the implementation's supported maximum: <code>max()</code> may be larger. Keep binary protocols at 0 or 1 regardless of that maximum.</p>
+<ul>
+<li><code>std::counting_semaphore&lt;10&gt; s(3);</code> starts with 3 permits; the initial count must be between 0 and <code>s.max()</code>.</li>
+<li><code>acquire()</code> blocks and has no stop-token overload. A <code>std::jthread</code> stop request does not wake it; use timed attempts with an explicit stop check when cancellation matters.</li>
+<li><code>try_acquire()</code> may fail spuriously even when a permit exists. <code>try_acquire_for(duration)</code> and <code>try_acquire_until(time_point)</code> are timed attempts; <code>false</code> means no permit was acquired, and spurious failure is permitted here too. Scheduling can delay a return past its deadline.</li>
+<li><code>release(std::ptrdiff_t update = 1)</code> adds nonnegative permits. Raising the count past <code>max()</code> is <strong>undefined behavior</strong>. An extra release in a binary protocol is always a logic error; it violates the library precondition if the new count exceeds the actual <code>max()</code>.</li>
+<li>No fairness guarantee, no ownership, not copyable or movable.</li>
+</ul>
+<p><strong>Before C++20</strong>, build one from a mutex and a condition variable (<a href="build-semaphore-and-latch.html">build it yourself</a> does exactly that). There is no C++17 standard semaphore. Keep a semaphore alive until all callers have finished using it.</p>
+</div>
+
+<p>API references: <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/Semaphore.html">Java 21 Semaphore</a> and the <a href="https://timsong-cpp.github.io/cppwp/n4861/thread.sema">C++20 semaphore specification</a>.</p>
+
+<h2 id="job-one-a-limit-on-a-scarce-resource">Job one: a limit on a scarce resource</h2>
+<p>Suppose a database can handle about 50 concurrent queries before it slows down for everyone, but your service has 400 request threads. A semaphore with 50 permits in front of the database client keeps the database inside its comfort zone. Add a timeout, and requests that cannot get a permit quickly fail fast instead of piling up. This is a thread-level bulkhead.</p>
+<p>The program below runs 24 slow calls from 8 threads through a semaphore with 3 permits, measures the most calls in flight at once, then shows a timed acquire giving up.</p>
+
+<figure class="code pair" data-sample="semaphores.1" data-expect="ok"><figcaption><span class="ctitle">Three permits in front of a slow dependency</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">3</span>&gt; <span class="f">db_permits</span>(<span class="n">3</span>);   <span class="c">// at most 3 calls in flight</span>
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; in_flight{<span class="n">0</span>}, max_in_flight{<span class="n">0</span>};
+
+<span class="k">class</span> Permit {                              <span class="c">// RAII: the permit goes back on every path out of the scope</span>
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Permit</span>(<span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">3</span>&gt;&amp; s) : <span class="f">s_</span>(s) { s_.<span class="f">acquire</span>(); }
+    ~<span class="f">Permit</span>() { s_.<span class="f">release</span>(); }
+    <span class="f">Permit</span>(<span class="k">const</span> Permit&amp;) = <span class="k">delete</span>;
+    Permit&amp; <span class="k">operator</span>=(<span class="k">const</span> Permit&amp;) = <span class="k">delete</span>;
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">3</span>&gt;&amp; s_;
+};
+
+<span class="t">void</span> <span class="f">call_database</span>() {
+    Permit <span class="f">permit</span>(db_permits);              <span class="c">// waits for a free permit</span>
+    <span class="t">int</span> now = in_flight.<span class="f">fetch_add</span>(<span class="n">1</span>) + <span class="n">1</span>;
+    <span class="t">int</span> seen = max_in_flight.<span class="f">load</span>();
+    <span class="k">while</span> (now &gt; seen &amp;&amp; !max_in_flight.<span class="f">compare_exchange_weak</span>(seen, now)) {
+    }
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">20</span>));   <span class="c">// the slow dependency (a demo sleep)</span>
+    in_flight.<span class="f">fetch_sub</span>(<span class="n">1</span>);
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; workers;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">8</span>; i += <span class="n">1</span>) {
+        workers.<span class="f">emplace_back</span>([] {
+            <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">3</span>; k += <span class="n">1</span>) <span class="f">call_database</span>();
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; w : workers) w.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"24 calls done, most in flight at once: "</span> &lt;&lt; max_in_flight.<span class="f">load</span>() &lt;&lt; <span class="s">" (limit 3)\n"</span>;
+
+    Permit <span class="f">first</span>(db_permits), <span class="f">second</span>(db_permits), <span class="f">third</span>(db_permits);   <span class="c">// hold all permits until scope exit</span>
+    <span class="k">auto</span> start = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>();
+    <span class="t">bool</span> got = db_permits.<span class="f">try_acquire_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">50</span>));
+    <span class="k">auto</span> waited = <span class="t">std</span>::<span class="t">chrono</span>::duration_cast&lt;<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>&gt;(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() - start).<span class="f">count</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"try_acquire_for with no free permit: "</span> &lt;&lt; <span class="t">std</span>::boolalpha &lt;&lt; got &lt;&lt; <span class="s">" after about "</span> &lt;&lt; waited &lt;&lt; <span class="s">" ms\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47</span><code><span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Semaphore</span> dbPermits = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">3</span>, <span class="k">true</span>);   <span class="c">// at most 3 calls in flight, fair admission</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicInteger</span> inFlight = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicInteger</span> maxInFlight = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">callDatabase</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        dbPermits.<span class="f">acquire</span>();                       <span class="c">// wait for a free permit</span>
+        <span class="t">int</span> now = inFlight.<span class="f">incrementAndGet</span>();
+        <span class="k">try</span> {
+            maxInFlight.<span class="f">accumulateAndGet</span>(now, <span class="t">Math</span>::max);
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">20</span>);                      <span class="c">// the slow dependency (a demo sleep)</span>
+        } <span class="k">finally</span> {
+            inFlight.<span class="f">decrementAndGet</span>();
+            dbPermits.<span class="f">release</span>();                   <span class="c">// always give the permit back</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span>[] workers = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">8</span>];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; workers.length; i += <span class="n">1</span>) {
+            workers[i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> k = <span class="n">0</span>; k &lt; <span class="n">3</span>; k += <span class="n">1</span>) <span class="f">callDatabase</span>();
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"worker-"</span> + i);
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> w : workers) w.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> w : workers) w.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"24 calls done, most in flight at once: "</span> + maxInFlight.<span class="f">get</span>() + <span class="s">" (limit 3)"</span>);
+
+        dbPermits.<span class="f">acquire</span>(<span class="n">3</span>);                      <span class="c">// take every permit, to show a timeout</span>
+        <span class="k">try</span> {
+            <span class="t">long</span> start = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="t">boolean</span> got = dbPermits.<span class="f">tryAcquire</span>(<span class="n">50</span>, <span class="t">TimeUnit</span>.MILLISECONDS);
+            <span class="t">long</span> waited = (<span class="t">System</span>.<span class="f">nanoTime</span>() - start) / <span class="n">1_000_000</span>;
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"tryAcquire with no free permit: "</span> + got + <span class="s">" after about "</span> + waited + <span class="s">" ms"</span>);
+        } <span class="k">finally</span> {
+            dbPermits.<span class="f">release</span>(<span class="n">3</span>);
+        }
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>24 calls done, most in flight at once: 3 (limit 3)
+tryAcquire with no free permit: false after about 51 ms</pre></div><div class="runout" hidden></div></figure>
+
+<p>Two habits are worth copying exactly. <strong>Acquire before the <code>try</code>, release in the <code>finally</code></strong> (or in a destructor in C++), so the permit goes back on every path, including exceptions, but is never released when the acquire itself failed. And <strong>prefer a timed acquire in front of a dependency</strong>: an untimed <code>acquire</code> turns a slow database into 400 blocked request threads, which is the outage you were trying to prevent.</p>
+
+<div class="box note">
+<h3>A concurrency limit is not a rate limit</h3>
+<p>A semaphore with 50 permits allows 50 calls <em>at once</em>. With sustained demand and negligible overhead, fixed 10 ms calls imply an ideal throughput of 50 / 0.01 = 5,000 calls a second; fixed 1 s calls imply 50 a second. A rate limiter constrains admissions over time, without directly bounding outstanding calls. Real services often need both; see <a href="rate-vs-concurrency-limits.html">rate limits versus concurrency limits</a>.</p>
+</div>
+
+<h2 id="job-two-signalling-between-threads">Job two: signalling between threads</h2>
+<p>A semaphore that starts at 0 is a gate that one thread opens for another. A <a class="term" data-term="condition-variable" href="glossary.html#condition-variable">condition variable</a> notification is not saved for future waiters; a persistent predicate protected by its mutex prevents a <a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a>. A semaphore release is <strong>remembered</strong> directly as a permit. Here two threads take strict turns, with one semaphore per turn.</p>
+
+<figure class="code pair" data-sample="semaphores.2" data-expect="ok"><figcaption><span class="ctitle">Ping and pong take turns</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">binary_semaphore</span> <span class="f">ping_turn</span>(<span class="n">1</span>);   <span class="c">// ping goes first</span>
+    <span class="t">std</span>::<span class="t">binary_semaphore</span> <span class="f">pong_turn</span>(<span class="n">0</span>);   <span class="c">// pong waits for a signal</span>
+    <span class="t">std</span>::<span class="t">string</span> out;                      <span class="c">// only the thread whose turn it is touches it</span>
+
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">pong</span>([&amp;] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+            pong_turn.<span class="f">acquire</span>();
+            out += <span class="s">"pong "</span>;
+            ping_turn.<span class="f">release</span>();          <span class="c">// hand the turn back</span>
+        }
+    });
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">ping</span>([&amp;] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+            ping_turn.<span class="f">acquire</span>();
+            out += <span class="s">"ping "</span>;
+            pong_turn.<span class="f">release</span>();          <span class="c">// hand the turn to pong</span>
+        }
+    });
+    ping.<span class="f">join</span>();
+    pong.<span class="f">join</span>();
+    out.<span class="f">pop_back</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; out &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Semaphore</span> pingTurn = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">1</span>);     <span class="c">// ping goes first</span>
+        <span class="t">Semaphore</span> pongTurn = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">0</span>);     <span class="c">// pong waits for a signal</span>
+        <span class="t">StringBuilder</span> out = <span class="k">new</span> <span class="t">StringBuilder</span>();   <span class="c">// only the thread whose turn it is touches it</span>
+
+        <span class="t">Thread</span> ping = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+                    pingTurn.<span class="f">acquire</span>();
+                    out.<span class="f">append</span>(<span class="s">"ping "</span>);
+                    pongTurn.<span class="f">release</span>();             <span class="c">// hand the turn to pong</span>
+                }
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"ping"</span>);
+        <span class="t">Thread</span> pong = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">try</span> {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">3</span>; i += <span class="n">1</span>) {
+                    pongTurn.<span class="f">acquire</span>();
+                    out.<span class="f">append</span>(<span class="s">"pong "</span>);
+                    pingTurn.<span class="f">release</span>();             <span class="c">// hand the turn back</span>
+                }
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"pong"</span>);
+        pong.<span class="f">start</span>();                               <span class="c">// the start order does not matter</span>
+        ping.<span class="f">start</span>();
+        ping.<span class="f">join</span>();
+        pong.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(out.<span class="f">toString</span>().<span class="f">trim</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>ping pong ping pong ping pong</pre></div><div class="runout" hidden></div></figure>
+
+<p>Notice that <code>out</code> is an ordinary, non-thread-safe string, yet there is no data race. The semaphores give mutual exclusion (only one thread holds a turn) and visibility (each release happens-before the next acquire). The same idea, one semaphore per thread, prints 1 to N with N threads in turn, a question Nvidia has asked, with the follow up "now do it with a single counting semaphore".</p>
+
+<h2 id="binary-semaphore-versus-mutex">Binary semaphore versus mutex</h2>
+<p>A binary semaphore and a <a class="term" data-term="mutex" href="glossary.html#mutex">mutex</a> both let one thread through at a time, so the question "what is the difference?" is a favourite. The difference is <strong>ownership</strong>.</p>
+<table>
+<thead><tr><th></th><th>Mutex</th><th>Binary semaphore</th></tr></thead>
+<tbody>
+<tr><td>Owner</td><td>The thread that locked it; only that thread may unlock (Java <code>ReentrantLock</code> throws <code>IllegalMonitorStateException</code> otherwise; in C++ it is undefined behavior)</td><td>None: any thread may release</td></tr>
+<tr><td>Meant for</td><td>Mutual exclusion around a critical section</td><td>Signalling between threads, or a one-permit limit</td></tr>
+<tr><td>Same thread acquires twice</td><td>Fine for a reentrant lock; undefined behavior for <code>std::mutex</code> (a hang is one possible symptom)</td><td>Waits on the second acquire until another thread releases; deadlocks if no such release can happen</td></tr>
+<tr><td>Priority inheritance</td><td>Ownership enables it where the platform and lock configuration support it; neither <code>std::mutex</code> nor <code>ReentrantLock</code> promises it</td><td>No unique owner to receive a priority boost</td></tr>
+<tr><td>Typical bug it allows</td><td>Forgetting to unlock</td><td>An extra release violates the application limit; in C++ exceeding the actual <code>max()</code> is undefined behavior</td></tr>
+<tr><td>Debugging</td><td>Tools may show ownership, for example Java monitor and <code>ReentrantLock</code> owners in suitable thread dumps</td><td>No built-in owner identifies who must release next</td></tr>
+</tbody>
+</table>
+<p>The one-line version for the interview: <strong>a mutex is a lock with an owner; a semaphore is a counter with a waiting room</strong>. Use a mutex to protect data, and a semaphore to count resources or to signal.</p>
+
+<div class="box example">
+<h3>Worked example: a connection pool</h3>
+<p>A pool of N database connections needs two things: a count of free connections that threads can wait on, and the connections themselves. A semaphore does the first; a small locked collection does the second.</p>
+<p>This minimal pool assumes distinct, non-null connections and exactly one return per borrow, to the same pool. Callers return in <code>finally</code> or through an RAII lease; double-return and foreign-connection validation are extensions in the practice problem. In C++, <code>C</code> is a connection handle with nonthrowing moves, such as <code>std::shared_ptr&lt;Connection&gt;</code>.</p>
+<figure class="code pair" data-sample="semaphores.3"><figcaption><span class="ctitle">A semaphore-guarded connection pool</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> C&gt;
+<span class="k">class</span> ConnectionPool {
+    <span class="k">static_assert</span>(<span class="t">std</span>::is_nothrow_move_constructible_v&lt;C&gt;);
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">ConnectionPool</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;C&gt; connections)
+        : <span class="f">idle_</span>(<span class="t">std</span>::<span class="f">move</span>(connections)), <span class="f">available_</span>(<span class="f">checked_count</span>(idle_.<span class="f">size</span>())) {}
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;C&gt; <span class="f">borrow</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span> timeout) {
+        <span class="k">if</span> (!available_.<span class="f">try_acquire_for</span>(timeout)) <span class="k">return</span> <span class="t">std</span>::nullopt;   <span class="c">// shed load instead of waiting forever</span>
+        <span class="k">struct</span> Reservation {
+            <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;&gt;&amp; sem;
+            <span class="t">bool</span> committed = <span class="k">false</span>;
+            ~<span class="f">Reservation</span>() { <span class="k">if</span> (!committed) sem.<span class="f">release</span>(); }
+        } reservation{available_};             <span class="c">// roll back if taking the mutex throws</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="t">std</span>::<span class="t">optional</span>&lt;C&gt; <span class="f">result</span>(<span class="t">std</span>::in_place, <span class="t">std</span>::<span class="f">move</span>(idle_.<span class="f">back</span>()));
+        idle_.<span class="f">pop_back</span>();
+        reservation.committed = <span class="k">true</span>;
+        <span class="k">return</span> result;                         <span class="c">// C's move cannot throw</span>
+    }
+
+    <span class="t">void</span> <span class="f">give_back</span>(C connection) {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+            idle_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(connection));   <span class="c">// capacity retained: no allocation on a valid return</span>
+        }
+        available_.<span class="f">release</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">static</span> <span class="t">std</span>::<span class="t">ptrdiff_t</span> <span class="f">checked_count</span>(<span class="t">std</span>::<span class="t">size_t</span> size) {
+        <span class="k">if</span> (<span class="t">std</span>::<span class="f">cmp_greater</span>(size, <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;&gt;::<span class="f">max</span>())) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"too many connections"</span>);
+        }
+        <span class="k">return</span> <span class="k">static_cast</span>&lt;<span class="t">std</span>::<span class="t">ptrdiff_t</span>&gt;(size);
+    }
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;C&gt; idle_;                        <span class="c">// guarded by m_; capacity never shrinks</span>
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;&gt; available_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+
+<span class="k">class</span> <span class="t">ConnectionPool</span>&lt;C&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;C&gt; idle;          <span class="c">// guarded by this</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> available;
+
+    <span class="t">ConnectionPool</span>(<span class="t">List</span>&lt;C&gt; connections) {
+        <span class="k">this</span>.idle = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;(connections);
+        <span class="k">this</span>.available = <span class="k">new</span> <span class="t">Semaphore</span>(connections.<span class="f">size</span>(), <span class="k">true</span>);   <span class="c">// fair permit admission</span>
+    }
+
+    C <span class="f">borrow</span>(<span class="t">long</span> timeoutMs) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (!available.<span class="f">tryAcquire</span>(timeoutMs, <span class="t">TimeUnit</span>.MILLISECONDS)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"no connection within "</span> + timeoutMs + <span class="s">" ms"</span>);
+        }
+        <span class="k">synchronized</span> (<span class="k">this</span>) {
+            <span class="k">return</span> idle.<span class="f">removeFirst</span>();         <span class="c">// holding a permit guarantees one is idle</span>
+        }
+    }
+
+    <span class="k">void</span> <span class="f">giveBack</span>(C connection) {
+        <span class="k">synchronized</span> (<span class="k">this</span>) {
+            idle.<span class="f">addFirst</span>(connection);         <span class="c">// put it back before releasing the permit</span>
+        }
+        available.<span class="f">release</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong>The invariant:</strong> the number of idle connections is at least the number of free permits plus the number of threads that hold a permit but have not yet taken their connection. Acquiring the permit before taking a connection, and returning the connection before releasing the permit, keeps it true at every step, so <code>removeFirst</code> never finds the deque empty. Swap the order in <code>giveBack</code> and a woken borrower can find nothing to take.</p>
+<figure class="timeline"><figcaption>The bug when a connection is advertised before it is returned</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Returning thread</span><span>Borrower</span><span>Pool state</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">One connection is checked out; idle collection is empty and permit count is zero</span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">Waits for a permit without holding the collection lock</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">3</span><span class="cell bad">Incorrectly releases the permit before putting the connection back</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">Acquires that permit, then takes the collection lock</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">5</span><span class="cell empty"></span><span class="cell bad">Finds the idle collection empty despite having a permit</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell">Only now attempts to return the connection to the collection</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Return the resource first, then advertise it by releasing the permit.</div></div></figure>
+<p><strong>Why not just a semaphore, or just a lock?</strong> The semaphore alone cannot protect the collection: several borrowers may hold permits simultaneously. A lock and condition variable alone also work. The semaphore packages permit waiting and timeouts, plus optional fair admission in Java; C++ offers no fairness guarantee.</p>
+<p>Never wait for a permit while holding the collection lock: a returning borrower needs that lock to make a permit available. Returning the most recently used connection first favours warm connections, but the sample has no idle eviction. Also, its timeout covers permit acquisition only; a strict end-to-end deadline must include the collection lock, connection validation and the query itself.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Acquiring inside the <code>try</code>.</strong> <code>try { sem.acquire(); use(); } finally { sem.release(); }</code> releases even when <code>acquire</code> threw <code>InterruptedException</code>, creating a permit out of thin air. Acquire first, then <code>try</code>.</li>
+<li><strong>Releasing after a failed timed acquire.</strong> If <code>tryAcquire(timeout, unit)</code> or <code>try_acquire_for(timeout)</code> returned false, you hold nothing; releasing raises the limit for everyone.</li>
+<li><strong>Using a semaphore as a mutex without enforcing the protocol.</strong> A binary protocol can protect data, but permits carry no ownership checks. An extra release may admit overlapping users or violate the C++ maximum. Prefer a mutex for ordinary critical sections.</li>
+<li><strong>An untimed acquire in front of a slow dependency.</strong> Every caller blocks, threads pile up, and the whole service stalls behind one sick database. Use a timed acquire and fail fast.</li>
+<li><strong>Confusing a concurrency limit with a rate limit.</strong> 50 permits is not 50 requests per second.</li>
+<li><strong>Acquiring several semaphores in different orders.</strong> Two threads that take semaphores A then B and B then A can deadlock exactly like two locks.</li>
+<li><strong>Assuming <code>counting_semaphore&lt;N&gt;</code> enforces your resource limit N.</strong> <code>max()</code> can exceed N. Your acquire and release accounting must preserve the application limit; exceeding the library maximum is undefined behavior.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Semaphores come up in theory screens and in coding rounds. LinkedIn phone screens have asked "mutex versus semaphore" and "binary semaphore versus mutex"; a Rubrik concurrency round opened with mutexes, locks and semaphores before the coding; Nvidia asked for 1 to N printed by N threads with N semaphores, then with one counting semaphore; a Microsoft round asked a candidate to implement a working semaphore (see <a href="build-semaphore-and-latch.html">build it yourself</a>); and a Google L4 task-scheduling question involved semaphores.</p>
+<p>Rubrik interviewers have also questioned a candidate's choice of <code>CyclicBarrier</code> versus <code>Semaphore</code>, and rejected a semaphore-plus-lock answer to the searcher, inserter, deleter problem; commenters pointed to races and suggested a read-write lock plus an insert mutex. A semaphore count alone does not express those exclusion rules; the surrounding protocol matters.</p>
+<blockquote>A semaphore is a count of permits: acquire takes one or waits, release gives one back, and it has no owner, so any thread can release. I use it for two things: to cap concurrency on a scarce resource, like 50 permits in front of a database client with a timed acquire so callers fail fast instead of piling up, and to signal between threads, because a release is remembered even if nobody is waiting yet. A mutex is different: it has an owner, only the owner can unlock, it can be reentrant and support priority inheritance. So I protect data with a mutex and count or signal with a semaphore.</blockquote>
+<p>Follow ups to expect: "What happens if a thread releases without acquiring?" (the count goes up; in C++ past <code>max()</code> it is undefined behavior), "Is it fair?" (Java: optional; C++: no promise), "How would you implement one?" (a count, a mutex and a condition variable), and "Rate limit or concurrency limit?"</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>The bulkhead needs bounded waiting too.</strong> One semaphore per downstream dependency caps its in-flight work. Timed admission limits individual waiting time, but a flood can still fill the shared request pool with waiters. Bound queues or reject immediately when necessary, set an I/O deadline for admitted work, and remember that a local semaphore does not enforce a global limit across service replicas.</p>
+<p><strong>Async work keeps its permit until real completion.</strong> A callback on another thread may release it because there is no ownership restriction. A timeout or cancellation request is not necessarily completion: returning the permit while the downstream operation still runs would undercount in-flight work. Release exactly once when the operation actually ends.</p>
+<p><strong>Virtual threads move the limit into semaphores.</strong> With Java 21 virtual threads, threads are cheap and should not be pooled; the <a href="https://openjdk.org/jeps/444">JDK guidance</a> is to limit concurrency with a construct designed for it, such as a <code>Semaphore</code>. The thread pool size used to be the concurrency limit; now the semaphore is.</p>
+<p><strong>Fair mode has a cost and a trap.</strong> FIFO admission can trade throughput for predictable queue ordering, and with multi-permit requests it can block the line: a fair <code>acquire(5)</code> at the head of the queue holds up a later <code>acquire(1)</code> even while one permit is free. Non-fair mode has the opposite risk: a big request can starve behind a stream of small ones.</p>
+<p><strong>Batch acquisition and cancellation need a protocol.</strong> C++ has no <code>acquire(n)</code>: taking permits in a loop is not atomic. Two callers needing all three permits can each hold some and wait forever for the rest. For all-or-nothing batches, use a mutex and condition variable. The turn-taking demos assume no worker is cancelled; restoring Java interrupt status alone does not wake its peer. A cancellable version must publish a stop state and wake or interrupt every participant without treating a cancellation wakeup as an ordinary turn.</p>
+<p><strong>A semaphore is a universal building block.</strong> Allen Downey's free <em>The Little Book of Semaphores</em> solves dozens of synchronization puzzles with nothing else, and the searcher, inserter, deleter problem Rubrik asked comes from it. Knowing the patterns there (turnstiles, mutex plus counter, the lightswitch for readers) helps you recognise interview puzzles quickly.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A semaphore is a permit count with a waiting room: acquire takes or waits, release returns, and there is no owner.</li>
+<li>Use it to cap concurrency on a scarce resource (with a timed acquire, so callers fail fast) and to signal between threads (releases are remembered).</li>
+<li>In a resource limiter, release exactly the permits successfully acquired, using <code>finally</code> or a destructor. In a signalling protocol, another thread deliberately releases.</li>
+<li>A mutex has an owner. A semaphore has none; prefer it for counting resources and signalling.</li>
+<li>Java offers fair admission and can exceed its initial count; C++20 promises no fairness and forbids exceeding its actual <code>max()</code>.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="semaphores"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="semaphores.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A semaphore starts with 2 permits. Five threads each run <code>acquire(); work(); release();</code>. What is the largest number of threads that can be inside <code>work()</code> at the same moment?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">1</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">2</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">5</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It depends on whether the semaphore is fair</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each thread inside <code>work()</code> holds one permit, and only 2 exist. Fairness changes which waiting thread gets the next permit, not how many permits there are.</div></div><div class="mcq" data-id="semaphores.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A resource limiter accidentally calls <code>release()</code> after a timed acquire returned false. The current count is below the representation limit. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The call is ignored, because the thread holds no permit</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">An exception is thrown in both languages</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The permit count goes up, so the application limit can silently grow</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The thread blocks until it acquires</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A semaphore has no owner, so it cannot know who is entitled to release. Java adds a permit unless its integer representation would overflow. C++ requires the count to stay within <code>max()</code>, and violating that is undefined behavior. In a resource limiter this is a bookkeeping bug; a signalling protocol may deliberately release from a thread that never acquired.</div></div><div class="mcq" data-id="semaphores.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which statement about a binary semaphore and a mutex is true?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">They are the same thing with different names</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A mutex has an owner that alone may unlock it; any thread may release a semaphore</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A binary semaphore is reentrant, so the same thread may acquire it twice</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only a semaphore can make other threads wait</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A mutex has an owner, while a semaphore does not track who acquired. Both can block callers. A semaphore is not reentrant: a second acquire waits for another release, potentially forever. A wrong-thread mutex unlock is not always diagnosed: it is undefined behavior for <code>std::mutex</code>.</div></div><div class="mcq" data-id="semaphores.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A semaphore starts at 0 and a plain integer <code>x</code> starts at 0. Thread A writes <code>x = 42</code>, then releases once. Thread B successfully acquires once, then prints <code>x</code>. There are no other accesses. What can B print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">0 or 42, because x is not atomic</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Only 42, even if A releases before B starts waiting</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nothing: an early release is lost</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The program has a data race in C++</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The successful handoff orders A's write before B's read, so there is no conflicting unordered access and B sees 42. A release sent before B waits remains available as a permit. Initialising the semaphore to 1 instead would remove this proof: B could pass before A publishes.</div></div><div class="mcq" data-id="semaphores.q5" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A service must allow at most 50 concurrent calls to a fragile database and fail fast when saturated. Which design fits best?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">One lock around each database call</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A token bucket that allows 50 calls per second</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A semaphore with 50 permits and a short timed acquire before each call</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A <code>volatile</code> counter checked before each call</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The requirement is a concurrency limit, which is exactly what permits express; the timed acquire gives the fail-fast behaviour. A lock serializes to one call. A token bucket limits the rate, not the number in flight. A checked counter is a check-then-act race.</div></div><div class="mcq" data-id="semaphores.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A <code>Semaphore</code> is created with <code>fair = true</code>. Several threads are waiting, and a permit is released. A new thread calls <code>tryAcquire()</code> with no arguments at that moment. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It fails, because fairness puts it behind the waiting threads</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It may take the permit at once: the untimed <code>tryAcquire()</code> ignores the fairness setting</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws <code>IllegalStateException</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It joins the queue and waits its turn</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The Javadoc says the untimed <code>tryAcquire()</code> does not honor fairness and takes any available permit. To respect fairness, use <code>tryAcquire(0, TimeUnit.SECONDS)</code>.</div></div><div class="mcq" data-id="semaphores.q7" data-a="3" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>What does this code do?
+<figure class="code single" data-sample="semaphores.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><code><span class="k">using</span> S = <span class="t">std</span>::<span class="t">binary_semaphore</span>;
+S s{S::<span class="f">max</span>()};
+s.<span class="f">release</span>();</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The count becomes <code>S::max() + 1</code> with defined behavior</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It throws <code>std::system_error</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nothing: the extra release is ignored</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is undefined behavior: release must not raise the count above <code>max()</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> The precondition of <code>release(update)</code> is that the count plus update does not exceed <code>max()</code>. Here the semaphore starts at its actual maximum, so one release violates that precondition. <code>binary_semaphore</code> aliases <code>counting_semaphore&lt;1&gt;</code>, whose maximum is at least 1, not portably exactly 1. No exception or saturation is required.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="semaphores.c1" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">"What is the difference between a mutex and a binary semaphore?" Answer as you would on a phone screen, in about a minute.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Both can let one thread through at a time, but they are different tools. A mutex is a lock with an owner: the thread that locked it is the only one allowed to unlock it, which enables reentrant implementations and ownership-aware diagnostics. Priority inheritance needs platform and lock support; the standard APIs here do not promise it. It is for mutual exclusion: protecting shared data in a critical section.</p>
+<p>A semaphore is a counter of permits with no owner: any thread can release, even one that never acquired. A binary semaphore is just a semaphore whose count is 0 or 1. That makes it a signalling tool, one thread releases to let another proceed, and a release sent before anyone waits is remembered. A binary protocol can protect data, but an extra release can break mutual exclusion or violate the C++ maximum, without a required diagnostic. So: mutex for protecting data, semaphore for counting resources and for signalling.</p></div></div><div class="cq" data-q="semaphores.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Wrap a function <code>fetch(url)</code> so that at most 4 calls run at once. A caller that cannot get a slot within 100 ms must fail fast with an error. Write the wrapper in your language.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="semaphores.4"><figcaption><span class="ctitle">A concurrency-limited fetch</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">class</span> LimitedFetcher {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">LimitedFetcher</span>(<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">std</span>::<span class="t">string</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;)&gt; fetch)
+        : <span class="f">fetch_</span>(<span class="t">std</span>::<span class="f">move</span>(fetch)) {}
+
+    <span class="t">std</span>::<span class="t">string</span> <span class="f">get</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; url) {
+        <span class="k">if</span> (!slots_.<span class="f">try_acquire_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">100</span>))) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"overloaded: no slot within 100 ms"</span>);
+        }
+        <span class="k">struct</span> Release {                       <span class="c">// gives the slot back even if fetch_ throws</span>
+            <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">4</span>&gt;&amp; s;
+            ~<span class="f">Release</span>() { s.<span class="f">release</span>(); }
+        } release{slots_};
+        <span class="k">return</span> <span class="f">fetch_</span>(url);
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;<span class="n">4</span>&gt; slots_{<span class="n">4</span>};
+    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">std</span>::<span class="t">string</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp;)&gt; fetch_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+<span class="k">import</span> java.util.function.<span class="t">Function</span>;
+
+<span class="k">class</span> <span class="t">LimitedFetcher</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> slots = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">4</span>, <span class="k">true</span>);
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Function</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; fetch;
+
+    <span class="t">LimitedFetcher</span>(<span class="t">Function</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; fetch) {
+        <span class="k">this</span>.fetch = fetch;
+    }
+
+    <span class="t">String</span> <span class="f">get</span>(<span class="t">String</span> url) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (!slots.<span class="f">tryAcquire</span>(<span class="n">100</span>, <span class="t">TimeUnit</span>.MILLISECONDS)) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"overloaded: no slot within 100 ms"</span>);
+        }
+        <span class="k">try</span> {
+            <span class="k">return</span> fetch.<span class="f">apply</span>(url);
+        } <span class="k">finally</span> {
+            slots.<span class="f">release</span>();                   <span class="c">// only reached when we really hold a slot</span>
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The points a grader checks: a timed acquire, not an untimed one; the release only on the path where the acquire succeeded; the release guaranteed by <code>finally</code> or a destructor even when <code>fetch</code> throws; and an explicit fairness choice in Java. Fair mode prevents queued callers being repeatedly overtaken; it does not promise an exact completion deadline. In C++ there is no fairness option, which is worth saying.</p></div></div><div class="cq" data-q="semaphores.c3" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Three threads must print the numbers 1 to 9 in order, thread 0 printing 1, 4, 7, thread 1 printing 2, 5, 8 and thread 2 printing 3, 6, 9. Use one semaphore per thread.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="semaphores.5" data-expect="ok"><figcaption><span class="ctitle">Round robin with one semaphore per thread</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">constexpr</span> <span class="t">int</span> n = <span class="n">3</span>, last = <span class="n">9</span>;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">unique_ptr</span>&lt;<span class="t">std</span>::<span class="t">binary_semaphore</span>&gt;&gt; turn;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) turn.<span class="f">push_back</span>(<span class="t">std</span>::<span class="t">make_unique</span>&lt;<span class="t">std</span>::<span class="t">binary_semaphore</span>&gt;(i == <span class="n">0</span> ? <span class="n">1</span> : <span class="n">0</span>));
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> id = <span class="n">0</span>; id &lt; n; id += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;turn, id] {
+            <span class="k">for</span> (<span class="t">int</span> v = id + <span class="n">1</span>; v &lt;= last; v += n) {
+                turn[id]-&gt;<span class="f">acquire</span>();                         <span class="c">// wait for my turn</span>
+                <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"thread "</span> &lt;&lt; id &lt;&lt; <span class="s">": "</span> &lt;&lt; v &lt;&lt; <span class="s">"\n"</span>;
+                turn[(id + <span class="n">1</span>) % n]-&gt;<span class="f">release</span>();               <span class="c">// pass the turn on</span>
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) t.<span class="f">join</span>();
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">int</span> n = <span class="n">3</span>, last = <span class="n">9</span>;
+        <span class="t">Semaphore</span>[] turn = <span class="k">new</span> <span class="t">Semaphore</span>[n];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) turn[i] = <span class="k">new</span> <span class="t">Semaphore</span>(i == <span class="n">0</span> ? <span class="n">1</span> : <span class="n">0</span>);   <span class="c">// thread 0 starts</span>
+        <span class="t">Thread</span>[] threads = <span class="k">new</span> <span class="t">Thread</span>[n];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; n; i += <span class="n">1</span>) {
+            <span class="t">int</span> id = i;
+            threads[i] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">int</span> v = id + <span class="n">1</span>; v &lt;= last; v += n) {
+                        turn[id].<span class="f">acquire</span>();                  <span class="c">// wait for my turn</span>
+                        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"thread "</span> + id + <span class="s">": "</span> + v);
+                        turn[(id + <span class="n">1</span>) % n].<span class="f">release</span>();        <span class="c">// pass the turn on</span>
+                    }
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"printer-"</span> + i);
+            threads[i].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : threads) t.<span class="f">join</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Each semaphore means "it is thread i's turn"; at most one permit is available across them at any time, with the current turn held by a worker between acquire and release, so the threads print strictly in order and the printing is race-free. The C++ version stores the semaphores behind <code>unique_ptr</code> because semaphores cannot be copied or moved, so they cannot live directly in a growing <code>std::vector</code>. The last thread's final release leaves one permit in thread 0's semaphore, which is harmless because nobody acquires it again.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="semaphores.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"Why would you choose a semaphore instead of a mutex in front of a database client?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Choose a semaphore to bound concurrent calls, with one permit per active call</li><li>A mutex serializes access to one caller; a semaphore has no owner</li><li>Acquire with a timeout and release exactly once after successful acquisition, even on failure</li><li>The permit wait and the database operation need separate deadlines</li><li>A concurrency limit differs from a rate limit, and waiting requests also need a bound</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use a semaphore because the requirement is several concurrent calls with a fixed upper limit. A mutex around the query would allow only one caller at a time. With fifty permits, each caller takes one before starting the query and returns it after finishing. The semaphore has no owner, so my wrapper must enforce that accounting. I acquire before entering the cleanup scope, then release in finally or an RAII destructor. A timeout or interruption during acquisition must not create a permit. I would use a short admission timeout and a separate database deadline, since getting a permit does not bound the query duration. Fifty permits means fifty calls in flight, not fifty requests per second. Faster calls allow a higher request rate. Finally, I would bound the waiting requests or reject them immediately under overload. Otherwise a semaphore can protect the database while the service still runs out of request capacity. The limit also applies only to this instance unless we coordinate across replicas.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How do you retain the permit if the database client completes asynchronously on another thread?</span></p></div></div><div class="sq" data-sq="semaphores.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Our three-permit limiter sometimes has four calls in flight. What would you inspect first?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Suspect an unmatched release and audit every exit path</li><li>Acquiring inside a try with unconditional finally can release after interruption</li><li>A failed timed acquire must not release; successful work must always release</li><li>Java does not cap permits at the initial count; C++ max need not equal the template argument</li><li>Check that all callers share the limiter and hold a permit until the real work finishes</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first look for a release without a matching successful acquisition. A common Java bug puts acquire inside a try block and release in finally. If acquisition is interrupted, finally still runs and invents a permit. The same mistake happens when a timed acquire returns false. I would move acquisition before the cleanup scope and release exactly once on every path after success, including exceptions. Java does not enforce the initial count as a capacity. In C++, the template argument is only a minimum supported maximum, so it is not an application accounting check either. I would then check that all callers share the same limiter. For asynchronous calls, I would check that the permit survives until the operation actually completes. Returning it when the request is merely submitted would let real in-flight work exceed the intended limit.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if cancellation is requested but the downstream operation keeps running?</span></p></div></div><div class="sq" data-sq="semaphores.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"A producer writes a result and releases a semaphore before the consumer waits. Is the signal lost, and is the result visible?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A zero-initialized semaphore remembers the release as a permit</li><li>A successful matching acquire publishes writes before the release</li><li>An initial spare permit would let the consumer pass before publication</li><li>One permit releases one successful acquisition; it is not a broadcast</li><li>Repeated handoffs need a protocol preventing overwrite while the consumer still reads</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The signal is remembered, and the result is visible after the successful handoff, provided the semaphore started at zero. The producer writes the result and releases one permit. If the consumer has not started waiting, that permit stays available. When the consumer acquires it, the synchronization orders the earlier write before the later read, so the result itself can be an ordinary variable. Starting with a spare permit would break the argument because the consumer could pass before the producer writes. There are two other limits. One permit admits one acquisition, so this is not a broadcast gate for many consumers. Also, publication does not protect a later overwrite. If the producer reuses the same result slot, I need an acknowledgement or another permit before it writes again. For multiple results, a synchronized queue is usually clearer than one shared slot.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you use two semaphores for a single producer and consumer sharing one reusable slot?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-connection-pool.html" data-problem="connection-pool"><span class="pk">Concurrent systems · medium</span><b>Fair connection pool</b><span class="pst"></span></a><a class="pcard" href="p-semaphore-from-scratch.html" data-problem="semaphore-from-scratch"><span class="pk">Build a primitive · warm-up</span><b>Semaphore from scratch</b><span class="pst"></span></a><a class="pcard" href="p-foobar-alternately.html" data-problem="foobar-alternately"><span class="pk">Ordering puzzles · warm-up</span><b>Print FooBar alternately</b><span class="pst"></span></a><a class="pcard" href="p-round-robin-printer.html" data-problem="round-robin-printer"><span class="pk">Ordering puzzles · medium</span><b>Round robin printer</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="progress-guarantees.html"><span>Previous</span><b>Blocking, lock-free and wait-free</b></a><a class="next" href="latches.html"><span>Next</span><b>Latches: wait until N things happen</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#what-a-semaphore-is">What a semaphore is</a><a href="#the-apis">The APIs</a><a href="#job-one-a-limit-on-a-scarce-resource">Job one: a limit on a scarce resource</a><a href="#job-two-signalling-between-threads">Job two: signalling between threads</a><a href="#binary-semaphore-versus-mutex">Binary semaphore versus mutex</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

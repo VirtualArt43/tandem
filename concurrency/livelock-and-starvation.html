@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Livelock, starvation and fairness · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="livelock-and-starvation" data-title="Livelock, starvation and fairness" data-track="core" data-module="core-11" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details open><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation" class=here><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m11">Module 11: Liveness and failure</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 11.3</span><span>23 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Livelock, starvation and fairness</h1><p class="lsum">Diagnose livelock and starvation, break retry symmetry, and explain the guarantees and costs of fair admission, bounded waiting and aging.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">LinkedIn</span><span class="co">Confluent</span></div><div class="prereq"><span>Before this:</span><a href="deadlock.html">Deadlock: the four conditions and how to break each</a><a href="trylock-timeouts-fairness.html">tryLock, timeouts, interruptible locking and fairness</a></div></header><article class="prose" id="article">
+<p class="lead">A system can look alive, with busy CPUs and active threads, while some or all of its work never finishes. You need to distinguish livelock from starvation and defend a fairness policy, as Rubrik's reported playground and bathroom questions require.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Two people meet in a narrow corridor. Both step left to let the other pass, then both step right, then both left again. Nobody is stuck in the deadlock sense; they are both moving, politely, and nobody gets anywhere. That is <strong>livelock</strong>.</p>
+<p>Now picture a bus stop with no queue. When a bus arrives, whoever is closest to the door and quickest gets on. A shy passenger who arrived first may watch ten buses leave without them, even though buses keep coming and people keep travelling. That is <strong>starvation</strong>: the system makes progress, just never for you.</p>
+</div>
+
+<h2 id="safety-and-liveness">Safety and liveness</h2>
+<p>Two useful kinds of concurrency property are safety and liveness; a specification can require both. <strong>Safety</strong> says nothing bad ever happens: no two threads in the critical section, no lost update. <strong><a class="term" data-term="liveness" href="glossary.html#liveness">Liveness</a></strong> says something good eventually happens: every request eventually completes. Races break safety. Deadlock, livelock and starvation break liveness.</p>
+<p>The critical section problem has three familiar requirements: mutual exclusion (only one thread inside), progress (entry is not postponed indefinitely when somebody wants to enter), and <strong>bounded waiting</strong> (after a thread asks to enter, only a bounded number of others may enter before it). Bounded waiting is stronger than starvation freedom: eventual entry alone gives no uniform bound on overtaking.</p>
+<p>Progress claims assume holders finish and eligible threads get scheduled; admission order alone promises no deadline in milliseconds. Peterson's classic two-thread proof assumes sequentially consistent shared operations, so copying it with plain fields into Java or C++ is not correct.</p>
+<table>
+<thead><tr><th></th><th>Deadlock</th><th>Livelock</th><th>Starvation</th></tr></thead>
+<tbody>
+<tr><td>Are the threads running?</td><td>Usually blocked; a spinlock cycle can spin</td><td>Repeatedly retrying, possibly with sleeps</td><td>Others progress; the victim may wait or retry</td></tr>
+<tr><td>CPU clue</td><td>Often low for blocked participants</td><td>Often high without backoff</td><td>Can be high or low</td></tr>
+<tr><td>Progress</td><td>None for the threads in the cycle</td><td>None for the threads involved</td><td>Plenty, but not for the victim</td></tr>
+<tr><td>Typical Java dump</td><td><code>BLOCKED</code> or <code>WAITING</code>, with dependencies that cannot resolve</td><td><code>RUNNABLE</code> in retries, or <code>TIMED_WAITING</code> during backoff</td><td>The same request waiting or retrying while others complete</td></tr>
+<tr><td>Typical fix</td><td>Break a Coffman condition</td><td>Break symmetry with a rule or randomized backoff</td><td>Control overtaking with FIFO, bounded batches or aging</td></tr>
+</tbody>
+</table>
+<p>CPU and thread states are <strong>clues, not proofs</strong>. Other threads can keep a deadlocked service busy. Compare repeated stacks, ownership dependencies, retry counts and completed operations; distinguish a loop that changes state uselessly from a thread waiting for an owner that can never run.</p>
+
+<h2 id="livelock-busy-polite-and-stuck">Livelock: busy, polite, and stuck</h2>
+<p>A <a class="term" data-term="livelock" href="glossary.html#livelock">livelock</a> is a set of threads that keep reacting to each other without any of them making progress. The cleanest example is two diners sharing one spoon, each too polite to eat while the other is hungry. Both stay hungry forever, handing the spoon back and forth. The demo stops after 20,000 hand-overs so it can finish; the real thing would not.</p>
+
+<figure class="timeline"><figcaption>The spoon moves, but neither diner eats</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Diner 0</span><span>Diner 1</span><span>Shared state</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">Both are hungry; diner 0 owns the spoon</span></div><div class="tl-row"><span class="t">2</span><span class="cell">sees diner 1 is hungry and passes the spoon</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">sees diner 0 is hungry and passes it back</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">Same hungry state, same owner, two handoffs later</span></div><div class="tl-row"><span class="t">5</span><span class="cell">repeats the same polite decision</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Lower-id-first breaks this cycle: diner 0 eats once, then diner 1 can eat.</div></div></figure>
+
+<figure class="code pair" data-sample="livelock-and-starvation.1" data-expect="ok"><figcaption><span class="ctitle">Polite diners: a livelock you can count, and its fix</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">constexpr</span> <span class="t">int</span> kLimit = <span class="n">20000</span>;                                <span class="c">// stop the demo after this many hand-overs</span>
+
+<span class="c">// Two diners share one spoon. Whoever holds it hands it over if the other is still hungry.</span>
+<span class="t">std</span>::<span class="t">string</span> <span class="f">dine</span>(<span class="t">bool</span> alwaysPolite) {
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; spoonOwner{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">bool</span>&gt; hungry[<span class="n">2</span>] = {<span class="k">true</span>, <span class="k">true</span>};
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; handOvers{<span class="n">0</span>}, meals{<span class="n">0</span>};
+    <span class="k">auto</span> diner = [&amp;](<span class="t">int</span> me) {
+        <span class="t">int</span> other = <span class="n">1</span> - me;
+        <span class="k">while</span> (hungry[me].<span class="f">load</span>() &amp;&amp; handOvers.<span class="f">load</span>() &lt; kLimit) {
+            <span class="k">if</span> (spoonOwner.<span class="f">load</span>() != me) { <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">yield</span>(); <span class="k">continue</span>; }   <span class="c">// not holding the spoon</span>
+            <span class="k">if</span> (handOvers.<span class="f">load</span>() &gt;= kLimit) <span class="k">break</span>;             <span class="c">// recheck after receiving ownership</span>
+            <span class="t">bool</span> giveWay = hungry[other].<span class="f">load</span>() &amp;&amp; (alwaysPolite || me &gt; other);
+            <span class="k">if</span> (giveWay) {                                   <span class="c">// "after you"</span>
+                handOvers += <span class="n">1</span>;
+                spoonOwner.<span class="f">store</span>(other);
+                <span class="k">continue</span>;
+            }
+            meals += <span class="n">1</span>;                                      <span class="c">// eat, then pass the spoon on</span>
+            hungry[me].<span class="f">store</span>(<span class="k">false</span>);
+            spoonOwner.<span class="f">store</span>(other);
+        }
+    };
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">a</span>(diner, <span class="n">0</span>), <span class="f">b</span>(diner, <span class="n">1</span>);
+    a.<span class="f">join</span>();
+    b.<span class="f">join</span>();
+    <span class="k">return</span> <span class="t">std</span>::<span class="f">to_string</span>(handOvers.<span class="f">load</span>()) + <span class="s">" hand-overs, "</span> + <span class="t">std</span>::<span class="f">to_string</span>(meals.<span class="f">load</span>()) + <span class="s">" meals"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"always polite:    %s\n"</span>, <span class="f">dine</span>(<span class="k">true</span>).<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"tie broken by id: %s\n"</span>, <span class="f">dine</span>(<span class="k">false</span>).<span class="f">c_str</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicBoolean</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> LIMIT = <span class="n">20_000</span>;                         <span class="c">// stop the demo after this many hand-overs</span>
+
+    <span class="c">// Two diners share one spoon. Whoever holds it hands it over if the other is still hungry.</span>
+    <span class="k">static</span> <span class="t">String</span> <span class="f">dine</span>(<span class="t">boolean</span> alwaysPolite) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">AtomicInteger</span> spoonOwner = <span class="k">new</span> <span class="t">AtomicInteger</span>(<span class="n">0</span>);
+        <span class="t">AtomicBoolean</span>[] hungry = {<span class="k">new</span> <span class="t">AtomicBoolean</span>(<span class="k">true</span>), <span class="k">new</span> <span class="t">AtomicBoolean</span>(<span class="k">true</span>)};
+        <span class="t">AtomicInteger</span> handOvers = <span class="k">new</span> <span class="t">AtomicInteger</span>(), meals = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">Thread</span>[] diners = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">2</span>];
+        <span class="k">for</span> (<span class="t">int</span> id = <span class="n">0</span>; id &lt; <span class="n">2</span>; id += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> me = id, other = <span class="n">1</span> - id;
+            diners[id] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">while</span> (hungry[me].<span class="f">get</span>() &amp;&amp; handOvers.<span class="f">get</span>() &lt; LIMIT) {
+                    <span class="k">if</span> (spoonOwner.<span class="f">get</span>() != me) { <span class="t">Thread</span>.<span class="f">onSpinWait</span>(); <span class="k">continue</span>; }   <span class="c">// not holding the spoon</span>
+                    <span class="k">if</span> (handOvers.<span class="f">get</span>() &gt;= LIMIT) <span class="k">break</span>;          <span class="c">// recheck after receiving ownership</span>
+                    <span class="t">boolean</span> giveWay = hungry[other].<span class="f">get</span>() &amp;&amp; (alwaysPolite || me &gt; other);
+                    <span class="k">if</span> (giveWay) {                           <span class="c">// "after you"</span>
+                        handOvers.<span class="f">incrementAndGet</span>();
+                        spoonOwner.<span class="f">set</span>(other);
+                        <span class="k">continue</span>;
+                    }
+                    meals.<span class="f">incrementAndGet</span>();                 <span class="c">// eat, then pass the spoon on</span>
+                    hungry[me].<span class="f">set</span>(<span class="k">false</span>);
+                    spoonOwner.<span class="f">set</span>(other);
+                }
+            }, <span class="s">"diner-"</span> + id);
+            diners[id].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> d : diners) d.<span class="f">join</span>();
+        <span class="k">return</span> handOvers.<span class="f">get</span>() + <span class="s">" hand-overs, "</span> + meals.<span class="f">get</span>() + <span class="s">" meals"</span>;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"always polite:    "</span> + <span class="f">dine</span>(<span class="k">true</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"tie broken by id: "</span> + <span class="f">dine</span>(<span class="k">false</span>));
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>always polite:    20000 hand-overs, 0 meals
+tie broken by id: 0 hand-overs, 2 meals</pre></div><div class="runout" hidden></div></figure>
+
+<p>Both threads repeatedly execute without eating in the polite run. Atomics make the shared state race-free, but do not make the protocol live; <code>onSpinWait()</code> and <code>yield()</code> provide no fairness guarantee. The fix is to <strong>break the symmetry</strong>: the lower id eats first when both are hungry, then passes the spoon.</p>
+<p>Each diner eats only once here, so both finish. Repeatedly favouring a fixed id across unlimited rounds could starve others; removing livelock does not automatically establish individual fairness.</p>
+
+<h3>Livelock in the wild</h3>
+<ul>
+<li><strong>Lock retries in lockstep.</strong> The take one, try the other, release and retry scheme from <a href="deadlock.html">the deadlock lesson</a> can repeat forever if two threads retry on the same schedule.</li>
+<li><strong>Optimistic updates that keep aborting each other.</strong> An abort policy can repeatedly roll back both transactions. A conventional lock-free CAS update loop is different: one caller may starve while others successfully update the value. System-wide livelock would contradict its lock-free progress guarantee under the stated execution assumptions.</li>
+<li><strong>Retry storms between services.</strong> Clients time out and retry, the extra load makes the service slower, more requests time out, and the system stays saturated doing work nobody will use. That is a <a class="term" data-term="retry-storm" href="glossary.html#retry-storm">retry storm</a>, covered in <a href="thundering-herd.html">thundering herd</a>.</li>
+<li><strong>The classic fix comes from networking.</strong> Early Ethernet stations that collided on the wire waited a random number of slots, doubling the range after each collision: randomized binary exponential backoff.</li>
+</ul>
+
+<h3>Backoff with jitter</h3>
+<p><a class="term" data-term="backoff" href="glossary.html#backoff">Exponential backoff with jitter</a> spreads retries out in time: after each failure, double the maximum delay up to a cap, and wait a <strong>random</strong> time below it. The <a href="https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/">AWS comparison of retry strategies</a> calls the simplest one "full jitter": wait a uniformly random time between zero and the current bound. Without the randomness, everyone who failed together retries together.</p>
+
+<figure class="plotfig"><figcaption>Exponential backoff with a cap, and full jitter</figcaption><svg class="plot" viewBox="0 0 640 300" role="img" aria-label="Exponential backoff with a cap, and full jitter"><line class="grid" x1="58" y1="250.0" x2="618" y2="250.0"/><text class="tick" x="50" y="254.0" text-anchor="end">0</text><line class="grid" x1="58" y1="207.2" x2="618" y2="207.2"/><text class="tick" x="50" y="211.2" text-anchor="end">220</text><line class="grid" x1="58" y1="164.4" x2="618" y2="164.4"/><text class="tick" x="50" y="168.4" text-anchor="end">440</text><line class="grid" x1="58" y1="121.6" x2="618" y2="121.6"/><text class="tick" x="50" y="125.6" text-anchor="end">660</text><line class="grid" x1="58" y1="78.8" x2="618" y2="78.8"/><text class="tick" x="50" y="82.8" text-anchor="end">880</text><line class="grid" x1="58" y1="36.0" x2="618" y2="36.0"/><text class="tick" x="50" y="40.0" text-anchor="end">1100</text><text class="tick" x="58.0" y="268" text-anchor="middle">0</text><text class="tick" x="170.0" y="268" text-anchor="middle">1.6</text><text class="tick" x="282.0" y="268" text-anchor="middle">3.2</text><text class="tick" x="394.0" y="268" text-anchor="middle">4.8</text><text class="tick" x="506.0" y="268" text-anchor="middle">6.4</text><text class="tick" x="618.0" y="268" text-anchor="middle">8</text><line class="axis" x1="58" y1="250" x2="618" y2="250"/><line class="axis" x1="58" y1="36" x2="58" y2="250"/><line class="mark" x1="268.0" y1="36" x2="268.0" y2="250"/><circle class="dot" cx="268.0" cy="234.4" r="4"/><text class="mtext" x="274.0" y="226.4">80</text><line class="mark" x1="478.0" y1="36" x2="478.0" y2="250"/><circle class="dot" cx="478.0" cy="125.5" r="4"/><text class="mtext" x="484.0" y="117.5">640</text><polyline class="l1" points="58.0,248.1 61.5,248.0 65.0,247.9 68.5,247.8 72.0,247.8 75.5,247.7 79.0,247.6 82.5,247.5 86.0,247.4 89.5,247.3 93.0,247.2 96.5,247.2 100.0,247.1 103.5,246.9 107.0,246.8 110.5,246.7 114.0,246.6 117.5,246.5 121.0,246.4 124.5,246.2 128.0,246.1 131.5,246.0 135.0,245.8 138.5,245.7 142.0,245.5 145.5,245.4 149.0,245.2 152.5,245.0 156.0,244.9 159.5,244.7 163.0,244.5 166.5,244.3 170.0,244.1 173.5,243.9 177.0,243.7 180.5,243.5 184.0,243.2 187.5,243.0 191.0,242.7 194.5,242.5 198.0,242.2 201.5,241.9 205.0,241.7 208.5,241.4 212.0,241.1 215.5,240.7 219.0,240.4 222.5,240.1 226.0,239.7 229.5,239.4 233.0,239.0 236.5,238.6 240.0,238.2 243.5,237.8 247.0,237.4 250.5,236.9 254.0,236.5 257.5,236.0 261.0,235.5 264.5,235.0 268.0,234.4 271.5,233.9 275.0,233.3 278.5,232.7 282.0,232.1 285.5,231.5 289.0,230.8 292.5,230.2 296.0,229.5 299.5,228.7 303.0,228.0 306.5,227.2 310.0,226.4 313.5,225.6 317.0,224.7 320.5,223.8 324.0,222.9 327.5,221.9 331.0,221.0 334.5,219.9 338.0,218.9 341.5,217.8 345.0,216.6 348.5,215.5 352.0,214.2 355.5,213.0 359.0,211.7 362.5,210.3 366.0,208.9 369.5,207.5 373.0,206.0 376.5,204.4 380.0,202.8 383.5,201.2 387.0,199.4 390.5,197.7 394.0,195.8 397.5,193.9 401.0,191.9 404.5,189.9 408.0,187.7 411.5,185.6 415.0,183.3 418.5,180.9 422.0,178.5 425.5,176.0 429.0,173.4 432.5,170.7 436.0,167.9 439.5,165.0 443.0,162.0 446.5,158.9 450.0,155.6 453.5,152.3 457.0,148.9 460.5,145.3 464.0,141.6 467.5,137.8 471.0,133.8 474.5,129.7 478.0,125.5 481.5,121.1 485.0,116.6 488.5,111.8 492.0,107.0 495.5,101.9 499.0,96.7 502.5,91.3 506.0,85.7 509.5,79.9 513.0,73.9 516.5,67.7 520.0,61.3 523.5,55.5 527.0,55.5 530.5,55.5 534.0,55.5 537.5,55.5 541.0,55.5 544.5,55.5 548.0,55.5 551.5,55.5 555.0,55.5 558.5,55.5 562.0,55.5 565.5,55.5 569.0,55.5 572.5,55.5 576.0,55.5 579.5,55.5 583.0,55.5 586.5,55.5 590.0,55.5 593.5,55.5 597.0,55.5 600.5,55.5 604.0,55.5 607.5,55.5 611.0,55.5 614.5,55.5 618.0,55.5"/><polyline class="l2" points="58.0,249.0 61.5,249.0 65.0,249.0 68.5,248.9 72.0,248.9 75.5,248.8 79.0,248.8 82.5,248.8 86.0,248.7 89.5,248.7 93.0,248.6 96.5,248.6 100.0,248.5 103.5,248.5 107.0,248.4 110.5,248.4 114.0,248.3 117.5,248.2 121.0,248.2 124.5,248.1 128.0,248.1 131.5,248.0 135.0,247.9 138.5,247.8 142.0,247.8 145.5,247.7 149.0,247.6 152.5,247.5 156.0,247.4 159.5,247.3 163.0,247.2 166.5,247.2 170.0,247.1 173.5,246.9 177.0,246.8 180.5,246.7 184.0,246.6 187.5,246.5 191.0,246.4 194.5,246.2 198.0,246.1 201.5,246.0 205.0,245.8 208.5,245.7 212.0,245.5 215.5,245.4 219.0,245.2 222.5,245.0 226.0,244.9 229.5,244.7 233.0,244.5 236.5,244.3 240.0,244.1 243.5,243.9 247.0,243.7 250.5,243.5 254.0,243.2 257.5,243.0 261.0,242.7 264.5,242.5 268.0,242.2 271.5,241.9 275.0,241.7 278.5,241.4 282.0,241.1 285.5,240.7 289.0,240.4 292.5,240.1 296.0,239.7 299.5,239.4 303.0,239.0 306.5,238.6 310.0,238.2 313.5,237.8 317.0,237.4 320.5,236.9 324.0,236.5 327.5,236.0 331.0,235.5 334.5,235.0 338.0,234.4 341.5,233.9 345.0,233.3 348.5,232.7 352.0,232.1 355.5,231.5 359.0,230.8 362.5,230.2 366.0,229.5 369.5,228.7 373.0,228.0 376.5,227.2 380.0,226.4 383.5,225.6 387.0,224.7 390.5,223.8 394.0,222.9 397.5,221.9 401.0,221.0 404.5,219.9 408.0,218.9 411.5,217.8 415.0,216.6 418.5,215.5 422.0,214.2 425.5,213.0 429.0,211.7 432.5,210.3 436.0,208.9 439.5,207.5 443.0,206.0 446.5,204.4 450.0,202.8 453.5,201.2 457.0,199.4 460.5,197.7 464.0,195.8 467.5,193.9 471.0,191.9 474.5,189.9 478.0,187.7 481.5,185.6 485.0,183.3 488.5,180.9 492.0,178.5 495.5,176.0 499.0,173.4 502.5,170.7 506.0,167.9 509.5,165.0 513.0,162.0 516.5,158.9 520.0,155.6 523.5,152.7 527.0,152.7 530.5,152.7 534.0,152.7 537.5,152.7 541.0,152.7 544.5,152.7 548.0,152.7 551.5,152.7 555.0,152.7 558.5,152.7 562.0,152.7 565.5,152.7 569.0,152.7 572.5,152.7 576.0,152.7 579.5,152.7 583.0,152.7 586.5,152.7 590.0,152.7 593.5,152.7 597.0,152.7 600.5,152.7 604.0,152.7 607.5,152.7 611.0,152.7 614.5,152.7 618.0,152.7"/><line class="l1" x1="70" y1="22" x2="92" y2="22"/><text class="legend" x="98" y="26">Upper bound</text><line class="l2" x1="187" y1="22" x2="209" y2="22"/><text class="legend" x="215" y="26">Average delay with full jitter</text><text class="alabel" x="338" y="290" text-anchor="middle">Attempt</text><text class="alabel" transform="translate(16 143) rotate(-90)" text-anchor="middle">Delay in ms</text></svg></figure>
+
+<figure class="code pair" data-sample="livelock-and-starvation.2"><figcaption><span class="ctitle">Full jitter: a random delay below a capped exponential bound</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;random&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">inline</span> <span class="t">void</span> <span class="f">sleepBeforeRetry</span>(<span class="t">int</span> attempt) {
+    <span class="k">constexpr</span> <span class="t">long</span> baseMs = <span class="n">10</span>, capMs = <span class="n">1000</span>;
+    <span class="t">long</span> bound = <span class="t">std</span>::<span class="f">min</span>(capMs, baseMs &lt;&lt; <span class="t">std</span>::<span class="f">clamp</span>(attempt, <span class="n">0</span>, <span class="n">20</span>));        <span class="c">// 10, 20, 40 ... capped at 1000 ms</span>
+    <span class="k">thread_local</span> <span class="t">std</span>::mt19937 rng{<span class="t">std</span>::random_device{}()};               <span class="c">// one generator per thread, no locking</span>
+    <span class="t">std</span>::uniform_int_distribution&lt;<span class="t">long</span>&gt; <span class="f">pick</span>(<span class="n">0</span>, bound);                   <span class="c">// anywhere from 0 to bound</span>
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="f">pick</span>(rng)));
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ThreadLocalRandom</span>;
+
+<span class="k">final</span> <span class="k">class</span> <span class="t">Backoff</span> {
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">long</span> BASE_MS = <span class="n">10</span>, CAP_MS = <span class="n">1_000</span>;
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">sleepBeforeRetry</span>(<span class="t">int</span> attempt) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">long</span> bound = <span class="t">Math</span>.<span class="f">min</span>(CAP_MS, BASE_MS &lt;&lt; <span class="t">Math</span>.<span class="f">max</span>(<span class="n">0</span>, <span class="t">Math</span>.<span class="f">min</span>(attempt, <span class="n">20</span>)));   <span class="c">// 10, 20, 40 ... capped at 1000 ms</span>
+        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="t">ThreadLocalRandom</span>.<span class="f">current</span>().<span class="f">nextLong</span>(bound + <span class="n">1</span>));    <span class="c">// anywhere from 0 to bound</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Release every lock held by the failed attempt before sleeping. This delay reduces retry collisions; it is not synchronization or a starvation-freedom proof. <strong>Cap retries and use an overall deadline</strong> so a lost cause fails instead of retrying forever.</p>
+<p>Prefer a deterministic rule when one fits: consistent blocking lock order removes this symmetric retry cycle, though it does not make admission fair. For remote retries, also require idempotency or deduplication because a timeout does not prove that the operation failed.</p>
+
+<h2 id="starvation-progress-for-everyone-except-you">Starvation: progress for everyone except you</h2>
+<p><a class="term" data-term="starvation" href="glossary.html#starvation">Starvation</a> means a pending operation keeps losing access to CPU time or a resource indefinitely while other work progresses. The victim may be blocked, runnable or actively retrying. Its common causes:</p>
+<ul>
+<li><strong>Barging locks.</strong> When a lock is released, a thread that is already running can grab it before the waiter that was just woken gets scheduled. That is <a class="term" data-term="barging" href="glossary.html#barging">barging</a>, and it is permitted by <code>synchronized</code>, default <code>ReentrantLock</code> and <code>std::mutex</code>; none promises FIFO admission. A thread that releases and immediately re-locks in a loop can win thousands of times in a row while another thread waits.</li>
+<li><strong>Greedy readers.</strong> A read-write lock that admits new readers while a writer waits lets a steady stream of overlapping readers keep the writer out forever: <a class="term" data-term="writer-starvation" href="glossary.html#writer-starvation">writer starvation</a>. The C++ standard does not specify a reader or writer preference for <code>std::shared_mutex</code>; library and OS choices differ. Java's non-fair <code>ReentrantReadWriteLock</code> explicitly permits indefinite postponement of readers or writers; do not mistake an implementation heuristic for a fairness guarantee.</li>
+<li><strong>Priorities without limits.</strong> In a priority queue of tasks, low priority work never runs while high priority work keeps arriving. The same happens with OS thread priorities.</li>
+<li><strong>Retry losers.</strong> Lock-free algorithms guarantee system-wide progress when threads keep taking steps, not completion for each caller: one unlucky thread can lose its CAS again and again. Only wait-free algorithms bound each thread's steps (see <a href="progress-guarantees.html">progress guarantees</a>).</li>
+<li><strong>Shared pools.</strong> One tenant can monopolize workers or admission. A finite burst followed by eventual service is a long delay, not proof of starvation; an unbounded monopoly can prevent other work from ever running.</li>
+<li><strong><code>notify()</code> picks arbitrarily.</strong> Java does not say which waiter <code>notify</code> wakes, so an unlucky waiter can be passed over repeatedly.</li>
+</ul>
+<p>Starvation hides in averages. The median looks fine and the 99.9th percentile, or the maximum wait for one tenant, is terrible. Measure per thread, per tenant and per request type before believing a mean.</p>
+
+<p>Here is priority starvation in a tiny deterministic scheduler: every tick one task runs and a new urgent request arrives. A low priority report that arrived first never runs under strict priority. With <strong><a class="term" data-term="aging" href="glossary.html#aging">aging</a></strong>, it does.</p>
+
+<figure class="code pair" data-sample="livelock-and-starvation.3" data-expect="ok"><figcaption><span class="ctitle">Strict priority starves the report; aging bounds its wait</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</span><code><span class="p">#include &lt;cstdio&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;queue&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">struct</span> Task {
+    <span class="t">std</span>::<span class="t">string</span> name;
+    <span class="t">int</span> priority;                                                  <span class="c">// a higher number is more urgent</span>
+    <span class="t">long</span> arrival;
+};
+
+<span class="k">using</span> RunsFirst = <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">bool</span>(<span class="k">const</span> Task&amp;, <span class="k">const</span> Task&amp;)&gt;;
+
+<span class="c">// Each tick: one urgent request arrives and one task runs. When does "report" get to run?</span>
+<span class="t">std</span>::<span class="t">string</span> <span class="f">whenReportRuns</span>(<span class="k">const</span> RunsFirst&amp; runsFirst) {
+    <span class="c">// std::priority_queue pops its largest element, so invert: a is "smaller" if b runs first.</span>
+    <span class="k">auto</span> lower = [&amp;](<span class="k">const</span> Task&amp; a, <span class="k">const</span> Task&amp; b) { <span class="k">return</span> <span class="f">runsFirst</span>(b, a); };
+    <span class="t">std</span>::<span class="t">priority_queue</span>&lt;Task, <span class="t">std</span>::<span class="t">vector</span>&lt;Task&gt;, <span class="k">decltype</span>(lower)&gt; <span class="t">queue</span>(lower);
+    <span class="t">queue</span>.<span class="f">push</span>({<span class="s">"report"</span>, <span class="n">0</span>, <span class="n">0</span>});                                  <span class="c">// low priority, arrived first</span>
+    <span class="k">for</span> (<span class="t">long</span> tick = <span class="n">0</span>; tick &lt; <span class="n">1000</span>; tick += <span class="n">1</span>) {
+        <span class="t">queue</span>.<span class="f">push</span>({<span class="s">"request-"</span> + <span class="t">std</span>::<span class="f">to_string</span>(tick), <span class="n">5</span>, tick});  <span class="c">// a steady stream of urgent work</span>
+        Task next = <span class="t">queue</span>.<span class="f">top</span>();
+        <span class="t">queue</span>.<span class="f">pop</span>();
+        <span class="k">if</span> (next.name == <span class="s">"report"</span>) <span class="k">return</span> <span class="s">"runs at tick "</span> + <span class="t">std</span>::<span class="f">to_string</span>(tick);
+    }
+    <span class="k">return</span> <span class="s">"never runs in 1000 ticks"</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    RunsFirst strictPriority = [](<span class="k">const</span> Task&amp; a, <span class="k">const</span> Task&amp; b) {
+        <span class="k">return</span> a.priority != b.priority ? a.priority &gt; b.priority : a.arrival &lt; b.arrival;
+    };
+    <span class="c">// Aging: each priority level is worth a head start of 20 ticks, and no more.</span>
+    RunsFirst withAging = [](<span class="k">const</span> Task&amp; a, <span class="k">const</span> Task&amp; b) {
+        <span class="t">long</span> ka = a.arrival - <span class="n">20L</span> * a.priority, kb = b.arrival - <span class="n">20L</span> * b.priority;
+        <span class="k">return</span> ka != kb ? ka &lt; kb : a.arrival &lt; b.arrival;
+    };
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"strict priority: report %s\n"</span>, <span class="f">whenReportRuns</span>(strictPriority).<span class="f">c_str</span>());
+    <span class="t">std</span>::<span class="f">printf</span>(<span class="s">"with aging:      report %s\n"</span>, <span class="f">whenReportRuns</span>(withAging).<span class="f">c_str</span>());
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">PriorityQueue</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Task</span>(<span class="t">String</span> name, <span class="t">int</span> priority, <span class="t">long</span> arrival) {}       <span class="c">// a higher priority number is more urgent</span>
+
+    <span class="c">// Each tick: one urgent request arrives and one task runs. When does "report" get to run?</span>
+    <span class="k">static</span> <span class="t">String</span> <span class="f">whenReportRuns</span>(<span class="t">Comparator</span>&lt;<span class="t">Task</span>&gt; runsFirst) {
+        <span class="t">PriorityQueue</span>&lt;<span class="t">Task</span>&gt; queue = <span class="k">new</span> <span class="t">PriorityQueue</span>&lt;&gt;(runsFirst);
+        queue.<span class="f">add</span>(<span class="k">new</span> <span class="t">Task</span>(<span class="s">"report"</span>, <span class="n">0</span>, <span class="n">0</span>));                       <span class="c">// low priority, arrived first</span>
+        <span class="k">for</span> (<span class="t">long</span> tick = <span class="n">0</span>; tick &lt; <span class="n">1_000</span>; tick += <span class="n">1</span>) {
+            queue.<span class="f">add</span>(<span class="k">new</span> <span class="t">Task</span>(<span class="s">"request-"</span> + tick, <span class="n">5</span>, tick));       <span class="c">// a steady stream of urgent work</span>
+            <span class="k">if</span> (queue.<span class="f">poll</span>().<span class="f">name</span>().<span class="f">equals</span>(<span class="s">"report"</span>)) <span class="k">return</span> <span class="s">"runs at tick "</span> + tick;
+        }
+        <span class="k">return</span> <span class="s">"never runs in 1000 ticks"</span>;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Comparator</span>&lt;<span class="t">Task</span>&gt; strictPriority = <span class="t">Comparator</span>.<span class="f">comparingInt</span>((<span class="t">Task</span> t) -&gt; -t.<span class="f">priority</span>())
+                .<span class="f">thenComparingLong</span>(<span class="t">Task</span>::arrival);
+        <span class="c">// Aging: each priority level is worth a head start of 20 ticks, and no more.</span>
+        <span class="t">Comparator</span>&lt;<span class="t">Task</span>&gt; withAging = <span class="t">Comparator</span>.<span class="f">comparingLong</span>((<span class="t">Task</span> t) -&gt; t.<span class="f">arrival</span>() - <span class="n">20L</span> * t.<span class="f">priority</span>())
+                .<span class="f">thenComparingLong</span>(<span class="t">Task</span>::arrival);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"strict priority: report "</span> + <span class="f">whenReportRuns</span>(strictPriority));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"with aging:      report "</span> + <span class="f">whenReportRuns</span>(withAging));
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>strict priority: report never runs in 1000 ticks
+with aging:      report runs at tick 100</pre></div><div class="runout" hidden></div></figure>
+
+<p>The trick in the aging comparator is that the key, arrival time minus a bonus per priority level, is <strong>fixed when the task is queued</strong>. Urgent work still jumps ahead, but only by its bonus (here 5 levels times 20 ticks), so arrivals more than 100 ticks later cannot overtake a priority-zero task when priorities are restricted to 0 through 5. Existing backlog can still delay it beyond 100 ticks. The demo runs the report at tick 100 because all earlier urgent tasks have already finished and the tie favours the report's earlier arrival.
+</p><p>This fixed key is equivalent to ranking by <code>priority + (now - arrival) / 20.0</code>, because the common <code>now</code> term cancels. No heap update is needed. Other aging policies that change relative order need explicit reordering, not a comparator that silently changes beneath a heap. Eventual service assumes bounded priorities, finitely many arrivals in each finite interval, continuing dispatch and finite task runtimes.</p>
+
+<h2 id="fairness-tools">Fairness tools</h2>
+<ol>
+<li><strong>Fair locks.</strong> <code>new ReentrantLock(true)</code> favours the longest waiter; fair <code>ReentrantReadWriteLock</code> uses approximate arrival order and can admit a group of readers together. <code>new Semaphore(n, true)</code> orders permit requests at internal queueing points, not by method-call timestamps. This is <a class="term" data-term="fair-lock" href="glossary.html#fair-lock">fair admission</a>, not fair CPU scheduling or a wall-clock bound. Untimed <code>tryLock()</code> and semaphore <code>tryAcquire()</code> may barge even in fair mode; timed variants respect fairness. A sleeping next waiter can reduce throughput, as <a href="priority-inversion-and-convoys.html">lock convoys</a> explains.</li>
+<li><strong>FIFO by construction: a <a class="term" data-term="ticket-lock" href="glossary.html#ticket-lock">ticket lock</a>.</strong> Each thread takes the next ticket number and waits until the "now serving" counter reaches it, so a thread waits only for earlier assigned tickets to finish. C++'s <code>std::mutex</code> promises no fairness. This teaching lock enforces ticket order <em>after ticket assignment</em>:
+<figure class="code pair" data-sample="livelock-and-starvation.4"><figcaption><span class="ctitle">A ticket lock: first come, first served</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> TicketLock {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">lock</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="t">unsigned</span> <span class="t">long</span> mine = next_;
+        next_ += <span class="n">1</span>;
+        cv_.<span class="f">wait</span>(lk, [&amp;] { <span class="k">return</span> serving_ == mine; });    <span class="c">// only the next ticket may proceed</span>
+    }
+
+    <span class="t">void</span> <span class="f">unlock</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+            serving_ += <span class="n">1</span>;
+        }
+        cv_.<span class="f">notify_all</span>();                                   <span class="c">// wake everyone; only the next ticket proceeds</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+    <span class="t">unsigned</span> <span class="t">long</span> next_ = <span class="n">0</span>, serving_ = <span class="n">0</span>;                  <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">class</span> <span class="t">TicketLock</span> {
+    <span class="k">private</span> <span class="t">long</span> nextTicket = <span class="n">0</span>;                     <span class="c">// guarded by this</span>
+    <span class="k">private</span> <span class="t">long</span> nowServing = <span class="n">0</span>;                     <span class="c">// guarded by this</span>
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">lock</span>() {
+        <span class="t">long</span> mine = nextTicket;
+        nextTicket += <span class="n">1</span>;
+        <span class="t">boolean</span> interrupted = <span class="k">false</span>;
+        <span class="k">while</span> (nowServing != mine) {                 <span class="c">// only the next ticket may proceed</span>
+            <span class="k">try</span> {
+                <span class="f">wait</span>();
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                interrupted = <span class="k">true</span>;                  <span class="c">// a ticket cannot be abandoned: keep waiting</span>
+            }
+        }
+        <span class="k">if</span> (interrupted) <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();   <span class="c">// restore the flag for the caller</span>
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">unlock</span>() {
+        nowServing += <span class="n">1</span>;
+        <span class="f">notifyAll</span>();                                 <span class="c">// wake everyone; only the next ticket proceeds</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>These are non-reentrant teaching locks: only the owner may unlock, every acquisition must be released with <code>finally</code> or <code>std::lock_guard&lt;TicketLock&gt;</code>, and the object must outlive its users. They omit ownership checks. The internal monitor or mutex publishes the previous owner's writes to the next owner, even though it is not held throughout the user's critical section.</p>
+<p>FIFO begins when the ticket is assigned, and a descheduled next ticket holder stalls everyone. The internal mutex must eventually admit both new callers and awakened waiters; the ticket policy cannot establish that from the standard mutex contract. Also assume holders finish, waiters get scheduled, and fewer tickets are outstanding than the counter's wraparound range.</p>
+<p>Note the Java version's interrupt handling: a thread may not walk away from its ticket, or every later ticket waits forever, so it keeps waiting and restores the interrupt flag afterwards. Supporting timeouts and cancellation needs more machinery, such as an explicit cancellable waiter queue. Waking every waiter on release is a small <a class="term" data-term="thundering-herd" href="glossary.html#thundering-herd">thundering herd</a>; a condition per waiter can signal just the next one, which must still reacquire the internal lock and check its predicate.</p></li>
+<li><strong>Writer preference for read-write locks.</strong> Once a writer is waiting, new readers queue behind it. Continuous writers can then starve readers, and individual writers still need fair admission. To protect both sides, serve arrivals in order, grouping consecutive readers, or use bounded alternating phases. You build these in <a href="build-rw-lock-and-barrier.html">build it yourself: read-write lock</a> and compare policies in <a href="readers-writers.html">readers and writers</a>.</li>
+<li><strong>Turns and batch limits for groups.</strong> When groups exclude each other (the bathroom and playground problems), let the current group admit at most K more members once another group is waiting, then drain and switch turns. Use FIFO within each group as well; fairness between groups alone does not protect individual members.</li>
+<li><strong>Aging</strong> for priority schemes, as above.</li>
+<li><strong>Per-tenant queues</strong> served round robin or by weighted fair queueing, plus per-tenant concurrency caps, so one tenant's burst cannot fill a shared pool (see <a href="bulkheads-timeouts-retries.html">bulkheads</a>).</li>
+</ol>
+
+<div class="box example">
+<h3>Worked example: Rubrik's playground, and several ways to stop starvation</h3>
+<p>Rubrik asked: a playground admits players from one team at a time, at most 10 players inside; players from many teams arrive concurrently. The follow up was several different ways to prevent starvation of any player or team. Walk through the options and what each costs.</p>
+<ol>
+<li><strong>The naive rule:</strong> admit a player if the playground is empty, or holds their own team and has room. The current team can hold the playground forever: as long as one teammate is inside, new teammates keep entering, and other teams starve.</li>
+<li><strong>Strict FIFO admission:</strong> arrivals join one queue, and only the head may enter, when it is compatible. Later arrivals cannot overtake a queued player. There are finitely many players ahead, so entry follows if each visit finishes and eligible threads run; a time bound additionally needs bounds on visit and scheduling delays. The cost is concurrency: a waiting player from team B at the head blocks team A players behind it even when there is room and A is inside.</li>
+<li><strong>Turns with a batch limit:</strong> the current team may keep admitting players, but once another team is waiting, it may admit at most K more; then admissions stop, the playground drains, and the turn passes to the team that has waited longest. For two teams this limits further opposing admissions to K before the current team drains. With more teams, count every turn ahead, its batch and its drain; FIFO within a team is also required for individual fairness.</li>
+<li><strong>Time slices:</strong> a team's turn lasts at most T seconds while others wait. Stop new entries at the end, let current players leave, then choose the oldest waiting team. This limits admissions, not visit duration; without a maximum stay it supplies no hard time bound.</li>
+</ol>
+<p>For two teams, if C players are inside when the other team queues, a positive batch limit K allows at most C + K further departures before the next team's turn. Here C is at most 10. This counts admissions and departures, not seconds; converting it to elapsed time needs bounded visit durations and bounded scheduling gaps. A particular player may also have teammates ahead of them.</p>
+<p>The senior move is to name the trade-off out loud: FIFO bounds overtaking per arrival; team batching may improve utilization but needs a separate bound for every turn and every player ahead. The <a href="p-fair-bathroom.html">fair bathroom problem</a> drills exactly this.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Retrying in lockstep.</strong> Release-and-retry without random backoff, or with a fixed delay, invites livelock.</li>
+<li><strong>Making every lock fair "to be safe".</strong> Throughput can fall under contention. Use fairness where controlling overtaking matters, and measure it.</li>
+<li><strong>Assuming locks or <code>notify</code> are FIFO.</strong> <code>synchronized</code>, default <code>ReentrantLock</code> and <code>std::mutex</code> make no such promise.</li>
+<li><strong>A reader-preferring read-write lock in front of data that must be updated.</strong> The update may never happen under heavy read load.</li>
+<li><strong>Strict priority without aging</strong> in a system that is ever busy.</li>
+<li><strong>Fixing starvation with <code>sleep</code> or <code>yield</code> in the greedy thread.</strong> It changes the odds on one machine, not the guarantee.</li>
+<li><strong>Measuring only averages.</strong> Starvation lives in the maximum and the far tail, per tenant.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The question "what is the difference between deadlock, livelock and starvation?" is a staple of phone screens and online assessments, and a LinkedIn senior report lists deadlocks, starvation and race conditions as the follow ups. Rubrik goes further and asks for fairness in code: the most eligible person enters the bathroom, no team starves at the playground, and the searchers, inserters and deleters constraints. Preventing deleter starvation is an additional practice follow up, not an independently verified interview requirement.</p>
+<blockquote>Deadlock means dependencies prevent the participants from progressing. Livelock means they keep reacting without completing useful work. Starvation means other work completes while one request never gets its turn. CPU usage helps triage, but cannot prove which one I have. I break retry symmetry with ordering or jitter, and control overtaking with FIFO admission, bounded batches or aging. I state the scheduling and finite-work assumptions behind any fairness claim, and measure throughput as well as waiting time.</blockquote>
+<p>Follow ups: "is a fair lock always better?", "how does your read-write lock avoid starving writers?", "why does full jitter work better than a fixed retry delay?", "what does lock-free guarantee about starvation?", and for the group problems, "can a team be starved? prove the bound".</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Safety: nothing bad happens. Liveness: something good eventually happens. Deadlock, livelock and starvation are liveness failures.</li>
+<li>Livelock: busy threads, no progress. Break the symmetry with a rule or with randomized, capped exponential backoff.</li>
+<li>Starvation: the system progresses, one party never does. Causes: barging locks, greedy readers, unbounded priorities, retry losers, shared pools.</li>
+<li>Control overtaking with fair admission, bounded team turns, aging and per-tenant queues. Writer preference alone can starve readers.</li>
+<li>Fairness can cost throughput and does not guarantee a deadline. State the assumptions and measure per-request tails as well as aggregate throughput.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="livelock-and-starvation"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="livelock-and-starvation.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A service is stuck: throughput is zero, CPU is at 100 percent on four cores, and thread dumps show the same threads <code>RUNNABLE</code> inside retry loops in every dump. What is the most likely diagnosis?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Deadlock</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Livelock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Starvation of one thread</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A lost wakeup</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Repeated retries with no completions make livelock the strongest hypothesis. A blocking deadlock or lost wakeup usually leaves participants asleep, and starvation of one caller allows others to finish. CPU alone is not proof: inspect dependencies to exclude a spinlock deadlock or an impossible predicate.</div></div><div class="mcq" data-id="livelock-and-starvation.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two threads use "lock one, try the other, release the held lock on failure and retry". They retry after exactly 10 ms every time, and under load they keep colliding. What fixes it best?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Retry after 1 ms instead of 10 ms</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Retry immediately, with no delay</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Retry after a random delay that grows with each failure, up to a cap, or acquire the locks in one global order</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Make both locks fair</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A fixed delay can preserve lockstep, whether it is 10 ms or 1 ms. Immediate retries can do the same. Randomness breaks the symmetry, and the growing bound handles heavier contention; blocking acquisition in a global lock order removes this retry cycle. Fair locks do not help, because each thread fails on the lock the other already holds.</div></div><div class="mcq" data-id="livelock-and-starvation.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A read-write lock admits new readers whenever no writer holds the lock. Readers arrive constantly and their read sections overlap. What happens to a writer?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It gets in between two readers</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It may wait forever: there is always at least one reader inside, so the lock is never free for writing</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It gets in after a timeout</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Readers block until the writer finishes</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Reader preference with overlapping readers means the read count never drops to zero, so the writer starves. The fix is writer preference (once a writer waits, new readers queue behind it) or alternating batches. Nothing in a plain read-write lock times out on the writer's behalf.</div></div><div class="mcq" data-id="livelock-and-starvation.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the scheduler demo, one priority-5 request arrives and one task runs each tick. The priority-0 report arrived at tick 0. With key <code>arrival - 20 * priority</code>, smaller first, and earlier arrival breaking ties, what does the aging run print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>report runs at tick 0</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>report runs at tick 100</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>report runs at tick 101</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>report never runs in 1000 ticks</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> The report's key is 0. Requests arriving at ticks 0 through 99 have negative keys and run first. At tick 100 the new request also has key 0, but the report wins the arrival tie. Tick 0 ignores the priority bonus, tick 101 ignores the tie-breaker, and indefinite postponement describes the strict-priority run. This exact tick depends on the demo's one-task-per-tick workload; aging does not promise it for arbitrary backlogs.</div></div><div class="mcq" data-id="livelock-and-starvation.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does it mean that an algorithm is lock-free but not wait-free?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It never uses CAS</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The system keeps completing operations as threads take steps, but one caller can keep losing retries and starve</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Every thread finishes each operation in a bounded number of steps</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It can deadlock but not livelock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Lock-free promises system-wide completion, not a per-caller step bound. Wait-free adds that bound on each operation's own steps, not elapsed time. CAS is compatible with either property; a failed weak CAS can even be spurious, so failure alone does not prove another operation completed. The progress guarantees exclude a system-wide deadlock under their execution assumptions.</div></div><div class="mcq" data-id="livelock-and-starvation.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A <code>ReentrantLock</code> is constructed with <code>new ReentrantLock(true)</code>. A thread calls <code>tryLock()</code> with no timeout while other threads are queued. What happens if the lock happens to be free at that instant?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It joins the back of the queue, because the lock is fair</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It takes the lock immediately, ahead of the queued threads: untimed <code>tryLock()</code> barges even on a fair lock</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It always returns false while anyone is queued</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws <code>IllegalStateException</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> The documentation is explicit: the untimed <code>tryLock()</code> does not honor the fairness setting. <code>tryLock(0, TimeUnit.SECONDS)</code> does honor it. The timed form also detects interruption, so the caller must handle or propagate <code>InterruptedException</code>. The untimed form neither queues nor throws merely because waiters exist.</div></div><div class="mcq" data-id="livelock-and-starvation.q7" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>What does the C++ standard promise about the order in which threads blocked on a <code>std::mutex</code> acquire it?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">First come, first served</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The highest priority thread first</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nothing: no fairness or ordering is guaranteed, so a thread can be overtaken indefinitely</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The most recently blocked thread first</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The standard specifies mutual exclusion and synchronization, not fairness. FIFO, highest-priority-first and newest-first are all outside its contract. Explicit tickets can order admission after ticket assignment, but the scheduler and the internal mutex still need progress assumptions.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="livelock-and-starvation.c1" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain deadlock, livelock and starvation to an interviewer: what each looks like in production, and how you fix each.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>All three violate progress requirements even when shared data remains consistent. For deadlock I reconstruct dependencies, such as a cycle of owned locks, and remove a dependency with global lock ordering. Blocking participants often consume little CPU, but a spinlock cycle need not. For livelock I look for retries or rollbacks increasing while completions stay flat, and break symmetry with ordering or randomized capped backoff plus a retry budget. For starvation I track one request or tenant while others complete, then control overtaking with FIFO, bounded batches or aging. Writer preference protects writers from reader floods but can starve readers. Repeated dumps, ownership information and per-request wait metrics matter more than CPU alone; Java deadlock detection covers supported monitor and ownable-synchronizer cycles, not every possible dependency. A fairness argument must state that holders finish and eligible threads get scheduled.</p></div></div><div class="cq" data-q="livelock-and-starvation.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">One thread pool of 32 workers serves 50 tenants. Whenever a large tenant runs a batch import, every other tenant's p99 latency explodes, although their own traffic has not changed. Design a fix.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>This suggests interference through a shared pool, not yet proof of indefinite starvation. I would measure queue delay and active workers per tenant. Use per-tenant bounded queues and dispatch round robin or by weights among tenants that have available concurrency capacity. Reserve the slot before submitting work: if workers instead block on a tenant semaphore, all 32 workers can still be occupied by that tenant. An illustrative cap of 8 leaves room for others, but I would tune it to demand and service times. Isolate batch imports in a smaller pool if their runtimes differ greatly. Aging gives imports eventual opportunities; interactive requests cannot always win under a permanent flood if imports must finish too. Enforce deadlines and load shedding for overload, and measure per-tenant completions and oldest pending request age. Fair selection does not preempt tasks already running or guarantee latency when task durations are unbounded.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="livelock-and-starvation.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"The service is busy but barely finishing requests. How would you distinguish deadlock, livelock and starvation?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Distinguish blocked dependencies, useless repeated reactions and one request losing while others finish</li><li>Use repeated stacks, ownership, retry counts and completion counts rather than CPU alone</li><li>Give a concrete symmetric retry sequence for livelock</li><li>Choose ordering or jitter with a retry budget, without promising success from randomness</li><li>Measure individual wait age and state fairness assumptions</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would classify the failure by progress and dependencies, not CPU alone. Deadlock means participants cannot resolve their dependencies. Livelock means they keep reacting but complete no useful work. Starvation means other work finishes while one request keeps losing. I would compare several thread dumps with lock ownership, retry counters and completion counters. A blocking deadlock often uses little CPU, but a spinlock cycle can keep a core busy, and backoff can make livelock look quiet. For example, two threads each take one lock, fail to take the other, release and retry together. A consistent blocking lock order removes that retry cycle. Randomized backoff reduces repeated collisions, but I would release held locks first and cap retries with a deadline; randomness is not a success guarantee. If only one tenant is stuck, I would inspect admission order and oldest pending request age. FIFO or bounded batches can prevent overtaking, assuming holders finish and eligible threads run. I would verify individual completions as well as aggregate throughput before calling the issue fixed.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Could a lock-free algorithm still starve one request?</span></p></div></div><div class="sq" data-sq="livelock-and-starvation.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Your playground serves one team at a time. Prove that nobody starves, then tell me what fairness costs."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Separate team fairness from fairness for each player</li><li>Use FIFO team turns, FIFO within teams and bounded admissions when another team waits</li><li>Explain the drain and finite-predecessor argument</li><li>Distinguish an admission bound from a time bound and state scheduling assumptions</li><li>Describe batching versus strict FIFO and the sleeping-next-waiter cost</li><li>Handle cancellation without leaving a blocking queue position</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I need fairness both between teams and within each team. Rotating teams alone does not stop new teammates from repeatedly passing one older player. I would keep FIFO queues of players, queue each waiting team once, and admit eligible queue heads whenever capacity remains. I would choose a positive batch limit K. When another team is waiting, the current team gets at most K further admissions, then admissions stop until everyone inside leaves. The next waiting team takes its turn. A team that still has players queues again behind other waiting teams. For a particular player, there are finitely many players ahead in their own queue and finitely many turns ahead of each service opportunity. Later arrivals cannot bypass those positions. Assuming every visit finishes and eligible threads get CPU time, that player eventually enters. This bounds overtaking, but a time bound also needs limits on visit duration and scheduling delay. Strict global FIFO is easier to reason about but can leave spare capacity unused when the head belongs to another team. Bounded batches can improve utilization, while a descheduled next player can still stall admission. I would remove cancelled waiters under the queue lock and advance the turn when necessary. The final check is per-player waiting age and completions under continuous competing arrivals, alongside throughput.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if one player is allowed to stay inside forever?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-fair-bathroom.html" data-problem="fair-bathroom"><span class="pk">Ordering puzzles · hard</span><b>The fair bathroom (and the team playground)</b><span class="pst"></span></a><a class="pcard" href="p-fair-read-write-lock.html" data-problem="fair-read-write-lock"><span class="pk">Build a primitive · hard</span><b>Fair read-write lock</b><span class="pst"></span></a><a class="pcard" href="p-searchers-inserters-deleters.html" data-problem="searchers-inserters-deleters"><span class="pk">Ordering puzzles · hard</span><b>Searchers, inserters and deleters</b><span class="pst"></span></a><a class="pcard" href="p-dining-philosophers.html" data-problem="dining-philosophers"><span class="pk">Ordering puzzles · medium</span><b>The dining philosophers</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="deadlock-avoidance-and-detection.html"><span>Previous</span><b>Deadlock avoidance and detection</b></a><a class="next" href="priority-inversion-and-convoys.html"><span>Next</span><b>Priority inversion and lock convoys</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#safety-and-liveness">Safety and liveness</a><a href="#livelock-busy-polite-and-stuck">Livelock: busy, polite, and stuck</a><a href="#starvation-progress-for-everyone-except-you">Starvation: progress for everyone except you</a><a href="#fairness-tools">Fairness tools</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

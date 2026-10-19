@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>javac, java, jshell, jstack and jcmd · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-tools" data-title="javac, java, jshell, jstack and jcmd" data-track="java" data-module="java-3" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details open><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools" class=here><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m3">Module 03: Tools and under the hood</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 03.1</span><span>17 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>javac, java, jshell, jstack and jcmd</h1><p class="lsum">Compile and run from the command line, experiment in jshell, and read stack traces and thread dumps taken with jps, jstack and jcmd.</p><div class="prereq"><span>Before this:</span><a href="java-how-it-runs.html">How Java runs: JVM, bytecode, JIT and GC</a><a href="java-exceptions.html">Exceptions, InterruptedException and try-with-resources</a></div></header><article class="prose" id="article">
+<p class="lead">When a threaded program hangs, nothing is printed and nothing is thrown. The fastest way to find out why is a thread dump, and taking one is two commands. This lesson is the toolbox: compile and run from a terminal, try an API in seconds, and read what the JVM tells you about its threads.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A doctor does not guess what is wrong with a patient who has gone quiet. She checks who is breathing, listens to the chest, and reads the notes written when the trouble started. For a Java process, <code>jps</code> tells you which JVMs are alive. <strong>A thread dump is the stethoscope: what every thread is doing at this instant, and which lock it is waiting for.</strong> A stack trace is the note written at the moment something went wrong. And <code>jshell</code> is the scratch pad where you check a fact before you rely on it.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li>Deadlocks, lost wakeups and exhausted thread pools produce no exception and no log line: the program just stops making progress. A thread dump shows each thread's state and the exact lock it waits for, and HotSpot names lock cycles outright.</li>
+<li>The thread states in a dump map one to one onto the concepts of this course: <code>BLOCKED</code> is waiting for a <code>synchronized</code> monitor, <code>WAITING</code> is <code>wait</code>, <code>join</code> or a parked <code>ReentrantLock</code> or <code>Condition</code>, <code>TIMED_WAITING</code> is the timed versions and <code>sleep</code>.</li>
+<li>Failures in worker threads arrive as chained stack traces ("Caused by"), and reading them quickly is a debugging round skill. On Tandem, the Run button takes a thread dump automatically when a program hangs, so you will read plenty.</li>
+</ul>
+</div>
+
+<h2 id="javac-and-java">javac and java</h2>
+<p><code>javac</code> compiles source files into bytecode, one <code>.class</code> file per class, including nested ones such as <code>Main$Worker.class</code>. <code>java</code> starts a JVM and runs the <code>main</code> method of the class you name. For a single-file program you can skip the compile step: since Java 11, <code>java Main.java</code> compiles the file in memory and runs it. In Java 21 that source mode takes exactly one file, and the first class declared in it must hold <code>main</code>.</p>
+
+<figure class="code single" data-sample="java-tools.1"><figcaption><span class="ctitle">The commands you will actually type</span><span class="ctabs"><span class="clang">Shell</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-bash" data-lang="bash"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code>javac -d out Main.java Worker.java     <span class="c"># compile into the out folder</span>
+java -ea -cp out Main                   <span class="c"># run, with assertions enabled</span>
+java Main.java                          <span class="c"># Java 11 and later: compile one file in memory and run it</span>
+java -XX:ActiveProcessorCount=2 -cp out Main    <span class="c"># pretend the machine has 2 cores</span>
+java -Xlog:gc -Xmx512m -cp out Main     <span class="c"># one log line per garbage collection, 512 MB heap cap</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Three flags matter for concurrency work. <strong><code>-ea</code> turns on <code>assert</code> statements, which are off by default</strong>, so a test that relies on <code>assert</code> silently passes without it (Tandem runs your code with <code>-ea</code>). <code>-XX:ActiveProcessorCount=N</code> makes the JVM believe it has N cores, which changes <code>availableProcessors()</code> and therefore the size of the common pool; it is a cheap way to test a pool sizing decision. And <code>-Xlog:gc</code> prints a line per garbage collection, which you line up against latency spikes. Some Java 21 concurrency APIs, such as <code>StructuredTaskScope</code>, are preview features and need the preview flag both when compiling and when running.</p>
+
+<h2 id="jshell-check-before-you-rely-on-it">jshell: check before you rely on it</h2>
+<p><code>jshell</code> (Java 9 and later) is a read, evaluate, print loop: type an expression and see its value. It is the fastest way to settle "does <code>TimeUnit.convert</code> go this way?" before you build an answer on it.</p>
+
+<figure class="code single" data-sample="java-tools.2"><figcaption><span class="ctitle">A short jshell session</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code>jshell&gt; TimeUnit.SECONDS.toMillis(3)
+$1 ==&gt; 3000
+
+jshell&gt; var list = new ArrayList&lt;&gt;(List.of(1, 2, 3, 4))
+list ==&gt; [1, 2, 3, 4]
+
+jshell&gt; list.removeIf(x -&gt; x % 2 == 1)
+$3 ==&gt; true
+
+jshell&gt; list
+list ==&gt; [2, 4]
+
+jshell&gt; import java.time.Duration
+
+jshell&gt; Duration.ofMillis(1500).getNano()
+$6 ==&gt; 500000000</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>jshell imports <code>java.util</code>, <code>java.util.concurrent</code>, <code>java.util.function</code>, <code>java.util.stream</code>, <code>java.io</code>, <code>java.math</code>, <code>java.net</code>, <code>java.nio.file</code>, <code>java.util.regex</code> and <code>java.util.prefs</code> for you. It does not import <code>java.time</code>, <code>java.util.concurrent.locks</code> or <code>java.util.concurrent.atomic</code>, which is why the session above imports <code>Duration</code>. Useful commands: <code>/vars</code>, <code>/methods</code>, <code>/imports</code>, <code>/list</code>, <code>/open file.jsh</code> and <code>/exit</code>; the Tab key completes names and shows method signatures. You can start threads in jshell too, but measure performance somewhere else: a snippet run once has not been compiled by the JIT yet.</p>
+
+<h2 id="stack-traces-reading-one-fast">Stack traces: reading one fast</h2>
+<p>Here is a realistic failure: a pool thread parses a price, the parse fails, the task wraps the error, and the main thread finds out through <code>get()</code>.</p>
+
+<figure class="code single" data-sample="java-tools.3" data-expect="ok"><figcaption><span class="ctitle">A failure in a worker, reported in main</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ExecutionException</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">int</span> <span class="f">parsePrice</span>(<span class="t">String</span> raw) {
+        <span class="k">return</span> <span class="t">Integer</span>.<span class="f">parseInt</span>(raw.<span class="f">trim</span>());
+    }
+
+    <span class="k">static</span> <span class="t">int</span> <span class="f">loadPrice</span>(<span class="t">String</span> raw) {
+        <span class="k">try</span> {
+            <span class="k">return</span> <span class="f">parsePrice</span>(raw);
+        } <span class="k">catch</span> (<span class="t">NumberFormatException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"bad price row: "</span> + raw, e);   <span class="c">// wrap, keep the cause</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">1</span>, r -&gt; <span class="k">new</span> <span class="t">Thread</span>(r, <span class="s">"price-loader"</span>))) {
+            <span class="t">Future</span>&lt;<span class="t">Integer</span>&gt; price = pool.<span class="f">submit</span>(() -&gt; <span class="f">loadPrice</span>(<span class="s">"12O"</span>));   <span class="c">// a letter O, not a zero</span>
+            <span class="k">try</span> {
+                price.<span class="f">get</span>();
+            } <span class="k">catch</span> (<span class="t">ExecutionException</span> e) {
+                e.<span class="f">printStackTrace</span>(<span class="t">System</span>.out);
+            }
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="code single" data-sample="java-tools.4"><figcaption><span class="ctitle">What it prints</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code>java.util.concurrent.ExecutionException: java.lang.IllegalStateException: bad price row: 12O
+    at java.base/java.util.concurrent.FutureTask.report(FutureTask.java:122)
+    at java.base/java.util.concurrent.FutureTask.get(FutureTask.java:191)
+    at Main.main(Main.java:23)
+Caused by: java.lang.IllegalStateException: bad price row: 12O
+    at Main.loadPrice(Main.java:15)
+    at Main.lambda$main$1(Main.java:21)
+    at java.base/java.util.concurrent.FutureTask.run(FutureTask.java:317)
+    at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+    at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+    at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.lang.NumberFormatException: For input string: "12O"
+    at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:67)
+    at java.base/java.lang.Integer.parseInt(Integer.java:662)
+    at java.base/java.lang.Integer.parseInt(Integer.java:778)
+    at Main.parsePrice(Main.java:8)
+    at Main.loadPrice(Main.java:13)
+    ... 5 more</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Read it in this order:</p>
+<ol>
+<li><strong>The first line</strong> gives the outermost exception and its message. When a trace escapes a thread uncaught, the JVM prefixes it with the thread's name, as in <code>Exception in thread &quot;main&quot;</code>.</li>
+<li><strong>The <code>at</code> lines</strong> list calls newest first. The top line is where that exception was created; scan down for the first line in your own code.</li>
+<li><strong>Each <code>Caused by:</code></strong> is the exception the one above it wrapped. <strong>The last <code>Caused by</code> is the root cause</strong>, and usually the thing to fix: here, a letter O typed where a zero belongs.</li>
+<li><strong><code>... 5 more</code></strong> means the remaining frames are the same as in the exception above, trimmed to save space.</li>
+<li><strong>Two threads in one trace.</strong> The <code>ExecutionException</code> frames are main's stack, waiting in <code>get()</code>. The <code>Caused by</code> frames are the stack of the <code>price-loader</code> pool thread, where the work actually failed. This is why you wrap with the cause and name your threads.</li>
+</ol>
+
+<h2 id="finding-the-process-jps-and-jcmd">Finding the process: jps and jcmd</h2>
+<p><code>jps -l</code> lists the running JVMs that belong to your user, with their process ids and main classes; <code>jcmd</code> with no arguments prints the same list. The list comes from small performance data files that each JVM publishes, and <code>jcmd &lt;pid&gt;</code> then talks to the chosen JVM through its attach mechanism, so run both as the same user as the target JVM, ideally from the same JDK version. A JVM started with <code>-XX:-UsePerfData</code> publishes no such file and does not show up in <code>jps</code>, though <code>jcmd</code> can still attach to it by process id.</p>
+
+<figure class="code single" data-sample="java-tools.5"><figcaption><span class="ctitle">jps on a machine with one stuck program</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><code>$ jps -l
+76326 Main
+76341 jdk.jcmd/sun.tools.jps.Jps</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p><code>jcmd &lt;pid&gt; help</code> lists everything you can ask a running JVM. The ones worth knowing: <code>Thread.print</code> (a thread dump), <code>Thread.dump_to_file</code> (a thread dump that includes virtual threads), <code>GC.class_histogram</code> (instance counts and bytes per class), <code>GC.heap_info</code>, <code>VM.flags</code>, <code>VM.uptime</code> and <code>JFR.start</code>.</p>
+
+<h2 id="thread-dumps">Thread dumps</h2>
+<p>Any of these prints a <a class="term" data-term="thread-dump" href="glossary.html#thread-dump">thread dump</a>: the stack of every thread in the target JVM.</p>
+<figure class="code single" data-sample="java-tools.6"><figcaption><span class="ctitle">Three ways to take a thread dump</span><span class="ctabs"><span class="clang">Shell</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-bash" data-lang="bash"><div class="cwrap"><code>jcmd 76326 Thread.print -l     <span class="c"># recommended; -l also lists java.util.concurrent locks each thread owns</span>
+jstack -l 76326                <span class="c"># the classic tool, same output format</span>
+kill -3 76326                  <span class="c"># SIGQUIT: the JVM prints the dump to its OWN standard output</span></code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The JDK documentation marks <code>jstack</code> as experimental and unsupported, and Oracle's troubleshooting guide recommends <code>jcmd</code> for new work; the output is the same. Below is a real dump, trimmed, from two threads that each hold one <code>synchronized</code> lock and want the other's:</p>
+
+<figure class="code single" data-sample="java-tools.7"><figcaption><span class="ctitle">Part of a real thread dump (Java 21)</span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code>"transfer-1" #28 [26627] prio=5 os_prio=31 cpu=0.21ms elapsed=10.88s tid=0x0000000ac30eea00 nid=26627 waiting for monitor entry  [0x0000000172262000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+    at Main.transfer(Main.java:10)
+    - waiting to lock &lt;0x00000004b48154b8&gt; (a java.lang.Object)
+    - locked &lt;0x00000004b48154a8&gt; (a java.lang.Object)
+    at Main.lambda$main$0(Main.java:26)
+    at java.lang.Thread.run(java.base@21.0.12.1/Thread.java:1583)
+
+"transfer-2" #29 [26371] prio=5 os_prio=31 cpu=0.18ms elapsed=10.88s tid=0x0000000ac30ef100 nid=26371 waiting for monitor entry  [0x000000017246e000]
+   java.lang.Thread.State: BLOCKED (on object monitor)
+    at Main.transfer(Main.java:10)
+    - waiting to lock &lt;0x00000004b48154a8&gt; (a java.lang.Object)
+    - locked &lt;0x00000004b48154b8&gt; (a java.lang.Object)
+    at Main.lambda$main$1(Main.java:27)
+    at java.lang.Thread.run(java.base@21.0.12.1/Thread.java:1583)
+
+Found one Java-level deadlock:
+=============================
+"transfer-1":
+  waiting to lock monitor 0x0000000ac30ace00 (object 0x00000004b48154b8, a java.lang.Object),
+  which is held by "transfer-2"
+
+"transfer-2":
+  waiting to lock monitor 0x0000000ac30acd20 (object 0x00000004b48154a8, a java.lang.Object),
+  which is held by "transfer-1"</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>How to read each thread's entry:</p>
+<ul>
+<li><strong>The header line:</strong> the thread's name (which is why you name threads), its Java thread number, the operating system thread id in brackets, its CPU time so far, how long it has existed, and a short summary such as "waiting for monitor entry".</li>
+<li><strong><code>java.lang.Thread.State</code>:</strong> one of the <a class="term" data-term="thread-states" href="glossary.html#thread-states">thread states</a> in the table below.</li>
+<li><strong>The frames,</strong> newest first, with lock lines underneath: <code>- locked &lt;address&gt;</code> is a monitor this thread holds, and <code>- waiting to lock &lt;address&gt;</code> is the one it wants. Search the dump for the same address to find the holder.</li>
+<li><strong>The deadlock section</strong> at the very end, when HotSpot finds a cycle. Here each thread holds the lock the other wants: transfer-1 holds <code>...a8</code> and wants <code>...b8</code>, transfer-2 the reverse.</li>
+</ul>
+
+<table>
+<thead><tr><th>State in the dump</th><th>What the thread is doing</th><th>Line to look for</th></tr></thead>
+<tbody>
+<tr><td><code>RUNNABLE</code></td><td>Running, ready to run, or inside native code, which includes a blocking socket read</td><td>your own frames, or a native I/O frame</td></tr>
+<tr><td><code>BLOCKED (on object monitor)</code></td><td>Waiting to enter a <code>synchronized</code> block or method, or to re-enter one after <code>wait</code></td><td><code>- waiting to lock &lt;...&gt;</code></td></tr>
+<tr><td><code>WAITING (on object monitor)</code></td><td>In <code>Object.wait()</code> with no timeout, or <code>Thread.join()</code></td><td><code>- waiting on &lt;...&gt;</code></td></tr>
+<tr><td><code>WAITING (parking)</code></td><td>Parked by a <code>java.util.concurrent</code> class: <code>ReentrantLock.lock()</code>, <code>Condition.await()</code>, <code>BlockingQueue.take()</code>, <code>Future.get()</code></td><td><code>- parking to wait for &lt;...&gt; (a ...ReentrantLock$NonfairSync)</code></td></tr>
+<tr><td><code>TIMED_WAITING</code></td><td><code>sleep</code>, <code>wait(ms)</code>, <code>join(ms)</code>, or a timed park such as <code>poll(timeout)</code> or <code>awaitNanos</code></td><td><code>Thread.sleep</code>, <code>parkNanos</code></td></tr>
+</tbody>
+</table>
+
+<p>Two readings trip people up. <strong>A thread waiting for a <code>ReentrantLock</code> is <code>WAITING (parking)</code>, not <code>BLOCKED</code></strong>, and the frames do not say who owns that lock; the <code>-l</code> option adds a "Locked ownable synchronizers" list under each thread, which does. And <code>RUNNABLE</code> does not mean "using CPU": a thread stuck in a socket read is <code>RUNNABLE</code> inside native code. HotSpot's deadlock section covers cycles through <code>synchronized</code> monitors and through <code>ReentrantLock</code> and <code>ReentrantReadWriteLock</code>, which it reports as "waiting for ownable synchronizer".</p>
+
+<h2 id="asking-from-inside-the-program">Asking from inside the program</h2>
+<p>The same information is available to code, through <code>java.lang.management</code>. This is how a watchdog or a test harness can detect a deadlock and report it instead of hanging. The demo deadlocks two daemon threads on purpose, mixing a monitor and a <code>ReentrantLock</code>, then finds the cycle:</p>
+
+<figure class="code single" data-sample="java-tools.8" data-expect="ok"><figcaption><span class="ctitle">Detecting a deadlock with ThreadMXBean</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</span><code><span class="k">import</span> java.lang.management.<span class="t">ManagementFactory</span>;
+<span class="k">import</span> java.lang.management.<span class="t">ThreadInfo</span>;
+<span class="k">import</span> java.lang.management.<span class="t">ThreadMXBean</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Object</span> accountA = <span class="k">new</span> <span class="t">Object</span>();
+        <span class="t">ReentrantLock</span> accountB = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="t">CountDownLatch</span> bothHoldOne = <span class="k">new</span> <span class="t">CountDownLatch</span>(<span class="n">2</span>);
+
+        <span class="t">Thread</span> t1 = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="k">synchronized</span> (accountA) {
+                bothHoldOne.<span class="f">countDown</span>();
+                <span class="f">awaitQuietly</span>(bothHoldOne);
+                accountB.<span class="f">lock</span>();               <span class="c">// waits forever: t2 holds it</span>
+            }
+        }, <span class="s">"transfer-1"</span>);
+        <span class="t">Thread</span> t2 = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            accountB.<span class="f">lock</span>();
+            bothHoldOne.<span class="f">countDown</span>();
+            <span class="f">awaitQuietly</span>(bothHoldOne);
+            <span class="k">synchronized</span> (accountA) {          <span class="c">// waits forever: t1 holds it</span>
+                <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"never printed"</span>);
+            }
+        }, <span class="s">"transfer-2"</span>);
+        t1.<span class="f">setDaemon</span>(<span class="k">true</span>);                    <span class="c">// daemons, so the JVM can still exit at the end</span>
+        t2.<span class="f">setDaemon</span>(<span class="k">true</span>);
+        t1.<span class="f">start</span>();
+        t2.<span class="f">start</span>();
+
+        <span class="t">ThreadMXBean</span> mx = <span class="t">ManagementFactory</span>.<span class="f">getThreadMXBean</span>();
+        <span class="t">long</span>[] ids = <span class="k">null</span>;
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">50</span> &amp;&amp; ids == <span class="k">null</span>; i += <span class="n">1</span>) {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">20</span>);                  <span class="c">// poll until the cycle has formed</span>
+            ids = mx.<span class="f">findDeadlockedThreads</span>();
+        }
+        <span class="k">if</span> (ids == <span class="k">null</span>) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"no deadlock found"</span>);
+            <span class="k">return</span>;
+        }
+        <span class="k">for</span> (<span class="t">ThreadInfo</span> info : mx.<span class="f">getThreadInfo</span>(ids)) {
+            <span class="t">System</span>.out.<span class="f">println</span>(info.<span class="f">getThreadName</span>() + <span class="s">" is "</span> + info.<span class="f">getThreadState</span>()
+                + <span class="s">", waiting for "</span> + info.<span class="f">getLockName</span>() + <span class="s">", held by "</span> + info.<span class="f">getLockOwnerName</span>());
+        }
+    }
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">awaitQuietly</span>(<span class="t">CountDownLatch</span> latch) {
+        <span class="k">try</span> {
+            latch.<span class="f">await</span>();
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Notice the two states: the thread waiting for the <code>ReentrantLock</code> is <code>WAITING</code>, the one waiting for the monitor is <code>BLOCKED</code>, exactly as in the table. <code>Thread.getAllStackTraces()</code> gives you every thread's stack as a map, if you only need the frames.</p>
+
+<h2 id="jfr-in-one-paragraph">JFR in one paragraph</h2>
+<p><a class="term" data-term="jfr" href="glossary.html#jfr">JDK Flight Recorder</a> is an event recorder built into the JVM, designed to stay on in production at low overhead. Start it with the JVM (<code>java -XX:StartFlightRecording=duration=60s,filename=rec.jfr -jar app.jar</code>) or attach it to a running one (<code>jcmd &lt;pid&gt; JFR.start duration=60s filename=rec.jfr</code>). For concurrency it records contended <code>synchronized</code> entry (<code>jdk.JavaMonitorEnter</code>), <code>wait</code> (<code>jdk.JavaMonitorWait</code>), parking in <code>java.util.concurrent</code> locks (<code>jdk.ThreadPark</code>), and virtual threads pinned to their carrier (<code>jdk.VirtualThreadPinned</code>); with the default settings, monitor entries and parks are recorded once they last 20 ms. Java 21 added <code>jfr view</code> to summarize a recording in the terminal: <strong><code>jfr view contention-by-site rec.jfr</code> ranks the places where threads waited for locks</strong>, and <code>jfr summary rec.jfr</code> counts the events. JDK Mission Control is the graphical viewer.</p>
+
+<div class="box example">
+<h3>Worked example: a service stopped responding</h3>
+<p>Requests time out, CPU is near zero, and nothing is in the logs. Low CPU says the threads are waiting, not working, so a thread dump is the first move.</p>
+<ol>
+<li><strong>Find the process:</strong> <code>jps -l</code> gives the pid.</li>
+<li><strong>Take two or three dumps, about ten seconds apart:</strong> <code>jcmd &lt;pid&gt; Thread.print -l &gt; dump1.txt</code>, and again into <code>dump2.txt</code>. One dump shows a moment; several show what is stuck.</li>
+<li><strong>Read the end of the file first.</strong> If HotSpot found a cycle, the "Found one Java-level deadlock" section names the threads and locks, as in the dump above, and you are nearly done.</li>
+<li><strong>No cycle? Group threads by state and top frame.</strong> Forty request threads <code>BLOCKED</code> on the same address point to one holder: search for <code>- locked &lt;that address&gt;</code> and read what the holder is doing. Holding a lock across a slow network call is a classic.</li>
+<li><strong>Compare the dumps.</strong> The same thread in the same frame in every dump is stuck; changing frames mean slow but moving. All pool workers <code>WAITING (parking)</code> inside <code>take()</code> means the pool is idle and the work never arrived; all of them <code>RUNNABLE</code> in one slow client call means the pool is exhausted by a slow dependency.</li>
+</ol>
+<p>For the dump above, the cause is two <code>transfer</code> calls taking the same two locks in opposite orders. The fix is to always lock in one global order, for example by account id, which <a href="deadlock.html">the deadlock lesson</a> covers in full.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Taking one dump.</strong> A single dump cannot tell stuck from slow. Take two or three, seconds apart.</li>
+<li><strong>Reading <code>RUNNABLE</code> as "busy on the CPU".</strong> Blocking socket reads show as <code>RUNNABLE</code> too.</li>
+<li><strong>Looking for <code>BLOCKED</code> to find <code>ReentrantLock</code> waits.</strong> They are <code>WAITING (parking)</code>; add <code>-l</code> to see owners.</li>
+<li><strong>Leaving threads unnamed.</strong> <code>pool-3-thread-7</code> tells you nothing. Name threads, and give pools a <code>ThreadFactory</code> that names them.</li>
+<li><strong>Attaching as a different user or with a mismatched JDK.</strong> The attach fails or hangs; run the tools as the JVM's user, from the same JDK.</li>
+<li><strong>Trusting <code>assert</code> without <code>-ea</code>.</strong> Assertions are off unless enabled, so the check never ran.</li>
+<li><strong>Reading only the first line of a trace.</strong> The root cause is the last <code>Caused by</code>.</li>
+<li><strong>Timing code in jshell or in a single run.</strong> The JIT has not warmed up, so the numbers mean little; use a benchmark harness such as JMH.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Tools come up as "how would you debug this?" after a deadlock or a hang, and as the vocabulary you use in a debugging round, where you are handed someone else's threaded code. Even when you cannot run anything, saying which thread is <code>BLOCKED</code> on which lock, and who holds it, is how you explain the bug crisply.</p>
+<blockquote>First I would take two or three thread dumps a few seconds apart with <code>jcmd Thread.print -l</code>. HotSpot prints any cycle through monitors or <code>ReentrantLock</code>s at the end as a Java-level deadlock. If there is none, I group threads by state and top frame: a pile of <code>BLOCKED</code> threads on one monitor points me to the holder, and the same frames in every dump mean stuck rather than slow.</blockquote>
+<p>Follow ups to expect. "What is the difference between <code>BLOCKED</code> and <code>WAITING</code>?" (monitor entry versus <code>wait</code>, <code>join</code> or parking). "How would you find lock contention, not a deadlock?" (JFR's monitor enter and park events, for example <code>jfr view contention-by-site</code>, or a profiler's lock mode). "Would the deadlock detector catch a hang on a <code>CountDownLatch</code>?" (no: see below).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>What the deadlock detector cannot see.</strong> It follows owners: monitors and the <code>java.util.concurrent</code> locks that record an owning thread. A latch, a semaphore, a future or a condition has no owner, so two threads each waiting for the other to count down a latch hang forever with no deadlock reported. The same goes for a class initialization cycle, where both threads even show as <code>RUNNABLE</code>.</li>
+<li><strong>Virtual threads.</strong> In Java 21, <code>Thread.print</code> lists platform threads; a virtual thread that is not currently mounted on a carrier does not appear. <code>jcmd &lt;pid&gt; Thread.dump_to_file -format=json threads.json</code> (or the plain format) includes them.</li>
+<li><strong>A dump pauses the JVM briefly.</strong> HotSpot collects the stacks at a safepoint, so every Java thread stops for a moment. It is fine to do in production, but not in a tight loop.</li>
+</ul>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li><code>javac</code> compiles, <code>java</code> runs; <code>java Main.java</code> runs a single file directly, and <code>-ea</code> is needed for <code>assert</code>.</li>
+<li>jshell answers API questions in seconds; it does not import <code>java.time</code> or the locks and atomics packages.</li>
+<li>Read a stack trace from the first line, down to your code, then to the last <code>Caused by</code>, which is the root cause.</li>
+<li><code>jcmd &lt;pid&gt; Thread.print -l</code> (or <code>jstack -l</code>) gives a thread dump: states, held locks, wanted locks, and a deadlock report for monitor and <code>ReentrantLock</code> cycles.</li>
+<li><code>BLOCKED</code> is monitor entry; <code>ReentrantLock</code> and <code>Condition</code> waits are <code>WAITING (parking)</code>; take several dumps to tell stuck from slow.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-tools"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-tools.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A thread is waiting inside <code>ReentrantLock.lock()</code> because another thread holds the lock. What state does a thread dump show for it?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>BLOCKED (on object monitor)</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>WAITING (parking)</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>RUNNABLE</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>TIMED_WAITING</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>java.util.concurrent</code> locks park the waiting thread with <code>LockSupport.park</code>, which shows as <code>WAITING (parking)</code> with a "parking to wait for" line. <code>BLOCKED</code> is only for <code>synchronized</code> monitor entry. Use the <code>-l</code> option to see which thread owns the <code>ReentrantLock</code>.</div></div><div class="mcq" data-id="java-tools.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A thread is blocked reading from a socket with a classic <code>InputStream</code> on a platform thread. What state does the dump show?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>BLOCKED</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>WAITING</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>RUNNABLE</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>TIMED_WAITING</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> The thread is inside a native read call, and the JVM reports threads in native code as <code>RUNNABLE</code>. That is why <code>RUNNABLE</code> does not mean "using CPU", and why a pool exhausted by a slow downstream service can look busy in a dump while the machine is idle.</div></div><div class="mcq" data-id="java-tools.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which command gives a thread dump that also lists the <code>ReentrantLock</code>s each thread owns?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>jps -l &lt;pid&gt;</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>jcmd &lt;pid&gt; Thread.print -l</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>jcmd &lt;pid&gt; GC.class_histogram</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>java -ea &lt;pid&gt;</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>Thread.print</code> prints every thread's stack, and <code>-l</code> adds the "Locked ownable synchronizers" list, which is where <code>ReentrantLock</code> owners appear. <code>jstack -l &lt;pid&gt;</code> prints the same. <code>jps</code> only lists JVMs, and the histogram counts objects per class.</div></div><div class="mcq" data-id="java-tools.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A stack trace has three sections: <code>ExecutionException</code>, then <code>Caused by: IllegalStateException</code>, then <code>Caused by: NumberFormatException</code>. Which one usually points at the code to fix?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The first line, <code>ExecutionException</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The middle <code>IllegalStateException</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The last <code>Caused by</code>, the <code>NumberFormatException</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Whichever has the most frames</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each <code>Caused by</code> is the exception that the one above it wrapped, so the last one is the original failure, the root cause. The <code>ExecutionException</code> only says that a task failed and that <code>get()</code> reported it; its frames show where the caller was waiting.</div></div><div class="mcq" data-id="java-tools.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A test harness checks results with <code>assert count == expected;</code> and is run with <code>java -cp out Harness</code>. A bug makes <code>count</code> wrong. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">An <code>AssertionError</code> is thrown</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: assertions are disabled unless the JVM is started with <code>-ea</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">javac refuses to compile <code>assert</code> without a flag</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The JVM prints a warning and continues</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>assert</code> statements are compiled in but skipped at run time unless assertions are enabled with <code>-ea</code> (or <code>-enableassertions</code>). A harness that depends on them passes silently. Use explicit checks that print or throw, or always run tests with <code>-ea</code>.</div></div><div class="mcq" data-id="java-tools.q6" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which of these hangs does HotSpot's "Found one Java-level deadlock" report detect? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Two threads each holding one <code>synchronized</code> lock and waiting for the other's</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Two threads each holding one <code>ReentrantLock</code> and waiting for the other's</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two threads each waiting on a <code>CountDownLatch</code> that only the other thread counts down</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Two threads waiting for each other's class initialization</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The detector follows ownership: monitors and the ownable synchronizers behind <code>ReentrantLock</code> and <code>ReentrantReadWriteLock</code>. A latch has no owner, so a cycle through latches, semaphores or futures goes unreported, and a class initialization cycle shows two <code>RUNNABLE</code> threads waiting on the class initialization monitor with no report.</div></div><div class="mcq" data-id="java-tools.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">You run <code>java Main.java</code> on Java 21 for a file that declares <code>class Helper</code> first and <code>public class Main</code> with the <code>main</code> method second. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It runs <code>Main.main</code>, because that class is public</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It fails, because source mode runs the first class declared in the file, and <code>Helper</code> has no <code>main</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It compiles both classes to disk and runs <code>Main</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It asks which class to run</span></button></li></ol><div class="why" hidden><strong>Why.</strong> In the Java 11 to 21 source launcher, the class that is run is the first top-level class in the file, and it must declare <code>main</code>. Move <code>Main</code> to the top, or compile with <code>javac</code> and name the class to run. Extra classes are fine as long as the first one is the entry point.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-tools.c1" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A batch job hangs. Part of its thread dump is below. What is the bug, and how do you fix it?
+<figure class="code single" data-sample="java-tools.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Text</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-text" data-lang="text"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code>"worker-1" #31 prio=5 waiting for monitor entry
+   java.lang.Thread.State: BLOCKED (on object monitor)
+    at Inventory.reserve(Inventory.java:41)
+    - waiting to lock &lt;0x0000000713a2c1e0&gt; (a Inventory$Bin)
+    - locked &lt;0x0000000713a2c3f8&gt; (a Inventory$Bin)
+    at Order.fill(Order.java:18)
+
+"worker-2" #32 prio=5 waiting for monitor entry
+   java.lang.Thread.State: BLOCKED (on object monitor)
+    at Inventory.reserve(Inventory.java:41)
+    - waiting to lock &lt;0x0000000713a2c3f8&gt; (a Inventory$Bin)
+    - locked &lt;0x0000000713a2c1e0&gt; (a Inventory$Bin)
+    at Order.fill(Order.java:18)</code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Both workers are <code>BLOCKED</code> in <code>Inventory.reserve</code> at the same line. worker-1 holds bin <code>...3f8</code> and wants bin <code>...1e0</code>; worker-2 holds <code>...1e0</code> and wants <code>...3f8</code>. That is a lock ordering deadlock: <code>reserve</code> locks two <code>Bin</code> objects in the order the order lists them, and two orders listed the same two bins in opposite orders. Neither thread can ever proceed, and the dump would end with a "Found one Java-level deadlock" section naming this cycle.</p>
+<p>Fix: make every thread take bin locks in one global order, for example by bin id: lock the bin with the smaller id first, then the other, whatever order the order lists them in. If the bins can be many, sort the ids first. Alternatives: <code>tryLock</code> with a timeout and back off and retry, or one coarser lock over the inventory if contention is low. I would also add a stress test that reserves overlapping pairs in random order, which reproduces the hang quickly.</p></div></div><div class="cq" data-q="java-tools.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Walk an interviewer through how you would investigate a Java service that has stopped responding but uses almost no CPU.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Almost no CPU means the threads are waiting, not computing, so I want to see what they wait for. I find the pid with <code>jps -l</code> and take two or three thread dumps about ten seconds apart with <code>jcmd pid Thread.print -l</code>. First I look at the end of the dump: if HotSpot found a cycle through monitors or <code>ReentrantLock</code>s, it prints a Java-level deadlock section with the threads and the locks, and the fix is a lock ordering change.</p>
+<p>If there is no cycle, I group the threads by state and top frame. Many threads <code>BLOCKED</code> on the same monitor point to one holder; I search for that lock address and read what the holder is doing, often slow I/O under a lock. Pool workers all inside the same remote call mean the pool is exhausted by a slow dependency. Workers all parked in <code>take()</code> mean the work never reaches the pool, so I look upstream. Comparing dumps tells me whether threads are stuck or just slow. I also keep in mind what the detector cannot see: waits on latches, futures or class initialization never show as a deadlock. After the fix, I add what made this slow to find: named threads, timeouts on remote calls, and metrics for queue depth and active workers.</p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-debug-the-cinema.html" data-problem="debug-the-cinema"><span class="pk">Bug hunts · senior</span><b>Debug the cinema</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-transfer-deadlock.html" data-problem="fix-the-transfer-deadlock"><span class="pk">Bug hunts · medium</span><b>Fix the transfers that freeze</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-collections-for-coding-rounds.html"><span>Previous</span><b>Collections for coding rounds: comparators, heaps, trees and traps</b></a><a class="next" href="java-under-the-hood.html"><span>Next</span><b>Under the hood: object headers, monitors and the JIT</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#javac-and-java">javac and java</a><a href="#jshell-check-before-you-rely-on-it">jshell: check before you rely on it</a><a href="#stack-traces-reading-one-fast">Stack traces: reading one fast</a><a href="#finding-the-process-jps-and-jcmd">Finding the process: jps and jcmd</a><a href="#thread-dumps">Thread dumps</a><a href="#asking-from-inside-the-program">Asking from inside the program</a><a href="#jfr-in-one-paragraph">JFR in one paragraph</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

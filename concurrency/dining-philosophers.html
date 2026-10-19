@@ -1,0 +1,876 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The dining philosophers · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="dining-philosophers" data-title="The dining philosophers" data-track="core" data-module="core-12" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details open><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers" class=here><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m12">Module 12: Classic problems</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 12.2</span><span>29 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The dining philosophers</h1><p class="lsum">Why everyone grabbing the left fork deadlocks, four ways to break the cycle, and who starves under each of them.</p><div class="asked"><span>Asked at</span><span class="co">Apple</span></div><div class="prereq"><span>Before this:</span><a href="deadlock.html">Deadlock: the four conditions and how to break each</a><a href="multiple-locks.html">Taking several locks safely</a><a href="semaphores.html">Semaphores: permits as a resource limit</a><a href="trylock-timeouts-fairness.html">tryLock, timeouts, interruptible locking and fairness</a></div></header><article class="prose" id="article">
+<p class="lead">The <a class="term" data-term="dining-philosophers" href="glossary.html#dining-philosophers">dining philosophers</a> problem is the textbook deadlock. Interviewers use it to see whether you can name the circular wait, break it on purpose with a reason, and then talk honestly about who can still starve.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Five friends sit at a round table, each with a plate of noodles. There is one chopstick between every pair of neighbors, so five chopsticks in all, and you need two to eat. Everyone follows the same polite rule: pick up the chopstick on your left, then the one on your right, eat, put both down.</p>
+<p>One evening all five sit down at the same moment and pick up their left chopstick together. Now every chopstick is taken, and each friend waits for the right one, which is in the neighbor's left hand. Nobody is rude and nobody is broken, yet <strong>nobody will ever eat, because each one waits for the next one around the table</strong>.</p>
+</div>
+
+<h2 id="the-problem-precisely">The problem, precisely</h2>
+<p>N philosophers, with N &gt;= 2, sit in a ring with N forks. Philosopher i's left fork is fork i and its right fork is fork (i + 1) mod N, so fork i is shared by philosophers i and (i + N - 1) mod N. Each philosopher loops: think, pick up both forks, eat, put both down. The full problem asks for four properties; a deadlock-free fix alone need not satisfy all four:</p>
+<ul>
+<li><strong>Mutual exclusion:</strong> a fork is used by at most one philosopher at a time.</li>
+<li><strong>No <a class="term" data-term="deadlock" href="glossary.html#deadlock">deadlock</a>:</strong> the table never freezes with everyone waiting.</li>
+<li><strong>No <a class="term" data-term="starvation" href="glossary.html#starvation">starvation</a>:</strong> a hungry philosopher eventually eats.</li>
+<li><strong>Concurrency:</strong> two philosophers who share no fork can eat at the same time. With five, at most two eat at once (in general, N / 2 rounded down).</li>
+</ul>
+<p>Each fork is a <a class="term" data-term="mutex" href="glossary.html#mutex">mutex</a>. Picking up two forks is taking two locks, so this is really the general question "how do you take several locks without deadlocking", dressed up for dinner. That is why it matters beyond the puzzle: two opposite-direction transfers can create the same two-lock cycle as two philosophers.</p>
+
+<h2 id="why-everyone-grabbing-the-left-fork-deadlocks">Why everyone grabbing the left fork deadlocks</h2>
+<p>The naive code is exactly the polite rule: lock left, lock right, eat, unlock both. Many schedules complete, so testing alone can miss the bad one. The demo below forces the unlucky timing with a latch, so that every philosopher holds the left fork before anyone reaches for the right one. It uses three philosophers to keep the thread dump short.</p>
+
+<figure class="code pair" data-sample="dining-philosophers.1" data-expect="deadlock"><figcaption><span class="ctitle">Everyone takes the left fork first</span><span class="cnote bad">deadlocks on purpose</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;latch&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">std</span>::<span class="t">mutex</span> printLock;
+
+<span class="t">void</span> <span class="f">say</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; s) {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(printLock);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; s &lt;&lt; <span class="t">std</span>::<span class="t">endl</span>;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">constexpr</span> <span class="t">int</span> n = <span class="n">3</span>;
+    <span class="t">std</span>::<span class="t">mutex</span> fork[n];
+    <span class="t">std</span>::<span class="t">latch</span> <span class="f">everyoneHasLeft</span>(n);                                 <span class="c">// only to make the bad timing certain</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; ts;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; n; p += <span class="n">1</span>) {
+        ts.<span class="f">emplace_back</span>([&amp;, p] {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">left</span>(fork[p]);
+            <span class="f">say</span>(<span class="s">"philosopher "</span> + <span class="t">std</span>::<span class="f">to_string</span>(p) + <span class="s">" picked up fork "</span> + <span class="t">std</span>::<span class="f">to_string</span>(p));
+            everyoneHasLeft.<span class="f">arrive_and_wait</span>();
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">right</span>(fork[(p + <span class="n">1</span>) % n]);  <span class="c">// held by the neighbor, who waits for ours</span>
+            <span class="f">say</span>(<span class="s">"philosopher "</span> + <span class="t">std</span>::<span class="f">to_string</span>(p) + <span class="s">" eats"</span>);
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : ts) t.<span class="f">join</span>();                                   <span class="c">// never returns</span>
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="k">import</span> java.util.concurrent.<span class="t">CountDownLatch</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> N = <span class="n">3</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Object</span>[] fork = <span class="k">new</span> <span class="t">Object</span>[N];
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; N; i += <span class="n">1</span>) fork[i] = <span class="k">new</span> <span class="t">Object</span>();
+        <span class="t">CountDownLatch</span> everyoneHasLeft = <span class="k">new</span> <span class="t">CountDownLatch</span>(N);   <span class="c">// only to make the bad timing certain</span>
+        <span class="t">Thread</span>[] ts = <span class="k">new</span> <span class="t">Thread</span>[N];
+        <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> me = p;
+            ts[p] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="t">Object</span> left = fork[me];
+                <span class="t">Object</span> right = fork[(me + <span class="n">1</span>) % N];
+                <span class="k">synchronized</span> (left) {
+                    <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"philosopher "</span> + me + <span class="s">" picked up fork "</span> + me);
+                    everyoneHasLeft.<span class="f">countDown</span>();
+                    <span class="k">try</span> {
+                        everyoneHasLeft.<span class="f">await</span>();
+                    } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                        <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                        <span class="k">return</span>;
+                    }
+                    <span class="k">synchronized</span> (right) {                         <span class="c">// held by the neighbor, who waits for ours</span>
+                        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"philosopher "</span> + me + <span class="s">" eats"</span>);
+                    }
+                }
+            }, <span class="s">"philosopher-"</span> + p);
+            ts[p].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : ts) t.<span class="f">join</span>();                              <span class="c">// never returns</span>
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>philosopher 0 picked up fork 0
+philosopher 1 picked up fork 1
+philosopher 2 picked up fork 2</pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>The circular wait, with three philosophers</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>philosopher 0</span><span>philosopher 1</span><span>philosopher 2</span></div><div class="tl-row"><span class="t">1</span><span class="cell">picks up fork 0 (its left)</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">picks up fork 1 (its left)</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">picks up fork 2 (its left)</span></div><div class="tl-row risk"><span class="t">4</span><span class="cell risk">waits for fork 1, held by P1</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">5</span><span class="cell empty"></span><span class="cell risk">waits for fork 2, held by P2</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">waits for fork 0, held by P0: the cycle is closed</span></div><div class="tl-note">Each waits for the next one around the table. Nobody can move, forever.</div></div></figure>
+
+<p>All four <a class="term" data-term="coffman-conditions" href="glossary.html#coffman-conditions">conditions for deadlock</a> are on the table at once, and naming them is the first thing an interviewer wants to hear:</p>
+<table>
+<thead><tr><th>Condition</th><th>At the table</th></tr></thead>
+<tbody>
+<tr><td>Mutual exclusion</td><td>A fork is held by one philosopher at a time</td></tr>
+<tr><td>Hold and wait</td><td>A philosopher keeps the left fork while waiting for the right one</td></tr>
+<tr><td>No preemption</td><td>Nobody can take a fork out of a neighbor's hand</td></tr>
+<tr><td>Circular wait</td><td>P0 waits for P1, who waits for P2, who waits for P0</td></tr>
+</tbody>
+</table>
+<p>Break any one of the four and the deadlock is impossible. <strong>Every solution below is a choice of which condition to break, and the choice decides what you pay.</strong> Mutual exclusion is the one you cannot break (a fork really cannot be shared), so the shared-memory fixes below remove circular wait or blocking hold and wait. Ordinary mutexes cannot safely be confiscated from their owners.</p>
+
+<h2 id="fix-1-order-the-resources">Fix 1: order the resources</h2>
+<p>Number the forks and make one rule for everyone: always pick up the lower numbered of your two forks first. Philosophers 0 to 3 notice no change, because their left fork already has the lower number. Philosopher 4 sits between fork 4 and fork 0, so it now reaches for fork 0 first. That single change makes a cycle impossible. This is <a class="term" data-term="lock-ordering" href="glossary.html#lock-ordering">lock ordering</a>, and it is the first answer to give.</p>
+
+<figure class="code pair" data-sample="dining-philosophers.2" data-expect="ok"><figcaption><span class="ctitle">Resource ordering: lower numbered fork first</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;array&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">constexpr</span> <span class="t">int</span> N = <span class="n">5</span>;
+<span class="k">constexpr</span> <span class="t">int</span> MEALS = <span class="n">2000</span>;
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>, N&gt; fork_;
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">int</span>, N&gt; meals{};                            <span class="c">// each philosopher writes only its own slot</span>
+
+<span class="t">void</span> <span class="f">dine</span>(<span class="t">int</span> p) {
+    <span class="t">int</span> left = p;
+    <span class="t">int</span> right = (p + <span class="n">1</span>) % N;
+    <span class="t">std</span>::<span class="t">mutex</span>&amp; first = fork_[<span class="t">std</span>::<span class="f">min</span>(left, right)];  <span class="c">// the global order: lower number first</span>
+    <span class="t">std</span>::<span class="t">mutex</span>&amp; second = fork_[<span class="t">std</span>::<span class="f">max</span>(left, right)];
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; MEALS; i += <span class="n">1</span>) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">a</span>(first);
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">b</span>(second);
+        meals[p] += <span class="n">1</span>;                                 <span class="c">// eat</span>
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; ts;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) ts.<span class="f">emplace_back</span>(dine, p);
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : ts) t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"meals ["</span>;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; (p ? <span class="s">", "</span> : <span class="s">""</span>) &lt;&lt; meals[p];
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"], no deadlock\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41</span><code><span class="k">import</span> java.util.<span class="t">Arrays</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> N = <span class="n">5</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> MEALS = <span class="n">2000</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">ReentrantLock</span>[] fork = <span class="k">new</span> <span class="t">ReentrantLock</span>[N];
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[] meals = <span class="k">new</span> <span class="t">int</span>[N];             <span class="c">// each philosopher writes only its own slot</span>
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">dine</span>(<span class="t">int</span> p) {
+        <span class="t">int</span> left = p;
+        <span class="t">int</span> right = (p + <span class="n">1</span>) % N;
+        <span class="t">ReentrantLock</span> first = fork[<span class="t">Math</span>.<span class="f">min</span>(left, right)];    <span class="c">// the global order: lower number first</span>
+        <span class="t">ReentrantLock</span> second = fork[<span class="t">Math</span>.<span class="f">max</span>(left, right)];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; MEALS; i += <span class="n">1</span>) {
+            first.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                second.<span class="f">lock</span>();
+                <span class="k">try</span> {
+                    meals[p] += <span class="n">1</span>;                     <span class="c">// eat</span>
+                } <span class="k">finally</span> {
+                    second.<span class="f">unlock</span>();
+                }
+            } <span class="k">finally</span> {
+                first.<span class="f">unlock</span>();
+            }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; N; i += <span class="n">1</span>) fork[i] = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="t">Thread</span>[] ts = <span class="k">new</span> <span class="t">Thread</span>[N];
+        <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> me = p;
+            ts[p] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; <span class="f">dine</span>(me), <span class="s">"philosopher-"</span> + p);
+            ts[p].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : ts) t.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"meals "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(meals) + <span class="s">", no deadlock"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>meals [2000, 2000, 2000, 2000, 2000], no deadlock</pre></div><div class="runout" hidden></div></figure>
+
+<div class="box example">
+<h3>Worked example: proving resource ordering cannot deadlock</h3>
+<p>An interviewer will often say "prove it". Here is the whole proof, short enough to say out loud.</p>
+<ol>
+<li>Suppose the table is deadlocked. Then there is a cycle of philosophers, each holding one fork and waiting for a fork held by the next philosopher in the cycle.</li>
+<li>Every philosopher takes the lower numbered fork first, so a waiting philosopher holds fork a and waits for fork b with a &lt; b.</li>
+<li>The fork it waits for (b) is the fork the next philosopher holds, so that philosopher holds b and waits for some c &gt; b, and so on around the cycle.</li>
+<li>Going around, the numbers strictly increase: a &lt; b &lt; c &lt; ... &lt; a. A number cannot be less than itself, so the cycle cannot exist.</li>
+</ol>
+<p>The same argument works for any set of locks with a strict global order, provided every acquisition follows it, including locks already held on entry. Use unique stable ids or hierarchy levels with a tie rule. For unrelated object pointers in C++, use <code>std::less</code> if ordering by address; built-in pointer <code>&lt;</code> does not provide a portable total order. That is why "always take locks in one global order" is the general cure, not just a dinner trick.</p>
+</div>
+
+<p><strong>One philosopher can reverse the order.</strong> On this simple ring, making philosopher N - 1 take right then left is exactly the lower-number-first rule. Reversing any one philosopher also breaks the ring's directed cycle; that shortcut is specific to the ring, while a global resource order works for arbitrary sets of locks.</p>
+
+<h2 id="fix-2-a-waiter-who-seats-at-most-n-minus-1">Fix 2: a waiter who seats at most N minus 1</h2>
+<p>Put a waiter at the door who lets at most four of the five philosophers reach for forks at once. The proof uses the ring structure: a wait cycle must include every philosopher. With at least one philosopher outside, the chain ends at a free fork or at a philosopher already able to finish eating. Under eventual scheduling and finite meals, someone can advance and release forks. In code the waiter is a <a class="term" data-term="semaphore" href="glossary.html#semaphore">semaphore</a> with N - 1 permits, and the philosophers may keep the naive left-then-right order.</p>
+
+<figure class="code pair" data-sample="dining-philosophers.3" data-expect="ok"><figcaption><span class="ctitle">A waiter who seats at most N minus 1</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38</span><code><span class="p">#include &lt;array&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">constexpr</span> <span class="t">int</span> N = <span class="n">5</span>;
+<span class="k">constexpr</span> <span class="t">int</span> MEALS = <span class="n">2000</span>;
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>, N&gt; fork_;
+<span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;N - <span class="n">1</span>&gt; <span class="f">waiter</span>(N - <span class="n">1</span>);             <span class="c">// at most 4 philosophers reach for forks</span>
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">int</span>, N&gt; meals{};
+
+<span class="k">class</span> Admission {
+<span class="k">public</span>:
+    <span class="f">Admission</span>() { waiter.<span class="f">acquire</span>(); }
+    ~<span class="f">Admission</span>() { waiter.<span class="f">release</span>(); }
+    <span class="f">Admission</span>(<span class="k">const</span> Admission&amp;) = <span class="k">delete</span>;
+    Admission&amp; <span class="k">operator</span>=(<span class="k">const</span> Admission&amp;) = <span class="k">delete</span>;
+};
+
+<span class="t">void</span> <span class="f">dine</span>(<span class="t">int</span> p) {
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; MEALS; i += <span class="n">1</span>) {
+        Admission seat;                              <span class="c">// released after both fork guards</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">left</span>(fork_[p]);
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">right</span>(fork_[(p + <span class="n">1</span>) % N]);
+        meals[p] += <span class="n">1</span>;
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; ts;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) ts.<span class="f">emplace_back</span>(dine, p);
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : ts) t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"meals ["</span>;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; (p ? <span class="s">", "</span> : <span class="s">""</span>) &lt;&lt; meals[p];
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"], no deadlock\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</span><code><span class="k">import</span> java.util.<span class="t">Arrays</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> N = <span class="n">5</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> MEALS = <span class="n">2000</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">ReentrantLock</span>[] fork = <span class="k">new</span> <span class="t">ReentrantLock</span>[N];
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Semaphore</span> waiter = <span class="k">new</span> <span class="t">Semaphore</span>(N - <span class="n">1</span>);   <span class="c">// at most 4 philosophers reach for forks</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[] meals = <span class="k">new</span> <span class="t">int</span>[N];
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">dine</span>(<span class="t">int</span> p) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">ReentrantLock</span> left = fork[p];
+        <span class="t">ReentrantLock</span> right = fork[(p + <span class="n">1</span>) % N];
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; MEALS; i += <span class="n">1</span>) {
+            waiter.<span class="f">acquire</span>();
+            <span class="k">try</span> {
+                left.<span class="f">lock</span>();                          <span class="c">// left then right is safe now</span>
+                <span class="k">try</span> {
+                    right.<span class="f">lock</span>();
+                    <span class="k">try</span> {
+                        meals[p] += <span class="n">1</span>;
+                    } <span class="k">finally</span> {
+                        right.<span class="f">unlock</span>();
+                    }
+                } <span class="k">finally</span> {
+                    left.<span class="f">unlock</span>();
+                }
+            } <span class="k">finally</span> {
+                waiter.<span class="f">release</span>();
+            }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; N; i += <span class="n">1</span>) fork[i] = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="t">Thread</span>[] ts = <span class="k">new</span> <span class="t">Thread</span>[N];
+        <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> me = p;
+            ts[p] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> { <span class="f">dine</span>(me); } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }, <span class="s">"philosopher-"</span> + p);
+            ts[p].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : ts) t.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"meals "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(meals) + <span class="s">", no deadlock"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>meals [2000, 2000, 2000, 2000, 2000], no deadlock</pre></div><div class="runout" hidden></div></figure>
+
+<p>Admission must happen before acquiring either fork, and the permit must be returned after releasing both. The extra semaphore adds contention and scheduling overhead, although the capacity of four does not reduce the theoretical maximum of two simultaneous eaters. This N - 1 proof is specific to the ring: a smaller cycle can still deadlock inside an arbitrary resource graph. Notice what the waiter does not fix: a lock order checker that only looks at the order forks are taken still sees left-then-right everywhere, so it may still report a potential cycle that the semaphore makes unreachable. Prefer ordering when you can; admission limits help only when you can prove that the limit excludes every possible cycle. C++ <code>std::latch</code> and <code>std::counting_semaphore</code> require C++20; in C++17 use a mutex and condition variable as in <a href="build-semaphore-and-latch.html">building a semaphore and latch</a>.</p>
+
+<h2 id="fix-3-try-for-both-or-put-the-left-one-down">Fix 3: try for both, or put the left one down</h2>
+<p>Break hold and wait instead: pick up the left fork, try the right fork without waiting, and if it is busy, put the left fork back and try again later. In this protocol a philosopher can block on its first fork, but never blocks waiting for its second, so no cycle of waiting can form. In Java this is <code>tryLock()</code> on a <code>ReentrantLock</code>; in C++ it is <code>try_lock</code>, here through <code>std::unique_lock</code> with <code>std::try_to_lock</code>. See <a class="term" data-term="try-lock" href="glossary.html#try-lock">tryLock</a>.</p>
+
+<figure class="code pair" data-sample="dining-philosophers.4" data-expect="ok"><figcaption><span class="ctitle">Try for both forks, or put the left one down</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</span><code><span class="p">#include &lt;array&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;random&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">constexpr</span> <span class="t">int</span> N = <span class="n">5</span>;
+<span class="k">constexpr</span> <span class="t">int</span> MEALS = <span class="n">2000</span>;
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>, N&gt; fork_;
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">int</span>, N&gt; meals{};
+<span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">int</span>, N&gt; retries{};
+
+<span class="t">void</span> <span class="f">dine</span>(<span class="t">int</span> p) {
+    <span class="t">std</span>::mt19937 <span class="f">rng</span>(p + <span class="n">1</span>);                            <span class="c">// one generator per thread, never shared</span>
+    <span class="t">std</span>::uniform_int_distribution&lt;<span class="t">int</span>&gt; <span class="f">backoffMicros</span>(<span class="n">1</span>, <span class="n">20</span>);
+    <span class="t">int</span> eaten = <span class="n">0</span>;
+    <span class="k">while</span> (eaten &lt; MEALS) {
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">left</span>(fork_[p]);
+            <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">right</span>(fork_[(p + <span class="n">1</span>) % N], <span class="t">std</span>::try_to_lock);
+            <span class="k">if</span> (right.<span class="f">owns_lock</span>()) {                    <span class="c">// never wait while holding a fork</span>
+                meals[p] += <span class="n">1</span>;
+                eaten += <span class="n">1</span>;
+                <span class="k">continue</span>;                               <span class="c">// both guards release here</span>
+            }
+        }                                               <span class="c">// the left fork goes down here</span>
+        retries[p] += <span class="n">1</span>;
+        <span class="c">// Backoff reduces collisions; releasing the fork is what prevents deadlock.</span>
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">microseconds</span>(<span class="f">backoffMicros</span>(rng)));
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; ts;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) ts.<span class="f">emplace_back</span>(dine, p);
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : ts) t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"meals ["</span>;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; (p ? <span class="s">", "</span> : <span class="s">""</span>) &lt;&lt; meals[p];
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"], retries ["</span>;
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; (p ? <span class="s">", "</span> : <span class="s">""</span>) &lt;&lt; retries[p];
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"]\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="k">import</span> java.util.<span class="t">Arrays</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ThreadLocalRandom</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">LockSupport</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> N = <span class="n">5</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> MEALS = <span class="n">2000</span>;
+    <span class="k">static</span> <span class="k">final</span> <span class="t">ReentrantLock</span>[] fork = <span class="k">new</span> <span class="t">ReentrantLock</span>[N];
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[] meals = <span class="k">new</span> <span class="t">int</span>[N];
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span>[] retries = <span class="k">new</span> <span class="t">int</span>[N];
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">dine</span>(<span class="t">int</span> p) {
+        <span class="t">ReentrantLock</span> left = fork[p];
+        <span class="t">ReentrantLock</span> right = fork[(p + <span class="n">1</span>) % N];
+        <span class="t">int</span> eaten = <span class="n">0</span>;
+        <span class="k">while</span> (eaten &lt; MEALS) {
+            left.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">if</span> (right.<span class="f">tryLock</span>()) {               <span class="c">// never wait while holding a fork</span>
+                    <span class="k">try</span> {
+                        meals[p] += <span class="n">1</span>;
+                        eaten += <span class="n">1</span>;
+                    } <span class="k">finally</span> {
+                        right.<span class="f">unlock</span>();
+                    }
+                    <span class="k">continue</span>;
+                }
+            } <span class="k">finally</span> {
+                left.<span class="f">unlock</span>();                       <span class="c">// put the left fork down either way</span>
+            }
+            retries[p] += <span class="n">1</span>;
+            <span class="c">// Backoff reduces collisions; releasing the fork is what prevents deadlock.</span>
+            <span class="k">if</span> (<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">isInterrupted</span>()) <span class="k">return</span>;
+            <span class="t">LockSupport</span>.<span class="f">parkNanos</span>(<span class="t">ThreadLocalRandom</span>.<span class="f">current</span>().<span class="f">nextLong</span>(<span class="n">1_000</span>, <span class="n">20_000</span>));
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; N; i += <span class="n">1</span>) fork[i] = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="t">Thread</span>[] ts = <span class="k">new</span> <span class="t">Thread</span>[N];
+        <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; N; p += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> me = p;
+            ts[p] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; <span class="f">dine</span>(me), <span class="s">"philosopher-"</span> + p);
+            ts[p].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : ts) t.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"meals "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(meals) + <span class="s">", retries "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(retries));
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>meals [2000, 2000, 2000, 2000, 2000], retries [37, 34, 36, 30, 31]</pre></div><div class="runout" hidden></div></figure>
+
+<p>The price is a new failure mode. If all five pick up the left fork, all fail on the right, all put down, and all retry after the same fixed delay, they can repeat that dance forever: busy, polite, and getting nowhere. That is <a class="term" data-term="livelock" href="glossary.html#livelock">livelock</a>. Random <a class="term" data-term="backoff" href="glossary.html#backoff">backoff and jitter</a> reduces repeated collisions but is not a deterministic progress guarantee: an unlucky philosopher can still lose again and again. These waits pace retries; correctness does not depend on their duration. The requested delays are illustrative, and the runtime may resume much later. Retry counts in the output are only an example.</p>
+
+<div class="only only-cpp"><span class="otag">C++</span><p>C++ supplies a deadlock-avoiding multi-lock operation: <code>std::scoped_lock both(fork_[left], fork_[right]);</code> uses <code>std::lock</code> for multiple mutexes; the implementation chooses its lock/try/release strategy. This C++17 guard is the idiomatic answer when the mutexes are distinct and the caller holds neither. It does not promise fairness, randomized backoff, or protection from cycles involving other locks already held.</p></div>
+<div class="only only-java"><span class="otag">Java</span><p>Java has no built in "lock these two" call like C++'s <code>std::scoped_lock</code>. Your options are ordering (the usual answer), <code>tryLock</code> with backoff as above, or <code>tryLock(timeout, unit)</code> followed by releasing the first fork on failure. A timeout on the second lock alone does not bound the whole operation: first-lock acquisition and repeated retries also need a deadline and cancellation policy.</p></div>
+
+<h2 id="fix-4-chandy-and-misra-for-when-there-is-no-table-to-look-at">Fix 4: Chandy and Misra, for when there is no table to look at</h2>
+<p>The first three fixes use shared-memory locks; ordering and try-and-release do not need a central observer. Chandy and Misra's message-passing solution extends dining to an arbitrary graph of neighbors sharing forks. Start the philosophers thinking. Give every fork one owner, initially the endpoint with the lower unique id, and mark every fork dirty. That initial priority relation is acyclic.</p>
+<p>A hungry philosopher requests missing forks. A requested dirty fork is cleaned and sent <strong>only when its owner is not eating</strong>; requests during eating are deferred. A requested clean fork is retained until its owner eats. Eating marks the owned forks dirty, and after the meal deferred requests are serviced.</p>
+<p>A hungry owner that gives away a needed fork requests it back. The clean/dirty rules maintain an acyclic priority relation and rotate priority away from philosophers that have eaten. Deadlock and starvation freedom depend on finite meals, eventual message delivery and request processing, and processes that keep taking steps. A crashed owner or lost fork message violates those assumptions. The senior follow up is to explain ownership, deferred requests and those progress assumptions before attempting the full distributed protocol.</p>
+
+<h2 id="fairness-and-starvation">Fairness and starvation</h2>
+<p>Deadlock freedom excludes a permanent circular lock wait. With eventual scheduling, finite meals and no other failure, blocking schemes can keep making progress; retry schemes can still livelock. Neither statement guarantees progress for each person. A philosopher can starve even in a deadlock free solution if its neighbors keep winning the forks.</p>
+<table>
+<thead><tr><th>Solution</th><th>Deadlock</th><th>Starvation</th><th>What it costs</th></tr></thead>
+<tbody>
+<tr><td>Left then right</td><td>Possible</td><td>Possible</td><td>It is the bug</td></tr>
+<tr><td>One global lock around eating</td><td>Impossible</td><td>Depends on that lock's fairness</td><td>Only one philosopher eats at a time</td></tr>
+<tr><td>Resource ordering</td><td>Impossible (no circular wait)</td><td>Impossible with fair, first in first out forks; possible with barging locks</td><td>A shared ordering convention; waiting with one fork can reduce concurrency</td></tr>
+<tr><td>Waiter with N - 1 permits</td><td>Impossible (the cycle cannot close)</td><td>Impossible with a fair semaphore and fair forks</td><td>One more synchronizer on every meal</td></tr>
+<tr><td>tryLock both or release</td><td>Impossible (no hold and wait)</td><td>Possible; randomized retries still give no deterministic progress bound</td><td>Wasted work on retries</td></tr>
+<tr><td>Chandy and Misra</td><td>Impossible</td><td>Impossible</td><td>Messages and per fork state</td></tr>
+</tbody>
+</table>
+<p>The progress guarantees in this table assume that runnable threads eventually execute, meals finish, and requests are not abandoned while retaining resources. Fair locks govern lock admission, not CPU scheduling; Java's untimed <code>tryLock()</code> can barge even on <code>new ReentrantLock(true)</code>, so it does not inherit FIFO admission.</p>
+<p>The classic textbook monitor solution, where a philosopher may eat only when neither neighbor is eating, shows the gap clearly: it never deadlocks, but philosopher 1 can starve if philosophers 0 and 2 take turns eating so that one of them is always eating. For ordered acquisition, fair fork locks suffice under those assumptions: the highest-ranked fork cannot be held while waiting for a higher one, so its holders finish, and the argument works down the order. Java supplies <code>new ReentrantLock(true)</code>; the waiter design also needs fair semaphore admission, such as <code>new Semaphore(N - 1, true)</code>. C++ <code>std::mutex</code> has no fairness option; a <a class="term" data-term="ticket-lock" href="glossary.html#ticket-lock">ticket lock</a> orders admission but spins, so a blocking request queue is usually preferable for long meals.</p>
+
+<p><strong>A starvation-free waiter can queue whole meals.</strong> Put hungry requests in FIFO order under one monitor. Grant the head only when both forks are free, reserve both atomically, remove that request, then grant further heads whose forks are free. Eating happens outside the monitor; on return release both reservations and retry admission. No new conflicting request can bypass a blocked head, so existing finite meals drain and the head eventually proceeds. This guarantee starts once a request is enqueued and assumes eventual access to the coordinator lock.</p>
+<p>This preserves some nonadjacent concurrency but can leave usable forks idle behind a blocked head. Remove cancelled requests and rerun admission under the same lock.</p>
+<p>A run where everyone eats 2,000 times does not prove starvation freedom. Track fork ownership in callbacks, assert that neighbors never eat together, exercise reversed starts, and arrange two nonadjacent eaters to overlap. Use bounded joins and a timeout for failures; use a proof for every-schedule progress. In Java, interruptions while acquiring the second ordered lock must release the first, as the checkpoint shows.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>"It ran a million times without hanging, so it is fine."</strong> The naive version needs everyone to grab the left fork in the same window, which testing may miss. A deadlock you cannot reproduce is still a deadlock; the proof is the cycle in the code.</li>
+<li><strong>Thinking fair locks prevent deadlock.</strong> Fairness decides who gets a free lock next; it does nothing when every lock is held and every holder waits. Fair locks with left-then-right still deadlock.</li>
+<li><strong>tryLock without releasing the first lock.</strong> If a failed <code>tryLock</code> loops back while still holding the left fork, nothing was fixed: the philosopher holds a fork and waits, just more busily.</li>
+<li><strong>Retrying with a fixed delay.</strong> Workers can retry in lockstep and livelock. Randomized backoff reduces that risk; it does not establish a hard waiting bound.</li>
+<li><strong>A waiter with N permits.</strong> Admitting all five changes nothing. Use a positive limit no greater than N - 1; zero permits would admit nobody.</li>
+<li><strong>Ordering by something that can tie.</strong> When you order real objects, use a unique key such as an id. If two objects can compare equal (two equal hash codes), add a tie breaker lock, or ordering silently stops covering those pairs.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>It is asked directly in some loops: an Apple candidate reported a dining philosophers question in one team's onsite, and LeetCode's crowd reported tags list The Dining Philosophers (LeetCode 1226) for Microsoft and Bloomberg, and for Google at low frequency. More often it appears in disguise: "transfer money between two accounts", "a job needs two machines", or a debugging round where a simulation takes two resources in different orders.</p>
+<p>What the interviewer listens for: the four conditions named, the circular wait identified as the one to break, a fix with a proof, and an honest word on starvation.</p>
+<blockquote>The naive version deadlocks because of a circular wait: everyone holds their left fork and waits for the right one. I will break the cycle by ordering the forks and always taking the lower numbered one first. Then a cycle would need fork numbers that increase all the way around the table, which is impossible. That gives deadlock freedom; for starvation freedom I would add fair admission and assume every scheduled holder finishes its meal. Fairness can cost throughput.</blockquote>
+<p>Follow ups to expect: "Prove it cannot deadlock." "Can someone still starve?" "How many can eat at once?" (two of five, N / 2 rounded down in general). "Solve it without changing the order" (the waiter, or try and release). "What does the thread dump of the naive version show?" (every philosopher thread blocked on a fork whose owner is the next philosopher, and in Java a "Found one Java-level deadlock" section). "Now generalize it to transfers between accounts."</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>The general rule behind the puzzle.</strong> For these exclusive single-owner resources, deadlock corresponds to a cycle in the wait-for graph, and every fix removes one of the four conditions. In a large codebase you rarely control the order of every lock, so teams assign each lock a level (a <a class="term" data-term="lock-hierarchy" href="glossary.html#lock-hierarchy">lock hierarchy</a>) and only allow taking a lock of a higher level than any you hold. Some runtimes can check this for you at debug time.</p>
+<p><strong>Ordering objects you did not number.</strong> For two accounts, order by account id. If there is no natural id, Java code often orders by <code>System.identityHashCode</code>, which can tie, so the standard trick is a third "tie breaker" lock taken first whenever the two hashes are equal. In C++, <code>std::scoped_lock</code> avoids ordering that set explicitly, provided all mutexes are distinct and initially unowned by the caller. Handle a transfer to the same account separately, and deduplicate accounts in a multi-account transfer.</p>
+<p><strong>Detection instead of prevention.</strong> Many database engines allow dynamically ordered locking, detect deadlocks and abort a victim transaction; applications can still reduce cycles with consistent ordering. In Java 21, <code>ThreadMXBean.findDeadlockedThreads()</code> detects cycles involving platform threads and monitors or ownable synchronizers. It does not detect virtual-thread cycles, nor every hang involving a semaphore or condition wait. Prevention is right for a small set of locks you own; detection and abort is right when transactions take locks in arbitrary order.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Left-then-right deadlocks because all four conditions hold, and the circular wait closes when everyone grabs at once.</li>
+<li>Resource ordering breaks the circular wait and is the first answer: lower numbered fork first, provable in four lines.</li>
+<li>A waiter with N - 1 permits also breaks the cycle, and try-and-release breaks hold and wait at the cost of retries and possible livelock.</li>
+<li>Deadlock freedom is not starvation freedom: add fair admission or a proved priority protocol, with scheduling and finite-work assumptions.</li>
+<li>The same reasoning covers every "take two locks" problem, from bank transfers to job schedulers.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="dining-philosophers"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="dining-philosophers.q1" data-a="3" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Resource ordering (always pick up the lower numbered fork first) prevents deadlock by breaking which condition?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Mutual exclusion</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Hold and wait</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">No preemption</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Circular wait</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Philosophers still hold one fork while waiting for another, so hold and wait remains. What disappears is the cycle: a cycle would need fork numbers that keep increasing all the way around and return to where they started. Mutual exclusion and no preemption still hold: forks remain exclusive and cannot be confiscated.</div></div><div class="mcq" data-id="dining-philosophers.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Five philosophers keep the naive left-then-right order. Each acquires one of 4 semaphore permits before either fork and returns it after both forks. Meals finish and workers eventually run. Why can the table no longer deadlock?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The semaphore makes the fork locks fair</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">At least one philosopher stays outside, breaking the ring, so an admitted philosopher can finish</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The semaphore serializes the philosophers, so only one eats at a time</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It can still deadlock; the semaphore only makes it less likely</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Any fork-wait cycle in this ring requires all five philosophers to participate. With one outside, a waiting chain ends at a free fork or a philosopher who can finish. The semaphore neither makes the locks fair nor serializes all meals: two nonadjacent philosophers can still eat. This is prevention, not a probability reduction.</div></div><div class="mcq" data-id="dining-philosophers.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Every philosopher locks the left fork, calls <code>tryLock</code> on the right one, and on failure unlocks the left fork and retries after exactly 1 ms. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Deadlock, because everyone holds a fork</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Livelock: everyone keeps picking up and putting down in lockstep while nobody eats</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two neighbors can eat with the same fork</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing bad: tryLock solutions are always live</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Nobody blocks while holding a fork, so it cannot deadlock. But identical retry timing can repeat the same failing pattern forever. Random backoff reduces repeated collisions but does not prove eventual progress for every schedule. The locks still exclude neighbors, so sharing a fork is impossible, while the lockstep schedule disproves guaranteed liveness.</div></div><div class="mcq" data-id="dining-philosophers.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Spot the bug in this attempt at "try for both forks":</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>tryLock</code> is not allowed on a <code>ReentrantLock</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">When <code>tryLock</code> fails it never releases the left fork, so it still holds and waits, and the hold count on <code>left</code> keeps growing</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It should call <code>right.lock()</code> instead of <code>tryLock()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>onSpinWait</code> puts the thread to sleep while holding the lock</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The whole point of try and release is to put the first fork down when the second is busy. Here the left fork is locked again on every loop (a <code>ReentrantLock</code> just counts up), never released, so it can strand a neighbor. After any failed iteration, one final <code>unlock</code> is insufficient to return the hold count to zero. <code>tryLock</code> exists, <code>onSpinWait</code> is only a spin hint, and replacing the try with a blocking lock restores the circular wait.</div></div><div class="mcq" data-id="dining-philosophers.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">All five fork locks are made fair (first in, first out) and philosophers still pick up left then right. What does fairness change?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It prevents the deadlock, because waiters are served in order</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing about the deadlock: when every fork is held and every holder waits, there is no free lock to hand out fairly</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It turns the deadlock into a livelock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It makes the waits time out</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Fairness only orders who gets a lock when it becomes free. In the circular wait no fork is ever released, so the queue order is irrelevant. Fairness helps with starvation, not with deadlock.</div></div><div class="mcq" data-id="dining-philosophers.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">With five philosophers, what is the maximum simultaneous eating allowed by fork exclusivity, assuming a solution that permits nonadjacent eaters?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">1</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">2</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">3</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">4</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each eater uses two of the five forks, and two neighbors cannot both eat. Two eaters use four forks; a third would need two more, but only one is left. Philosophers 0 and 2 show that two is achievable, so one is not the maximum. In general the limit is N / 2 rounded down.</div></div><div class="mcq" data-id="dining-philosophers.q7" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>transfer(from, to, amount)</code> locks <code>from</code> and then <code>to</code>. The accounts are distinct and have unique stable ids; callers hold no account lock on entry. Thread A runs transfer(x, y) while thread B runs transfer(y, x). Which change fixes the deadlock without a global lock?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Make both account locks fair</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Lock <code>to</code> first and then <code>from</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Lock the account with the smaller id first, whatever the direction of the transfer</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Mark the balance fields volatile</span></button></li></ol><div class="why" hidden><strong>Why.</strong> This is the dining philosophers with two philosophers. Swapping the order for everyone just moves the cycle; ordering by a global key breaks it. Fairness cannot free a held fork, and <code>volatile</code> does not change lock acquisition. In C++, <code>std::scoped_lock lock(from.m, to.m);</code> also works under the stated distinct-lock assumptions.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="dining-philosophers.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Implement LeetCode 1226: <code>wantsToEat(philosopher, pickLeftFork, pickRightFork, eat, putLeftFork, putRightFork)</code> for 5 philosophers, called from many threads, with no deadlock. Assume callbacks finish without throwing or re-entering. Use resource ordering, and explain the additional requirements for starvation freedom.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="dining-philosophers.5"><figcaption><span class="ctitle">LeetCode 1226 with resource ordering</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> DiningPhilosophers {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">wantsToEat</span>(<span class="t">int</span> philosopher, <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; pickLeftFork, <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; pickRightFork,
+                    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; eat, <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; putLeftFork,
+                    <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; putRightFork) {
+        <span class="t">int</span> left = philosopher;
+        <span class="t">int</span> right = (philosopher + <span class="n">1</span>) % <span class="n">5</span>;
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">first</span>(fork_[<span class="t">std</span>::<span class="f">min</span>(left, right)]);   <span class="c">// one global order for every philosopher</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">second</span>(fork_[<span class="t">std</span>::<span class="f">max</span>(left, right)]);
+        <span class="f">pickLeftFork</span>();
+        <span class="f">pickRightFork</span>();
+        <span class="f">eat</span>();
+        <span class="f">putLeftFork</span>();
+        <span class="f">putRightFork</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> fork_[<span class="n">5</span>];
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">DiningPhilosophers</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span>[] fork = <span class="k">new</span> <span class="t">ReentrantLock</span>[<span class="n">5</span>];
+
+    <span class="t">DiningPhilosophers</span>() {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">5</span>; i += <span class="n">1</span>) fork[i] = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    }
+
+    <span class="k">void</span> <span class="f">wantsToEat</span>(<span class="t">int</span> philosopher, <span class="t">Runnable</span> pickLeftFork, <span class="t">Runnable</span> pickRightFork, <span class="t">Runnable</span> eat,
+                    <span class="t">Runnable</span> putLeftFork, <span class="t">Runnable</span> putRightFork) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">int</span> left = philosopher;
+        <span class="t">int</span> right = (philosopher + <span class="n">1</span>) % <span class="n">5</span>;
+        <span class="t">ReentrantLock</span> first = fork[<span class="t">Math</span>.<span class="f">min</span>(left, right)];      <span class="c">// one global order for every philosopher</span>
+        <span class="t">ReentrantLock</span> second = fork[<span class="t">Math</span>.<span class="f">max</span>(left, right)];
+        first.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            second.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                pickLeftFork.<span class="f">run</span>();
+                pickRightFork.<span class="f">run</span>();
+                eat.<span class="f">run</span>();
+                putLeftFork.<span class="f">run</span>();
+                putRightFork.<span class="f">run</span>();
+            } <span class="k">finally</span> {
+                second.<span class="f">unlock</span>();
+            }
+        } <span class="k">finally</span> {
+            first.<span class="f">unlock</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The callbacks only report the actions; the real exclusion is the two fork locks, taken in one global order (lower number first) and released when the scope ends. Philosopher 4 is the only one whose order differs from left-then-right, and that is enough to make a cycle impossible. In C++, <code>std::scoped_lock both(fork_[left], fork_[right]);</code> is another deadlock-free answer. These default locks do not promise starvation freedom; use the fair admission design above when that is required.</p>
+<p>Java's nested <code>finally</code> blocks release the first lock even if acquiring the second is interrupted. In C++, guards release held locks during exception unwinding. That does not automatically pair reporting callbacks when <code>eat</code> throws: a production contract must define which successful pick callbacks require compensating puts, make cleanup nonthrowing, and report failure to the caller. The puzzle code deliberately assumes nonthrowing callbacks.</p></div></div><div class="cq" data-q="dining-philosophers.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain to an interviewer why the naive solution deadlocks, using the four conditions, and compare two fixes by what they cost.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>A fork can be held by one philosopher (mutual exclusion); a philosopher keeps the left fork while waiting for the right one (hold and wait); nobody can take a fork away (no preemption); and if all five pick up the left fork together, each waits for the next one around the table (circular wait). With all four present, that state is permanent.</p>
+<p>Resource ordering breaks the circular wait: everyone takes the lower numbered fork first, so a cycle would need ever increasing fork numbers that come back to the start, which is impossible. It needs no extra synchronizer and is my default, though holding one fork while waiting can reduce concurrency. Try and release breaks hold and wait: take the left fork, try the right without blocking, and put the left down on failure. It needs no global order, which helps when you cannot impose one, but it wastes work on retries, can livelock even though randomized backoff reduces the risk, and does not stop one unlucky philosopher from starving. Neither fix alone guarantees starvation freedom; for ordered blocking acquisition I would add fair locks, or use a FIFO allocator for whole fork pairs. Fair locks do not make an untimed try-and-release loop starvation-free.</p></div></div><div class="cq" data-q="dining-philosophers.c3" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A payments service runs <code>transfer(a, b, amount)</code> on many threads, and a transfer must hold both account locks. Sometimes the service freezes. Diagnose it and design the fix, including what happens when a transfer touches the same account twice.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Diagnosis: two transfers in opposite directions, x to y and y to x, each lock their source first, so each holds one account and waits for the other. That is a two philosopher dining table. A thread dump would show two threads each blocked on the lock the other owns.</p>
+<p>Fix: lock in a global order, the account with the smaller id first, regardless of which is the source. Then no cycle can form between any number of concurrent transfers. Edge cases: if <code>a == b</code>, lock once (or reject the transfer), because recursively acquiring a C++ <code>std::mutex</code> violates its precondition and may deadlock. In Java, if accounts had no unique id, I could order by <code>System.identityHashCode</code> and use a tie breaker lock when the hashes are equal. In C++ I could use <code>std::scoped_lock</code> after handling the same-account case, while holding neither mutex on entry. If transfers can involve many accounts, the same rule extends: deduplicate the accounts, sort by id and lock them in that order. For starvation I would make the locks fair only if monitoring showed some transfers waiting far longer than others, because fairness costs throughput.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="dining-philosophers.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"All five philosophers pick up their left fork and wait. Walk me through the deadlock and prove that your fix prevents it."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Name mutual exclusion, hold and wait, no preemption and circular wait in the example</li><li>Choose a strict global fork order with lower ids acquired first</li><li>A cycle would require strictly increasing fork ids to return to the starting id</li><li>All acquisition paths must obey the order, including locks already held</li><li>Nonadjacent philosophers can still overlap; at most two of five can eat</li><li>Separate deadlock freedom from starvation freedom</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would break the circular wait by numbering the forks and always acquiring the lower numbered fork first. In the broken state, each fork is exclusive, each philosopher holds one while waiting for another, nobody can confiscate a fork, and the waits form a cycle. Those are the four deadlock conditions. With ordering, a philosopher holding fork a can wait only for a higher numbered fork b. Following a supposed cycle would give strictly increasing fork numbers that eventually return to a. That is impossible, so the cycle cannot exist. Every code path must obey the order, including any locks the caller already holds. For this ring, the philosopher between forks zero and four changes acquisition direction. I still allow nonadjacent philosophers to eat together; with five forks, at most two can eat at once. This proves deadlock freedom, not starvation freedom. An unfair lock can keep bypassing one hungry philosopher. If eventual service is required, I would add fair admission and explicitly assume that runnable holders get CPU time and finish their meals.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Does reversing just one philosopher's acquisition order work for an arbitrary resource graph?</span></p></div></div><div class="sq" data-sq="dining-philosophers.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Your solution finishes a million meals without a hang. Can you claim that nobody starves? What would make that claim defensible?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A finite successful run does not prove starvation freedom</li><li>Show how an unfair admission policy can repeatedly bypass one hungry philosopher</li><li>Ordered blocking acquisition with fair locks needs eventual scheduling and finite meals</li><li>Java untimed tryLock bypasses fairness; C++ mutex has no fairness option</li><li>A FIFO waiter can reserve both forks atomically and prevent later requests bypassing a blocked head</li><li>Explain the concurrency cost and use tests as evidence alongside a proof</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">No. A successful finite run shows progress on the schedules we tested, but it cannot prove that every hungry philosopher eventually eats. With unfair locks, neighbors can repeatedly win while one philosopher keeps waiting, even though the table remains active. For ordered blocking acquisition, I would use fair fork admission and state the remaining assumptions: runnable threads eventually execute, holders finish their meals, and nobody abandons a held resource. The highest ranked fork cannot depend on a higher one, so its holders finish; the argument then works down the order. In Java, fair ReentrantLock instances support that policy, but untimed tryLock can still barge. C++ mutexes provide no fairness switch. Another design is a FIFO queue of whole meal requests. Under a monitor, reserve both free forks for the queue head, then consider the next head. Eating happens outside that monitor. Later requests cannot bypass a blocked head, so existing finite meals drain and it eventually gets its forks. The tradeoff is that a blocked head can leave unrelated forks idle, although consecutive compatible requests can still eat together. I would test ownership, overlapping nonadjacent eaters and bounded completion, but I would use the admission argument, not the meal count, to justify starvation freedom.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How do you remove a cancelled request without leaving the FIFO waiter stuck?</span></p></div></div><div class="sq" data-sq="dining-philosophers.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"We replaced fork locking with try-and-release, but the threads stay busy and nobody eats. What is happening?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Identify livelock when failed attempts release resources but repeatedly collide</li><li>Describe the lockstep acquire, failed try, release and retry schedule</li><li>Verify release on every failure path and use randomized backoff only to reduce collisions</li><li>Do not claim fairness or a deterministic waiting bound from random retries</li><li>Use a deadline for the whole attempt or choose ordered blocking acquisition or queued admission</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">This can be livelock. The threads are taking steps, but none completes a meal. All philosophers can acquire their left forks, fail to try the right forks, release the left forks, and repeat the same pattern. I would first verify that every failed attempt actually releases its first fork, including exception paths; otherwise we still retain resources while waiting. Randomized backoff can reduce repeated collisions, but it is not a proof of eventual service or a fixed waiting bound. In particular, a fair Java lock does not make untimed tryLock respect its queue. If the operation must give up, I would apply one deadline to the whole attempt, including first-lock acquisition and retries, and return holding nothing. If starvation freedom matters, I would prefer ordered blocking acquisition with fair admission, or a waiter that queues whole fork pairs.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Why does a timeout on only the second lock fail to bound the total operation time?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-dining-philosophers.html" data-problem="dining-philosophers"><span class="pk">Ordering puzzles · medium</span><b>The dining philosophers</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-transfer-deadlock.html" data-problem="fix-the-transfer-deadlock"><span class="pk">Bug hunts · medium</span><b>Fix the transfers that freeze</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="ordering-threads.html"><span>Previous</span><b>Making threads take turns</b></a><a class="next" href="readers-writers.html"><span>Next</span><b>Readers and writers, three ways</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-problem-precisely">The problem, precisely</a><a href="#why-everyone-grabbing-the-left-fork-deadlocks">Why everyone grabbing the left fork deadlocks</a><a href="#fix-1-order-the-resources">Fix 1: order the resources</a><a href="#fix-2-a-waiter-who-seats-at-most-n-minus-1">Fix 2: a waiter who seats at most N minus 1</a><a href="#fix-3-try-for-both-or-put-the-left-one-down">Fix 3: try for both, or put the left one down</a><a href="#fix-4-chandy-and-misra-for-when-there-is-no-table-to-look-at">Fix 4: Chandy and Misra, for when there is no table to look at</a><a href="#fairness-and-starvation">Fairness and starvation</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

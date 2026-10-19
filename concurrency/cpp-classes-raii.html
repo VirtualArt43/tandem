@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Classes, constructors, destructors and RAII · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-classes-raii" data-title="Classes, constructors, destructors and RAII" data-track="cpp" data-module="cpp-1" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details open><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii" class=here><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m1">Module 01: The language core</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 01.4</span><span>24 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Classes, constructors, destructors and RAII</h1><p class="lsum">Constructors, initializer lists, destructors, the rules of zero, three and five, and RAII: why every lock in modern C++ is released by a destructor.</p><div class="asked"><span>Asked at</span><span class="co">Amazon</span><span class="co">Bloomberg</span></div><div class="prereq"><span>Before this:</span><a href="cpp-lifetime-stack-heap.html">Object lifetime, the stack and the heap</a></div></header><article class="prose" id="article">
+<p class="lead">Every lock you take in modern C++ is released by a destructor. RAII is not a style preference: it is the reason C++ locking code can stay short and still be correct when an early return or an exception cuts a function off halfway.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Picture a library whose exit gate checks every book back in automatically. However you leave, through the front door, through the fire exit, or carried out on a stretcher, the gate returns the book for you. You cannot forget to return it, because forgetting is not one of the options.</p>
+<p>That is <a class="term" data-term="raii" href="glossary.html#raii">RAII</a>, resource acquisition is initialization. You acquire a resource (memory, a file, a lock, a thread) in an object's constructor, and the object's destructor releases it. C++ runs destructors for fully constructed local objects on normal scope exit and during stack unwinding, so <strong>early returns and unwinding release the resource</strong>.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><code>std::lock_guard</code>, <code>std::unique_lock</code>, <code>std::scoped_lock</code> and <code>std::jthread</code> are RAII types. A hand-written <code>m.lock()</code> and <code>m.unlock()</code> leaks the lock on the first early return or exception, and <strong>every other thread then blocks forever</strong>.</li>
+<li><code>std::thread</code>'s destructor calls <code>std::terminate</code> if you never joined or detached it: the one thread type that punishes you instead of cleaning up. <code>std::jthread</code> fixes that.</li>
+<li>A class that holds a <code>std::mutex</code> cannot be copied or moved by default, because the mutex cannot. The rules of three and five tell you what to write when you do need copies.</li>
+<li>RAII releases the lock when an exception flies, but it does not undo half-finished changes to the data. Exception safety is a separate design decision.</li>
+<li>An Amazon online assessment question reported in 2025 showed a C-style container guarded by one mutex and asked for every problem in it, with deadlock, resource leak and memory corruption among the options. The worked example below has the same shape.</li>
+</ul>
+</div>
+
+<h2 id="constructors-and-member-initializer-lists">Constructors and member initializer lists</h2>
+<p>A constructor's job is to establish the object's invariant before anybody can use it. Members are initialized in the <strong>member initializer list</strong>, the part after the colon; by the time the constructor body runs, every member already exists.</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.1"><figcaption><span class="ctitle">Initializer lists, default member initializers, delegation</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="k">class</span> Account {
+<span class="k">public</span>:
+    <span class="f">Account</span>(<span class="t">std</span>::<span class="t">string</span> owner, <span class="t">long</span> opening_balance)
+        : <span class="f">owner_</span>(<span class="t">std</span>::<span class="f">move</span>(owner)), <span class="f">balance_</span>(opening_balance) {}   <span class="c">// members are built here</span>
+
+    <span class="k">explicit</span> <span class="f">Account</span>(<span class="t">std</span>::<span class="t">string</span> owner) : <span class="f">Account</span>(<span class="t">std</span>::<span class="f">move</span>(owner), <span class="n">0</span>) {}   <span class="c">// delegates to the one above</span>
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span> owner_;   <span class="c">// a const member can only be set in the initializer list</span>
+    <span class="t">long</span> balance_ = <span class="n">0</span>;          <span class="c">// default member initializer, used when the list does not mention it</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;              <span class="c">// default constructed</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<ul>
+<li>Initialize in the list, not by assignment in the body. Assignment in the body means "default construct, then overwrite", which costs twice and is impossible for <code>const</code> members, references, and types with no default constructor.</li>
+<li><strong>Members are always initialized in declaration order</strong>, whatever order you write in the list. <code>-Wall</code> warns when the two orders differ. That is why the previous lesson could say "declare the thread last" and have it mean something.</li>
+<li>Mark single-argument constructors <code>explicit</code>, so a <code>std::string</code> passed where an <code>Account</code> is expected (<code>void audit(const Account&amp;)</code> called as <code>audit(name)</code>) does not silently become a brand new account.</li>
+</ul>
+
+<h2 id="destructors-cleanup-on-scope-exit">Destructors: cleanup on scope exit</h2>
+<p>A destructor runs automatically: at the closing brace for a local, during stack unwinding when an exception passes through, when the owning smart pointer or container destroys a heap object, and after <code>main</code> for statics. The order is fixed: the destructor body first, then the members in reverse declaration order, then base classes.</p>
+<ul>
+<li>Since C++11, a destructor without an explicit exception specification is normally <code>noexcept</code>, unless a base or member has a potentially throwing destructor. Escaping a <code>noexcept</code> destructor calls <code>std::terminate</code>; escaping a destructor invoked during exception unwinding also terminates. Design resource cleanup so it <strong>never throws</strong>.</li>
+<li>A class meant to be deleted through a pointer to its base class needs a <code>virtual</code> destructor in the base. Without it the delete is undefined behavior; typically only the base part is destroyed.</li>
+<li>A destructor may block. <code>std::jthread</code>'s destructor joins, so destroying one while holding a lock the worker needs is a <a class="term" data-term="deadlock" href="glossary.html#deadlock">deadlock</a>.</li>
+</ul>
+
+<h2 id="raii-acquire-in-the-constructor-release-in-the-destructor">RAII: acquire in the constructor, release in the destructor</h2>
+<p>RAII is not a guarantee of cleanup during abrupt termination. <code>std::abort</code> and <code>std::_Exit</code> do not unwind local scopes, and <code>std::exit</code> skips automatic local destructors. When an exception has no matching handler, unwinding before <code>std::terminate</code> is implementation-defined.</p>
+<p>There is no magic in <code>std::lock_guard</code>. Here is essentially the whole thing, written out so you can see it:</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.2"><figcaption><span class="ctitle">What std::lock_guard does, in nine lines</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="k">class</span> Guard {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Guard</span>(<span class="t">std</span>::<span class="t">mutex</span>&amp; m) : <span class="f">m_</span>(m) { m_.<span class="f">lock</span>(); }   <span class="c">// acquire</span>
+    ~<span class="f">Guard</span>() { m_.<span class="f">unlock</span>(); }                              <span class="c">// release, on every path out of the scope</span>
+    <span class="f">Guard</span>(<span class="k">const</span> Guard&amp;) = <span class="k">delete</span>;                          <span class="c">// a copy would unlock twice</span>
+    Guard&amp; <span class="k">operator</span>=(<span class="k">const</span> Guard&amp;) = <span class="k">delete</span>;
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span>&amp; m_;
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Real code uses the standard types. Compare the alternative, which is what the rule "never call <code>lock()</code> and <code>unlock()</code> yourself" protects you from:</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.3"><figcaption><span class="ctitle">Manual locking: two ways to leak the lock</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8</span><code><span class="t">void</span> <span class="f">withdraw</span>(<span class="t">int</span> amount) {
+    m.<span class="f">lock</span>();
+    <span class="k">if</span> (amount &gt; balance) {
+        <span class="k">return</span>;                     <span class="c">// BUG: returns with m still locked</span>
+    }
+    balance -= <span class="f">fee_for</span>(amount);     <span class="c">// BUG: if fee_for throws, m stays locked forever</span>
+    m.<span class="f">unlock</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>One early return, every thread stuck</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Thread A</span><span>Thread B</span><span>Thread C</span></div><div class="tl-row"><span class="t">1</span><span class="cell">withdraw(500): locks m, sees too little money, returns without unlocking</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">withdraw(30): blocks on m</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">deposit(10): blocks on m</span></div><div class="tl-note">! A&#x27;s call is over, but m is still locked, and no code path will ever unlock it.</div></div></figure>
+
+<p>With a guard, both exits release the lock, and the program keeps going. Run it: the first withdrawal throws while the lock is held, and a second thread still gets in.</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.4" data-expect="ok"><figcaption><span class="ctitle">An exception inside a lock_guard scope</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">std</span>::<span class="t">mutex</span> m;
+<span class="t">int</span> balance = <span class="n">100</span>;   <span class="c">// guarded by m</span>
+
+<span class="t">void</span> <span class="f">withdraw</span>(<span class="t">int</span> amount) {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m);
+    <span class="k">if</span> (amount &gt; balance) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"insufficient funds"</span>);   <span class="c">// guard unlocks m during unwinding</span>
+    }
+    balance -= amount;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">try</span> {
+        <span class="f">withdraw</span>(<span class="n">500</span>);
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"first withdraw failed: "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+    <span class="c">// If the failed call had leaked the lock, this thread would block forever.</span>
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>([] { <span class="f">withdraw</span>(<span class="n">30</span>); });
+    t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"balance = "</span> &lt;&lt; balance &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="the-standard-raii-types-for-threads">The standard RAII types for threads</h2>
+<table>
+<thead><tr><th>Type</th><th>Constructor</th><th>Destructor</th><th>Use it when</th></tr></thead>
+<tbody>
+<tr><td><code>std::lock_guard&lt;M&gt;</code></td><td>Locks</td><td>Unlocks</td><td>One mutex, held for the whole scope. The default.</td></tr>
+<tr><td><code>std::unique_lock&lt;M&gt;</code></td><td>Locks, or defers, tries, or waits with a timeout</td><td>Unlocks if it owns the lock</td><td>You must unlock early, relock, move the lock, or wait on a <code>std::condition_variable</code>.</td></tr>
+<tr><td><code>std::scoped_lock&lt;M...&gt;</code> (C++17)</td><td>Locks one or more mutexes with a deadlock avoidance algorithm</td><td>Unlocks all of them</td><td>Two or more mutexes at once. See <a href="multiple-locks.html">taking several locks safely</a>.</td></tr>
+<tr><td><code>std::shared_lock&lt;M&gt;</code></td><td>Takes a shared (reader) lock</td><td>Releases it</td><td>Readers of a <code>std::shared_mutex</code>.</td></tr>
+<tr><td><code>std::jthread</code> (C++20)</td><td>Starts a thread</td><td>Requests a stop, then joins</td><td>Any thread you own.</td></tr>
+<tr><td><code>std::thread</code></td><td>Starts a thread</td><td>Calls <code>std::terminate</code> if still joinable</td><td>Only with a guaranteed <code>join</code> on every path.</td></tr>
+<tr><td><code>std::unique_ptr&lt;T&gt;</code></td><td>Takes ownership</td><td>Deletes the object</td><td>Owning heap objects. See <a href="cpp-smart-pointers.html">smart pointers</a>.</td></tr>
+</tbody>
+</table>
+<p>Since C++17, class template argument deduction lets you drop the template arguments: <code>std::lock_guard guard(m);</code> and <code>std::scoped_lock both(a, b);</code> are complete declarations.</p>
+
+<h3>Name your guard</h3>
+<p>The most common RAII slip in interviews is a guard without a name:</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.5"><figcaption><span class="ctitle">Two guards that protect nothing</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt;{m_};    <span class="c">// a temporary: locks and unlocks within this one statement</span>
+count_ += <span class="n">1</span>;                        <span class="c">// unprotected</span>
+
+<span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt;(m_);   <span class="c">// declares a NEW, empty unique_lock variable named m_: locks nothing</span>
+count_ += <span class="n">1</span>;                        <span class="c">// unprotected</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Clang with libc++ warns about both (the first through a <code>[[nodiscard]]</code> constructor, the second as a vexing parse), but other toolchains can stay silent. <strong>A guard needs a name</strong>: <code>std::lock_guard&lt;std::mutex&gt; guard(m_);</code>. To end a guard early, give it its own block with braces instead of unlocking by hand.</p>
+
+<h2 id="std-thread-versus-std-jthread">std::thread versus std::jthread</h2>
+<p><code>std::thread</code> is a handle that does not clean up after itself. If its destructor finds the thread still joinable, it calls <code>std::terminate</code>, and the process dies. The committee chose that on purpose: joining implicitly could hang the program, and detaching implicitly could leave a thread using destroyed locals. The trap is that <strong>an exception between starting the thread and joining it skips the join</strong>, and the unwinding destructor terminates the program.</p>
+<p>A <a class="term" data-term="jthread" href="glossary.html#jthread">std::jthread</a> is the RAII version. Its destructor calls <code>request_stop()</code> and then <a class="term" data-term="join" href="glossary.html#join">join</a>. If the thread function accepts a <code>std::stop_token</code>, it can notice the request and finish early:</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.6" data-expect="ok"><figcaption><span class="ctitle">A thread that cleans up after itself</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stop_token&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> ticks = <span class="n">0</span>;   <span class="c">// written by the worker, read by main only after the join</span>
+    {
+        <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([&amp;ticks](<span class="t">std</span>::<span class="t">stop_token</span> stop) {
+            <span class="k">while</span> (!stop.<span class="f">stop_requested</span>()) {
+                ticks += <span class="n">1</span>;
+                <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">1</span>));
+            }
+        });
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">20</span>));   <span class="c">// only to let the worker run a little</span>
+    }   <span class="c">// ~jthread runs here: request_stop(), then join()</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"worker stopped and joined after "</span> &lt;&lt; ticks &lt;&lt; <span class="s">" ticks\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="the-rules-of-zero-three-and-five">The rules of zero, three and five</h2>
+<p>Five special member functions decide what happens when an object is copied, moved and destroyed: the destructor, the copy constructor, copy assignment, the move constructor and move assignment.</p>
+<ul>
+<li><strong>Rule of three</strong> (classic C++): if a class needs a custom destructor, copy constructor or copy assignment, it almost certainly needs all three, because it manages a resource by hand.</li>
+<li><strong>Rule of five</strong> (C++11): the same, plus the two move operations.</li>
+<li><strong><a class="term" data-term="rule-of-zero" href="glossary.html#rule-of-zero">rule of zero</a></strong>: better than both. Build classes from members that already manage themselves (<code>std::string</code>, <code>std::vector</code>, <code>std::unique_ptr</code>, guards) and write none of the five. The compiler-generated versions are then correct.</li>
+</ul>
+<p>What the compiler generates depends on what you declared, and the table hides a trap in its second row:</p>
+<table>
+<thead><tr><th>You declare</th><th>Implicit copy operations</th><th>Implicit move operations</th></tr></thead>
+<tbody>
+<tr><td>None of the five</td><td>Generated</td><td>Generated</td></tr>
+<tr><td>Only a destructor</td><td>Still generated (deprecated)</td><td>Not declared: a "move" silently copies</td></tr>
+<tr><td>A copy constructor or copy assignment</td><td>The other one generated (deprecated)</td><td>Not declared: moves copy</td></tr>
+<tr><td>A move constructor or move assignment</td><td>Deleted</td><td>The other one not declared</td></tr>
+</tbody>
+</table>
+<p>So adding an empty <code>~Widget() {}</code> "for logging" quietly turns every move of a <code>Widget</code> into a copy. If you must declare one special member, declare all five, using <code>= default</code> and <code>= delete</code> to say what you mean.</p>
+
+<h3>A class that holds a mutex</h3>
+<p><code>std::mutex</code> can be neither copied nor moved: other threads may be blocked on it, at its address. So any class with a mutex member has deleted copy and move operations. For an object shared between threads that is usually exactly right. When you do want copies, say a snapshot of a thread-safe container, write the copy operations yourself: lock the source, copy the data, and let the new object have its own fresh mutex. Assignment must lock both objects, without deadlock, and must not lock one mutex twice.</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.7" data-expect="ok"><figcaption><span class="ctitle">Copying an object that has a mutex</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Tally {
+<span class="k">public</span>:
+    <span class="f">Tally</span>() = <span class="k">default</span>;
+
+    <span class="c">// std::mutex cannot be copied, so the implicit copy constructor is deleted. Write one:</span>
+    <span class="c">// lock the source, copy the data, and let the new object get its own fresh mutex.</span>
+    <span class="f">Tally</span>(<span class="k">const</span> Tally&amp; other) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(other.m_);
+        votes_ = other.votes_;
+    }
+
+    Tally&amp; <span class="k">operator</span>=(<span class="k">const</span> Tally&amp; other) {
+        <span class="k">if</span> (<span class="k">this</span> != &amp;other) {                      <span class="c">// locking one mutex twice would be undefined</span>
+            <span class="t">std</span>::<span class="t">scoped_lock</span> <span class="f">both</span>(m_, other.m_);   <span class="c">// two locks, taken without deadlock risk</span>
+            votes_ = other.votes_;
+        }
+        <span class="k">return</span> *<span class="k">this</span>;
+    }
+
+    <span class="t">void</span> <span class="f">add</span>(<span class="t">int</span> candidate) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        votes_.<span class="f">push_back</span>(candidate);
+    }
+
+    <span class="t">std</span>::<span class="t">size_t</span> <span class="f">count</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">return</span> votes_.<span class="f">size</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;      <span class="c">// mutable so const members can lock it (see the const lesson)</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; votes_;    <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Tally live;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">10</span>; i += <span class="n">1</span>) {
+        live.<span class="f">add</span>(i % <span class="n">3</span>);
+    }
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">voter</span>([&amp;live] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">1000</span>; i += <span class="n">1</span>) {
+            live.<span class="f">add</span>(i % <span class="n">3</span>);
+        }
+    });
+    Tally snapshot = live;      <span class="c">// copy constructor: a consistent copy, taken while the voter is busy</span>
+    voter.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"snapshot: "</span> &lt;&lt; snapshot.<span class="f">count</span>() &lt;&lt; <span class="s">" votes (anywhere from 10 to 1010)\n"</span>;
+    snapshot = live;            <span class="c">// copy assignment: both objects locked together</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"after assignment: "</span> &lt;&lt; snapshot.<span class="f">count</span>() &lt;&lt; <span class="s">" votes\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The first number depends on timing, but it is always a consistent count, never a torn vector. Because this class declares copy operations, it gets no implicit moves, so <code>std::move(tally)</code> copies. That is fine here; if moves mattered you would declare them too, locking the source.</p>
+
+<h2 id="exception-safety-raii-releases-it-does-not-roll-back">Exception safety: RAII releases, it does not roll back</h2>
+<p><a class="term" data-term="exception-safety" href="glossary.html#exception-safety">exception safety</a> comes in three levels. The <strong>basic</strong> guarantee: after an exception nothing leaks and every invariant still holds, though the state may have changed. The <strong>strong</strong> guarantee: the operation either completes or has no effect at all. The <strong>nothrow</strong> guarantee: it cannot fail. RAII hands you "nothing leaks" for free. It does not hand you invariants.</p>
+<p>That matters more with threads, because <strong>releasing a lock publishes whatever state you left behind</strong>. If an exception escapes halfway through updating two fields under a lock, the guard unlocks during unwinding and the next thread walks into the half-updated object.</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.8"><figcaption><span class="ctitle">A transfer that keeps its invariant when push_back throws</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">struct</span> Account {
+    <span class="t">std</span>::<span class="t">mutex</span> m;
+    <span class="t">long</span> balance = <span class="n">0</span>;               <span class="c">// guarded by m</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">long</span>&gt; history;      <span class="c">// guarded by m; must always add up to balance</span>
+};
+
+<span class="t">void</span> <span class="f">transfer</span>(Account&amp; from, Account&amp; to, <span class="t">long</span> amount) {
+    <span class="k">if</span> (&amp;from == &amp;to) {
+        <span class="k">return</span>;                                          <span class="c">// one mutex locked twice would be undefined</span>
+    }
+    <span class="t">std</span>::<span class="t">scoped_lock</span> <span class="f">both</span>(from.m, to.m);
+    <span class="k">if</span> (from.balance &lt; amount) {
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"insufficient funds"</span>);  <span class="c">// nothing has changed yet: safe to throw</span>
+    }
+    from.history.<span class="f">push_back</span>(-amount);                     <span class="c">// may throw std::bad_alloc</span>
+    <span class="k">try</span> {
+        to.history.<span class="f">push_back</span>(amount);                    <span class="c">// may throw after the first step succeeded</span>
+    } <span class="k">catch</span> (...) {
+        from.history.<span class="f">pop_back</span>();                         <span class="c">// undo step one, then let the error continue</span>
+        <span class="k">throw</span>;
+    }
+    from.balance -= amount;                              <span class="c">// cannot throw: the commit point</span>
+    to.balance += amount;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The recipe: <strong>do everything that can throw first, then commit with operations that cannot</strong>. A second form of the same idea also shortens critical sections: build the new state outside the lock, then swap it in under the lock with a swap that cannot throw.</p>
+
+<figure class="code single" data-sample="cpp-classes-raii.9"><figcaption><span class="ctitle">Prepare outside the lock, commit inside</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="t">void</span> Profile::<span class="f">update</span>(<span class="t">std</span>::<span class="t">string</span> name, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; tags) {   <span class="c">// the caller already made the copies</span>
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+    name_.<span class="f">swap</span>(name);    <span class="c">// swaps cannot throw, so readers see both changes or neither</span>
+    tags_.<span class="f">swap</span>(tags);
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<div class="box example">
+<h3>Worked example: review a C-style container</h3>
+<p>You are handed this class and asked to list every problem, the way the Amazon assessment item and debugging rounds do. Read it before you read the answers.</p>
+<figure class="code single" data-sample="cpp-classes-raii.10"><figcaption><span class="ctitle">A registry with manual locking</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33</span><code><span class="k">class</span> Registry {
+<span class="k">public</span>:
+    <span class="t">int</span> <span class="f">get</span>(<span class="t">int</span> key) {
+        m_.<span class="f">lock</span>();
+        <span class="k">auto</span> it = map_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it == map_.<span class="f">end</span>()) {
+            <span class="k">return</span> -<span class="n">1</span>;                  <span class="c">// (1)</span>
+        }
+        <span class="t">int</span> value = it-&gt;second;
+        m_.<span class="f">unlock</span>();
+        <span class="k">return</span> value;
+    }
+
+    <span class="t">void</span> <span class="t">set</span>(<span class="t">int</span> key, <span class="t">int</span> value) {
+        m_.<span class="f">lock</span>();
+        <span class="k">if</span> (map_.<span class="f">size</span>() &gt;= capacity_) {
+            <span class="f">grow</span>();                     <span class="c">// (2)</span>
+        }
+        map_[key] = value;              <span class="c">// (3)</span>
+        m_.<span class="f">unlock</span>();
+    }
+
+    <span class="t">void</span> <span class="f">grow</span>() {
+        m_.<span class="f">lock</span>();
+        capacity_ *= <span class="n">2</span>;
+        m_.<span class="f">unlock</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">int</span>, <span class="t">int</span>&gt; map_;
+    <span class="t">std</span>::<span class="t">size_t</span> capacity_ = <span class="n">16</span>;
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<ol>
+<li><strong>Leaked lock on the early return.</strong> A lookup for a missing key returns with <code>m_</code> held, and every later call blocks forever.</li>
+<li><strong>Self-deadlock.</strong> <code>set</code> holds <code>m_</code> and calls <code>grow</code>, which locks <code>m_</code> again. <code>std::mutex</code> is not recursive: locking it twice from one thread is undefined behavior and in practice hangs. This is a <a class="term" data-term="self-deadlock" href="glossary.html#self-deadlock">self-deadlock</a>.</li>
+<li><strong>Leaked lock on an exception.</strong> <code>map_[key] = value</code> can allocate and throw <code>std::bad_alloc</code>, skipping the unlock.</li>
+<li>A design smell as well: <code>-1</code> is a valid value that doubles as "not found".</li>
+</ol>
+<figure class="timeline"><figcaption>Bug 1 in action</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Thread A</span><span>Thread B</span></div><div class="tl-row"><span class="t">1</span><span class="cell">get(42): locks m_, key missing, returns -1 with m_ still locked</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">set(7, 1): calls m_.lock()</span></div><div class="tl-row bad"><span class="t">3</span><span class="cell empty"></span><span class="cell bad">blocks forever: A will never unlock</span></div><div class="tl-note">A function that returns is not a function that cleaned up.</div></div></figure>
+<p>The fix uses guards everywhere and splits each operation into a public method that locks and a private helper that assumes the lock is already held:</p>
+<figure class="code single" data-sample="cpp-classes-raii.11"><figcaption><span class="ctitle">The same registry, fixed</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="k">class</span> Registry {
+<span class="k">public</span>:
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; <span class="f">get</span>(<span class="t">int</span> key) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">auto</span> it = map_.<span class="f">find</span>(key);
+        <span class="k">if</span> (it == map_.<span class="f">end</span>()) {
+            <span class="k">return</span> <span class="t">std</span>::nullopt;            <span class="c">// the guard unlocks on this path too</span>
+        }
+        <span class="k">return</span> it-&gt;second;
+    }
+
+    <span class="t">void</span> <span class="t">set</span>(<span class="t">int</span> key, <span class="t">int</span> value) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">if</span> (map_.<span class="f">size</span>() &gt;= capacity_) {
+            <span class="f">grow_locked</span>();                  <span class="c">// the caller already holds m_</span>
+        }
+        map_[key] = value;                  <span class="c">// if this throws, the guard still unlocks</span>
+    }
+
+    <span class="t">void</span> <span class="f">grow</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="f">grow_locked</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">grow_locked</span>() { capacity_ *= <span class="n">2</span>; }  <span class="c">// precondition: this thread holds m_</span>
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">unordered_map</span>&lt;<span class="t">int</span>, <span class="t">int</span>&gt; map_;      <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">size_t</span> capacity_ = <span class="n">16</span>;             <span class="c">// guarded by m_</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The "locked helper" convention (a <code>_locked</code> suffix, or a comment stating the precondition) is how real codebases avoid recursive mutexes. Saying it out loud in a review is a strong signal.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Calling <code>lock()</code> and <code>unlock()</code> by hand.</strong> Every early return and exception becomes a leaked lock. Use a guard.</li>
+<li><strong>A guard without a name.</strong> It unlocks at the end of the statement, or declares a new variable and locks nothing.</li>
+<li><strong>A <code>std::thread</code> that is not joined on every path,</strong> including the path where an exception is thrown. Use <code>std::jthread</code>.</li>
+<li><strong>Throwing from a destructor.</strong> It terminates the program if it happens during unwinding, and by default it terminates anyway because destructors are <code>noexcept</code>.</li>
+<li><strong>A custom destructor with default copies</strong> for a class that owns a raw handle: two copies, two releases. Follow the rule of zero, or write all five.</li>
+<li><strong>A hand-written copy constructor that does not lock the source.</strong> It copies while another thread writes: a data race.</li>
+<li><strong>Doing slow work while the guard is alive.</strong> Logging, I/O and callbacks inside the lock stretch the critical section. End the guard early with an inner block.</li>
+<li><strong>Assuming RAII rolls back state.</strong> It releases resources; your code must keep the invariants.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>RAII itself is asked by name: a 2020 Bloomberg C++ candidate was questioned on RAII alongside semaphores versus mutexes. Expect "why <code>lock_guard</code> instead of calling lock and unlock?", "what happens if an exception is thrown while you hold the lock?", "difference between <code>lock_guard</code>, <code>unique_lock</code> and <code>scoped_lock</code>?", and "what does <code>std::thread</code>'s destructor do?". In review and debugging formats, such as the Amazon assessment item above and Rubrik's debugging round, you are handed manual locking and asked to find every way it fails.</p>
+<blockquote>I use RAII guards so the unlock is tied to scope exit: early returns and exceptions all release the lock. <code>lock_guard</code> for a single mutex held for the whole scope, <code>unique_lock</code> when I need to unlock early or wait on a condition variable, <code>scoped_lock</code> for two or more mutexes because it avoids lock order deadlocks.</blockquote>
+<blockquote>If an exception is thrown under a guard, the destructor releases the lock during unwinding. That makes the half-done state visible to the next thread, so I structure updates to do everything that can throw first and commit with operations that cannot throw.</blockquote>
+<p>Follow ups: "Can you return early from inside a <code>lock_guard</code> scope?" (yes, that is the point); "Why is <code>std::mutex</code> not copyable?" (threads may be waiting on it at its address, and copying a lock's state makes no sense); "Why not make <code>grow</code> lock recursively?" (recursive mutexes hide the fact that an invariant may be broken when the inner call runs; prefer a locked helper).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Starting threads in constructors.</strong> A thread started in a base class constructor that calls a virtual function may get the base version (the derived part does not exist yet) or the derived one, depending on timing, because the object's dynamic type changes while the thread runs; that switch is itself a data race on the object, and a pure virtual base turns it into a crash. Anything the thread touches that is declared later is not constructed either. Start threads in the most derived class, declare the thread member last, or use a separate <code>start()</code> step.</p>
+<p><strong>Destructors that block can deadlock.</strong> A <code>std::jthread</code> destructor joins. Destroying it while holding a mutex the worker needs to finish means the join never returns. And a thread that destroys its own <code>jthread</code> would be joining itself, which the library reports as an error inside a <code>noexcept</code> destructor, so the program terminates.</p>
+<p><strong>Copy and swap</strong> gives assignment the strong guarantee: take the parameter by value (the copy happens first and may throw), then swap members with operations that cannot throw. For thread-safe classes it also keeps the locked part of assignment tiny.</p>
+</div>
+
+<div class="box under">
+<h3>Under the hood</h3>
+<p>Mainstream compilers implement exceptions with tables rather than extra code on the normal path. When an exception is thrown, the runtime walks the stack frame by frame and, for each one, runs a small cleanup block that the compiler generated to destroy the live locals of that frame, guards included, before continuing to the matching <code>catch</code>. This <a class="term" data-term="stack-unwinding" href="glossary.html#stack-unwinding">stack unwinding</a> is why a guard's destructor runs even though no line of your code calls it.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Initialize members in the initializer list; they are built in declaration order, whatever the list says.</li>
+<li>RAII ties a resource to a scope: the destructor releases it on normal exit and during stack unwinding, including early returns and handled exceptions. Every C++ lock should be held by a named guard.</li>
+<li><code>std::thread</code> terminates the program if destroyed while joinable; <code>std::jthread</code> requests a stop and joins.</li>
+<li>Prefer the rule of zero. Declaring only a destructor silently turns moves into copies. A mutex member deletes copying and moving unless you write them, locking the source.</li>
+<li>RAII releases locks during exceptions but does not restore invariants: do the throwing work first, then commit with operations that cannot throw.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-classes-raii"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-classes-raii.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What is wrong with this member function?<figure class="code single" data-sample="cpp-classes-raii.12"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">void</span> Counter::<span class="f">increment</span>() {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt;{m_};
+    count_ += <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The guard is a temporary: it locks and unlocks within its own statement, so the increment runs unlocked</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: braces and parentheses are interchangeable here</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It deadlocks, because the guard locks twice</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile without template argument deduction</span></button></li></ol><div class="why" hidden><strong>Why.</strong> An unnamed object is a temporary that dies at the end of the full expression, so the lock is released before <code>count_ += 1</code> runs. Clang with libc++ warns, but not every toolchain does. Name it: <code>std::lock_guard&lt;std::mutex&gt; guard(m_);</code>.</div></div><div class="mcq" data-id="cpp-classes-raii.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A function creates <code>std::thread t(work);</code> and then calls <code>parse(input)</code> before <code>t.join();</code>. <code>parse</code> throws. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>std::terminate</code> is called: the unwinding destroys <code>t</code> while it is still joinable</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The thread is joined automatically during unwinding</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The thread is detached automatically and keeps running</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The exception is caught by the thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The exception skips <code>t.join()</code>, and <code>std::thread</code>'s destructor calls <code>std::terminate</code> when the thread is joinable. <code>std::jthread</code> would request a stop and join instead, which is why it is the safer default.</div></div><div class="mcq" data-id="cpp-classes-raii.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Inside a <code>std::lock_guard</code> scope, a function updates <code>a_</code>, then throws before updating <code>b_</code>, where <code>a_</code> and <code>b_</code> must always agree. What do other threads see?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The lock is released during unwinding, so the next thread can see the new <code>a_</code> with the old <code>b_</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The lock stays held forever, so no thread sees anything</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>a_</code> is rolled back automatically because the guard was active</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The program terminates, because exceptions are not allowed while a mutex is locked</span></button></li></ol><div class="why" hidden><strong>Why.</strong> RAII guarantees the unlock, not a rollback. Releasing the lock publishes the half-done state. Do the work that can throw before changing shared state, or undo partial changes in a catch block before rethrowing.</div></div><div class="mcq" data-id="cpp-classes-raii.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>class Buffer { std::vector&lt;char&gt; data_; public: ~Buffer() { std::puts(&quot;freed&quot;); } };</code>. What does <code>Buffer b2 = std::move(b1);</code> do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It copies <code>data_</code>: declaring a destructor stops the compiler from generating move operations</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It moves <code>data_</code>, because <code>std::vector</code> is movable</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile, because there is no move constructor</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is undefined behavior</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A user-declared destructor suppresses the implicit move constructor and move assignment, while the copy operations are still generated (a deprecated rule kept for old code). The rvalue then binds to the copy constructor, so the "move" copies the whole vector. Declare <code>Buffer(Buffer&amp;&amp;) = default;</code> and friends, or drop the destructor.</div></div><div class="mcq" data-id="cpp-classes-raii.q5" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>class Counter { std::mutex m_; long n_ = 0; /* methods */ };</code>. What does <code>Counter c2 = c1;</code> do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It does not compile: the implicit copy constructor is deleted because <code>std::mutex</code> cannot be copied</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It copies <code>n_</code> and shares the mutex between <code>c1</code> and <code>c2</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It copies <code>n_</code> and default constructs a new mutex</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It compiles, but copying a locked mutex is undefined behavior</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::mutex</code> has deleted copy and move operations, so every class containing one gets deleted copy and move operations too. If you want copies, write the copy constructor: lock the source's mutex, copy <code>n_</code>, and let the new object's mutex be default constructed.</div></div><div class="mcq" data-id="cpp-classes-raii.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>class Range { int size_; int start_; public: Range(int s) : start_(s), size_(start_ + 10) {} };</code>. What is <code>size_</code> after <code>Range r(5);</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">15</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Unpredictable: <code>size_</code> is declared first, so it is initialized from <code>start_</code> before <code>start_</code> has a value</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">10</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Members are initialized in declaration order, not in the order of the initializer list. <code>size_</code> comes first and reads an uninitialized <code>start_</code>, which is undefined behavior. <code>-Wall</code> warns that the list order does not match the declaration order.</div></div><div class="mcq" data-id="cpp-classes-raii.q7" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A <code>std::jthread</code> object goes out of scope while its thread is still running. What does its destructor do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It requests a stop through the thread's stop token, then joins</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It detaches the thread</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It calls <code>std::terminate</code>, like <code>std::thread</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It kills the thread immediately</span></button></li></ol><div class="why" hidden><strong>Why.</strong> That is the point of <code>std::jthread</code>: <code>request_stop()</code> then <code>join()</code>. The thread is not killed; if it ignores its stop token, the join simply waits for it to finish. C++ has no safe way to kill a thread from outside.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-classes-raii.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a thread-safe <code>Inventory</code> with <code>add(item, qty)</code>, <code>remove(item, qty)</code> that throws <code>std::invalid_argument</code> when there is not enough stock, and <code>count(item)</code>. Use RAII, and say what an exception does to the lock and to the data.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-classes-raii.13"><figcaption><span class="ctitle">Inventory</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+
+<span class="k">class</span> Inventory {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">add</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; item, <span class="t">int</span> qty) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        stock_[item] += qty;
+    }
+
+    <span class="t">void</span> <span class="f">remove</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; item, <span class="t">int</span> qty) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">auto</span> it = stock_.<span class="f">find</span>(item);
+        <span class="k">if</span> (it == stock_.<span class="f">end</span>() || it-&gt;second &lt; qty) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"not enough "</span> + item);   <span class="c">// nothing changed: safe</span>
+        }
+        it-&gt;second -= qty;                                       <span class="c">// cannot throw</span>
+    }
+
+    <span class="t">int</span> <span class="f">count</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; item) <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">auto</span> it = stock_.<span class="f">find</span>(item);
+        <span class="k">return</span> it == stock_.<span class="f">end</span>() ? <span class="n">0</span> : it-&gt;second;
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">int</span>&gt; stock_;   <span class="c">// guarded by m_</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Every method holds a named <code>std::lock_guard</code>, so the mutex is released on every exit, including the throw in <code>remove</code>. The data stays consistent because <code>remove</code> checks first and throws before changing anything, and the only change, <code>it-&gt;second -= qty</code>, cannot throw: that is the strong guarantee. <code>count</code> takes the same lock as the writers, because reading without it would race with <code>add</code>. It uses <code>find</code> rather than <code>operator[]</code>, which would insert a zero entry and could not be called from a const method.</p></div></div><div class="cq" data-q="cpp-classes-raii.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A teammate's <code>Cache</code> has <code>std::string get(int key)</code> that calls <code>m_.lock()</code>, returns <code>&quot;&quot;</code> early when the key is missing, and otherwise unlocks and returns the value; and <code>void put(int key, std::string v)</code> that locks, calls <code>evict()</code> (which also locks <code>m_</code>) when full, inserts, and unlocks. List every problem and the fix.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>First, <code>get</code> returns early without unlocking, so after one miss the mutex stays locked and every later call blocks forever. Second, <code>put</code> calls <code>evict</code> while holding <code>m_</code>, and <code>evict</code> locks <code>m_</code> again; <code>std::mutex</code> is not recursive, so that is undefined behavior and in practice a self-deadlock. Third, both functions can throw between lock and unlock (allocating the string copy, inserting into the map), which leaks the lock. Fourth, <code>&quot;&quot;</code> doubles as a real value and as "missing".</p>
+<p>Fix: a named <code>std::lock_guard</code> in every public method, so every exit unlocks; split eviction into a private <code>evict_locked()</code> that documents "caller holds <code>m_</code>" and is called from <code>put</code>, with a public <code>evict()</code> that takes the guard and calls the helper; and return <code>std::optional&lt;std::string&gt;</code> from <code>get</code>. Then rerun the tests under stress and under ThreadSanitizer. Do not count on a sanitizer to find the self-deadlock for you: the second <code>lock()</code> on the same thread usually just hangs, and a stack dump showing <code>put</code> calling <code>evict</code>, which is blocked in <code>m_.lock()</code>, is how you recognise it.</p></div></div><div class="cq" data-q="cpp-classes-raii.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain the rules of zero, three and five, and what a <code>std::mutex</code> member does to a class's copy and move operations.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The five special members are the destructor, copy constructor, copy assignment, move constructor and move assignment. The rule of three says that if you need a custom destructor or copy operation, you are managing a resource by hand and need all three; C++11 made it five by adding the moves. The rule of zero says the best class needs none: hold resources in members that manage themselves, like <code>std::vector</code>, <code>std::string</code>, <code>std::unique_ptr</code> and lock guards, and the generated operations are correct. A trap: declaring only a destructor suppresses the implicit moves, so moves silently become copies.</p>
+<p>A <code>std::mutex</code> cannot be copied or moved, so a class containing one gets deleted copy and move operations. For an object shared between threads that is usually what I want. If I need copies, I write the copy constructor to lock the source and copy the data, giving the new object its own mutex, and the assignment operator to check for self-assignment and lock both mutexes with <code>std::scoped_lock</code> so two concurrent assignments in opposite directions cannot deadlock.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-classes-raii.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A function holds a lock_guard, updates one field, and throws before updating a second field that must agree with it. Has RAII made this safe?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>RAII releases the mutex during unwinding but does not restore the two-field invariant</li><li>The next thread taking the mutex can observe the partial update</li><li>The basic exception guarantee preserves invariants; the strong guarantee leaves the logical state unchanged on failure</li><li>Perform throwing work before a nonthrowing commit, or roll back while still holding the lock</li><li>Preparation outside the lock requires revalidation if it depends on mutable shared state</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">RAII has made lock cleanup safe, but it has not made the update safe. When the exception unwinds this scope, the guard releases the mutex. The next thread can acquire it and observe the first field changed while the second still has its old value. If those fields must agree, the object has lost its invariant. The basic exception guarantee requires invariants to survive failure. The strong guarantee goes further and leaves the logical state unchanged. I would arrange the operation so everything that can throw happens before a commit that cannot throw. For example, prepare a new profile name and tags, then swap both into place under the same lock. If I must change shared state before a later step can fail, I need a reliable rollback before releasing the lock. Preparing outside the lock can reduce contention, but if that preparation depends on current shared state, I must revalidate it under the lock. My review therefore checks both resource cleanup and the state another thread can observe after failure.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you test that the invariant survives an allocation failure in the second update?</span></p></div></div><div class="sq" data-sq="cpp-classes-raii.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"You are implementing a queue and a transfer between two accounts. How do you choose among lock_guard, unique_lock and scoped_lock?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Use a named lock_guard for one mutex held for the whole scope</li><li>Use unique_lock for condition variable waiting or controlled unlock and relock</li><li>Use C++17 scoped_lock to acquire multiple distinct mutexes with deadlock avoidance</li><li>Handle a transfer to the same account before attempting to lock both mutexes</li><li>An unnamed temporary guard expires at the semicolon and protects no following statement</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I choose the guard according to the operation. For a single mutex held until scope exit, I use a named lock_guard. It is the simplest ownership model and releases the mutex on return or during unwinding. In a blocking queue, I use unique_lock because the condition variable must release the mutex while waiting and reacquire it before checking the predicate again. It also supports an explicit unlock and relock when the algorithm needs that. For a transfer between two different accounts, I use C++17 scoped_lock with both mutexes, so acquisition uses deadlock avoidance. I handle a transfer to the same account first, because passing the same nonrecursive mutex twice is invalid. In each case the guard needs a name. A temporary guard dies at its semicolon, leaving the next statement unprotected. The guard's scope should cover the entire invariant update and no unrelated slow work.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What can still deadlock if code under those guards calls a helper that locks one of the same mutexes?</span></p></div></div><div class="sq" data-sq="cpp-classes-raii.s3" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A class with a mutex no longer copies. We need a snapshot while another thread updates it. How would you design copying and assignment?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A mutex is neither copyable nor movable, so default memberwise copying is deleted</li><li>If copying is required, give the destination a fresh mutex and copy data while holding the source mutex</li><li>Assignment checks for self-assignment and locks both objects with scoped_lock</li><li>Locking both objects together avoids deadlock between assignments in opposite directions</li><li>Preserve invariants if copying throws, and state that explicit copy operations suppress implicit moves</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would give each object its own mutex and copy only the protected data. A mutex cannot be copied or moved, so the compiler correctly rejects default memberwise copying. If the API only needs snapshots, returning a separate value object is often simpler. If the class itself must be copyable, its copy constructor can default construct a fresh mutex, lock the source, and copy the data while that lock is held. The destination is not yet published, so the source lock is the one that matters. Assignment is different because both objects already exist. I would first handle self-assignment, then lock both mutexes with scoped_lock. That avoids locking one mutex twice and avoids a deadlock when two threads assign in opposite directions. I would prepare any throwing copy before committing, or otherwise preserve the destination's invariants on failure. Finally, declaring copy operations suppresses implicit moves. I would state that policy explicitly rather than assume the compiler supplies a cheap move. The snapshot represents one protected moment; it is independent of later updates.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">If you add a destructor only for logging, how can that change move behavior for a class containing a vector?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-safe-stack.html" data-problem="thread-safe-stack"><span class="pk">Thread-safe structures · warm-up</span><b>Thread-safe stack</b><span class="pst"></span></a><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-lifetime-stack-heap.html"><span>Previous</span><b>Object lifetime, the stack and the heap</b></a><a class="next" href="cpp-const-and-mutable.html"><span>Next</span><b>const correctness and mutable</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#constructors-and-member-initializer-lists">Constructors and member initializer lists</a><a href="#destructors-cleanup-on-scope-exit">Destructors: cleanup on scope exit</a><a href="#raii-acquire-in-the-constructor-release-in-the-destructor">RAII: acquire in the constructor, release in the destructor</a><a href="#the-standard-raii-types-for-threads">The standard RAII types for threads</a><a href="#std-thread-versus-std-jthread">std::thread versus std::jthread</a><a href="#the-rules-of-zero-three-and-five">The rules of zero, three and five</a><a href="#exception-safety-raii-releases-it-does-not-roll-back">Exception safety: RAII releases, it does not roll back</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

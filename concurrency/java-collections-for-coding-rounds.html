@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Collections for coding rounds: comparators, heaps, trees and traps · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-collections-for-coding-rounds" data-title="Collections for coding rounds: comparators, heaps, trees and traps" data-track="java" data-module="java-2" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details open><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional"><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds" class=here><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m2">Module 02: Modern Java every day</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 02.9</span><span>36 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Collections for coding rounds: comparators, heaps, trees and traps</h1><p class="lsum">Turn ordering, top-k, predecessor queries and counting into reliable Java code, without comparator, collection view or boxing surprises.</p><div class="prereq"><span>Before this:</span><a href="java-collections.html">The collections you will use</a><a href="java-lambdas-functional.html">Lambdas, functional interfaces and method references</a><a href="java-iterators-cme.html">Iterators and ConcurrentModificationException</a><a href="java-equals-hashcode.html">equals, hashCode and objects as keys</a></div></header><article class="prose" id="article">
+<p class="lead">You can have the right algorithm and still lose a coding round to a comparator that overflows, a tree that drops equal-priority jobs, or a list that refuses an insertion. Learn the exact Java operations that make your algorithm's promise true.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A railway clerk can sort the whole day's tickets, keep the next departure on top, find the last departure before noon, or serve passengers in arrival order. Each arrangement answers a different question quickly.</p>
+<p>Two passengers with the same departure time are still two passengers. A window into another clerk's register is not your own copy. Decide what stays distinct, what order matters, and who owns the paper before choosing the tool.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<p>A scheduler orders deadlines, a crawler queues work, and a metrics worker counts keys. These examples use collections owned by one thread; <a href="java-collections.html">the collections overview</a> already teaches implementation choices and sharing rules.</p>
+<p><strong>A convenient method name does not promise atomicity.</strong> Shared <code>HashMap.merge</code> calls need synchronization, and an atomic map insertion does not protect a mutable value. Continue with <a href="concurrent-hash-maps.html">concurrent hash maps</a>, <a href="scheduled-executors.html">scheduled executors</a> and <a href="java-toolkit-collections-and-synchronizers.html">the concurrent collections toolkit</a> for those mechanisms.</p>
+</div>
+
+<h2 id="write-the-ordering-rule-before-the-comparator">Write the ordering rule before the comparator</h2>
+<p><code>compare(a, b)</code> returns a negative number when a belongs before b, zero for an ordering tie, and a positive number when a belongs after b. Only the sign matters. Swapping arguments must reverse the sign, ordering must be transitive, and tied values must compare with the same sign against every third value.</p>
+<p>Complexities below assume constant-time key comparisons and equality checks. Long strings or custom comparison logic can add work to each comparison.</p>
+
+<h3>API card: comparison and sorting</h3>
+<table>
+<thead><tr><th>Operation</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>Comparator.comparing(key)</code></td><td>Compare extracted object keys; an overload takes a comparator for the key.</td></tr>
+<tr><td><code>comparingInt(key)</code>, <code>comparingLong(key)</code></td><td>Compare primitive keys without boxing them.</td></tr>
+<tr><td><code>thenComparing(key)</code> or <code>thenComparing(other)</code></td><td>Use the next key or comparator only when previous comparisons tie.</td></tr>
+<tr><td><code>thenComparingInt(key)</code>, <code>thenComparingLong(key)</code></td><td>Add a primitive tie-breaker.</td></tr>
+<tr><td><code>reversed()</code>, <code>Comparator.reverseOrder()</code></td><td>Reverse this comparator, or reverse natural order.</td></tr>
+<tr><td><code>list.sort(c)</code>, <code>Collections.sort(list, c)</code></td><td>Sort the same list in place, stably; both return <code>void</code>.</td></tr>
+<tr><td><code>Collections.sort(list)</code>, <code>list.sort(null)</code></td><td>Sort by natural order, such as ascending integers.</td></tr>
+</tbody>
+</table>
+<p>For "team ascending, priority descending, sequence ascending", reverse only the priority comparison. Calling <code>reversed()</code> after the entire chain reverses every key. Method references are explained in <a href="java-lambdas-functional.html">lambdas and method references</a>.</p>
+<p><code>Comparable&lt;T&gt;.compareTo(T)</code> defines a type's natural order; a <code>Comparator&lt;T&gt;</code> supplies an external order for a particular use. A record does not automatically implement <code>Comparable</code>. These examples assume non-null comparison keys; for nullable team names, use <code>Comparator.comparing(Job::team, Comparator.nullsLast(Comparator.naturalOrder()))</code>. That handles a null team, not a null job, and cannot override a collection's ban on null elements.</p>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.1" data-expect="ok"><figcaption><span class="ctitle">Mixed directions and an overflow boundary</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Job</span>(<span class="t">String</span> team, <span class="t">int</span> priority, <span class="t">long</span> sequence) {}
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Comparator</span>&lt;<span class="t">Job</span>&gt; order = <span class="t">Comparator</span>.<span class="f">comparing</span>(<span class="t">Job</span>::team)
+                .<span class="f">thenComparing</span>(<span class="t">Comparator</span>.<span class="f">comparingInt</span>(<span class="t">Job</span>::priority).<span class="f">reversed</span>())
+                .<span class="f">thenComparingLong</span>(<span class="t">Job</span>::sequence);
+        <span class="t">List</span>&lt;<span class="t">Job</span>&gt; jobs = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(<span class="t">List</span>.<span class="f">of</span>(
+                <span class="k">new</span> <span class="t">Job</span>(<span class="s">"B"</span>, <span class="n">9</span>, <span class="n">0</span>), <span class="k">new</span> <span class="t">Job</span>(<span class="s">"A"</span>, <span class="n">2</span>, <span class="n">2</span>),
+                <span class="k">new</span> <span class="t">Job</span>(<span class="s">"A"</span>, <span class="n">5</span>, <span class="n">1</span>), <span class="k">new</span> <span class="t">Job</span>(<span class="s">"A"</span>, <span class="n">2</span>, <span class="n">0</span>)));
+        jobs.<span class="f">sort</span>(order);
+        <span class="k">for</span> (<span class="t">Job</span> job : jobs) {
+            <span class="t">System</span>.out.<span class="f">println</span>(job.<span class="f">team</span>() + <span class="s">" "</span> + job.<span class="f">priority</span>() + <span class="s">" "</span> + job.<span class="f">sequence</span>());
+        }
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; numbers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(<span class="t">List</span>.<span class="f">of</span>(<span class="n">3</span>, <span class="n">1</span>, <span class="n">2</span>));
+        <span class="t">Collections</span>.<span class="f">sort</span>(numbers);
+        <span class="k">if</span> (!numbers.<span class="f">equals</span>(<span class="t">List</span>.<span class="f">of</span>(<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>))) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(numbers);
+        <span class="t">int</span> a = <span class="t">Integer</span>.MAX_VALUE, b = -<span class="n">1</span>;
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"subtract: "</span> + (a - b));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"compare: "</span> + <span class="t">Integer</span>.<span class="f">compare</span>(a, b));
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The jobs print <code>A 5 1</code>, <code>A 2 0</code>, <code>A 2 2</code>, then <code>B 9 0</code>. Subtraction prints <code>-2147483648</code>, falsely putting the largest integer before negative one; <code>Integer.compare</code> prints <code>1</code>. Use <code>Integer.compare</code> or <code>Long.compare</code>, never subtraction or a narrowed timestamp difference.</p>
+<p><strong>Stable sorting preserves input order among comparator ties.</strong> It cannot invent arrival order from an unordered set. Sorting requires element replacement, so fixed-size <code>Arrays.asList</code> works while <code>List.of</code> does not. See the Java 21 contracts for <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Comparator.html">comparators</a> and <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html#sort(java.util.Comparator)">list sorting</a>.</p>
+
+<h2 id="heaps-keep-the-next-item-or-the-best-k">Heaps: keep the next item, or the best k</h2>
+<p>A <code>PriorityQueue</code> is a <a class="term" data-term="binary-heap" href="glossary.html#binary-heap">binary heap</a> whose head is least according to its comparator. Natural integer order gives a min heap; <code>Comparator.reverseOrder()</code> gives a max heap. Duplicates survive, but equal priorities have no FIFO guarantee. Add an increasing unique sequence as the final key when arrival order matters.</p>
+<h3>API card: PriorityQueue</h3>
+<table>
+<thead><tr><th>Operation</th><th>Meaning and cost</th></tr></thead>
+<tbody>
+<tr><td><code>offer(x)</code></td><td>Insert, amortized O(log n) including array growth; null is rejected.</td></tr>
+<tr><td><code>peek()</code></td><td>Examine the head in O(1), or return null when empty.</td></tr>
+<tr><td><code>poll()</code></td><td>Remove the head in O(log n), or return null when empty.</td></tr>
+<tr><td><code>remove(x)</code>, <code>contains(x)</code></td><td>Search by equality in O(n); removal deletes one occurrence.</td></tr>
+<tr><td><code>size()</code>, <code>isEmpty()</code></td><td>Inspect the element count in O(1).</td></tr>
+</tbody>
+</table>
+
+<div class="box example">
+<h3>Worked example: the largest three values seen so far</h3>
+<p>Keep a <strong>min heap of at most three values</strong>. Insert each input, then poll once if oversized. The invariant is that the heap contains the largest three values in the processed prefix, or all values when fewer than three have arrived.</p>
+<table>
+<thead><tr><th>Input</th><th>Retained values, shown sorted for explanation</th><th>Evicted</th></tr></thead>
+<tbody>
+<tr><td>4, then 1, then 7</td><td>1, 4, 7</td><td>Nothing</td></tr>
+<tr><td>7</td><td>4, 7, 7</td><td>1</td></tr>
+<tr><td>2</td><td>4, 7, 7</td><td>2</td></tr>
+<tr><td>9</td><td>7, 7, 9</td><td>4</td></tr>
+</tbody>
+</table>
+<p>This table is not heap iteration order. Repeated polling is ordered and destructive; copy the heap first if you must preserve it.</p>
+</div>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.2" data-expect="ok"><figcaption><span class="ctitle">Top-k with duplicates, plus a max heap</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">PriorityQueue</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; <span class="f">largest</span>(<span class="t">int</span>[] values, <span class="t">int</span> k) {
+        <span class="k">if</span> (k &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"negative k"</span>);
+        <span class="k">if</span> (k == <span class="n">0</span>) <span class="k">return</span> <span class="t">List</span>.<span class="f">of</span>();
+        <span class="t">PriorityQueue</span>&lt;<span class="t">Integer</span>&gt; kept = <span class="k">new</span> <span class="t">PriorityQueue</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> value : values) {
+            kept.<span class="f">offer</span>(value);
+            <span class="k">if</span> (kept.<span class="f">size</span>() &gt; k) kept.<span class="f">poll</span>();
+        }
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; answer = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">while</span> (!kept.<span class="f">isEmpty</span>()) answer.<span class="f">add</span>(kept.<span class="f">poll</span>());
+        <span class="k">return</span> answer;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">int</span>[] input = {<span class="n">4</span>, <span class="n">1</span>, <span class="n">7</span>, <span class="n">7</span>, <span class="n">2</span>, <span class="n">9</span>};
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; answer = <span class="f">largest</span>(input, <span class="n">3</span>);
+        <span class="k">if</span> (!answer.<span class="f">equals</span>(<span class="t">List</span>.<span class="f">of</span>(<span class="n">7</span>, <span class="n">7</span>, <span class="n">9</span>))) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(answer);
+        <span class="k">if</span> (!<span class="f">largest</span>(input, <span class="n">0</span>).<span class="f">isEmpty</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"k = 0"</span>);
+        <span class="k">if</span> (!<span class="f">largest</span>(<span class="k">new</span> <span class="t">int</span>[] {<span class="n">2</span>}, <span class="n">5</span>).<span class="f">equals</span>(<span class="t">List</span>.<span class="f">of</span>(<span class="n">2</span>))) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"k &gt; n"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"largest three, ascending: "</span> + answer);
+        <span class="t">PriorityQueue</span>&lt;<span class="t">Integer</span>&gt; max = <span class="k">new</span> <span class="t">PriorityQueue</span>&lt;&gt;(<span class="t">Comparator</span>.<span class="f">reverseOrder</span>());
+        max.<span class="f">addAll</span>(<span class="t">List</span>.<span class="f">of</span>(<span class="t">Integer</span>.MIN_VALUE, <span class="n">3</span>, <span class="t">Integer</span>.MAX_VALUE));
+        <span class="k">while</span> (!max.<span class="f">isEmpty</span>()) <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"max poll: "</span> + max.<span class="f">poll</span>());
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>For n inputs and k at least one, processing costs O(n log(k + 1)); retained storage is O(k). Draining m retained values costs O(m log(m + 1)). A max heap of size k instead keeps the smallest k. Sort when you need every element ordered once.</p>
+<p>Changing a queued object's priority does not repair the heap. Remove before changing and reinsert, or enqueue immutable replacements and skip stale versions when polling. There is no decrease-key operation. The <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/PriorityQueue.html">PriorityQueue contract</a> also leaves iteration unordered.</p>
+<p>Removal by object searches using <code>equals</code>, not the priority comparator, and costs O(n). Lazy replacement avoids that search but retains stale entries until removed: compare each polled version with the authoritative current version and discard mismatches. Bound that extra memory or periodically rebuild; live task count alone no longer bounds heap size. A constructor's initial capacity is not a queue limit, and an insertion that grows the backing array can cost O(n) on that call.</p>
+
+<h2 id="trees-neighbours-ranges-and-duplicates">Trees: neighbours, ranges and duplicates</h2>
+<p>Use <code>TreeMap</code> or <code>TreeSet</code> for neighbours, ordered traversal or ranges. <strong>Comparison returning zero means the same tree key</strong>: a set rejects the second element, and a map replaces the existing value. Ordering equivalence should match <code>equals</code> for the usual set and map contracts; revisit <a href="java-equals-hashcode.html">equality and keys</a> for the distinction from hashing.</p>
+<h3>API card: navigable trees</h3>
+<table>
+<thead><tr><th>TreeMap</th><th>TreeSet</th><th>Meaning in ascending numeric order</th></tr></thead>
+<tbody>
+<tr><td><code>floorKey(x)</code></td><td><code>floor(x)</code></td><td>Greatest key at most x, or null.</td></tr>
+<tr><td><code>ceilingKey(x)</code></td><td><code>ceiling(x)</code></td><td>Smallest key at least x, or null.</td></tr>
+<tr><td><code>lowerKey(x)</code>, <code>higherKey(x)</code></td><td><code>lower(x)</code>, <code>higher(x)</code></td><td>Strictly below or above x, or null.</td></tr>
+<tr><td><code>firstEntry()</code>, <code>lastEntry()</code></td><td><code>first()</code>, <code>last()</code></td><td>Examine an endpoint; map methods return null on empty, set methods throw.</td></tr>
+<tr><td><code>pollFirstEntry()</code>, <code>pollLastEntry()</code></td><td><code>pollFirst()</code>, <code>pollLast()</code></td><td>Remove an endpoint; return null on empty.</td></tr>
+<tr><td><code>headMap(x, inclusive)</code></td><td><code>headSet(x, inclusive)</code></td><td>Backed view below the bound, optionally including it.</td></tr>
+<tr><td><code>tailMap(x, inclusive)</code></td><td><code>tailSet(x, inclusive)</code></td><td>Backed view above the bound, optionally including it.</td></tr>
+<tr><td><code>subMap(lo, true, hi, false)</code></td><td><code>subSet(lo, true, hi, false)</code></td><td>Backed view from lo inclusive to hi exclusive.</td></tr>
+</tbody>
+</table>
+<p>One-argument <code>headMap(x)</code> excludes x; <code>tailMap(x)</code> includes x. Navigation follows the comparator, so "first" means numerically largest under reverse order. Basic updates and neighbour queries cost O(log n); traversing r range entries costs O(log n + r). Computing a range view's size may scan it.</p>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.3" data-expect="ok"><figcaption><span class="ctitle">Tree boundaries and a range view that writes through</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">NavigableMap</span>;
+<span class="k">import</span> java.util.<span class="t">Objects</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">TreeMap</span>&lt;<span class="t">Integer</span>, <span class="t">String</span>&gt; versions = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;(
+                <span class="t">Map</span>.<span class="f">of</span>(<span class="n">10</span>, <span class="s">"v1"</span>, <span class="n">20</span>, <span class="s">"v2"</span>, <span class="n">30</span>, <span class="s">"v3"</span>));
+        <span class="k">if</span> (!<span class="t">Objects</span>.<span class="f">equals</span>(versions.<span class="f">floorKey</span>(<span class="n">25</span>), <span class="n">20</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"floor"</span>);
+        <span class="k">if</span> (!<span class="t">Objects</span>.<span class="f">equals</span>(versions.<span class="f">ceilingKey</span>(<span class="n">25</span>), <span class="n">30</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"ceiling"</span>);
+        <span class="k">if</span> (versions.<span class="f">floorKey</span>(<span class="n">5</span>) != <span class="k">null</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"missing floor"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"first: "</span> + versions.<span class="f">firstEntry</span>());
+        <span class="t">NavigableMap</span>&lt;<span class="t">Integer</span>, <span class="t">String</span>&gt; earlier = versions.<span class="f">headMap</span>(<span class="n">20</span>, <span class="k">true</span>);
+        <span class="t">TreeMap</span>&lt;<span class="t">Integer</span>, <span class="t">String</span>&gt; saved = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;(earlier);
+        earlier.<span class="f">remove</span>(<span class="n">10</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"original: "</span> + versions);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"saved: "</span> + saved);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"strictly later: "</span> + versions.<span class="f">tailMap</span>(<span class="n">20</span>, <span class="k">false</span>));
+        <span class="k">if</span> (versions.<span class="f">containsKey</span>(<span class="n">10</span>) || !saved.<span class="f">containsKey</span>(<span class="n">10</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"view"</span>);
+        <span class="t">TreeSet</span>&lt;<span class="t">Integer</span>&gt; available = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(<span class="t">List</span>.<span class="f">of</span>(<span class="n">10</span>, <span class="n">20</span>, <span class="n">30</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"floor and ceiling: "</span> + available.<span class="f">floor</span>(<span class="n">25</span>) + <span class="s">" "</span> + available.<span class="f">ceiling</span>(<span class="n">25</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"removed first: "</span> + available.<span class="f">pollFirst</span>());
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"remaining: "</span> + available);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The original becomes <code>{20=v2, 30=v3}</code> while the copy stays <code>{10=v1, 20=v2}</code>. Views share storage, including removals; inserting an out-of-range key through one throws <code>IllegalArgumentException</code>. Copying a tree copies references, not its key and value objects.</p>
+<p><code>firstEntry()</code> returns an entry snapshot that does not support <code>setValue</code>; update through the map. Guard a missing floor before unboxing: <code>int t = versions.floorKey(5)</code> would throw. See the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/TreeMap.html">TreeMap</a> and <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/TreeSet.html">TreeSet</a> contracts.</p>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.4" data-expect="ok"><figcaption><span class="ctitle">Equal priority is not equal identity</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Task</span>(<span class="t">int</span> priority, <span class="t">String</span> id) {}
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Task</span> a = <span class="k">new</span> <span class="t">Task</span>(<span class="n">4</span>, <span class="s">"a"</span>), b = <span class="k">new</span> <span class="t">Task</span>(<span class="n">4</span>, <span class="s">"b"</span>);
+        <span class="t">Comparator</span>&lt;<span class="t">Task</span>&gt; priorityOnly = <span class="t">Comparator</span>.<span class="f">comparingInt</span>(<span class="t">Task</span>::priority);
+        <span class="t">TreeSet</span>&lt;<span class="t">Task</span>&gt; collapsed = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(priorityOnly);
+        collapsed.<span class="f">add</span>(a);
+        <span class="t">boolean</span> added = collapsed.<span class="f">add</span>(b);
+        <span class="t">TreeMap</span>&lt;<span class="t">Task</span>, <span class="t">String</span>&gt; map = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;(priorityOnly);
+        map.<span class="f">put</span>(a, <span class="s">"first"</span>);
+        map.<span class="f">put</span>(b, <span class="s">"second"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"second add: "</span> + added + <span class="s">", size: "</span> + collapsed.<span class="f">size</span>());
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"value at a: "</span> + map.<span class="f">get</span>(a));
+        <span class="t">TreeSet</span>&lt;<span class="t">Task</span>&gt; distinct = <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(priorityOnly.<span class="f">thenComparing</span>(<span class="t">Task</span>::id));
+        distinct.<span class="f">add</span>(a);
+        distinct.<span class="f">add</span>(b);
+        <span class="k">if</span> (distinct.<span class="f">size</span>() != <span class="n">2</span> || added || map.<span class="f">size</span>() != <span class="n">1</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"with id: "</span> + distinct);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The fixed comparator uses both record components, matching this record's equality. A unique id does not automatically make every comparator consistent with every class's <code>equals</code>. Keep comparison fields immutable while stored; remove an old leaderboard key before inserting its replacement. Locking cannot repair an ordering rule you invalidate yourself.</p>
+<p>For duplicate numbers, a <code>TreeMap&lt;Integer, Integer&gt;</code> can store value to positive frequency: <code>bag.merge(value, 1, Integer::sum)</code> adds one. To remove one known-present value, read its count, remove the key if the count is one, otherwise store count minus one. Remove zero-count keys so neighbour queries only find live values. <code>bag.size()</code> counts distinct values, not occurrences; counts need overflow bounds, and the whole update needs one lock if shared.</p>
+<p>A tree's ordering does not provide rank in O(log n). <code>headMap(score).size()</code> may scan the range, and Java's <code>TreeMap</code> has no built-in kth-element operation. For frequent rank queries, use a structure that maintains subtree counts or a frequency index over bounded scores.</p>
+
+<h2 id="arraydeque-choose-the-two-ends-deliberately">ArrayDeque: choose the two ends deliberately</h2>
+<p>For FIFO, insert at the tail and remove at the head. For LIFO, insert and remove at the head. Prefer <code>ArrayDeque</code> to legacy <code>Stack</code>, which extends <code>Vector</code> and synchronizes individual methods without making "check, then pop" atomic.</p>
+<h3>API card: stack and queue operations</h3>
+<table>
+<thead><tr><th>Operation</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>offerLast(x)</code>, <code>pollFirst()</code>, <code>peekFirst()</code></td><td>FIFO insertion, removal and inspection; empty removal or inspection returns null.</td></tr>
+<tr><td><code>push(x)</code>, <code>pop()</code>, <code>peek()</code></td><td>LIFO at the head; <code>pop()</code> throws on empty, <code>peek()</code> returns null.</td></tr>
+<tr><td><code>offerFirst(x)</code>, <code>pollLast()</code>, <code>peekLast()</code></td><td>The other ends, useful for monotonic deque algorithms.</td></tr>
+<tr><td><code>removeFirst()</code>, <code>removeLast()</code></td><td>Remove an endpoint, throwing <code>NoSuchElementException</code> when empty.</td></tr>
+</tbody>
+</table>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.5" data-expect="ok"><figcaption><span class="ctitle">One implementation, FIFO or LIFO</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">Deque</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Deque</span>&lt;<span class="t">String</span>&gt; queue = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+        queue.<span class="f">offerLast</span>(<span class="s">"first"</span>);
+        queue.<span class="f">offerLast</span>(<span class="s">"second"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"FIFO: "</span> + queue.<span class="f">pollFirst</span>() + <span class="s">", "</span> + queue.<span class="f">pollFirst</span>());
+        <span class="t">Deque</span>&lt;<span class="t">String</span>&gt; stack = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+        stack.<span class="f">push</span>(<span class="s">"first"</span>);
+        stack.<span class="f">push</span>(<span class="s">"second"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"LIFO: "</span> + stack.<span class="f">pop</span>() + <span class="s">", "</span> + stack.<span class="f">pop</span>());
+        <span class="k">if</span> (queue.<span class="f">pollFirst</span>() != <span class="k">null</span> || stack.<span class="f">peek</span>() != <span class="k">null</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"both empty"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Endpoint operations are amortized O(1); searching or removing an interior value is O(n). Null is forbidden, capacity grows, and <code>poll</code> never waits. A constructor capacity is not a maximum size. See <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ArrayDeque.html">ArrayDeque</a> and <a href="blocking-queues.html">blocking queues</a> for the distinction.</p>
+
+<h2 id="arrays-and-list-factories-mutation-is-part-of-the-api">Arrays and list factories: mutation is part of the API</h2>
+<table>
+<thead><tr><th>Operation</th><th>Meaning and trap</th></tr></thead>
+<tbody>
+<tr><td><code>Arrays.sort(a)</code></td><td>Sort in place; <code>int[]</code> uses ascending numeric order. There is no <code>boolean[]</code> overload.</td></tr>
+<tr><td><code>Arrays.sort(objects, comparator)</code></td><td>Stable object-array sort; no comparator overload exists for <code>int[]</code>.</td></tr>
+<tr><td><code>Arrays.sort(a, from, to)</code></td><td>Sort from the inclusive lower index to the exclusive upper index.</td></tr>
+<tr><td><code>Arrays.fill(a, value)</code> or <code>Arrays.fill(a, from, to, value)</code></td><td>Assign selected slots; object values are references, not clones.</td></tr>
+<tr><td><code>Arrays.asList(array)</code></td><td>Fixed-size list backed by the object array; replacement works, resizing does not.</td></tr>
+<tr><td><code>List.of(elements)</code></td><td>Unmodifiable list rejecting null elements; its elements can still be mutable.</td></tr>
+<tr><td><code>new ArrayList&lt;&gt;(collection)</code></td><td>Independent, resizable list holding the same element references.</td></tr>
+</tbody>
+</table>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.6" data-expect="ok"><figcaption><span class="ctitle">Primitive sorting, object sorting and filling each DP row</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="k">import</span> java.util.<span class="t">Arrays</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">int</span>[] input = {<span class="n">9</span>, <span class="n">4</span>, <span class="n">1</span>, <span class="n">4</span>};
+        <span class="t">int</span>[] sorted = input.<span class="f">clone</span>();
+        <span class="t">Arrays</span>.<span class="f">sort</span>(sorted);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"sorted copy: "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(sorted));
+        <span class="k">if</span> (input[<span class="n">0</span>] != <span class="n">9</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"changed input"</span>);
+        <span class="t">int</span>[][] intervals = {{<span class="n">3</span>, <span class="n">5</span>}, {<span class="n">1</span>, <span class="n">4</span>}, {<span class="n">1</span>, <span class="n">2</span>}};
+        <span class="t">Arrays</span>.<span class="f">sort</span>(intervals, <span class="t">Comparator</span>.<span class="f">comparingInt</span>((<span class="t">int</span>[] row) -&gt; row[<span class="n">0</span>])
+                .<span class="f">thenComparingInt</span>(row -&gt; row[<span class="n">1</span>]));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"intervals: "</span> + <span class="t">Arrays</span>.<span class="f">deepToString</span>(intervals));
+        <span class="t">int</span>[][] dp = <span class="k">new</span> <span class="t">int</span>[<span class="n">2</span>][<span class="n">3</span>];
+        <span class="k">for</span> (<span class="t">int</span>[] row : dp) <span class="t">Arrays</span>.<span class="f">fill</span>(row, -<span class="n">1</span>);
+        <span class="t">Arrays</span>.<span class="f">fill</span>(dp[<span class="n">0</span>], <span class="n">1</span>, <span class="n">3</span>, <span class="n">0</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"dp: "</span> + <span class="t">Arrays</span>.<span class="f">deepToString</span>(dp));
+        <span class="k">if</span> (dp[<span class="n">1</span>][<span class="n">1</span>] != -<span class="n">1</span> || dp[<span class="n">0</span>][<span class="n">0</span>] != -<span class="n">1</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"fill range"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The interval array contains <code>int[]</code> references, so it accepts a comparator. It prints <code>[[1, 2], [1, 4], [3, 5]]</code>; the matrix prints <code>[[-1, 0, 0], [-1, -1, -1]]</code>. For primitive descending order, sort ascending and reverse by swapping endpoints.</p>
+<p>Fill each matrix row: <code>Arrays.fill(dp, -1)</code> selects an object-array overload and throws <code>ArrayStoreException</code>. Filling all outer slots with one <code>int[]</code> instead makes every row reference the same array.</p>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.7" data-expect="ok"><figcaption><span class="ctitle">Fixed-size views, primitive varargs and an unmodifiable list</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Arrays</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">String</span>[] array = {<span class="s">"b"</span>, <span class="s">"a"</span>};
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; view = <span class="t">Arrays</span>.<span class="f">asList</span>(array);
+        view.<span class="f">sort</span>(<span class="k">null</span>);
+        view.<span class="f">set</span>(<span class="n">0</span>, <span class="s">"z"</span>);
+        array[<span class="n">1</span>] = <span class="s">"q"</span>;
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"array: "</span> + <span class="t">Arrays</span>.<span class="f">toString</span>(array) + <span class="s">", view: "</span> + view);
+        <span class="k">try</span> {
+            view.<span class="f">add</span>(<span class="s">"x"</span>);
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"view grew"</span>);
+        } <span class="k">catch</span> (<span class="t">UnsupportedOperationException</span> expected) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"view cannot grow"</span>);
+        }
+        <span class="t">int</span>[] primitives = {<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>};
+        <span class="t">List</span>&lt;<span class="t">int</span>[]&gt; oneArray = <span class="t">Arrays</span>.<span class="f">asList</span>(primitives);
+        <span class="k">if</span> (oneArray.<span class="f">size</span>() != <span class="n">1</span> || oneArray.<span class="f">get</span>(<span class="n">0</span>) != primitives) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"primitive array list size: "</span> + oneArray.<span class="f">size</span>());
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; fixed = <span class="t">List</span>.<span class="f">of</span>(<span class="s">"b"</span>, <span class="s">"a"</span>);
+        <span class="k">try</span> {
+            fixed.<span class="f">set</span>(<span class="n">0</span>, <span class="s">"z"</span>);
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"list allowed replacement"</span>);
+        } <span class="k">catch</span> (<span class="t">UnsupportedOperationException</span> expected) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"List.of cannot replace"</span>);
+        }
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; editable = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(fixed);
+        editable.<span class="f">sort</span>(<span class="k">null</span>);
+        editable.<span class="f">add</span>(<span class="s">"c"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"editable: "</span> + editable);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong><code>Arrays.asList(intArray)</code> contains one element, the entire array.</strong> Varargs do not box each primitive into a separate <code>Integer</code>; loop over the primitives to build that list. <code>List.of</code> prevents list changes, including sorting, but does not freeze elements. See <a href="java-final-immutability.html">immutability and records</a>, and the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html">Arrays</a> and <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html#unmodifiable">unmodifiable list</a> contracts.</p>
+<p>On <code>List&lt;Integer&gt;</code>, <code>remove(1)</code> removes index one and returns the removed <code>Integer</code>; <code>remove(Integer.valueOf(1))</code> removes the first value equal to one and returns a boolean. From <code>[1, 2, 1]</code>, those calls independently leave <code>[1, 1]</code> and <code>[2, 1]</code>. <code>list.subList(lo, hi)</code> is another backed view, with hi exclusive: clearing it deletes that range from the parent. Structural changes to the parent outside the view invalidate its specified semantics; take an <code>ArrayList</code> copy when you need an independent result.</p>
+
+<h3>Binary search: a match is not a boundary</h3>
+<p><code>Arrays.binarySearch(a, key)</code> requires a sorted array and returns a matching index, or <code>-(insertionPoint + 1)</code> when absent. Recover an absent insertion point with <code>-(result + 1)</code>. With duplicates, a successful search may return any matching index. <code>Collections.binarySearch(list, key, comparator)</code> follows the same convention and requires sorting by that comparator; on a large linked list, navigation can still cost O(n).</p>
+<p>These are the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Arrays.html#binarySearch(int[],int)">array search</a> and <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Collections.html#binarySearch(java.util.List,T,java.util.Comparator)">list search</a> contracts. Neither method promises the first duplicate.</p>
+<p>To find the first value at least a target, keep a half-open search interval <code>[lo, hi)</code>: everything before lo is too small, everything from hi onward qualifies. For the first value strictly greater, change <code>&lt;</code> to <code>&lt;=</code>; do not search for target plus one, which can overflow.</p>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.8" data-expect="ok"><figcaption><span class="ctitle">Lower and upper boundaries without losing duplicates</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">import</span> java.util.<span class="t">Arrays</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">int</span> <span class="f">lowerBound</span>(<span class="t">int</span>[] sorted, <span class="t">int</span> target) {
+        <span class="t">int</span> lo = <span class="n">0</span>, hi = sorted.length;
+        <span class="k">while</span> (lo &lt; hi) {
+            <span class="t">int</span> mid = lo + (hi - lo) / <span class="n">2</span>;
+            <span class="k">if</span> (sorted[mid] &lt; target) lo = mid + <span class="n">1</span>;
+            <span class="k">else</span> hi = mid;
+        }
+        <span class="k">return</span> lo;
+    }
+
+    <span class="k">static</span> <span class="t">int</span> <span class="f">upperBound</span>(<span class="t">int</span>[] sorted, <span class="t">int</span> target) {
+        <span class="t">int</span> lo = <span class="n">0</span>, hi = sorted.length;
+        <span class="k">while</span> (lo &lt; hi) {
+            <span class="t">int</span> mid = lo + (hi - lo) / <span class="n">2</span>;
+            <span class="k">if</span> (sorted[mid] &lt;= target) lo = mid + <span class="n">1</span>;
+            <span class="k">else</span> hi = mid;
+        }
+        <span class="k">return</span> lo;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">int</span>[] sorted = {<span class="n">1</span>, <span class="n">4</span>, <span class="n">4</span>, <span class="n">9</span>};
+        <span class="t">int</span> lo = <span class="f">lowerBound</span>(sorted, <span class="n">4</span>), hi = <span class="f">upperBound</span>(sorted, <span class="n">4</span>);
+        <span class="k">if</span> (lo != <span class="n">1</span> || hi != <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"duplicate boundaries"</span>);
+        <span class="t">int</span> missing = <span class="t">Arrays</span>.<span class="f">binarySearch</span>(sorted, <span class="n">5</span>);
+        <span class="k">if</span> (missing != -<span class="n">4</span> || -(missing + <span class="n">1</span>) != <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"insertion"</span>);
+        <span class="k">if</span> (<span class="f">lowerBound</span>(<span class="k">new</span> <span class="t">int</span>[<span class="n">0</span>], <span class="n">4</span>) != <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"empty"</span>);
+        <span class="k">if</span> (<span class="f">upperBound</span>(<span class="k">new</span> <span class="t">int</span>[] {<span class="t">Integer</span>.MAX_VALUE}, <span class="t">Integer</span>.MAX_VALUE) != <span class="n">1</span>) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"maximum key"</span>);
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"equal range: ["</span> + lo + <span class="s">", "</span> + hi + <span class="s">"), count: "</span> + (hi - lo));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"absent result: "</span> + missing + <span class="s">", insertion index: "</span> + -(missing + <span class="n">1</span>));
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Both searches use O(log(n + 1)) time and O(1) extra space. They return n when no element qualifies, so check the result before indexing. The difference <code>upperBound(a, x) - lowerBound(a, x)</code> counts x; a predecessor at most x is at <code>upperBound(a, x) - 1</code> if that index is non-negative. Searching is logarithmic, but inserting into a sorted <code>ArrayList</code> still shifts elements in O(n).</p>
+
+<h2 id="counting-grouping-and-iterating-maps">Counting, grouping and iterating maps</h2>
+<h3>API card: Map convenience methods</h3>
+<table>
+<thead><tr><th>Operation</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><code>getOrDefault(k, fallback)</code></td><td>Read a value or fallback if absent; insert nothing. A present null stays null.</td></tr>
+<tr><td><code>merge(k, value, combine)</code></td><td>Install a non-null value if absent or mapped to null; otherwise combine old and supplied values. A null result removes the mapping.</td></tr>
+<tr><td><code>computeIfAbsent(k, factory)</code></td><td>Compute for an absent or null-valued key, installing a non-null result; a null result leaves no new mapping.</td></tr>
+<tr><td><code>entrySet()</code>, <code>keySet()</code>, <code>values()</code></td><td>Backed views; choose entries when you need both key and value.</td></tr>
+<tr><td><code>forEach((key, value) -&gt; ...)</code></td><td>Visit entries; it does not make structural changes during traversal safe.</td></tr>
+</tbody>
+</table>
+
+<figure class="code single" data-sample="java-collections-for-coding-rounds.9" data-expect="ok"><figcaption><span class="ctitle">Two counters, grouping, and deterministic map output</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">HashMap</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; words = <span class="t">List</span>.<span class="f">of</span>(<span class="s">"red"</span>, <span class="s">"blue"</span>, <span class="s">"red"</span>, <span class="s">"green"</span>, <span class="s">"blue"</span>, <span class="s">"red"</span>);
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; counts = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; byReadThenPut = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+        <span class="t">Map</span>&lt;<span class="t">Integer</span>, <span class="t">List</span>&lt;<span class="t">String</span>&gt;&gt; byLength = <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">String</span> word : words) {
+            counts.<span class="f">merge</span>(word, <span class="n">1</span>, <span class="t">Integer</span>::sum);
+            byReadThenPut.<span class="f">put</span>(word, byReadThenPut.<span class="f">getOrDefault</span>(word, <span class="n">0</span>) + <span class="n">1</span>);
+            byLength.<span class="f">computeIfAbsent</span>(word.<span class="f">length</span>(), length -&gt; <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;()).<span class="f">add</span>(word);
+        }
+        <span class="k">if</span> (!counts.<span class="f">equals</span>(byReadThenPut) || counts.<span class="f">get</span>(<span class="s">"red"</span>) != <span class="n">3</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>();
+        <span class="t">long</span> total = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; entry : <span class="k">new</span> <span class="t">TreeMap</span>&lt;&gt;(counts).<span class="f">entrySet</span>()) {
+            <span class="t">System</span>.out.<span class="f">println</span>(entry.<span class="f">getKey</span>() + <span class="s">"="</span> + entry.<span class="f">getValue</span>());
+            total += entry.<span class="f">getValue</span>();
+        }
+        <span class="k">if</span> (total != words.<span class="f">size</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(total);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"groups: "</span> + byLength);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"absent fallback: "</span> + counts.<span class="f">getOrDefault</span>(<span class="s">"black"</span>, <span class="n">0</span>));
+        <span class="k">if</span> (counts.<span class="f">containsKey</span>(<span class="s">"black"</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"fallback inserted"</span>);
+        counts.<span class="f">put</span>(<span class="s">"unknown"</span>, <span class="k">null</span>);
+        <span class="k">if</span> (counts.<span class="f">getOrDefault</span>(<span class="s">"unknown"</span>, <span class="n">0</span>) != <span class="k">null</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"null mapping"</span>);
+        counts.<span class="f">merge</span>(<span class="s">"unknown"</span>, <span class="n">1</span>, <span class="t">Integer</span>::sum);
+        counts.<span class="f">merge</span>(<span class="s">"unknown"</span>, <span class="n">1</span>, (oldValue, supplied) -&gt; <span class="k">null</span>);
+        <span class="k">if</span> (counts.<span class="f">containsKey</span>(<span class="s">"unknown"</span>)) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"merge removal"</span>);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The counter prints <code>blue=2</code>, <code>green=1</code>, <code>red=3</code>; sorting a copy makes output deterministic. <code>HashMap</code> promises no iteration order. <code>getOrDefault(k, expensive())</code> evaluates the fallback even for an existing key; <code>computeIfAbsent</code> invokes its factory only when required. Neither a factory nor a merge callback should modify the same map.</p>
+<p>For a <code>HashMap</code> owned by one thread with non-null counts, <code>counts.entrySet().removeIf(e -&gt; e.getValue() == 0)</code> removes zeros safely. Calling the map's structural modification methods inside an enhanced for loop can throw <code>ConcurrentModificationException</code>, even on one thread. The full mechanism belongs to <a href="java-iterators-cme.html">iterators and ConcurrentModificationException</a>.</p>
+<p><code>HashMap</code> counting needs confinement or locking when shared. <code>ConcurrentHashMap.merge</code> can make counting atomic per key, but <code>computeIfAbsent(k, x -&gt; new ArrayList&lt;&gt;()).add(v)</code> still exposes an unsynchronized list. Follow the <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html">Map contracts</a> and the concrete implementation's guarantees.</p>
+
+<h2 id="boxed-numbers-equality-and-hot-loops">Boxed numbers: equality and hot loops</h2>
+<p>Two <code>Integer</code> references compared with <code>==</code> use identity; use <code>Objects.equals(a, b)</code> for null-safe value equality. Comparing an <code>Integer</code> with primitive <code>3</code> unboxes it and throws if null. Caching can hide an identity bug. <a href="java-types-pitfalls-and-modern-java.html">Types and modern Java</a> covers the conversions and cache boundaries.</p>
+<p><a class="term" data-term="autoboxing" href="glossary.html#autoboxing">Autoboxing</a> makes maps convenient, but updates may create wrappers and incur GC work. Keep a hot accumulator as <code>long</code>, not <code>Long</code>, and use primitive arrays for dense bounded keys. The JIT may eliminate allocations; do not claim every boxing operation allocates or invent a speed ratio. Use <code>long</code> counts when bounds can overflow <code>int</code>; <code>Integer::sum</code> does not detect overflow.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Subtracting comparator keys.</strong> Use comparison methods, and test extremes and ties.</li>
+<li><strong>Reversing the whole comparator chain accidentally.</strong> Reverse the intended key.</li>
+<li><strong>Using a max heap to retain the largest k.</strong> Keep the weakest retained candidate at the head, using a min heap.</li>
+<li><strong>Using priority as tree identity.</strong> Distinguish full keys consistently with equality, or map each priority to a bucket.</li>
+<li><strong>Returning a range view as a snapshot.</strong> Copy under the appropriate lock, and decide whether values need copying.</li>
+<li><strong>Treating fixed-size as immutable.</strong> <code>Arrays.asList</code> permits replacement; <code>List.of</code> does not. Neither deep-copies elements.</li>
+<li><strong>Confusing a search match with the first duplicate.</strong> Use explicit lower and upper boundaries, and decode negative library results before indexing.</li>
+<li><strong>Trusting a missing exception or a map helper.</strong> Fail-fast detection is best effort; ordinary maps and nested mutable values need a sharing policy.</li>
+<li><strong>Boxed identity and boxed hot accumulators.</strong> Compare values, handle null, and keep repeated arithmetic primitive.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Expect "retain the best k", "find the latest version at or before t", "why did one task vanish?", and "now several workers call this". State the order, duplicate policy, empty result and mutation boundary before typing.</p>
+<blockquote>I will keep a min heap of at most k candidates. The root is the weakest retained candidate, so inserting and removing the root when oversized preserves the largest k seen so far. I will specify a tie-breaker when output order matters, and test duplicates, extreme keys, empty input and k equal to zero.</blockquote>
+<p>Follow ups: "Change priorities?" Remove and reinsert, or use versioned entries. "Duplicate priorities in a tree?" Distinct full comparison keys or buckets. "Can readers keep this range?" Define snapshot or locking semantics. <a href="invariants-and-critical-sections.html">Invariants and critical sections</a> turns those promises into synchronization boundaries.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Compose comparison keys, reverse only the intended key, and never subtract to compare.</li>
+<li>A heap exposes one extreme; a tree adds neighbours and ranges, with comparison ties defining duplicate keys.</li>
+<li>Use <code>ArrayDeque</code> endpoints deliberately; empty polling returns null and never waits.</li>
+<li>Distinguish fixed-size lists, unmodifiable lists, live views and shallow copies.</li>
+<li>Give map helpers explicit null, overflow and iteration policies.</li>
+<li>Choose value equality and primitive arithmetic, then define synchronization separately.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-collections-for-coding-rounds"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-collections-for-coding-rounds.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A comparator returns <code>a - b</code> for arbitrary <code>int</code> keys. What happens for <code>a = Integer.MAX_VALUE</code> and <code>b = -1</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It correctly returns a positive value.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It overflows to a negative value, incorrectly placing a before b.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Java throws <code>ArithmeticException</code>.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It returns zero because the keys are at opposite extremes.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Subtraction wraps to <code>Integer.MIN_VALUE</code>. Java does not throw for ordinary integer overflow. <code>Integer.compare(a, b)</code> returns the correct positive sign without subtracting.</div></div><div class="mcq" data-id="java-collections-for-coding-rounds.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">You need priority descending and id ascending for non-null tasks with non-null ids in <code>record Task(int priority, String id) {}</code>. Which comparator works?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>Comparator.comparingInt(Task::priority).reversed().thenComparing(Task::id)</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>Comparator.comparingInt(Task::priority).thenComparing(Task::id).reversed()</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>Comparator.comparing(Task::id).thenComparingInt(Task::priority).reversed()</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>Comparator.comparingInt(Task::priority).thenComparing(Task::id)</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Reverse priority before appending ascending id. Reversing the finished chain also reverses id. Starting with id makes id the primary key, and leaving the priority comparator unreversed sorts priority ascending.</div></div><div class="mcq" data-id="java-collections-for-coding-rounds.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A min heap retains the largest three values by offering each value and polling once when oversized. After inputs <code>4, 1, 7, 7, 2, 9</code>, what do three polls return?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>9, 7, 7</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>1, 2, 4</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>7, 7, 9</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The result is unspecified because priority queues are unordered.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The largest three include both sevens, and a min heap returns them ascending. Iteration is unordered; polling still obeys the comparator.</div></div><div class="mcq" data-id="java-collections-for-coding-rounds.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A <code>TreeSet&lt;Task&gt;</code> compares only priority. You add <code>(priority=4, id=&quot;a&quot;)</code>, then <code>(priority=4, id=&quot;b&quot;)</code>. The record's <code>equals</code> says they differ. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Both survive because their <code>equals</code> results differ.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The second add returns false and the size stays one.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The set throws <code>IllegalArgumentException</code>.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Both survive but their iteration order is unspecified.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The tree uses comparison zero as equivalence, collapsing two unequal records and violating the general equality-based set contract. A heap would retain both, but a sorted set does not.</div></div><div class="mcq" data-id="java-collections-for-coding-rounds.q5" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">A natural-order <code>TreeMap&lt;Integer, String&gt;</code> has keys 10, 20 and 30. Evaluate each statement independently from that state. Which are true? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>floorKey(25)</code> returns 20 and <code>ceilingKey(25)</code> returns 30.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>headMap(20).clear()</code> removes key 10 from the original map.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>tailMap(20)</code> excludes key 20.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>firstEntry()</code> removes the first mapping.</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Floor and ceiling include equality. The one-argument head view excludes its bound and writes through; the tail view includes its bound. <code>firstEntry</code> examines; <code>pollFirstEntry</code> removes.</div></div><div class="mcq" data-id="java-collections-for-coding-rounds.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does <code>Arrays.asList(new int[] {1, 2, 3}).size()</code> return?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">3</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">1</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">0</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile because generics reject primitive arrays.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> An <code>int[]</code> is a reference type and becomes one element of <code>List&lt;int[]&gt;</code>. Generic varargs do not box its contents into three integers.</div></div><div class="mcq" data-id="java-collections-for-coding-rounds.q7" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">A single thread owns <code>HashMap&lt;String, Integer&gt; counts</code>, containing <code>&quot;x&quot;</code> mapped to null. Evaluate each statement independently from that state. Which are true? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>counts.getOrDefault(&quot;x&quot;, 0)</code> returns null.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>counts.merge(&quot;x&quot;, 1, Integer::sum)</code> installs 1 without calling the combining function.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>counts.getOrDefault(&quot;missing&quot;, 0)</code> inserts the missing mapping.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>merge</code> remains atomic if several threads use this same <code>HashMap</code> without a lock.</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The fallback applies to absence, not stored null, and does not insert anything. Merge treats absent and null-valued keys alike when installing its supplied value, without invoking the combining function. Neither method grants <code>HashMap</code> concurrency guarantees.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-collections-for-coding-rounds.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write <code>best(scores, k)</code> for unique non-null names mapped to non-null integer scores. Return at most k names by descending score, then ascending name. Bound the heap to k candidates, handle k equal to zero, and explain its comparator.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Reverse the desired output order for the heap: its head must be the worst retained candidate, including the lexicographically largest name on a score tie. Sort only retained candidates for output.</p>
+<figure class="code single" data-sample="java-collections-for-coding-rounds.10" data-expect="ok"><figcaption><span class="ctitle">Top-k ranking with correct tie eviction</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Comparator</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">PriorityQueue</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Candidate</span>(<span class="t">String</span> name, <span class="t">int</span> score) {}
+
+    <span class="k">static</span> <span class="t">List</span>&lt;<span class="t">String</span>&gt; <span class="f">best</span>(<span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; scores, <span class="t">int</span> k) {
+        <span class="k">if</span> (k &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"negative k"</span>);
+        <span class="k">if</span> (k == <span class="n">0</span>) <span class="k">return</span> <span class="t">List</span>.<span class="f">of</span>();
+        <span class="t">Comparator</span>&lt;<span class="t">Candidate</span>&gt; outputOrder = <span class="t">Comparator</span>.<span class="f">comparingInt</span>(<span class="t">Candidate</span>::score)
+                .<span class="f">reversed</span>().<span class="f">thenComparing</span>(<span class="t">Candidate</span>::name);
+        <span class="t">PriorityQueue</span>&lt;<span class="t">Candidate</span>&gt; heap = <span class="k">new</span> <span class="t">PriorityQueue</span>&lt;&gt;(outputOrder.<span class="f">reversed</span>());
+        <span class="k">for</span> (<span class="t">Map</span>.<span class="t">Entry</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; entry : scores.<span class="f">entrySet</span>()) {
+            <span class="t">Candidate</span> candidate = <span class="k">new</span> <span class="t">Candidate</span>(entry.<span class="f">getKey</span>(), entry.<span class="f">getValue</span>());
+            <span class="k">if</span> (heap.<span class="f">size</span>() &lt; k) {
+                heap.<span class="f">offer</span>(candidate);
+            } <span class="k">else</span> <span class="k">if</span> (outputOrder.<span class="f">compare</span>(candidate, heap.<span class="f">peek</span>()) &lt; <span class="n">0</span>) {
+                heap.<span class="f">poll</span>();
+                heap.<span class="f">offer</span>(candidate);
+            }
+        }
+        <span class="t">List</span>&lt;<span class="t">Candidate</span>&gt; ranked = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(heap);
+        ranked.<span class="f">sort</span>(outputOrder);
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; names = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">Candidate</span> candidate : ranked) names.<span class="f">add</span>(candidate.<span class="f">name</span>());
+        <span class="k">return</span> names;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Integer</span>&gt; scores = <span class="t">Map</span>.<span class="f">of</span>(<span class="s">"zoe"</span>, <span class="n">9</span>, <span class="s">"amy"</span>, <span class="n">9</span>, <span class="s">"lee"</span>, <span class="t">Integer</span>.MIN_VALUE);
+        <span class="k">if</span> (!<span class="f">best</span>(scores, <span class="n">1</span>).<span class="f">equals</span>(<span class="t">List</span>.<span class="f">of</span>(<span class="s">"amy"</span>))) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"tie eviction"</span>);
+        <span class="k">if</span> (!<span class="f">best</span>(scores, <span class="n">0</span>).<span class="f">isEmpty</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"zero"</span>);
+        <span class="k">if</span> (!<span class="f">best</span>(scores, <span class="n">5</span>).<span class="f">equals</span>(<span class="t">List</span>.<span class="f">of</span>(<span class="s">"amy"</span>, <span class="s">"zoe"</span>, <span class="s">"lee"</span>))) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"large k"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="f">best</span>(scores, <span class="n">2</span>));
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>For n entries and k at least one, heap work costs O(n log(k + 1)); sorting m retained entries costs O(m log(m + 1)). Space is O(k). Unique names resolve ties, so iteration order cannot affect the answer. A shared source map needs a snapshot or synchronization contract.</p></div></div><div class="cq" data-q="java-collections-for-coding-rounds.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A method returns <code>versions.headMap(cutoff, true)</code> from a natural-order <code>TreeMap&lt;Integer, String&gt;</code> as a "snapshot". Its caller clears the result. With no intervening writes, <code>int t = versions.floorKey(cutoff)</code> throws. Explain both symptoms and the correct snapshot boundary when concurrent writers are introduced.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Clearing the backed view deletes original entries at or below the cutoff. The floor lookup then returns null, and assignment to <code>int</code> unboxes null, throwing <code>NullPointerException</code>. Keep the result as <code>Integer</code> and handle absence explicitly.</p>
+<p>Construct <code>new TreeMap&lt;&gt;(versions.headMap(cutoff, true))</code> under the same lock every access to <code>versions</code> uses, then release the lock before iterating the copy. Its structure is independent and these <code>String</code> values are immutable. For mutable value types, a shallow copy still shares references: use immutable values or copy them if their state belongs to the snapshot contract. Copying an unsynchronized tree during writes is unsafe.</p></div></div><div class="cq" data-q="java-collections-for-coding-rounds.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">A teammate proposes <code>groups.computeIfAbsent(key, k -&gt; new ArrayList&lt;&gt;()).add(value)</code> on a <code>ConcurrentHashMap</code>, saying it fixes missing groups and concurrent appends. What does it fix, and what remains?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The map coordinates value creation and publication per key. The following <code>add</code> runs on an ordinary list outside that map operation; callers can obtain the same list and race inside it. Protect each group's reads and writes with the same lock, choose a suitable concurrent value collection, or atomically replace immutable values. If groups can be removed, also define whether appending to an already removed group is allowed; protecting the list alone does not settle that lifecycle race. A plain <code>HashMap</code> would need protection even for lookup and insertion.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="java-collections-for-coding-rounds.s1" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Two equal-priority jobs enter a tree, but one disappears. Walk me through the bug and what you would change before sharing this scheduler across threads."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>The comparator returns zero for distinct jobs, so the tree treats them as one key</li><li>TreeSet rejects the second add; TreeMap replaces the existing value</li><li>Use a comparison key that preserves identity and agrees with the intended equality</li><li>Keep ordering fields immutable or remove before changing and reinserting</li><li>A lock protects shared operations but cannot repair an incorrect ordering rule</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The comparator is treating two different jobs as the same tree key. If it compares only priority, equal priorities return zero. A tree set then rejects the second insertion, and a tree map replaces the value already stored at that key. I would define the identity rule first. If both jobs must survive, I would compare priority and then a distinguishing id, with equality designed consistently. For example, priority four with id a must differ from priority four with id b. I would also keep ordering fields immutable while stored. To change priority, remove the old entry and insert a replacement. Before sharing the scheduler, I would protect its state transitions and reads with the chosen synchronization policy. A lock prevents overlapping operations, but it cannot make a comparator that discards valid jobs correct.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">When would you choose a priority queue instead, and what would happen to equal-priority arrival order?</span></p></div></div><div class="sq" data-sq="java-collections-for-coding-rounds.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Several workers need to append values to groups in a map. Why is <code>computeIfAbsent</code> not the whole thread-safety answer?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Atomicity depends on the map implementation; HashMap has no such concurrency guarantee</li><li>ConcurrentHashMap can coordinate installation of the value for one key</li><li>The following ArrayList.add is a separate operation on shared mutable state</li><li>Choose a value-level lock, a concurrent collection, or immutable replacement</li><li>Include readers and group removal in the same ownership and lifecycle contract</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">It can make group creation safe on a concurrent hash map, but it does not automatically make the group safe. On a plain hash map, even the compute operation needs external protection. With a concurrent hash map, two workers can safely obtain the same installed list, then both call add on that ordinary array list at once. Those appends are outside the map operation and can lose data or damage the list. I would choose a policy for the value: a lock used by every reader and writer, a suitable concurrent collection, or immutable replacement through an atomic map update. I would also ask whether groups can be removed. An append to a list that was just detached from the map can disappear from future lookups even if the list itself is synchronized. The full operation needs a clear lifecycle contract.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">If the operation must update two groups together, is one atomic map operation per key sufficient?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-delay-queue.html" data-problem="delay-queue"><span class="pk">Thread-safe structures · hard</span><b>Delay queue</b><span class="pst"></span></a><a class="pcard" href="p-concurrent-time-map.html" data-problem="concurrent-time-map"><span class="pk">Thread-safe structures · medium</span><b>Concurrent time-based key-value store</b><span class="pst"></span></a><a class="pcard" href="p-thread-safe-stack.html" data-problem="thread-safe-stack"><span class="pk">Thread-safe structures · warm-up</span><b>Thread-safe stack</b><span class="pst"></span></a><a class="pcard" href="p-retain-best-cache.html" data-problem="retain-best-cache"><span class="pk">Thread-safe structures · medium</span><b>Retain best cache</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-streams-optional.html"><span>Previous</span><b>Streams and Optional</b></a><a class="next" href="java-tools.html"><span>Next</span><b>javac, java, jshell, jstack and jcmd</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#write-the-ordering-rule-before-the-comparator">Write the ordering rule before the comparator</a><a href="#heaps-keep-the-next-item-or-the-best-k">Heaps: keep the next item, or the best k</a><a href="#trees-neighbours-ranges-and-duplicates">Trees: neighbours, ranges and duplicates</a><a href="#arraydeque-choose-the-two-ends-deliberately">ArrayDeque: choose the two ends deliberately</a><a href="#arrays-and-list-factories-mutation-is-part-of-the-api">Arrays and list factories: mutation is part of the API</a><a href="#counting-grouping-and-iterating-maps">Counting, grouping and iterating maps</a><a href="#boxed-numbers-equality-and-hot-loops">Boxed numbers: equality and hot loops</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Predict the output, C++ set 1 · Drill · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-test page-drill" data-test="drill-predict-cpp-01" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><section class="pagehead"><p class="eyebrow"><a href="practice.html#drills">Timed drills</a> · Predict the output · C++</p><h1>Predict the output, C++ set 1</h1><p class="hhsub">Thirteen C++ snippets: thread lifetime, std::async, lock scope, condition variables, atomics and undefined behaviour.</p><p>Microsoft interviewers have handed candidates multithreaded C++ and asked them to predict the output before finding the bugs. In C++ the honest answer is sometimes "the program aborts" or "the behaviour is undefined", and the follow up is always "what would you see in practice". Every snippet here was built with clang in C++20 mode and run, with ThreadSanitizer or AddressSanitizer where a bug is claimed. Where several outcomes are possible, the question says "can" and every possible outcome among the options is marked correct.</p><div class="drillstart" id="dstart"><p>13 questions, 20 minutes. Answers and explanations stay hidden until you submit or the clock runs out. Multi answer questions say so; pick every option that is true.</p><button type="button" class="btn" data-dstart><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Start the clock</button><span class="tbest" data-testbest="drill-predict-cpp-01"></span></div><div class="testbar drillbar" hidden><span class="dtimer" id="dtimer">20:00</span><span id="tprog">0 answered</span><span id="tscore"></span><button type="button" class="btn small" data-dsubmit>Submit</button><button type="button" class="btn ghost small" data-treset hidden>Start again</button></div></section><section class="testbody quiz drillbody" data-test="drill-predict-cpp-01" data-drill="predict-cpp-01" data-minutes="20" hidden><div class="mcq" data-id="d-predict-cpp-01.q1" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What happens when this runs?
+<figure class="code single" data-sample="d-predict-cpp-01.1"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">void</span> <span class="f">run</span>() {
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>([] { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"work\n"</span>; });
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="f">run</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"after\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>work</code>, then <code>after</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>after</code>; <code>work</code> may or may not print before the process exits</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The program aborts through <code>std::terminate</code> at the end of <code>run()</code>; <code>after</code> never prints, and <code>work</code> may or may not appear first</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile: a <code>std::thread</code> must be joined or detached before it goes out of scope</span></button></li></ol><div class="why" hidden><strong>Why.</strong> When <code>run()</code> returns, <code>t</code> is destroyed while still joinable (never joined or detached), and the <code>std::thread</code> destructor calls <code>std::terminate</code>. The new thread may or may not have printed by then; in 20 runs it never had, and every run ended with "libc++abi: terminating". The compiler does not check this. Fix it with <code>t.join()</code>, or use <code>std::jthread</code> (C++20), whose destructor joins.</div></div><div class="mcq" data-id="d-predict-cpp-01.q2" data-a="3" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-cpp-01.2"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="t">void</span> <span class="f">work</span>() { }
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">try</span> {
+        <span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>(work);
+        <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"bad input"</span>);
+        t.<span class="f">join</span>();
+    } <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">exception</span>&amp; e) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"caught "</span> &lt;&lt; e.<span class="f">what</span>() &lt;&lt; <span class="s">"\n"</span>;
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"end\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>caught bad input</code>, then <code>end</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>caught bad input</code>, then <code>end</code>; the thread keeps running detached</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>caught bad input</code>, then the program aborts when the handler finishes</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing: <code>std::terminate</code> runs during stack unwinding, before the handler</span></button></li></ol><div class="why" hidden><strong>Why.</strong> When the exception leaves the <code>try</code> block, local objects are destroyed before the <code>catch</code> handler runs. <code>t</code> is still joinable, so its destructor calls <code>std::terminate</code> and neither line prints; the run printed only "libc++abi: terminating". This is the real reason a bare <code>std::thread</code> is dangerous: any early return or exception between creating and joining it kills the process. Use <code>std::jthread</code>, or a small RAII guard that joins in its destructor.</div></div><div class="mcq" data-id="d-predict-cpp-01.q3" data-a="1,2,3" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which statements about this code are true? Select all that apply.
+<figure class="code single" data-sample="d-predict-cpp-01.3"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="t">void</span> <span class="f">log_later</span>(<span class="t">int</span> request_id) {
+    <span class="t">std</span>::<span class="t">string</span> msg = <span class="s">"request "</span> + <span class="t">std</span>::<span class="f">to_string</span>(request_id) + <span class="s">" finished with status ok"</span>;
+    <span class="t">std</span>::<span class="t">thread</span>([&amp;msg] {
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">50</span>));
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; msg &lt;&lt; <span class="s">"\n"</span>;
+    }).<span class="f">detach</span>();
+}   <span class="c">// msg is destroyed here</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="f">log_later</span>(<span class="n">7</span>);
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">100</span>));
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It always prints the message, because main sleeps longer than the thread</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It can have undefined behaviour: if the detached thread reads <code>msg</code> after <code>log_later</code> destroys it, the reference dangles, so it may print garbage, crash or seem to work</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Capturing <code>[msg]</code> by value instead of <code>[&amp;msg]</code> fixes the lifetime bug</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">If main returned at once instead of sleeping, the process could end before the detached thread prints anything</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>detach()</code> copies everything the lambda refers to into the new thread, so the reference stays valid</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The lambda captures a reference, and <code>detach()</code> allows it to outlive the function that owns <code>msg</code>. If it reads the string after the function returns, it uses a destroyed object. The sleeps encourage that schedule but provide no synchronization or lifetime guarantee. An AddressSanitizer run reported <code>stack-use-after-return</code>; a different manifestation would not make the program valid. Main's sleep can keep the process alive, but does not keep <code>msg</code> alive. Capture the string by value or move it into the lambda so the thread owns its data. <code>detach()</code> itself does not copy referenced objects. If main returns before the detached thread finishes, process exit can cut off that work.</div></div><div class="mcq" data-id="d-predict-cpp-01.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print? The number is the elapsed milliseconds.
+<figure class="code single" data-sample="d-predict-cpp-01.4"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</span><code><span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::<span class="t">chrono</span>;   <span class="c">// steady_clock, milliseconds and the 200ms literal</span>
+
+<span class="k">auto</span> t0 = <span class="t">steady_clock</span>::<span class="f">now</span>();
+<span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, [] { <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(200ms); <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"A "</span>; });
+<span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, [] { <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(200ms); <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"B "</span>; });
+<span class="k">auto</span> ms = duration_cast&lt;<span class="t">milliseconds</span>&gt;(<span class="t">steady_clock</span>::<span class="f">now</span>() - t0).<span class="f">count</span>();
+<span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"main "</span> &lt;&lt; ms &lt;&lt; <span class="s">"\n"</span>;</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>A B main</code>, with a time of about 400</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>main 0</code>, then <code>A B</code> or <code>B A</code> about 200 ms later</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>A B main</code> or <code>B A main</code>, with a time of about 200</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile: the <code>std::future</code> returned by <code>std::async</code> must be stored</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each <code>std::async</code> call returns a <code>std::future</code> that is not stored, so it is a temporary destroyed at the end of its statement. The destructor of the last future that refers to a <code>std::async</code> shared state blocks until the task finishes. So the first statement waits for A (200 ms), then the second starts B and waits for it. The run printed <code>A B main 405</code>. Store both futures (<code>auto fa = ...; auto fb = ...;</code>) and they overlap, about 200 ms in total. It compiles; recent standard libraries mark <code>std::async</code> as <code>[[nodiscard]]</code>, so you get only a warning.</div></div><div class="mcq" data-id="d-predict-cpp-01.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-cpp-01.5"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6</span><code><span class="k">auto</span> d = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::deferred, [] { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"D "</span>; <span class="k">return</span> <span class="n">1</span>; });
+<span class="k">auto</span> n = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::deferred, [] { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"N "</span>; <span class="k">return</span> <span class="n">2</span>; });
+<span class="k">auto</span> a = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>,    [] { <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"A "</span>; <span class="k">return</span> <span class="n">3</span>; });
+a.<span class="f">wait</span>();
+<span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"M "</span>;
+<span class="t">std</span>::<span class="t">cout</span> &lt;&lt; d.<span class="f">get</span>() &lt;&lt; <span class="s">"\n"</span>;</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>D N A M 1</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>A M D 1</code>, and the deferred function runs on the main thread inside <code>get()</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>A M D 1 N</code>: <code>n</code>'s function runs when <code>n</code> is destroyed</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>A M D 1</code>, with <code>D</code> printed by a new thread that <code>get()</code> starts</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::launch::deferred</code> means lazy evaluation: nothing runs until someone calls <code>get()</code> or <code>wait()</code> on that future, and then the function runs on the calling thread. <code>std::launch::async</code> runs the function as if on a new thread, and <code>a.wait()</code> makes sure <code>A</code> is printed before <code>M</code>. <code>d.get()</code> then runs <code>D</code> on main and returns 1. <code>n</code> is never waited on, so its function never runs; destroying a deferred future does not run it. Confirmed: the run printed <code>A M D 1</code>, and a version that compared thread ids showed <code>D</code> on main.</div></div><div class="mcq" data-id="d-predict-cpp-01.q6" data-a="0,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which of these, written as the first line of <code>update</code>, keep <code>m</code> locked until <code>update</code> returns? Select all that apply.
+<figure class="code single" data-sample="d-predict-cpp-01.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</span><code><span class="t">std</span>::<span class="t">mutex</span> m;
+<span class="t">int</span> shared_total = <span class="n">0</span>;
+
+<span class="t">void</span> <span class="f">update</span>(<span class="t">int</span> x) {
+    <span class="c">// candidate line goes here</span>
+    shared_total += x;
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>std::lock_guard&lt;std::mutex&gt; lk(m);</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>std::lock_guard&lt;std::mutex&gt;{m};</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::scoped_lock lk(m);</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>std::unique_lock&lt;std::mutex&gt;(m);</code></span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>std::unique_lock&lt;std::mutex&gt; lk(m, std::defer_lock);</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The named <code>lock_guard</code> and <code>scoped_lock</code> objects live until <code>update</code> returns and keep the global mutex locked over the update. The unnamed <code>std::lock_guard&lt;std::mutex&gt;{m};</code> is destroyed at its semicolon, so it unlocks before the update. <code>std::unique_lock&lt;std::mutex&gt;(m);</code> is parsed as a declaration of a default-constructed local <code>unique_lock</code> named <code>m</code>; it shadows the global mutex and owns no lock. This declaration compiles, and a type assertion plus <code>owns_lock()</code> confirmed that interpretation. The named <code>unique_lock</code> with <code>std::defer_lock</code> also starts unlocked. Thus only A and C protect <code>shared_total</code>; ThreadSanitizer reported races for B, D and E.</div></div><div class="mcq" data-id="d-predict-cpp-01.q7" data-a="0,1,3" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which statements about this queue are true? Select all that apply.
+<figure class="code single" data-sample="d-predict-cpp-01.7"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="t">std</span>::<span class="t">mutex</span> m;
+<span class="t">std</span>::<span class="t">condition_variable</span> cv;
+<span class="t">std</span>::<span class="t">queue</span>&lt;<span class="t">int</span>&gt; jobs;
+
+<span class="t">int</span> <span class="f">take</span>() {
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m);
+    <span class="k">if</span> (jobs.<span class="f">empty</span>()) {
+        cv.<span class="f">wait</span>(lk);
+    }
+    <span class="t">int</span> j = jobs.<span class="f">front</span>();
+    jobs.<span class="f">pop</span>();
+    <span class="k">return</span> j;
+}
+
+<span class="t">void</span> <span class="f">give</span>(<span class="t">int</span> j) {
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m);
+        jobs.<span class="f">push</span>(j);
+    }
+    cv.<span class="f">notify_one</span>();
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A spurious wakeup can make <code>take()</code> call <code>front()</code> on an empty queue, which is undefined behaviour</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A consumer that was not waiting can grab the job between the notify and the woken consumer relocking <code>m</code>, so the woken consumer finds the queue empty</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Calling <code>notify_one()</code> after the lock is released can lose the notification here</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Writing <code>cv.wait(lk, [] { return !jobs.empty(); });</code> instead of the <code>if</code> fixes both problems</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot"><code>cv.wait</code> would work just as well with a <code>std::lock_guard</code></span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> A spurious wakeup can return from <code>wait</code> with no job available. Even after a real notification, another consumer can take the job before the awakened consumer reacquires the mutex. Because <code>if</code> does not recheck, either case can lead to <code>front()</code> on an empty queue, violating its precondition. <code>cv.wait(lk, [] { return !jobs.empty(); });</code> loops until the predicate holds while the mutex is owned. Notifying after unlocking is safe here because the queue state changes under that same mutex; the predicate preserves the information even if no thread is currently waiting. <code>std::condition_variable</code> requires <code>std::unique_lock&lt;std::mutex&gt;</code> so it can unlock and relock. <code>condition_variable_any</code> supports other lockable types, but a <code>lock_guard</code> still cannot be used because it provides no <code>lock()</code> or <code>unlock()</code> operations.</div></div><div class="mcq" data-id="d-predict-cpp-01.q8" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this do?
+<figure class="code single" data-sample="d-predict-cpp-01.8"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="t">std</span>::<span class="t">mutex</span> m;
+<span class="t">std</span>::<span class="t">condition_variable</span> cv;
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>([] { cv.<span class="f">notify_one</span>(); });
+    t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m);
+    cv.<span class="f">wait</span>(lk);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"woke\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Prints <code>woke</code>: the notification is remembered until someone waits</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It can wait indefinitely: the notification happened with no waiter and was not saved; only a spurious wakeup could make this wait return</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Throws <code>std::system_error</code>, because <code>notify_one</code> was called without holding <code>m</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Undefined behaviour, because <code>notify_one</code> requires at least one waiting thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A condition variable has no memory. A notify with no waiter does nothing, and it is legal, with or without the mutex. The <code>join()</code> makes sure the notify happened before main waits, so main waits for a signal that already came and went (the run hung until it was killed). This is the lost wakeup. The cure is a predicate guarded by the mutex: set <code>ready = true</code> under the lock before notifying, and wait with <code>cv.wait(lk, [] { return ready; })</code>, which returns at once if the flag is already set. A semaphore, by contrast, does remember a release.</div></div><div class="mcq" data-id="d-predict-cpp-01.q9" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-cpp-01.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; hits{<span class="n">0</span>};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; ts;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+        ts.<span class="f">emplace_back</span>([] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">1000</span>; i += <span class="n">1</span>) {
+                hits.<span class="f">fetch_add</span>(<span class="n">1</span>, <span class="t">std</span>::memory_order_relaxed);
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : ts) t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; hits.<span class="f">load</span>(<span class="t">std</span>::memory_order_relaxed) &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always <code>4000</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Anything from 1000 to 4000, because relaxed ordering allows lost updates</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Any value at all: relaxed atomics are a data race</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Always <code>4000</code> on x86, but possibly less on ARM</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A memory order says how an atomic operation orders the other memory accesses around it; it never weakens the atomicity of the operation itself. <code>fetch_add</code> is an atomic read, modify, write at every memory order, and each one reads the latest value in that variable's modification order, so no increment is lost. The joins make every increment visible to the final load. This was run on ARM64 (where relaxed really is weaker than on x86): 4000, and ThreadSanitizer stayed silent. Relaxed is the right choice for a statistics counter that orders nothing else.</div></div><div class="mcq" data-id="d-predict-cpp-01.q10" data-a="0,2,3" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Compiled as C++20, which statements about this program's possible behaviour are valid? Select all that apply. Compiler optimizations may change the observed outcome.
+<figure class="code single" data-sample="d-predict-cpp-01.10"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="t">bool</span> stop = <span class="k">false</span>;
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">worker</span>([] {
+        <span class="k">while</span> (!stop) {
+        }
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"worker: saw stop\n"</span>;
+    });
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">100</span>));
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"main: setting stop\n"</span>;
+    stop = <span class="k">true</span>;
+    worker.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"main: joined\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>main: setting stop</code>, <code>worker: saw stop</code>, <code>main: joined</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Only the first output: a <code>bool</code> store is a single instruction, so there is no race</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>worker: saw stop</code> first, before main has set the flag at all</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>main: setting stop</code>, then hang forever</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> The plain <code>stop</code> flag is read and written by different threads without synchronization, so the program has a data race and undefined behaviour. The standard imposes no output guarantee: the expected sequence, an early worker message and a hang are all compatible with that lack of guarantees, and these are not an exhaustive list. A single-instruction store does not remove a data race. ThreadSanitizer reported the conflicting accesses to <code>stop</code>. A tested clang <code>-O2</code> build printed the worker message before main's setting message, showing why source-level loop reasoning is unreliable here. Other builds may retain a stale value or behave differently. Use <code>std::atomic&lt;bool&gt;</code> or a mutex; C++ <code>volatile</code> does not supply thread synchronization.</div></div><div class="mcq" data-id="d-predict-cpp-01.q11" data-a="0,1,4" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Main starts three threads running <code>use(1)</code>, <code>use(2)</code> and <code>use(3)</code>, then joins them. Which statements are true? Select all that apply.
+<figure class="code single" data-sample="d-predict-cpp-01.11"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="t">std</span>::<span class="t">once_flag</span> flag;
+<span class="t">std</span>::<span class="t">mutex</span> out;
+
+<span class="t">void</span> <span class="f">use</span>(<span class="t">int</span> id) {
+    <span class="t">std</span>::<span class="t">call_once</span>(flag, [id] {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(out);
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"init "</span> &lt;&lt; id &lt;&lt; <span class="s">"\n"</span>;
+    });
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(out);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"use "</span> &lt;&lt; id &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure><span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Exactly one <code>init</code> line appears, and it can name any of the three ids</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Every <code>use</code> line comes after the <code>init</code> line</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Two <code>init</code> lines can appear if two threads reach <code>call_once</code> at exactly the same instant</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">If the init function throws, the flag is set anyway and the function never runs again</span></button></li><li><button type="button" class="opt" data-i="4"><span class="ok">E</span><span class="ot">The <code>use</code> lines can come in any order</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>std::call_once</code> runs the function exactly once, picked from whichever thread gets there first, and every other caller blocks until that call has finished, so no <code>use</code> line can come before the <code>init</code> line. After that the threads race for <code>out</code>, so the <code>use</code> lines can come in any order (one run printed <code>init 1</code>, <code>use 1</code>, <code>use 3</code>, <code>use 2</code>). If the function exits with an exception, the call does not count: the exception goes to that caller and a later <code>call_once</code> runs a function again (we confirmed a second attempt ran). A function local <code>static</code> gives the same once only guarantee for initialization.</div></div><div class="mcq" data-id="d-predict-cpp-01.q12" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What happens when <code>restock_all(5)</code> is called on an inventory that has at least one item?
+<figure class="code single" data-sample="d-predict-cpp-01.12"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13</span><code><span class="k">class</span> Inventory {
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">int</span>&gt; stock_;
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">add</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; item, <span class="t">int</span> n) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        stock_[item] += n;
+    }
+    <span class="t">void</span> <span class="f">restock_all</span>(<span class="t">int</span> n) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lk</span>(m_);
+        <span class="k">for</span> (<span class="k">auto</span>&amp; [item, count] : stock_) <span class="f">add</span>(item, n);
+    }
+};</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It works: a thread may lock a <code>std::mutex</code> it already holds</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Undefined behaviour: locking a <code>std::mutex</code> the thread already owns; in practice the thread usually deadlocks on itself</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: <code>lock_guard</code> detects the second lock of the same mutex</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The standard requires <code>std::system_error</code> to be thrown every time</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>restock_all</code> holds <code>m_</code> and calls <code>add</code>, which locks <code>m_</code> again on the same thread. <code>std::mutex</code> is not recursive, and locking it while owning it breaks a precondition of <code>lock()</code>, so the behaviour is undefined. An implementation may detect it and throw <code>resource_deadlock_would_occur</code>, but nothing requires that; our macOS build simply hung. The usual fix is a private helper that assumes the lock is held (<code>add_locked</code>), called by both public methods. Reaching for <code>std::recursive_mutex</code> usually hides a design problem. In Java, <code>synchronized</code> and <code>ReentrantLock</code> are reentrant, so the same code works there.</div></div><div class="mcq" data-id="d-predict-cpp-01.q13" data-a="3" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?
+<figure class="code single" data-sample="d-predict-cpp-01.13"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+
+<span class="t">int</span> <span class="f">main</span>() {
+    {
+        <span class="t">std</span>::<span class="t">jthread</span> <span class="f">t</span>([](<span class="t">std</span>::<span class="t">stop_token</span> st) {
+            <span class="k">while</span> (!st.<span class="f">stop_requested</span>()) {
+                <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(10ms);
+            }
+            <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"stopped\n"</span>;
+        });
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(50ms);
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"leaving scope\n"</span>;
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"after\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>leaving scope</code>, then <code>std::terminate</code>, because <code>t</code> is still joinable at the end of the scope</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>leaving scope</code>, <code>after</code>, then <code>stopped</code>: the <code>jthread</code> detaches when it goes out of scope</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>leaving scope</code>, then it hangs: nothing tells the loop to stop</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>leaving scope</code>, <code>stopped</code>, <code>after</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::jthread</code> (C++20) fixes both <code>std::thread</code> traps. Its destructor first calls <code>request_stop()</code> and then <code>join()</code>. Because the lambda's first parameter is a <code>std::stop_token</code>, the <code>jthread</code> passes in its own token, so the loop sees <code>stop_requested()</code> become true, prints <code>stopped</code> and returns; then the join completes and main prints <code>after</code>. Confirmed by running it. It would hang only if the function ignored the token (the next set has that case).</div></div></section><section class="testend" id="testend" hidden></section></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The toolkit: async, future, promise and packaged_task · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-toolkit-futures-and-async" data-title="The toolkit: async, future, promise and packaged_task" data-track="cpp" data-module="cpp-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables"><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details open><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async" class=here><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m5">Module 05: The concurrency toolkit</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.5</span><span>28 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The toolkit: async, future, promise and packaged_task</h1><p class="lsum">Separate execution from result delivery, choose async launch policies, propagate exceptions, and understand shared states and future lifetime traps.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Google</span><span class="co">Microsoft</span></div><div class="prereq"><span>Before this:</span><a href="cpp-toolkit-threads.html">The toolkit: std::thread, std::jthread and thread_local</a><a href="cpp-exceptions.html">Exceptions, noexcept and exception safety</a><a href="cpp-move-semantics.html">Copy, move and move-only types</a></div></header><article class="prose" id="article">
+<p class="lead">A thread describes execution. A <a class="term" data-term="future" href="glossary.html#future">future</a> describes a result that may become available through a dedicated thread, a <a class="term" data-term="thread-pool" href="glossary.html#thread-pool">worker pool</a>, or deferred work.</p>
+<div class="box plain"><h3>In plain words</h3><p>A collection receipt lets you return for a parcel later. The receipt does not tell you whether one courier, a warehouse worker, or you yourself will do the remaining work. A <a class="term" data-term="promise" href="glossary.html#promise">promise</a> is the delivery end, a future is the collection end, and their shared state stores either the parcel or the explanation of failure.</p></div>
+<div class="box why"><h3>Why this matters for concurrency</h3><p>Pool submissions return results without exposing worker threads. Exceptions must cross thread boundaries deliberately. Waiting for a result can also deadlock when the caller holds a resource the task needs. Learn these APIs here, then study <a href="futures-and-promises.html">futures and promises</a>, <a href="composing-async.html">asynchronous composition</a>, and <a href="build-thread-pool.html">building a thread pool</a>.</p></div>
+<h2 id="api-card">API card</h2>
+<table><thead><tr><th>Type or operation in <code>&lt;future&gt;</code></th><th>One line semantics</th></tr></thead><tbody>
+<tr><td><code>std::async(std::launch::async, f, args...)</code></td><td>Starts asynchronous execution and returns a future for its value or exception.</td></tr>
+<tr><td><code>std::async(std::launch::deferred, f, args...)</code></td><td>Stores work for execution by a thread making the first nontimed wait on its state.</td></tr>
+<tr><td><code>future&lt;T&gt;::get()</code></td><td>Waits, returns the result or rethrows its exception, then consumes this future's state.</td></tr>
+<tr><td><code>wait()</code></td><td>Waits for readiness without consuming the result or rethrowing a stored task exception.</td></tr>
+<tr><td><code>wait_for(duration)</code>, <code>wait_until(deadline)</code></td><td>Return <code>future_status::ready</code>, <code>timeout</code>, or <code>deferred</code>; timed waits do not run deferred work.</td></tr>
+<tr><td><code>valid()</code></td><td>Reports an associated shared state, not readiness.</td></tr>
+<tr><td><code>future::share()</code></td><td>Transfers the association into a <code>std::shared_future</code> and invalidates the original future.</td></tr>
+<tr><td><code>promise&lt;T&gt;::get_future()</code></td><td>Obtains the single future associated with this provider; call once.</td></tr>
+<tr><td><code>set_value(value)</code>, <code>set_exception(exception_ptr)</code></td><td>Store a value or failure and make the state ready; fulfill it once.</td></tr>
+<tr><td><code>packaged_task&lt;R(Args...)&gt;</code></td><td>Owns a callable and shared state; invoking it stores the callable's result or exception.</td></tr>
+<tr><td><code>packaged_task::get_future()</code>, <code>valid()</code>, <code>reset()</code></td><td>Obtain a future handle, inspect association, or prepare a new state for another invocation.</td></tr>
+<tr><td><code>shared_future&lt;T&gt;::get()</code></td><td>Allows repeated reads, returning a const reference for ordinary value <code>T</code>; copies share the result state.</td></tr>
+<tr><td><code>future_errc::broken_promise</code></td><td>A provider abandoned an unready state; retrieval throws <code>std::future_error</code>.</td></tr>
+</tbody></table>
+<h2 id="start-with-the-shared-state">Start with the shared state</h2>
+<p>A shared state is the library-managed connection between the producer and consumer. It contains readiness plus either a result or an exception. A future is a move-only handle to that state. <code>valid()</code> is true even while the task is running; a default constructed or moved-from future has no state.</p>
+<p>For an ordinary <code>std::future&lt;T&gt;</code>, <code>get()</code> waits, obtains the stored result, and invalidates the handle, including when it rethrows a stored exception. Do not call <code>get()</code> twice. Use <code>valid()</code> only for association checks; use timed waits for readiness checks. Calling <code>get()</code> or a waiting function on an invalid future is undefined behaviour in C++20; do not rely on a particular library always throwing a helpful error.</p>
+<p><strong>Readiness publishes preceding work.</strong> Successfully detecting readiness establishes the library's synchronization with the provider's result publication. A timed wait returning <code>timeout</code> or <code>deferred</code>, and a call to <code>valid()</code>, provide no such publication guarantee. See the <a href="https://timsong-cpp.github.io/cppwp/n4861/futures.state">C++20 shared-state rules</a>.</p>
+<p>That synchronization does not authorize concurrent mutation of the same external object after readiness. A future carrying a pointer also does not automatically own the pointee. Prefer a value result or an explicit owning pointer when that expresses the real lifetime.</p>
+<p><code>std::future&lt;T&gt;::get()</code> moves an ordinary value out, so <code>T</code> can be move-only, such as <code>std::unique_ptr&lt;int&gt;</code>. <code>std::future&lt;T&amp;&gt;::get()</code> returns <code>T&amp;</code> without extending the referred object's lifetime; <code>std::future&lt;void&gt;::get()</code> returns nothing but still waits and propagates failure. These are distinct <a href="https://timsong-cpp.github.io/cppwp/n4861/futures.unique.future">result retrieval contracts</a>.</p>
+<h2 id="choose-the-launch-policy-explicitly"><code>std::async</code>: choose the launch policy explicitly</h2>
+<p>With <code>std::launch::async</code>, the callable runs as if in a new thread of execution. With <code>std::launch::deferred</code>, execution is postponed until the first nontimed wait, such as <code>get()</code> or <code>wait()</code>, on the state. The waiting thread executes it. While work is still deferred, a timed wait reports <code>deferred</code> without starting it. If nobody performs a nontimed wait, the deferred callable never runs.</p>
+<p>The overload without an explicit policy permits <code>std::launch::async | std::launch::deferred</code>, so it can choose deferred execution. Specify <code>std::launch::async</code> when the contract requires a separate execution thread, although simultaneous progress still depends on scheduling. An inability to start that thread throws <code>std::system_error</code> with <code>std::errc::resource_unavailable_try_again</code>; allocation can throw <code>std::bad_alloc</code>. <code>std::async</code> is not a bounded worker pool.</p>
+<p>In C++20, <code>std::async</code> copies or moves decayed versions of the callable and arguments in the submitting thread. Failures while making those copies escape the call itself; exceptions from running the callable are stored for <code>get()</code>. Use <code>std::ref(x)</code> from <code>&lt;functional&gt;</code> to pass an argument by reference deliberately. Neither it nor a lambda's reference capture extends <code>x</code>'s lifetime: keep <code>x</code> alive through completion, or transfer ownership with a value or move capture.</p>
+<figure class="code single" data-sample="cpp-toolkit-futures-and-async.1" data-expect="ok"><figcaption><span class="ctitle">Explicit policies and the last async future</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">const</span> <span class="k">auto</span> caller = <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">get_id</span>();
+    <span class="t">bool</span> deferred_ran = <span class="k">false</span>;
+    <span class="k">auto</span> delayed = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::deferred, [&amp;] {
+        deferred_ran = <span class="k">true</span>;
+        <span class="f">assert</span>(<span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">get_id</span>() == caller);
+        <span class="k">return</span> <span class="n">21</span>;
+    });
+    <span class="f">assert</span>(delayed.<span class="f">valid</span>());
+    <span class="f">assert</span>(delayed.<span class="f">wait_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">0</span>)) == <span class="t">std</span>::future_status::deferred);
+    <span class="f">assert</span>(!deferred_ran);
+    <span class="k">const</span> <span class="t">int</span> delayed_value = delayed.<span class="f">get</span>();
+    <span class="f">assert</span>(delayed_value == <span class="n">21</span> &amp;&amp; deferred_ran);
+    <span class="f">assert</span>(!delayed.<span class="f">valid</span>());
+
+    <span class="k">auto</span> parallel = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, [] { <span class="k">return</span> <span class="n">42</span>; });
+    parallel.<span class="f">wait</span>();
+    <span class="f">assert</span>(parallel.<span class="f">valid</span>());
+    <span class="k">const</span> <span class="t">int</span> parallel_value = parallel.<span class="f">get</span>();
+    <span class="f">assert</span>(parallel_value == <span class="n">42</span>);
+
+    <span class="t">int</span> completed = <span class="n">0</span>;
+    {
+        <span class="k">auto</span> last = <span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, [&amp;] { completed = <span class="n">7</span>; });
+        <span class="c">// Releasing the last reference to this unfinished async state waits.</span>
+    }
+    <span class="f">assert</span>(completed == <span class="n">7</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"deferred on caller, async result 42, destructor completed 7\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<h2 id="the-async-destructor-trap">The async destructor trap</h2>
+<p>A future obtained with <code>std::launch::async</code> has special shared-state lifetime behavior: releasing the last reference to that state can wait for the asynchronous execution to complete. Consequently, discarding each temporary future in a loop can serialize work you intended to overlap. Keep the futures, then call <code>wait()</code> or <code>get()</code> after launching the intended set.</p>
+<p>Do not generalize this into “all future destructors join.” A future obtained from a promise or <code>std::packaged_task</code> does not gain ownership of an arbitrary producer thread. Conversely, <a class="term" data-term="shared-future" href="glossary.html#shared-future">shared future</a> copies can extend the async state lifetime, moving the final wait to another owner's destruction. The precise special case is described by the <a href="https://timsong-cpp.github.io/cppwp/n4861/futures.async">C++20 async shared-state rules</a>.</p>
+<p>A blocking destructor is especially dangerous while holding a mutex the async task needs. The same applies to <code>get()</code> and <code>wait()</code>. Establish the lifetime boundary outside such locks, including move assignment that releases an existing async state. Discarding an async future also discards ordinary result inspection: destruction waits when required but does not rethrow the task's stored exception for you.</p>
+<figure class="timeline"><figcaption>A hidden wait while holding a lock</figcaption><div class="tl c2"><div class="tl-head"><span class="t">step</span><span>Caller</span><span>Async worker</span></div><div class="tl-row"><span class="t">1</span><span class="cell">holds the service mutex and destroys the last async future</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell">waits for the worker to finish</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">needs the service mutex before it can finish</span></div><div class="tl-note">! The future&#x27;s lifetime boundary created a circular wait.</div></div></figure>
+<h2 id="explicitly-deliver-a-value-or-exception"><code>std::promise</code>: explicitly deliver a value or exception</h2>
+<p>A promise is the provider endpoint. Obtain its future before transferring the promise to a producer, so you retain the consumer handle. Move the promise, because it is not copyable. A successful <code>set_value()</code> or <code>set_exception()</code> fulfills the state once; another fulfillment throws <code>std::future_error</code> with <code>std::future_errc::promise_already_satisfied</code>.</p>
+<p><code>get_future()</code> is permitted once per shared state; repeating it throws <code>std::future_error</code> with <code>std::future_errc::future_already_retrieved</code>. Fulfillment may precede that first retrieval. Calling <code>get_future()</code>, <code>set_value()</code>, or <code>set_exception()</code> on a moved-from promise throws <code>std::future_error</code> with <code>std::future_errc::no_state</code>; this differs from an invalid future's <code>get()</code>, which has undefined behaviour.</p>
+<p>Use <code>std::promise&lt;void&gt;</code> for a completion event without a value and call its <code>set_value()</code> with no argument. For a failure, catch inside the worker and use <code>std::current_exception()</code> to capture the active exception. Pass a non-null <code>std::exception_ptr</code> to <code>set_exception()</code>; the consumer's <code>get()</code> rethrows it on the consumer thread. A plain thread does not perform this transport automatically.</p>
+<p>These result APIs date from C++11. The samples use C++20 <code>std::jthread</code> for automatic joining during unwinding; in C++17 use <code>std::thread</code> with an RAII joining guard, as in <a href="cpp-toolkit-threads.html">the threads toolkit</a>.</p>
+<figure class="code single" data-sample="cpp-toolkit-futures-and-async.2" data-expect="ok"><figcaption><span class="ctitle">Values, transported failure, and an abandoned provider</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; success;
+    <span class="k">auto</span> value = success.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">producer</span>([p = <span class="t">std</span>::<span class="f">move</span>(success)]() <span class="k">mutable</span> { p.<span class="f">set_value</span>(<span class="n">42</span>); });
+    <span class="k">const</span> <span class="t">int</span> received = value.<span class="f">get</span>();
+    <span class="f">assert</span>(received == <span class="n">42</span>);
+    producer.<span class="f">join</span>();
+
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; failure;
+    <span class="k">auto</span> result = failure.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">failing</span>([p = <span class="t">std</span>::<span class="f">move</span>(failure)]() <span class="k">mutable</span> {
+        <span class="k">try</span> { <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"load failed"</span>); }
+        <span class="k">catch</span> (...) { p.<span class="f">set_exception</span>(<span class="t">std</span>::<span class="f">current_exception</span>()); }
+    });
+    result.<span class="f">wait</span>();  <span class="c">// readiness alone does not rethrow the stored failure</span>
+    <span class="t">bool</span> caught = <span class="k">false</span>;
+    <span class="k">try</span> { (<span class="t">void</span>)result.<span class="f">get</span>(); }
+    <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp;) { caught = <span class="k">true</span>; }
+    failing.<span class="f">join</span>();
+    <span class="f">assert</span>(caught &amp;&amp; !result.<span class="f">valid</span>());
+
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; orphan;
+    {
+        <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">int</span>&gt; abandoned;
+        orphan = abandoned.<span class="f">get_future</span>();
+    }
+    <span class="t">bool</span> broken = <span class="k">false</span>;
+    <span class="k">try</span> { (<span class="t">void</span>)orphan.<span class="f">get</span>(); }
+    <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::future_error&amp; error) {
+        broken = error.<span class="f">code</span>() == <span class="t">std</span>::<span class="f">make_error_code</span>(<span class="t">std</span>::future_errc::broken_promise);
+    }
+    <span class="f">assert</span>(broken);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"value 42, task exception, broken promise\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The outer caller cannot catch a worker's escaping exception with a <code>try</code> around <code>join()</code>; an exception escaping the thread function calls <code>std::terminate()</code>. In this program the worker catches before escaping, and the shared state transports the exception. Setting an already fulfilled or moved-from promise is a separate programming error, not a task failure to silently retry.</p>
+<p>Destroying an unfulfilled provider abandons its state. If a consumer remains, it becomes ready with <code>std::future_errc::broken_promise</code> rather than waiting forever for a result that can no longer arrive. That is different from the task explicitly throwing <code>std::runtime_error</code>. It often signals a dropped task, a missing fulfillment branch, or shutdown discarding queued work.</p>
+<h3>A ready result is not necessarily an exited producer</h3>
+<p>A promise's <code>set_value()</code> can wake the consumer while the producer keeps running. It publishes work before fulfillment, not later cleanup. <code>set_value_at_thread_exit()</code> and <code>set_exception_at_thread_exit()</code> instead store the outcome now and make it ready at thread exit, after thread-local destruction; see the <a href="https://timsong-cpp.github.io/cppwp/n4861/futures.promise">promise contract</a>. Do not use these to signal per-task completion on a long-lived pool worker.</p>
+<figure class="code single" data-sample="cpp-toolkit-futures-and-async.3" data-expect="ok"><figcaption><span class="ctitle">Publish data, then let the producer finish</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> payload = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; published, release, finished;
+    <span class="k">auto</span> ready = published.<span class="f">get_future</span>();
+    <span class="k">auto</span> proceed = release.<span class="f">get_future</span>();
+    <span class="k">auto</span> done = finished.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">producer</span>([&amp;] {
+        payload = <span class="n">42</span>;
+        published.<span class="f">set_value</span>();
+        proceed.<span class="f">wait</span>();  <span class="c">// Still running after publishing the result.</span>
+        finished.<span class="f">set_value</span>();
+    });
+    ready.<span class="f">wait</span>();
+    <span class="f">assert</span>(payload == <span class="n">42</span>);  <span class="c">// Ordered by publication, before join.</span>
+    <span class="f">assert</span>(done.<span class="f">wait_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">0</span>)) == <span class="t">std</span>::future_status::timeout);
+    release.<span class="f">set_value</span>();
+    producer.<span class="f">join</span>();
+    ready.<span class="f">get</span>();  <span class="c">// wait() did not consume the state.</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"published 42 before producer exit\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<h2 id="the-callable-plus-its-result-channel"><code>std::packaged_task</code>: the callable plus its result channel</h2>
+<p>A <a class="term" data-term="packaged-task" href="glossary.html#packaged-task">packaged task</a> combines the callable with the promise-like result storage. Obtain its future, move the task into an execution mechanism, and invoke it there. Invocation stores a normal return or catches and stores the callable's exception. Construction alone starts no thread. This separation is why <code>std::packaged_task</code> is a useful building block for a pool.</p>
+<figure class="code single" data-sample="cpp-toolkit-futures-and-async.4" data-expect="ok"><figcaption><span class="ctitle">A move-only task and two readers of one result</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="p">#include &lt;array&gt;</span>
+<span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="t">int</span>(<span class="t">int</span>)&gt; <span class="f">task</span>([](<span class="t">int</span> value) { <span class="k">return</span> value * <span class="n">2</span>; });
+    <span class="k">auto</span> unique_result = task.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">shared_future</span>&lt;<span class="t">int</span>&gt; result = unique_result.<span class="f">share</span>();
+    <span class="f">assert</span>(!unique_result.<span class="f">valid</span>() &amp;&amp; result.<span class="f">valid</span>());
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">producer</span>(<span class="t">std</span>::<span class="f">move</span>(task), <span class="n">21</span>);
+    <span class="t">std</span>::<span class="t">array</span>&lt;<span class="t">int</span>, <span class="n">2</span>&gt; seen{};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; readers;
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; seen.<span class="f">size</span>(); i += <span class="n">1</span>) {
+        readers.<span class="f">emplace_back</span>([result, &amp;seen, i] { seen[i] = result.<span class="f">get</span>(); });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; reader : readers) { reader.<span class="f">join</span>(); }
+    producer.<span class="f">join</span>();
+    <span class="f">assert</span>(seen[<span class="n">0</span>] == <span class="n">42</span> &amp;&amp; seen[<span class="n">1</span>] == <span class="n">42</span>);
+    <span class="k">const</span> <span class="t">int</span> first = result.<span class="f">get</span>(), second = result.<span class="f">get</span>();
+    <span class="f">assert</span>(first == <span class="n">42</span> &amp;&amp; second == <span class="n">42</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"one task, two consumers, repeated result 42\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>For ordinary <code>T</code>, <code>std::shared_future&lt;T&gt;::get()</code> returns <code>const T&amp;</code> into the shared state. Copies keep that state alive; do not retain a reference after the owning handles are gone. <code>std::shared_future&lt;T&amp;&gt;::get()</code> returns <code>T&amp;</code>, and the <code>void</code> specialization returns nothing. Repeated <code>get()</code> calls also rethrow a stored exception repeatedly, without invalidating the handle.</p>
+<p>Give each consumer its own <code>std::shared_future</code> copy. The shared state synchronizes readiness; it does not make concurrent assignment or destruction of the same handle safe. Access through the returned result must also be safe: a shared future of a mutable pointer does not protect its pointee. Sharing a future of <code>std::unique_ptr&lt;T&gt;</code> allows observation through a const reference, not multiple transfers of unique ownership.</p>
+<p><code>std::packaged_task</code> is move-only, so <code>std::function&lt;void()&gt;</code> cannot directly hold a C++20 lambda that owns one by move. Options include a queue whose element is <code>std::packaged_task&lt;void()&gt;</code>, a custom move-only task wrapper, or a copyable lambda holding a shared pointer to a task with carefully defined single invocation.</p>
+<p><strong>Each task state is fulfilled once.</strong> A second invocation throws <code>std::future_error</code> with <code>std::future_errc::promise_already_satisfied</code>, even though <code>valid()</code> remains true. <code>reset()</code> retains the callable but creates a fresh result state: obtain a new future before reusing it. Existing futures retain the old outcome; resetting an unfulfilled task abandons the old state with <code>broken_promise</code>. See <a href="https://timsong-cpp.github.io/cppwp/n4861/futures.task.members">the task member contracts</a>.</p>
+<figure class="code single" data-sample="cpp-toolkit-futures-and-async.5" data-expect="ok"><figcaption><span class="ctitle">Stored failure, reset, and a move-only result</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="t">std</span>::<span class="t">unique_ptr</span>&lt;<span class="t">int</span>&gt;(<span class="t">int</span>)&gt; <span class="f">task</span>([](<span class="t">int</span> value) {
+        <span class="k">if</span> (value &lt; <span class="n">0</span>) { <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"negative input"</span>); }
+        <span class="k">return</span> <span class="t">std</span>::<span class="t">make_unique</span>&lt;<span class="t">int</span>&gt;(value);
+    });
+    <span class="k">auto</span> failed = task.<span class="f">get_future</span>();
+    <span class="f">task</span>(-<span class="n">1</span>);  <span class="c">// Captures the callable's exception instead of throwing it here.</span>
+    <span class="f">assert</span>(task.<span class="f">valid</span>());
+    task.<span class="f">reset</span>();
+    <span class="k">auto</span> succeeded = task.<span class="f">get_future</span>();
+    <span class="f">task</span>(<span class="n">42</span>);  <span class="c">// Runs on this thread; packaging does not schedule work.</span>
+    <span class="k">auto</span> owned = succeeded.<span class="f">get</span>();
+    <span class="f">assert</span>(owned &amp;&amp; *owned == <span class="n">42</span>);
+
+    <span class="t">bool</span> caught = <span class="k">false</span>;
+    <span class="k">try</span> { (<span class="t">void</span>)failed.<span class="f">get</span>(); }
+    <span class="k">catch</span> (<span class="k">const</span> <span class="t">std</span>::<span class="t">runtime_error</span>&amp;) { caught = <span class="k">true</span>; }
+    <span class="f">assert</span>(caught);  <span class="c">// The old state survived reset with its failure intact.</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"old failure preserved, new owned result "</span> &lt;&lt; *owned &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<h2 id="waiting-cancellation-and-pool-starvation">Waiting, cancellation, and pool starvation</h2>
+<p>C++20 <code>std::future</code> has no <code>cancel()</code> method and no built-in <code>then()</code> continuation member. A timeout from <code>wait_for()</code> stops waiting, not the underlying work. Supply a <a class="term" data-term="stop-token" href="glossary.html#stop-token">stop token</a> or another explicit cancellation protocol to the task if cancellation is part of the contract. A timeout is also not proof that the task has not started, and readiness may change immediately after that observation.</p>
+<p><strong>A timed wait does not bound the enclosing function's latency.</strong> Scheduling can delay the wait's return, and returning from a timeout branch can destroy the last async future and wait for the task anyway. Handle <code>ready</code>, <code>timeout</code>, and <code>deferred</code> separately; polling until <code>ready</code> will never start deferred work. For repeated waits use one <code>std::chrono::steady_clock</code> deadline instead of restarting the full timeout each time.</p>
+<p>A pool worker that waits on a child task submitted to the same fully occupied pool can prevent that child from ever running. This is a capacity dependency even without a mutex. Avoid blocking nested waits, reserve execution capacity deliberately, or choose a scheduler designed for that composition. The <a href="rejection-and-pool-failures.html">pool failure lesson</a> explores these cases.</p>
+<div class="box example"><h3>Worked example: submit in a small pool</h3><p>Suppose your two-worker pool accepts tasks A, B and C. Create a <code>std::packaged_task</code> and obtain its future for each submission. Under the queue mutex, either accept the task or reject it according to shutdown and capacity rules. A worker removes a task while locked, then leaves the lock scope before invoking it.</p><p>A returns 42 and B throws: their futures become ready with 42 and the captured exception respectively. If shutdown destroys queued C before invocation, C's future becomes ready with <code>broken_promise</code>; if shutdown only returns C to an owner who retains it, C remains pending. Choose that policy explicitly. None of these outcomes require exposing a worker thread to the caller, and B's callable exception does not kill its worker.</p></div>
+<div class="box mistakes"><h3>Common mistakes</h3><ul><li>Using <code>valid()</code> as a ready check: it reports state association.</li><li>Calling <code>get()</code> twice on <code>std::future</code>: use <code>std::shared_future</code> for repeated observation.</li><li>Assuming <code>wait()</code> rethrows task exceptions: <code>get()</code> performs result retrieval.</li><li>Discarding async futures and accidentally waiting at each semicolon: keep the handles until all intended launches have occurred.</li><li>Expecting a timed wait to cancel work or a promise future to join its producer: manage cancellation and thread lifetime separately.</li><li>Returning work that captures a local by reference: give the task ownership, or keep the local alive until completion.</li></ul></div>
+<div class="box interview"><h3>In the interview</h3><p>Expect “make pool submissions return results,” “why do these async calls run serially?” or “the wait timed out, so why has the request not returned?” Explain the execution policy, state ownership, and publication boundary before proposing a fix.</p><blockquote>I separate who executes the task from how its result travels. A packaged task can run on any worker and fulfill a future with a value or exception. I state the launch policy, avoid waiting under locks, and define rejection and cancellation outside the future API.</blockquote><p>Be ready to trace a dropped queued task, return a move-only result, distinguish readiness from thread exit, and explain why a pool full of waiting parents cannot run their children.</p></div>
+<div class="box takeaways"><h3>Key takeaways</h3><ul><li>A future observes a result; a thread supplies execution.</li><li><code>get()</code> consumes an ordinary future, while <code>std::shared_future</code> supports repeated reads.</li><li>Launch policy and last-state destruction can change when and where work completes.</li><li>A promise transports explicitly stored failures; a packaged task captures callable failures automatically.</li><li>Readiness publishes preceding work; timeout, cancellation, and thread exit are separate events.</li></ul></div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-toolkit-futures-and-async"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-toolkit-futures-and-async.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A valid future is not ready yet. Is that contradictory?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No, <code>valid()</code> reports association with a shared state.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes, <code>valid()</code> means <code>get()</code> cannot block.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only promises can create valid but unready futures.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Association and readiness are different. Timed waits inspect readiness; <code>valid()</code> does not, so <code>get()</code> can still block. Futures from async launches and packaged tasks can also be valid before they are ready.</div></div><div class="mcq" data-id="cpp-toolkit-futures-and-async.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A future's deferred callable has not started. What does <code>wait_for(std::chrono::milliseconds(0))</code> do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It launches a background thread.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It runs the callable and returns ready.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It reports <code>std::future_status::deferred</code> without executing the callable.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A timed wait neither starts a background thread nor executes the deferred callable. Deferred execution starts on a nontimed wait such as <code>wait()</code> or <code>get()</code>, in the thread performing that wait. After the callable has completed, later waits report readiness instead.</div></div><div class="mcq" data-id="cpp-toolkit-futures-and-async.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A task exception was stored in a future. Which call retrieves and rethrows it?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>wait()</code>, always.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>get()</code>.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>valid()</code>.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>wait()</code> waits for readiness but does not extract the result. <code>get()</code> performs retrieval and rethrows a stored exception. <code>valid()</code> only checks whether the handle refers to a shared state; an exception is still a ready outcome.</div></div><div class="mcq" data-id="cpp-toolkit-futures-and-async.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Which destructor can wait for task execution as a special shared-state rule?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Every future destructor, regardless of provider.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">No future destructor can ever wait.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The last reference release for unfinished execution launched with <code>std::launch::async</code>.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The <code>std::launch::async</code> case has special execution lifetime rules. A promise-produced or packaged-task-produced future does not automatically own or join an arbitrary producer thread, so “every destructor” is wrong. Unstarted deferred work is not executed merely because its future is destroyed, but that does not make “no destructor can wait” true.</div></div><div class="mcq" data-id="cpp-toolkit-futures-and-async.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An unfulfilled promise is destroyed while its future survives. What is the result?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The result is default constructed automatically.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The future becomes ready with <code>std::future_errc::broken_promise</code>.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The future necessarily waits forever.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Abandonment stores <code>std::future_error</code> with <code>std::future_errc::broken_promise</code> and makes the state ready. <code>get()</code> throws that error; no default result is fabricated and the missing producer does not leave the future waiting forever.</div></div><div class="mcq" data-id="cpp-toolkit-futures-and-async.q6" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why is <code>std::packaged_task</code> useful in a pool?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It separates a callable and its result channel from the thread that invokes it.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It automatically creates and sizes a worker pool.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It makes every stored callable copyable.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The pool supplies execution and queueing; constructing a packaged task creates no workers. <code>std::packaged_task</code> captures the outcome and is move-only, so neither it nor a lambda owning it becomes copyable just because the callable is packaged.</div></div><div class="mcq" data-id="cpp-toolkit-futures-and-async.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Assuming thread creation succeeds, what does this program print?
+<figure class="code single" data-sample="cpp-toolkit-futures-and-async.6"><figcaption><span class="ctitle">A completion event and plain data</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> payload = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; published;
+    <span class="k">auto</span> ready = published.<span class="f">get_future</span>();
+    <span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([&amp;] {
+        payload = <span class="n">42</span>;
+        published.<span class="f">set_value</span>();
+    });
+    ready.<span class="f">wait</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; payload &lt;&lt; <span class="s">' '</span> &lt;&lt; ready.<span class="f">valid</span>() &lt;&lt; <span class="s">'\n'</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>0 1</code> or <code>42 1</code>, depending on scheduling.</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>42 1</code>.</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>42 0</code>, because <code>wait()</code> consumes the state.</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Undefined behaviour because <code>payload</code> is not atomic.</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The write to <code>payload</code> precedes publication, which synchronizes with successful waiting. The read therefore observes 42 without a data race even before the worker is joined. <code>wait()</code> does not consume the handle, so <code>valid()</code> is true, printed as 1. A read after only <code>valid()</code> or a timed-out wait would lack this publication guarantee.</div></div><div class="qscore" hidden></div></section>
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-toolkit-futures-and-async.c1" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">Two discarded <code>std::launch::async</code> calls appear to run serially. What is the likely reason?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div>Each temporary future can be the last owner of its unfinished async state. Its destruction at the end of the statement waits before the next statement launches more work. Keep both futures until the intended launches have occurred, then retrieve results. This permits overlap; scheduling does not guarantee simultaneous execution.</div></div><div class="cq" data-q="cpp-toolkit-futures-and-async.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">How would a pool return exceptions to callers without killing its workers, including tasks dropped during shutdown?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div>Wrap tasks in <code>std::packaged_task</code> or catch inside a worker and fulfill a promise with <code>std::current_exception()</code>. Execute user work outside the queue mutex. Return the associated future so <code>get()</code> rethrows on the caller. Reject before returning a future, or return a future fulfilled with a defined rejection exception. Destroying queued, uninvoked packaged tasks makes their futures ready with <code>broken_promise</code>; merely retaining those tasks elsewhere leaves the futures pending. If the API promises a distinct cancellation exception, provide that result explicitly rather than treating abandonment as cancellation.</div></div><div class="cq" data-q="cpp-toolkit-futures-and-async.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A function times out in <code>wait_for()</code> and immediately returns, but the caller still waits for the task to finish. Why?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div>The timeout only ended that wait; the task can already be running. Returning can destroy the last future for a <code>std::launch::async</code> state, which waits for completion. Keep execution and captures alive under a longer-lived owner, or request cooperative cancellation and wait for acknowledgement if that fits the deadline contract. Neither a future timeout nor a stop request forces an uncooperative task to finish. Even the timed wait itself can return late because of scheduling.</div></div></section>
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-toolkit-futures-and-async.s1" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Compare a thread, a promise, a future, and a packaged task. Which parts would you use for a worker pool?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Thread supplies execution</li><li>Promise fulfills a shared state</li><li>Future observes its value or exception</li><li>Packaged task connects callable invocation to fulfillment</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">A thread is an execution resource. A promise is the provider side of a shared result state, and a future is the consumer side that waits and retrieves a value or exception. A packaged task combines a callable with that result channel: invoking it stores either the return value or the thrown exception. It does not start a thread by itself. That makes it useful in a pool, where the queue and workers decide when to execute it. I can return the future to the submitter while keeping thread ownership inside the pool.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What happens if a queued provider is destroyed without ever running?</span></p></div></div><div class="sq" data-sq="cpp-toolkit-futures-and-async.s2" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"Why can destroying a future unexpectedly block, and why is that dangerous under a lock?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li><code>std::launch::async</code> states have a last-reference completion rule</li><li>Temporary future destruction can serialize launches</li><li>Promise futures do not universally join producers</li><li>Waiting under a needed mutex creates a cycle</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The special case is a shared state created with <code>std::launch::async</code>. Releasing its last reference can wait for the associated execution to finish. That can happen at the end of a statement when a temporary future is discarded, so apparently parallel launches may become serial. It is also dangerous while holding a mutex: if the worker needs that mutex before returning, destruction waits for a worker that is waiting for the caller. I keep the result handles deliberately and place completion waits outside such locks. I would not generalize the behavior to every promise-produced future.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Does destroying that future rethrow a stored task exception?</span></p></div></div></section>
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-pool-from-scratch.html" data-problem="thread-pool-from-scratch"><span class="pk">Executors and async · hard</span><b>Thread pool from scratch</b><span class="pst"></span></a><a class="pcard" href="p-executor-wait-for-all.html" data-problem="executor-wait-for-all"><span class="pk">Executors and async · medium</span><b>Executor with wait for all</b><span class="pst"></span></a><a class="pcard" href="p-future-from-scratch.html" data-problem="future-from-scratch"><span class="pk">Build a primitive · hard</span><b>A future from scratch</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-pool-self-deadlock.html" data-problem="fix-the-pool-self-deadlock"><span class="pk">Bug hunts · hard</span><b>Fix the pool self-deadlock</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-toolkit-atomics.html"><span>Previous</span><b>The toolkit: std::atomic and memory orders</b></a><a class="next" href="cpp-toolkit-cpp20-sync.html"><span>Next</span><b>The toolkit: semaphores, latches, barriers and stop tokens</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#api-card">API card</a><a href="#start-with-the-shared-state">Start with the shared state</a><a href="#choose-the-launch-policy-explicitly">: choose the launch policy explicitly</a><a href="#the-async-destructor-trap">The async destructor trap</a><a href="#explicitly-deliver-a-value-or-exception">: explicitly deliver a value or exception</a><a href="#the-callable-plus-its-result-channel">: the callable plus its result channel</a><a href="#waiting-cancellation-and-pool-starvation">Waiting, cancellation, and pool starvation</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

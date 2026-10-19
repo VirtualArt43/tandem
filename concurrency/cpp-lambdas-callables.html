@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Lambdas, captures and callables · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-cpp" data-slug="cpp-lambdas-callables" data-title="Lambdas, captures and callables" data-track="cpp" data-module="cpp-2" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-cpp.html">C++ for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The language core<span class="mc" data-modfrac="cpp-1"></span></summary><ol><li><a href="cpp-how-it-runs.html" data-slug="cpp-how-it-runs"><span class="lnum">1</span><span class="lt">How C++ becomes a running program</span></a></li><li><a href="cpp-values-references-pointers.html" data-slug="cpp-values-references-pointers"><span class="lnum">2</span><span class="lt">Values, references and pointers</span></a></li><li><a href="cpp-lifetime-stack-heap.html" data-slug="cpp-lifetime-stack-heap"><span class="lnum">3</span><span class="lt">Object lifetime, the stack and the heap</span></a></li><li><a href="cpp-classes-raii.html" data-slug="cpp-classes-raii"><span class="lnum">4</span><span class="lt">Classes, constructors, destructors and RAII</span></a></li><li><a href="cpp-const-and-mutable.html" data-slug="cpp-const-and-mutable"><span class="lnum">5</span><span class="lt">const correctness and mutable</span></a></li><li><a href="cpp-types-casts-and-initialization.html" data-slug="cpp-types-casts-and-initialization"><span class="lnum">6</span><span class="lt">Types, casts, conversions and initialization</span></a></li><li><a href="cpp-memory-and-object-layout.html" data-slug="cpp-memory-and-object-layout"><span class="lnum">7</span><span class="lt">Memory and object layout: sizeof, alignment, new and delete</span></a></li></ol></details><details open><summary><span class="mn">02</span>Modern C++ every day<span class="mc" data-modfrac="cpp-2"></span></summary><ol><li><a href="cpp-move-semantics.html" data-slug="cpp-move-semantics"><span class="lnum">1</span><span class="lt">Copy, move and move-only types</span></a></li><li><a href="cpp-smart-pointers.html" data-slug="cpp-smart-pointers"><span class="lnum">2</span><span class="lt">unique_ptr, shared_ptr and weak_ptr</span></a></li><li><a href="cpp-lambdas-callables.html" data-slug="cpp-lambdas-callables" class=here><span class="lnum">3</span><span class="lt">Lambdas, captures and callables</span></a></li><li><a href="cpp-templates-auto.html" data-slug="cpp-templates-auto"><span class="lnum">4</span><span class="lt">Templates, auto and type deduction</span></a></li><li><a href="cpp-stl-containers.html" data-slug="cpp-stl-containers"><span class="lnum">5</span><span class="lt">STL containers, complexity and iterator invalidation</span></a></li><li><a href="cpp-vocabulary-types.html" data-slug="cpp-vocabulary-types"><span class="lnum">6</span><span class="lt">optional, pair, tuple, string_view and friends</span></a></li><li><a href="cpp-exceptions.html" data-slug="cpp-exceptions"><span class="lnum">7</span><span class="lt">Exceptions, noexcept and exception safety</span></a></li><li><a href="cpp-chrono.html" data-slug="cpp-chrono"><span class="lnum">8</span><span class="lt">std::chrono: durations, clocks and deadlines</span></a></li><li><a href="cpp-stl-for-coding-rounds.html" data-slug="cpp-stl-for-coding-rounds"><span class="lnum">9</span><span class="lt">The STL for coding rounds: algorithms, heaps, hashing and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="cpp-3"></span></summary><ol><li><a href="cpp-build-debug-sanitizers.html" data-slug="cpp-build-debug-sanitizers"><span class="lnum">1</span><span class="lt">Building, debugging and sanitizers</span></a></li><li><a href="cpp-under-the-hood-pthreads.html" data-slug="cpp-under-the-hood-pthreads"><span class="lnum">2</span><span class="lt">Under the hood: how std::thread maps to the OS</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented C++<span class="mc" data-modfrac="cpp-4"></span></summary><ol><li><a href="cpp-inheritance-and-virtual-functions.html" data-slug="cpp-inheritance-and-virtual-functions"><span class="lnum">1</span><span class="lt">Inheritance and virtual functions</span></a></li><li><a href="cpp-polymorphism-and-interfaces.html" data-slug="cpp-polymorphism-and-interfaces"><span class="lnum">2</span><span class="lt">Polymorphism, abstract classes and operator overloading</span></a></li><li><a href="cpp-oop-design-for-lld.html" data-slug="cpp-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Object oriented design for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="cpp-5"></span></summary><ol><li><a href="cpp-toolkit-threads.html" data-slug="cpp-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: std::thread, std::jthread and thread_local</span></a></li><li><a href="cpp-toolkit-mutexes-and-locks.html" data-slug="cpp-toolkit-mutexes-and-locks"><span class="lnum">2</span><span class="lt">The toolkit: mutexes and lock guards</span></a></li><li><a href="cpp-toolkit-condition-variables.html" data-slug="cpp-toolkit-condition-variables"><span class="lnum">3</span><span class="lt">The toolkit: condition variables</span></a></li><li><a href="cpp-toolkit-atomics.html" data-slug="cpp-toolkit-atomics"><span class="lnum">4</span><span class="lt">The toolkit: std::atomic and memory orders</span></a></li><li><a href="cpp-toolkit-futures-and-async.html" data-slug="cpp-toolkit-futures-and-async"><span class="lnum">5</span><span class="lt">The toolkit: async, future, promise and packaged_task</span></a></li><li><a href="cpp-toolkit-cpp20-sync.html" data-slug="cpp-toolkit-cpp20-sync"><span class="lnum">6</span><span class="lt">The toolkit: semaphores, latches, barriers and stop tokens</span></a></li><li><a href="cpp-toolkit-putting-it-together.html" data-slug="cpp-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="cpp-interview-style.html" data-slug="cpp-interview-style"><span class="lnum">8</span><span class="lt">Writing C++ in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-cpp.html">C++ refresher</a><span>/</span><a href="track-cpp.html#m2">Module 02: Modern C++ every day</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 02.3</span><span>24 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Lambdas, captures and callables</h1><p class="lsum">What lambdas compile to, captures and their lifetimes in threads, init captures, mutable, std::function, and handing callables to std::thread.</p><div class="asked"><span>Asked at</span><span class="co">Google</span><span class="co">Adobe</span></div><div class="prereq"><span>Before this:</span><a href="cpp-move-semantics.html">Copy, move and move-only types</a></div></header><article class="prose" id="article">
+<p class="lead">Almost every thread you start in C++ runs a lambda, and the lambda's capture list is the exact list of what that thread shares with you, and for how long. Read a capture list the way you read a lock: as a statement about sharing and lifetime.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>You are sending a colleague off to work in another building. You can pack them a lunchbox with copies of everything they need: they can go anywhere, at any time, and nothing at home is affected. Or you can leave a note: "the files are on my desk". The note is lighter, but it only works while the files are still on your desk, and if you are editing them while they read, you will get in each other's way.</p>
+<p>A lambda that <strong>captures by value</strong> packs the lunchbox. One that <strong>captures by reference</strong> leaves the note. Threads go to another building and come back on their own schedule, which is why the choice matters so much.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><code>std::thread t([&amp;] { ... });</code> captures every local it uses by reference: <strong>shared state plus a lifetime promise</strong> your code must keep until the thread finishes.</li>
+<li><code>[=]</code> copies values, but not what pointers and <code>this</code> point to. A by-value lambda can still share, and dangle.</li>
+<li>Init captures, <code>[v = std::move(v)]</code>, can transfer ownership into the thread. Moving an owning value can remove sharing; moving a pointer, view or shared owner does not prove its target is private.</li>
+<li>Callbacks run later, on some other thread. A 2024 Google phone screen had the candidate re-implement a drive search on top of <code>get_async(path, callback)</code>, which runs the callback on a thread it creates, and a 2021 Adobe C++ candidate was grilled on lambda internals.</li>
+<li>Thread pools store tasks as <code>std::function&lt;void()&gt;</code>, which requires a copyable callable, so a task that owns a <code>std::unique_ptr</code> needs a workaround you should know.</li>
+</ul>
+</div>
+
+<h2 id="what-a-lambda-is">What a lambda is</h2>
+<p>A <a class="term" data-term="lambda-expression" href="glossary.html#lambda-expression">lambda expression</a> creates an object, the <strong>closure</strong>, of a unique unnamed class type that the compiler writes for you. The general form is <code>[captures](parameters) specifiers -&gt; return_type { body }</code>, and most parts are optional. This lambda and the class below it are, for practical purposes, the same thing:</p>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.1"><figcaption><span class="ctitle">A lambda and the class the compiler generates for it</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="t">int</span> limit = <span class="n">10</span>;
+<span class="t">int</span> hits = <span class="n">0</span>;
+<span class="k">auto</span> check = [limit, &amp;hits](<span class="t">int</span> x) { <span class="k">if</span> (x &gt; limit) { hits += <span class="n">1</span>; } };
+
+<span class="c">// What the compiler generates, roughly:</span>
+<span class="k">class</span> Closure {
+<span class="k">public</span>:
+    <span class="f">Closure</span>(<span class="t">int</span> limit, <span class="t">int</span>&amp; hits) : <span class="f">limit_</span>(limit), <span class="f">hits_</span>(hits) {}
+    <span class="t">void</span> <span class="k">operator</span>()(<span class="t">int</span> x) <span class="k">const</span> {      <span class="c">// const by default: by-value captures are read-only</span>
+        <span class="k">if</span> (x &gt; limit_) {
+            hits_ += <span class="n">1</span>;                 <span class="c">// allowed: hits_ is a reference, the int it names is not const</span>
+        }
+    }
+<span class="k">private</span>:
+    <span class="t">int</span> limit_;                         <span class="c">// a by-value capture is a data member holding a copy</span>
+    <span class="t">int</span>&amp; hits_;                         <span class="c">// a by-reference capture refers to the original</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Everything else follows from that picture, and it is what "lambda internals" questions are after:</p>
+<ul>
+<li><strong>By-value captures are data members, filled in when the lambda is created</strong>, not when it is called. Reference captures refer to the original objects; their storage representation is unspecified.</li>
+<li>The call operator is <code>const</code> unless you write <code>mutable</code>, so by-value captures cannot be changed by default.</li>
+<li>Every lambda expression has its own type. Store one in <code>auto</code>, pass it to a template, or erase its type with <code>std::function</code>.</li>
+<li>A lambda with no captures converts to an ordinary function pointer, which is how you pass one to a C API.</li>
+<li>Parameters can be <code>auto</code> (a generic lambda, C++14), and C++20 allows an explicit template parameter list: <code>[]&lt;typename T&gt;(const std::vector&lt;T&gt;&amp; v) { ... }</code>.</li>
+</ul>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.2" data-expect="ok"><figcaption><span class="ctitle">Closures are ordinary objects</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> a = <span class="n">1</span>;
+    <span class="t">double</span> b = <span class="n">2.5</span>;
+    <span class="k">auto</span> none = [] { <span class="k">return</span> <span class="n">42</span>; };                 <span class="c">// captures nothing</span>
+    <span class="k">auto</span> by_value = [a, b] { <span class="k">return</span> a + b; };      <span class="c">// closure holds an int and a double</span>
+    <span class="k">auto</span> by_ref = [&amp;a, &amp;b] { <span class="k">return</span> a + b; };      <span class="c">// closure typically holds two addresses</span>
+    <span class="t">int</span> (*fp)() = none;                            <span class="c">// only a captureless lambda converts to a function pointer</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"sizes: "</span> &lt;&lt; <span class="k">sizeof</span>(none) &lt;&lt; <span class="s">", "</span> &lt;&lt; <span class="k">sizeof</span>(by_value) &lt;&lt; <span class="s">", "</span> &lt;&lt; <span class="k">sizeof</span>(by_ref) &lt;&lt; <span class="s">"\n"</span>;
+    a = <span class="n">10</span>;                                        <span class="c">// by_value copied a when it was created</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"by_value() = "</span> &lt;&lt; <span class="f">by_value</span>() &lt;&lt; <span class="s">", by_ref() = "</span> &lt;&lt; <span class="f">by_ref</span>() &lt;&lt; <span class="s">", fp() = "</span> &lt;&lt; <span class="f">fp</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>With this compiler it prints sizes 1, 16 and 16 (an empty class still has size 1; reference captures are typically stored as pointers, though the standard does not promise how), then <code>by_value() = 3.5</code> but <code>by_ref() = 12.5</code>, because only the reference capture sees the later change to <code>a</code>.</p>
+
+<h2 id="captures-the-list-of-what-you-share">Captures: the list of what you share</h2>
+<p>Every <a class="term" data-term="lambda-capture" href="glossary.html#lambda-capture">variable capture</a> form says one of two things: "copy this into the closure" or "refer to the original".</p>
+<table>
+<thead><tr><th>Capture</th><th>Meaning</th><th>What a thread running it shares with you</th></tr></thead>
+<tbody>
+<tr><td><code>[x]</code></td><td>Copy <code>x</code> now</td><td>The copy is separate, but pointers, views and shared owners inside it can still reach shared objects</td></tr>
+<tr><td><code>[&amp;x]</code></td><td>Refer to <code>x</code></td><td><code>x</code> itself: needs sync if anyone writes, and <code>x</code> must outlive the thread</td></tr>
+<tr><td><code>[=]</code></td><td>Copy every local the body uses</td><td>Whatever those copies point to</td></tr>
+<tr><td><code>[&amp;]</code></td><td>Refer to every local the body uses</td><td>All of them</td></tr>
+<tr><td><code>[this]</code>, or <code>[=, this]</code> in C++20</td><td>Copy the <code>this</code> pointer</td><td>The whole object, through the pointer</td></tr>
+<tr><td><code>[*this]</code> (C++17)</td><td>Copy the whole object</td><td>The object's copy semantics decide: pointer-like members may still share targets</td></tr>
+<tr><td><code>[v = std::move(v)]</code></td><td>Init capture: a new member initialized from an expression</td><td>The closure owns its new member; existing aliases or pointer-like members can still share its target</td></tr>
+<tr><td><code>[&amp;, x]</code> or <code>[=, &amp;total]</code></td><td>A default plus exceptions</td><td>As the parts say</td></tr>
+</tbody>
+</table>
+<p>Two rules catch people. Globals and statics are never captured; the body uses them directly, so every thread shares them. And in a member function, <code>[=]</code> does not copy members: it captures <code>this</code>, so the body reads the live object. C++20 deprecates that implicit capture of <code>this</code> through <code>[=]</code> (GCC warns by default, clang under <code>-Wdeprecated</code>), so write <code>[=, this]</code> when you mean the pointer and <code>[*this]</code> when you want a copy.</p>
+
+<h2 id="captures-and-threads-sharing-and-lifetime">Captures and threads: sharing and lifetime</h2>
+<p>A reference capture is fine when two things are both true: the referenced object outlives the thread (it is joined in the same scope, for example), and every access to it is synchronized or there are no concurrent writes. Break the first and you have a <a class="term" data-term="dangling-reference" href="glossary.html#dangling-reference">dangling reference</a>; break the second and you have a <a class="term" data-term="data-race" href="glossary.html#data-race">data race</a>. The classic bug breaks both at once:</p>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.3" data-expect="race"><figcaption><span class="ctitle">Threads created in a loop, capturing the loop variable by reference</span><span class="cnote bad">has a deliberate race</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; sum{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">4</span>; i += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;] { sum += i; });   <span class="c">// every thread shares the one loop variable i</span>
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : threads) {
+        t.<span class="f">join</span>();
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"sum = "</span> &lt;&lt; sum.<span class="f">load</span>() &lt;&lt; <span class="s">" (expected 0 + 1 + 2 + 3 = 6)\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>Four threads, one i</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Main thread</span><span>Thread 0</span><span>Thread 1</span></div><div class="tl-row"><span class="t">1</span><span class="cell">i is 0, starts thread 0 with a reference to i</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell">i += 1, starts thread 1 with a reference to the same i</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">3</span><span class="cell empty"></span><span class="cell risk">finally runs: reads i, which is now 2</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">i becomes 4, the loop ends, and i no longer exists</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell bad">reads i: a dead variable, and a data race either way</span></div><div class="tl-note">The lambda captured where i lives, not what i was.</div></div></figure>
+
+<p>On this site it printed sums like 9 and 12 instead of 6, and ThreadSanitizer reported the race on <code>i</code>. The fix is one character: capture <code>i</code> by value, <code>[&amp;sum, i]</code>, so each closure gets the value at creation time. <strong>When a lambda goes to another thread, capture by value by default</strong> and reference only what you have argued about.</p>
+
+<h2 id="init-captures-move-ownership-into-the-lambda">Init captures: move ownership into the lambda</h2>
+<p>An <a class="term" data-term="init-capture" href="glossary.html#init-capture">init capture</a> (C++14) creates a closure member from any expression. It is how you move data into a thread instead of sharing it:</p>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.4"><figcaption><span class="ctitle">Three init captures you will write constantly</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="t">std</span>::<span class="t">jthread</span> <span class="f">worker</span>([data = <span class="t">std</span>::<span class="f">move</span>(data)] { <span class="f">summarize</span>(data); });   <span class="c">// the closure owns the vector</span>
+
+pool.<span class="f">submit</span>([job = <span class="t">std</span>::<span class="t">make_unique</span>&lt;Job&gt;(spec)] { job-&gt;<span class="f">run</span>(); });     <span class="c">// a move-only capture</span>
+
+timer.<span class="f">after</span>(5s, [self = <span class="f">shared_from_this</span>()] { self-&gt;<span class="f">expire</span>(); });    <span class="c">// keep the object alive until then</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Inside the body these members are const, like any by-value capture, so you can read <code>data</code> but not move out of it unless the lambda is <code>mutable</code>. The second line also makes the closure move-only, which matters for <code>std::function</code> below.</p>
+
+<h2 id="mutable-each-closure-has-its-own-state">mutable: each closure has its own state</h2>
+<p><code>mutable</code> removes the const from the call operator, so the body can change its by-value captures. Those changes live in that particular closure object, and copies of the closure are separate objects. <code>std::thread</code> copies the callable it is given, so a thread mutates its own copy:</p>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.5" data-expect="ok"><figcaption><span class="ctitle">Whose copy is it?</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">int</span> calls = <span class="n">0</span>;
+    <span class="k">auto</span> counter = [calls]() <span class="k">mutable</span> {   <span class="c">// the closure owns a copy of calls</span>
+        calls += <span class="n">1</span>;
+        <span class="k">return</span> calls;
+    };
+    <span class="f">counter</span>();
+    <span class="f">counter</span>();                           <span class="c">// the closure's copy is now 2</span>
+    <span class="k">auto</span> twin = counter;                 <span class="c">// copying the closure copies its state</span>
+    <span class="f">twin</span>();                              <span class="c">// twin's copy is 3; counter's is still 2</span>
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>(counter);              <span class="c">// std::thread copies the closure too</span>
+    t.<span class="f">join</span>();                            <span class="c">// the thread's copy went to 3 and was destroyed</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"outer calls = "</span> &lt;&lt; calls &lt;&lt; <span class="s">", counter() = "</span> &lt;&lt; <span class="f">counter</span>() &lt;&lt; <span class="s">", twin() = "</span> &lt;&lt; <span class="f">twin</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>It prints <code>outer calls = 0, counter() = 3, twin() = 4</code>. The outer variable never changes, the thread's increments vanished with its copy, and the two named closures count independently. <code>mutable</code> makes nothing thread-safe. On a lambda it makes the call operator non-const; on a class data member it instead permits modifying that member through a const object.</p>
+
+<h2 id="function-objects-function-pointers-and-member-functions">Function objects, function pointers and member functions</h2>
+<p>A lambda is one kind of callable. A <a class="term" data-term="function-object" href="glossary.html#function-object">function object</a> is any class with an <code>operator()</code>; a function pointer and a pointer to a member function are callables too. <code>std::thread</code>, <code>std::invoke</code> and the rest of the library call all of them the same way, which hides a trap with member functions:</p>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.6" data-expect="ok"><figcaption><span class="ctitle">Every kind of callable, and one surprise</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31</span><code><span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">class</span> Counter {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">add</span>(<span class="t">int</span> n) { total_ += n; }
+    <span class="t">int</span> <span class="f">total</span>() <span class="k">const</span> { <span class="k">return</span> total_; }
+<span class="k">private</span>:
+    <span class="t">int</span> total_ = <span class="n">0</span>;
+};
+
+<span class="k">struct</span> Repeat {                                   <span class="c">// a function object: a class with operator()</span>
+    <span class="t">int</span> times;
+    <span class="t">void</span> <span class="k">operator</span>()(Counter&amp; c) <span class="k">const</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; times; i += <span class="n">1</span>) {
+            c.<span class="f">add</span>(<span class="n">1</span>);
+        }
+    }
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Counter c;
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t1</span>(&amp;Counter::add, &amp;c, <span class="n">5</span>);         <span class="c">// calls c.add(5) through a pointer: c must outlive t1</span>
+    t1.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t2</span>(&amp;Counter::add, c, <span class="n">100</span>);        <span class="c">// copies c into the thread: adds to the copy</span>
+    t2.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t3</span>(Repeat{<span class="n">3</span>}, <span class="t">std</span>::<span class="f">ref</span>(c));       <span class="c">// a function object, sharing c on purpose</span>
+    t3.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"total = "</span> &lt;&lt; c.<span class="f">total</span>() &lt;&lt; <span class="s">" (5 + 3; the copy got the 100)\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Passing <code>&amp;c</code> shares the object through a pointer; passing <code>c</code> copies the whole object into the thread, exactly like any other argument. Either can be right, but only one of them updates <code>c</code>.</p>
+
+<h2 id="std-function-one-type-for-any-callable">std::function: one type for any callable</h2>
+<p><a class="term" data-term="std-function" href="glossary.html#std-function">std::function</a> <code>&lt;R(Args...)&gt;</code> can hold any copyable callable with a matching signature: a lambda, a function object, a function pointer, a bound member function. It is the usual element type of task queues and callback lists, because every lambda has a different type and a queue needs one.</p>
+<ul>
+<li>It erases the type, so a call goes through an indirection, and storing a large closure may allocate memory (small ones usually fit in an internal buffer; the size is up to the implementation).</li>
+<li>Calling an empty <code>std::function</code> throws <code>std::bad_function_call</code>.</li>
+<li><strong>It requires a copyable target.</strong> <code>std::function&lt;void()&gt; f = [p = std::move(ptr)] { ... };</code> does not compile when <code>ptr</code> is a <code>std::unique_ptr</code>. C++23 adds <code>std::move_only_function</code>; before that, put the move-only part behind a <code>std::shared_ptr</code>.</li>
+</ul>
+
+<p>That last point is exactly the problem of a thread pool's <code>submit</code>, which must return a future. <code>std::packaged_task</code> is move-only, so the classic idiom shares it through a <code>shared_ptr</code> and stores a small copyable lambda in the queue:</p>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.7" data-expect="ok"><figcaption><span class="ctitle">submit() returning a future, on top of std::function</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">class</span> Executor {
+<span class="k">public</span>:
+    <span class="f">Executor</span>() : <span class="f">worker_</span>([<span class="k">this</span>](<span class="t">std</span>::<span class="t">stop_token</span> stop) { <span class="f">run</span>(stop); }) {}
+
+    <span class="k">template</span> &lt;<span class="k">typename</span> F&gt;
+    <span class="k">auto</span> <span class="f">submit</span>(F f) -&gt; <span class="t">std</span>::<span class="t">future</span>&lt;<span class="k">decltype</span>(<span class="f">f</span>())&gt; {
+        <span class="k">using</span> R = <span class="k">decltype</span>(<span class="f">f</span>());
+        <span class="c">// packaged_task is move-only and std::function needs a copyable target, so share it.</span>
+        <span class="k">auto</span> task = <span class="t">std</span>::<span class="t">make_shared</span>&lt;<span class="t">std</span>::<span class="t">packaged_task</span>&lt;<span class="f">R</span>()&gt;&gt;(<span class="t">std</span>::<span class="f">move</span>(f));
+        <span class="t">std</span>::<span class="t">future</span>&lt;R&gt; result = task-&gt;<span class="f">get_future</span>();
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+            tasks_.<span class="f">push_back</span>([task] { (*task)(); });   <span class="c">// copying this lambda copies a shared_ptr</span>
+        }
+        cv_.<span class="f">notify_one</span>();
+        <span class="k">return</span> result;
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">run</span>(<span class="t">std</span>::<span class="t">stop_token</span> stop) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">while</span> (cv_.<span class="f">wait</span>(lock, stop, [<span class="k">this</span>] { <span class="k">return</span> !tasks_.<span class="f">empty</span>(); })) {
+            <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt; task = <span class="t">std</span>::<span class="f">move</span>(tasks_.<span class="f">front</span>());
+            tasks_.<span class="f">pop_front</span>();
+            lock.<span class="f">unlock</span>();
+            <span class="f">task</span>();                                    <span class="c">// run it without holding the lock</span>
+            lock.<span class="f">lock</span>();
+        }
+    }
+
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable_any</span> cv_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; tasks_;          <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">jthread</span> worker_;                              <span class="c">// declared last</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Executor ex;
+    <span class="k">auto</span> data = <span class="t">std</span>::<span class="t">make_unique</span>&lt;<span class="t">int</span>&gt;(<span class="n">20</span>);
+    <span class="c">// A lambda that owns a unique_ptr is move-only; submit wraps it inside a shared packaged_task.</span>
+    <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">int</span>&gt; answer = ex.<span class="f">submit</span>([d = <span class="t">std</span>::<span class="f">move</span>(data)] { <span class="k">return</span> *d + <span class="n">22</span>; });
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"answer = "</span> &lt;&lt; answer.<span class="f">get</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>It prints <code>answer = 42</code>. You will build the full version, with several workers, shutdown and rejection, in <a href="build-thread-pool.html">build a thread pool</a>.</p>
+<p><strong><code>std::bind</code>, in a sentence:</strong> <code>std::bind(f, args...)</code> makes a callable with some arguments fixed (copied, unless wrapped in <code>std::ref</code>) and placeholders <code>_1</code>, <code>_2</code> for the rest; prefer a lambda, which is clearer and optimizes better, or C++20 <code>std::bind_front(f, args...)</code> when you only fix the leading arguments.</p>
+
+<h2 id="handing-a-callable-to-std-thread">Handing a callable to std::thread</h2>
+<p><code>std::thread t(f, args...)</code> copies or moves <code>f</code> and every argument into the new thread's storage, in the calling thread, before the constructor returns (the <a class="term" data-term="decay-copy" href="glossary.html#decay-copy">decay copy</a> from the values lesson), then calls them in the new thread. Four consequences:</p>
+<ul>
+<li><strong>Conversions happen late.</strong> Arguments are stored as their decayed types and converted to the parameter types only when the new thread calls <code>f</code>. That creates the classic dangling buffer bug below.</li>
+<li><strong>The return value is thrown away.</strong> Use a <code>std::promise</code>, a <code>std::packaged_task</code> or <code>std::async</code> to get a result back.</li>
+<li><strong>An exception escaping the callable calls <code>std::terminate</code>.</strong> Catch inside the thread and pass the error out, as covered in <a href="exceptions-in-threads.html">exceptions inside threads</a>.</li>
+<li><strong>Beware the most vexing parse.</strong> <code>std::thread t(Worker());</code> declares a function named <code>t</code> and starts nothing (clang warns). Write <code>std::thread t{Worker()};</code> or pass a lambda.</li>
+</ul>
+
+<figure class="code single" data-sample="cpp-lambdas-callables.8"><figcaption><span class="ctitle">The char buffer that dies before the string is built</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="t">void</span> <span class="f">log_line</span>(<span class="t">int</span> level, <span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; text);
+
+<span class="t">void</span> <span class="f">report</span>(<span class="t">int</span> code) {
+    <span class="t">char</span> buffer[<span class="n">64</span>];
+    <span class="t">std</span>::<span class="f">snprintf</span>(buffer, <span class="k">sizeof</span>(buffer), <span class="s">"error %d"</span>, code);
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>(log_line, <span class="n">3</span>, buffer);   <span class="c">// stores a char* pointing into this stack frame</span>
+    t.<span class="f">detach</span>();                           <span class="c">// report returns; later the thread builds a std::string</span>
+}                                         <span class="c">// from that pointer: a dangling read</span>
+
+<span class="c">// Fix: convert in the calling thread, so the thread owns a real string.</span>
+<span class="c">//   std::thread t(log_line, 3, std::string(buffer));</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<div class="box example">
+<h3>Worked example: searching a drive through get_async</h3>
+<p>This is the shape of the Google phone screen question. You are given <code>get_async(folder, callback)</code>: it lists one folder on a new thread and then calls <code>callback</code> <em>on that thread</em> with the folder's children. Find every file whose path contains <code>&quot;plan&quot;</code>, exploring folders in parallel, and return when the whole search is done. Every capture below is a decision:</p>
+<figure class="code single" data-sample="cpp-lambdas-callables.9" data-expect="ok"><figcaption><span class="ctitle">Parallel search with callbacks</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;map&gt;</span>
+<span class="p">#include &lt;memory&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// A fake remote drive: folder to children. Names ending in '/' are folders.</span>
+<span class="k">const</span> <span class="t">std</span>::<span class="t">map</span>&lt;<span class="t">std</span>::<span class="t">string</span>, <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;&gt; kDrive = {
+    {<span class="s">"/"</span>, {<span class="s">"/docs/"</span>, <span class="s">"/photos/"</span>, <span class="s">"/todo.txt"</span>}},
+    {<span class="s">"/docs/"</span>, {<span class="s">"/docs/plan.txt"</span>, <span class="s">"/docs/old/"</span>}},
+    {<span class="s">"/docs/old/"</span>, {<span class="s">"/docs/old/plan_v1.txt"</span>, <span class="s">"/docs/old/notes.txt"</span>}},
+    {<span class="s">"/photos/"</span>, {<span class="s">"/photos/goa.jpg"</span>}},
+};
+
+<span class="c">// The interviewer's API: lists one folder on a new thread, then calls back ON THAT THREAD.</span>
+<span class="k">class</span> Drive {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">get_async</span>(<span class="t">std</span>::<span class="t">string</span> folder, <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;)&gt; callback) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        threads_.<span class="f">emplace_back</span>([folder = <span class="t">std</span>::<span class="f">move</span>(folder), callback = <span class="t">std</span>::<span class="f">move</span>(callback)] {
+            <span class="f">callback</span>(kDrive.<span class="f">at</span>(folder));
+        });
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; threads_;   <span class="c">// joined when the Drive is destroyed</span>
+};
+
+<span class="k">struct</span> Search {                           <span class="c">// shared by every callback, owned through shared_ptr</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m;
+    <span class="t">std</span>::<span class="t">condition_variable</span> done;
+    <span class="t">int</span> pending = <span class="n">0</span>;                      <span class="c">// folders requested but not yet handled; guarded by m</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; found;       <span class="c">// guarded by m</span>
+};
+
+<span class="t">void</span> <span class="f">explore</span>(Drive&amp; drive, <span class="t">std</span>::<span class="t">shared_ptr</span>&lt;Search&gt; s, <span class="t">std</span>::<span class="t">string</span> folder, <span class="t">std</span>::<span class="t">string</span> needle) {
+    {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(s-&gt;m);
+        s-&gt;pending += <span class="n">1</span>;                  <span class="c">// count it before the callback can possibly run</span>
+    }
+    drive.<span class="f">get_async</span>(<span class="t">std</span>::<span class="f">move</span>(folder), [&amp;drive, s, needle](<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; children) {
+        <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; child : children) {
+            <span class="k">if</span> (child.<span class="f">back</span>() == <span class="s">'/'</span>) {
+                <span class="f">explore</span>(drive, s, child, needle);            <span class="c">// more callbacks, on more threads</span>
+            } <span class="k">else</span> <span class="k">if</span> (child.<span class="f">find</span>(needle) != <span class="t">std</span>::<span class="t">string</span>::npos) {
+                <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(s-&gt;m);
+                s-&gt;found.<span class="f">push_back</span>(child);
+            }
+        }
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(s-&gt;m);
+        s-&gt;pending -= <span class="n">1</span>;
+        <span class="k">if</span> (s-&gt;pending == <span class="n">0</span>) {
+            s-&gt;done.<span class="f">notify_all</span>();                            <span class="c">// the last folder is finished</span>
+        }
+    });
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    Drive drive;                          <span class="c">// declared first, so it is destroyed (and joined) last</span>
+    <span class="k">auto</span> s = <span class="t">std</span>::<span class="t">make_shared</span>&lt;Search&gt;();
+    <span class="f">explore</span>(drive, s, <span class="s">"/"</span>, <span class="s">"plan"</span>);
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(s-&gt;m);
+    s-&gt;done.<span class="f">wait</span>(lock, [&amp;s] { <span class="k">return</span> s-&gt;pending == <span class="n">0</span>; });
+    <span class="t">std</span>::<span class="f">sort</span>(s-&gt;found.<span class="f">begin</span>(), s-&gt;found.<span class="f">end</span>());
+    <span class="k">for</span> (<span class="k">const</span> <span class="k">auto</span>&amp; f : s-&gt;found) {
+        <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; f &lt;&lt; <span class="s">"\n"</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>It prints <code>/docs/old/plan_v1.txt</code> and <code>/docs/plan.txt</code>, with ThreadSanitizer silent. Walk through the captures the way you would in the interview:</p>
+<ul>
+<li><strong><code>folder</code> and <code>callback</code> are moved into the thread's lambda</strong> inside <code>get_async</code>, so the caller can return at once and nothing dangles.</li>
+<li><strong><code>s</code> is a <code>shared_ptr</code> captured by value.</strong> Every pending callback co-owns the search state, so it stays alive however the threads are scheduled.</li>
+<li><strong><code>needle</code> is captured by value:</strong> a small string, copied, never shared.</li>
+<li><strong><code>&amp;drive</code> is the one reference</strong>, and it comes with its sentence: <code>main</code> waits for <code>pending</code> to reach zero, so no callback can submit more work before destruction starts. The drive is declared first, destroyed last, and joins the remaining worker threads before its mutex is destroyed.</li>
+<li><strong>The callbacks run on other threads,</strong> so everything they touch in <code>Search</code> is guarded by its mutex, and <code>main</code> waits on a condition variable, not a sleep.</li>
+<li><strong>Termination is a counter:</strong> <code>pending</code> goes up before each request and down after each folder is handled. A child folder's increment always happens before its parent's decrement, so the count cannot reach zero early.</li>
+</ul>
+<p>For the complexity follow up: with network latency per listing, the sequential search costs roughly one latency per folder, while this one costs roughly one latency per level of depth, at the price of one thread per folder; a real version would cap concurrency with a pool.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong><code>[&amp;]</code> on a lambda that runs on a detached thread or is stored for later.</strong> Capture by value, or move ownership in.</li>
+<li><strong>Capturing a loop variable by reference in threads created in the loop.</strong> Capture it by value.</li>
+<li><strong>Believing <code>[=]</code> copies members.</strong> It captures <code>this</code>; use <code>[*this]</code> for a copy, and write <code>[=, this]</code> when you mean the pointer.</li>
+<li><strong>A task lambda that captures a function parameter by reference,</strong> like <code>submit(task)</code> doing <code>queue.push([&amp;] { task(); })</code>. The parameter dies when <code>submit</code> returns.</li>
+<li><strong>Expecting a <code>mutable</code> lambda's state to change in the original</strong> after passing it to <code>std::thread</code>, which copied it.</li>
+<li><strong>Putting a move-only lambda in a <code>std::function</code>.</strong> It does not compile; share the move-only part, or use <code>std::move_only_function</code> in C++23.</li>
+<li><strong>Passing a <code>char</code> array, or anything needing conversion, to a thread that then detaches.</strong> Convert before the thread starts.</li>
+<li><strong>Letting an exception escape the thread's callable,</strong> which terminates the whole program.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Lambdas appear in nearly every C++ concurrency answer, so the questions are pointed: "what does <code>[&amp;]</code> capture, and is that safe here?", "what happens to a lambda capturing <code>this</code> when the object is destroyed?", "how do you pass a <code>unique_ptr</code> into a pool task?", "what does the compiler generate for a lambda?". The Google drive question adds the callback twist: your code runs on threads you did not create, so you must say what each callback owns and what it locks.</p>
+<blockquote>A lambda is an object of a compiler-generated class: by-value captures are data members holding copies made when the lambda is created, by-reference captures refer to the originals, and the call operator is const unless the lambda is <code>mutable</code>. When a lambda goes to another thread, I capture by value or move ownership in with an init capture, and every reference I do capture comes with a reason it outlives the thread and a lock for every shared write.</blockquote>
+<blockquote><code>std::function</code> needs a copyable target, so for a pool's <code>submit</code> I wrap the <code>packaged_task</code> in a <code>shared_ptr</code> and queue a small lambda that calls it; in C++23 I could use <code>std::move_only_function</code> instead.</blockquote>
+<p>Follow ups: "Where does the callback run?" (on the API's thread, so it must be thread-safe and quick, or hand off its work); "What is the cost of <code>std::function</code>?" (an indirect call and possibly an allocation); "Why might <code>[=]</code> in a member function dangle?" (it copied <code>this</code>, not the object).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong><code>std::function</code> hides a const loophole.</strong> Its call operator is <code>const</code>, but it invokes its target as non-const. Two threads calling one shared <code>std::function</code> can therefore race if its <code>mutable</code> lambda changes captured state without synchronization, even though every call looks like a const read. <code>std::move_only_function</code> in C++23 makes const part of the signature: a <code>std::move_only_function&lt;void() const&gt;</code> only accepts targets callable as const. Const-callability alone still cannot prove thread safety if the target accesses shared mutable objects.</p>
+<p><strong>Coroutine lambdas keep their captures in the closure,</strong> not in the coroutine frame. If the closure object dies before the coroutine finishes, every capture dangles at the next resume. The C++ Core Guidelines therefore advise against capturing lambdas that are coroutines; pass the data as parameters, which are copied into the frame.</p>
+<p><strong>Generic lambdas are templates.</strong> <code>[](auto x) { ... }</code> gives the closure a templated call operator, so one closure can be called with different types; every capture rule above applies unchanged.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A lambda has a compiler-generated class type: value captures are members filled in at creation, reference captures borrow the originals, and the C++20 call operator is const unless <code>mutable</code>.</li>
+<li>By-value captures copy; by-reference captures share and must outlive every thread that runs the lambda. Capture by value by default for threads, and never capture a loop variable by reference.</li>
+<li><code>[=]</code> in a member function captures <code>this</code>, not the members; use <code>[*this]</code> or <code>[=, this]</code> explicitly.</li>
+<li>Init captures move ownership into a closure; a move-only closure cannot go into <code>std::function</code>, so share the move-only part or use C++23 <code>std::move_only_function</code>.</li>
+<li><code>std::thread</code> copies or moves the callable and its arguments, converts arguments late, discards return values and terminates on escaping exceptions.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="cpp-lambdas-callables"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="cpp-lambdas-callables.q1" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>for (int i = 0; i &lt; 4; i += 1) threads.emplace_back([&amp;] { sum += i; });</code> where <code>sum</code> is a <code>std::atomic&lt;int&gt;</code>, followed by joining all threads. What is true?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It is a data race on <code>i</code>, and a thread may even read <code>i</code> after the loop has ended; the sum can be anything, not just 6</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It always prints 6, because <code>sum</code> is atomic</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It always prints 16, because every thread sees <code>i</code> as 4</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It does not compile, because <code>i</code> cannot be captured by reference</span></button></li></ol><div class="why" hidden><strong>Why.</strong> All four closures refer to the one variable <code>i</code>, which the main thread keeps incrementing and which stops existing when the loop ends. The atomic <code>sum</code> protects the additions, not the reads of <code>i</code>. Capture <code>i</code> by value: <code>[&amp;sum, i]</code>.</div></div><div class="mcq" data-id="cpp-lambdas-callables.q2" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does this print?<figure class="code single" data-sample="cpp-lambdas-callables.10"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9</span><code><span class="t">int</span> calls = <span class="n">0</span>;
+<span class="k">auto</span> counter = [calls]() <span class="k">mutable</span> { calls += <span class="n">1</span>; <span class="k">return</span> calls; };
+<span class="f">counter</span>();
+<span class="f">counter</span>();
+<span class="k">auto</span> twin = counter;
+<span class="f">twin</span>();
+<span class="t">std</span>::<span class="t">thread</span> <span class="f">t</span>(counter);
+t.<span class="f">join</span>();
+<span class="t">std</span>::<span class="t">cout</span> &lt;&lt; calls &lt;&lt; <span class="s">" "</span> &lt;&lt; <span class="f">counter</span>() &lt;&lt; <span class="s">" "</span> &lt;&lt; <span class="f">twin</span>();</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>0 3 4</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>5 5 6</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>0 4 5</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>3 3 3</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each closure holds its own copy of <code>calls</code>. <code>counter</code> reaches 2, <code>twin</code> is copied at 2 and reaches 3, and the thread runs on its own copy of <code>counter</code>, so <code>counter</code> is still 2 and its next call returns 3. <code>twin()</code> then returns 4, and the outer <code>calls</code> was never touched. (C++17 guarantees left to right evaluation of the <code>&lt;&lt;</code> operands.)</div></div><div class="mcq" data-id="cpp-lambdas-callables.q3" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Inside a member function, <code>std::thread t([=] { use(count_); }); t.detach();</code> where <code>count_</code> is a data member. What does the lambda capture?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The <code>this</code> pointer, so the thread reads the live member, and dangles if the object is destroyed first</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A copy of <code>count_</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A copy of the whole object</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing: members cannot be used in a lambda</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Members are reached through <code>this</code>, so <code>[=]</code> captures the pointer, not the member. C++20 deprecates this implicit capture. Copy the member with <code>[count = count_]</code>, copy the object with <code>[*this]</code>, or keep the object alive with <code>shared_from_this()</code>.</div></div><div class="mcq" data-id="cpp-lambdas-callables.q4" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Does <code>std::function&lt;void()&gt; f = [p = std::make_unique&lt;int&gt;(1)] { use(*p); };</code> compile?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">No: the lambda owns a <code>unique_ptr</code>, so it is move-only, and <code>std::function</code> requires a copyable target</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Yes: <code>std::function</code> moves the lambda in</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Yes, but calling <code>f</code> twice is undefined behavior</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">No: init captures cannot hold a <code>unique_ptr</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>std::function</code> must be copyable, so it can only store copyable callables. Share the resource (<code>std::shared_ptr</code>), or in C++23 use <code>std::move_only_function</code>. Init captures of <code>unique_ptr</code> are fine on their own; it is the <code>std::function</code> that objects.</div></div><div class="mcq" data-id="cpp-lambdas-callables.q5" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>struct Worker { void operator()() const; };</code> and then <code>std::thread t(Worker()); t.join();</code>. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It does not compile: the first line declares a function named <code>t</code>, so <code>t.join()</code> is an error</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A thread runs <code>Worker</code> and is joined</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The thread is created but never started</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It compiles, and <code>join</code> throws because nothing is running</span></button></li></ol><div class="why" hidden><strong>Why.</strong> This is the most vexing parse: <code>std::thread t(Worker());</code> reads as a declaration of a function <code>t</code> taking a function that returns <code>Worker</code>. Clang warns on the declaration, and calling <code>.join()</code> on a function fails to compile. Use braces, <code>std::thread t{Worker()};</code>, or a lambda.</div></div><div class="mcq" data-id="cpp-lambdas-callables.q6" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>Counter c;</code> then <code>std::thread t(&amp;Counter::add, c, 100); t.join();</code> where <code>add</code> adds its argument to a member. What is <code>c</code>'s total afterwards?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Unchanged: the thread called <code>add</code> on its own copy of <code>c</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Increased by 100</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: a member function needs a pointer</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Undefined: two threads touched <code>c</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Like every argument, the object is copied into the thread's storage, and <code>std::invoke</code> calls <code>add</code> on that copy. Pass <code>&amp;c</code> (or <code>std::ref(c)</code>) to operate on the original, and then make sure <code>c</code> outlives the thread.</div></div><div class="mcq" data-id="cpp-lambdas-callables.q7" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>void log_line(int level, const std::string&amp; text);</code> In a function, <code>char buffer[64]</code> is filled, then <code>std::thread t(log_line, 3, buffer); t.detach();</code> and the function returns. What is wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The thread stores a <code>char*</code> and builds the <code>std::string</code> later, from a stack buffer that may already be gone</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: the <code>std::string</code> is constructed before the constructor returns</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: arrays cannot be thread arguments</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only that <code>detach</code> leaks the thread's memory</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Arguments are stored as their decayed types, so the array becomes a pointer into the caller's stack, and the conversion to <code>std::string</code> happens in the new thread when it calls <code>log_line</code>. Convert first: <code>std::thread t(log_line, 3, std::string(buffer));</code>.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="cpp-lambdas-callables.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">You have a blocking <code>std::vector&lt;std::string&gt; list_folder(const std::string&amp; path)</code>. Implement <code>get_async(path, callback)</code> so callers can return immediately, the callback receives the result, and nothing dangles. Say which thread runs the callback.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="cpp-lambdas-callables.11"><figcaption><span class="ctitle">get_async on top of a blocking call</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;string&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; <span class="f">list_folder</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; path);   <span class="c">// the blocking call we were given</span>
+
+<span class="k">class</span> AsyncLister {
+<span class="k">public</span>:
+    <span class="k">using</span> Callback = <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>(<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt;)&gt;;
+
+    <span class="t">void</span> <span class="f">get_async</span>(<span class="t">std</span>::<span class="t">string</span> path, Callback callback) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        workers_.<span class="f">emplace_back</span>([path = <span class="t">std</span>::<span class="f">move</span>(path), callback = <span class="t">std</span>::<span class="f">move</span>(callback)] {
+            <span class="f">callback</span>(<span class="f">list_folder</span>(path));          <span class="c">// runs on the worker thread</span>
+        });
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;                                <span class="c">// guards workers_: get_async may be called from many threads</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">jthread</span>&gt; workers_;           <span class="c">// declared after m_, so joined before m_ is destroyed</span>
+};</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The path and the callback are moved into the thread's lambda, so the caller's locals can die immediately. The callback runs on the worker thread, not on the caller's thread, so the caller must make it thread-safe (lock whatever it touches) and keep alive anything it captured by reference. The <code>std::jthread</code>s are owned by the lister and joined in its destructor, so no thread outlives the object. A production version would reuse a bounded pool instead of one thread per call, and would decide what happens to callbacks still pending at shutdown.</p></div></div><div class="cq" data-q="cpp-lambdas-callables.c2" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A hand-written pool has <code>void submit(std::function&lt;void()&gt; task) { std::lock_guard&lt;std::mutex&gt; g(m_); queue_.push([&amp;] { task(); }); cv_.notify_one(); }</code>. Workers pop and run the queued lambdas. What is wrong, and how do you fix it?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The queued lambda captures <code>task</code>, the function parameter, by reference. <code>submit</code> returns right after pushing, so <code>task</code> is destroyed while the lambda that refers to it waits in the queue. When a worker runs it, it calls a destroyed <code>std::function</code>: undefined behavior that may crash, call garbage, or appear to work. It is a lifetime bug, not a locking bug; the lock is fine.</p>
+<p>Fix: move the task into the queue instead of wrapping it, <code>queue_.push(std::move(task));</code>, or if a wrapper is needed, capture by move: <code>queue_.push([task = std::move(task)] { task(); });</code>. The rule: anything that outlives the current call must own what it uses.</p></div></div><div class="cq" data-q="cpp-lambdas-callables.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "What does the compiler generate for <code>[x, &amp;y](int z) { return x + y + z; }</code>, and what does that mean when the lambda runs on another thread?"</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The compiler generates an unnamed class with a data member holding a copy of <code>x</code>, access to the original <code>y</code> through a reference capture, and a <code>const</code> <code>operator()(int z)</code> that returns <code>x + y + z</code>. The reference capture is typically represented by a pointer, but the standard does not require a data member for it. Evaluating the lambda initializes its captures and produces one closure object. Because it has captures, it does not convert to a function pointer, and its type is unique, so it is stored in <code>auto</code>, a template parameter or a <code>std::function</code>.</p>
+<p>On another thread: the copy of <code>x</code> is private to the closure, so it is safe however long the thread runs. The reference to <code>y</code> is shared, so <code>y</code> must outlive the thread (joined in the same scope, or owned elsewhere for longer), and if any thread writes <code>y</code> while this one reads it, that is a data race unless both use a lock or <code>y</code> is atomic. Also, <code>std::thread</code> copies the closure, which copies <code>x</code> again and copies the reference, so the thread still refers to the same <code>y</code>.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="cpp-lambdas-callables.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"My pool protects its queue with a mutex, but a task sometimes crashes after <code>submit</code> returns. The queued lambda captures the task parameter by reference. What would you check?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>The reference capture borrows the parameter and does not extend its lifetime</li><li>Submit can destroy the parameter before the worker invokes the queued closure</li><li>The queue mutex protects queue operations, not the lifetime of borrowed task state</li><li>Move the callable into the queue, or capture it by move in a wrapper</li><li>Audit pointers, views and references inside the callable for further borrowed lifetimes</li><li>Run tasks outside the queue lock and join workers before destroying executor state</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would first check lifetime. Capturing the task parameter by reference does not keep it alive. The queue can hold a perfectly valid closure whose reference points to a destroyed parameter. For example, submit pushes the wrapper, returns, and destroys its local task. A worker later pops the wrapper and calls through that dangling reference. The result is undefined behavior, even though every queue operation used the mutex correctly. I would move the task directly into the queue. If a wrapper is necessary, I would use an init capture that moves the task into the closure. That gives the queued object ownership of the callable until execution or cancellation destroys it. I would then inspect the callable's own captures. Owning a closure does not make a borrowed pointer or string view inside it safe. Those need an independently valid lifetime or an owning replacement. Finally, workers should remove tasks under the queue lock and invoke them after unlocking, and shutdown must join workers before destroying the state they use. The queue lock solves access ordering; the captures must also solve lifetime.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What if the moved task owns a <code>unique_ptr</code>, but the queue stores <code>std::function&lt;void()&gt;</code>?</span></p></div></div><div class="sq" data-sq="cpp-lambdas-callables.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A member function queues a callback with <code>[=]</code>. Does that give the callback a safe snapshot of the object? What would you choose instead?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>When the body accesses members, implicit this capture copies the pointer, not the object</li><li>Destruction can leave the callback dangling; concurrent member mutation can race even while the object lives</li><li>Capture selected owning values for an independent snapshot, taking synchronization while copying if required</li><li>Capturing star-this copies the object but leaves pointer-like members sharing their targets</li><li>Capture a shared owner for required work or a weak observer for work that may be skipped</li><li>Keeping the object alive still leaves its mutable state needing synchronization</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">No. When the callback uses a member, the default value capture captures the this pointer, not a snapshot of the whole object. If the object dies before execution, accessing the member is undefined behavior. If it survives but another thread changes that member without synchronization, there can still be a data race. For a task that only needs a name and a timeout, I would capture those values explicitly. If they are concurrently mutable, I would take their snapshot under the appropriate lock. Capturing star-this is another option for a copyable object, but it uses the object's copy semantics. Raw pointers, views and shared pointers inside the copy may still refer to shared state. If the callback needs the original object, I would capture a shared owner when completion must keep it alive, or a weak observer when it should skip work after destruction. The weak callback must lock and check the resulting owner before use. Either way, preserving lifetime does not protect mutable fields. I would state both the ownership rule and the synchronization rule before calling the callback safe.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What ownership cycle could a callback capturing a shared owner create if it is stored inside that same object?</span></p></div></div><div class="sq" data-sq="cpp-lambdas-callables.s3" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"In C++20, design a pool submission that accepts a lambda owning a <code>unique_ptr</code>, returns a future, and queues work in <code>std::function&lt;void()&gt;</code>. Why is a direct conversion rejected?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A unique-pointer capture makes the closure move-only; <code>std::function</code> requires a copyable target</li><li>Move the callable into a packaged task whose future carries its result or exception</li><li>Own the packaged task through a shared pointer and queue a lambda capturing that pointer by value</li><li>Copyable wrappers share one task, so the executor must invoke each accepted task exactly once</li><li>Execute outside the queue lock and define what happens to accepted work during shutdown</li><li>C++23 <code>std::move_only_function</code> can remove this copyability workaround if supported by the queue</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The direct conversion fails because the closure is move-only, while a C++20 <code>std::function</code> requires a copyable target. Moving the lambda into the wrapper does not remove that requirement: the wrapper must support being copied later. I would move the user's callable into a packaged task and obtain its future. Then I would put that packaged task in a shared pointer and queue a small lambda that captures the pointer by value and invokes the task. That wrapper is copyable because copying it copies an owning handle, not the unique pointer inside the original callable. The packaged task carries the return value or a thrown exception to the future. There is still only one logical task, so the pool must invoke each accepted submission exactly once, even if it copied the wrapper internally. A worker pops under the queue mutex and calls the wrapper after unlocking. I would also define shutdown: either drain accepted tasks or abandon them with a documented result, rather than leave futures waiting indefinitely. In C++23, a queue of <code>std::move_only_function</code> can hold move-only wrappers directly and avoid the shared ownership workaround. For C++20, sharing the packaged task is a practical bridge between unique resource ownership and a copyable queue element.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What does the future observe if its packaged task is destroyed before it is invoked?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-pool-from-scratch.html" data-problem="thread-pool-from-scratch"><span class="pk">Executors and async · hard</span><b>Thread pool from scratch</b><span class="pst"></span></a><a class="pcard" href="p-executor-wait-for-all.html" data-problem="executor-wait-for-all"><span class="pk">Executors and async · medium</span><b>Executor with wait for all</b><span class="pst"></span></a><a class="pcard" href="p-scheduled-executor.html" data-problem="scheduled-executor"><span class="pk">Executors and async · hard</span><b>Scheduled executor</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="cpp-smart-pointers.html"><span>Previous</span><b>unique_ptr, shared_ptr and weak_ptr</b></a><a class="next" href="cpp-templates-auto.html"><span>Next</span><b>Templates, auto and type deduction</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#what-a-lambda-is">What a lambda is</a><a href="#captures-the-list-of-what-you-share">Captures: the list of what you share</a><a href="#captures-and-threads-sharing-and-lifetime">Captures and threads: sharing and lifetime</a><a href="#init-captures-move-ownership-into-the-lambda">Init captures: move ownership into the lambda</a><a href="#mutable-each-closure-has-its-own-state">mutable: each closure has its own state</a><a href="#function-objects-function-pointers-and-member-functions">Function objects, function pointers and member functions</a><a href="#std-function-one-type-for-any-callable">std::function: one type for any callable</a><a href="#handing-a-callable-to-std-thread">Handing a callable to std::thread</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

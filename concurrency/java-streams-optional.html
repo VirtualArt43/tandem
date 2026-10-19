@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Streams and Optional · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-java" data-slug="java-streams-optional" data-title="Streams and Optional" data-track="java" data-module="java-2" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-java.html">Java for concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">01</span>The JVM and the language core<span class="mc" data-modfrac="java-1"></span></summary><ol><li><a href="java-how-it-runs.html" data-slug="java-how-it-runs"><span class="lnum">1</span><span class="lt">How Java runs: JVM, bytecode, JIT and GC</span></a></li><li><a href="java-objects-references.html" data-slug="java-objects-references"><span class="lnum">2</span><span class="lt">Objects, references and the heap</span></a></li><li><a href="java-classes-interfaces.html" data-slug="java-classes-interfaces"><span class="lnum">3</span><span class="lt">Classes, interfaces and inheritance</span></a></li><li><a href="java-final-immutability.html" data-slug="java-final-immutability"><span class="lnum">4</span><span class="lt">final, immutability and records</span></a></li><li><a href="java-equals-hashcode.html" data-slug="java-equals-hashcode"><span class="lnum">5</span><span class="lt">equals, hashCode and objects as keys</span></a></li><li><a href="java-types-pitfalls-and-modern-java.html" data-slug="java-types-pitfalls-and-modern-java"><span class="lnum">6</span><span class="lt">Types, pitfalls and modern Java (17 to 21)</span></a></li></ol></details><details open><summary><span class="mn">02</span>Modern Java every day<span class="mc" data-modfrac="java-2"></span></summary><ol><li><a href="java-generics.html" data-slug="java-generics"><span class="lnum">1</span><span class="lt">Generics</span></a></li><li><a href="java-lambdas-functional.html" data-slug="java-lambdas-functional"><span class="lnum">2</span><span class="lt">Lambdas, functional interfaces and method references</span></a></li><li><a href="java-collections.html" data-slug="java-collections"><span class="lnum">3</span><span class="lt">The collections you will use</span></a></li><li><a href="java-iterators-cme.html" data-slug="java-iterators-cme"><span class="lnum">4</span><span class="lt">Iterators and ConcurrentModificationException</span></a></li><li><a href="java-exceptions.html" data-slug="java-exceptions"><span class="lnum">5</span><span class="lt">Exceptions, InterruptedException and try-with-resources</span></a></li><li><a href="java-static-init-singletons.html" data-slug="java-static-init-singletons"><span class="lnum">6</span><span class="lt">static, class initialization and singletons</span></a></li><li><a href="java-time-units.html" data-slug="java-time-units"><span class="lnum">7</span><span class="lt">Time: nanoTime, Duration and TimeUnit</span></a></li><li><a href="java-streams-optional.html" data-slug="java-streams-optional" class=here><span class="lnum">8</span><span class="lt">Streams and Optional</span></a></li><li><a href="java-collections-for-coding-rounds.html" data-slug="java-collections-for-coding-rounds"><span class="lnum">9</span><span class="lt">Collections for coding rounds: comparators, heaps, trees and traps</span></a></li></ol></details><details><summary><span class="mn">03</span>Tools and under the hood<span class="mc" data-modfrac="java-3"></span></summary><ol><li><a href="java-tools.html" data-slug="java-tools"><span class="lnum">1</span><span class="lt">javac, java, jshell, jstack and jcmd</span></a></li><li><a href="java-under-the-hood.html" data-slug="java-under-the-hood"><span class="lnum">2</span><span class="lt">Under the hood: object headers, monitors and the JIT</span></a></li></ol></details><details><summary><span class="mn">04</span>Object oriented Java<span class="mc" data-modfrac="java-4"></span></summary><ol><li><a href="java-inheritance-and-polymorphism.html" data-slug="java-inheritance-and-polymorphism"><span class="lnum">1</span><span class="lt">Inheritance, overriding and polymorphism</span></a></li><li><a href="java-oop-principles.html" data-slug="java-oop-principles"><span class="lnum">2</span><span class="lt">Encapsulation, composition and SOLID</span></a></li><li><a href="java-oop-design-for-lld.html" data-slug="java-oop-design-for-lld"><span class="lnum">3</span><span class="lt">Design patterns for LLD and machine coding rounds</span></a></li></ol></details><details><summary><span class="mn">05</span>The concurrency toolkit<span class="mc" data-modfrac="java-5"></span></summary><ol><li><a href="java-toolkit-threads.html" data-slug="java-toolkit-threads"><span class="lnum">1</span><span class="lt">The toolkit: Thread, Runnable, Callable and virtual threads</span></a></li><li><a href="java-toolkit-synchronized.html" data-slug="java-toolkit-synchronized"><span class="lnum">2</span><span class="lt">The toolkit: synchronized, wait and notify</span></a></li><li><a href="java-toolkit-volatile-and-atomics.html" data-slug="java-toolkit-volatile-and-atomics"><span class="lnum">3</span><span class="lt">The toolkit: volatile and the atomic classes</span></a></li><li><a href="java-toolkit-locks.html" data-slug="java-toolkit-locks"><span class="lnum">4</span><span class="lt">The toolkit: ReentrantLock, Condition, ReadWriteLock and StampedLock</span></a></li><li><a href="java-toolkit-executors-and-futures.html" data-slug="java-toolkit-executors-and-futures"><span class="lnum">5</span><span class="lt">The toolkit: executors, Future and CompletableFuture</span></a></li><li><a href="java-toolkit-collections-and-synchronizers.html" data-slug="java-toolkit-collections-and-synchronizers"><span class="lnum">6</span><span class="lt">The toolkit: concurrent collections and synchronizers</span></a></li><li><a href="java-toolkit-putting-it-together.html" data-slug="java-toolkit-putting-it-together"><span class="lnum">7</span><span class="lt">Putting it together: a thread safe class from scratch</span></a></li><li><a href="java-interview-style.html" data-slug="java-interview-style"><span class="lnum">8</span><span class="lt">Writing Java in an interview</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-java.html">Java refresher</a><span>/</span><a href="track-java.html#m2">Module 02: Modern Java every day</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 02.8</span><span>17 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Streams and Optional</h1><p class="lsum">Stream pipelines, why lambdas must not mutate shared state, the parallel stream common pool trap, and Optional for absent results.</p><div class="prereq"><span>Before this:</span><a href="java-lambdas-functional.html">Lambdas, functional interfaces and method references</a><a href="java-collections.html">The collections you will use</a></div></header><article class="prose" id="article">
+<p class="lead">Streams make data processing short and readable, and <code>.parallel()</code> makes it look like a free way to use every core. It is not free: a lambda with a side effect becomes a race, and every parallel stream in the JVM shares one small pool of threads.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Picture an assembly line. Items ride past a few stations: one throws out damaged items (filter), one paints each item (map), and at the end a packer puts them in boxes (collect). Each station only looks at the item in front of it, which is why the line is easy to reason about.</p>
+<p>Now open three more identical lines to go faster. That still works, as long as no station scribbles on a shared whiteboard; with four lines writing on one board at once, the board becomes garbage. And there is a catch: the extra lines are staffed from <strong>one pool of workers shared by the whole factory</strong>. If one line's workers stand around waiting for a delivery truck, every other line in the factory slows down.</p>
+</div>
+
+<div class="box why">
+<h3>Why this matters for concurrency</h3>
+<ul>
+<li><code>parallel()</code> runs your lambdas on several threads at once. A lambda that writes to a shared <code>ArrayList</code>, <code>HashMap</code> or counter is then a <a class="term" data-term="data-race" href="glossary.html#data-race">data race</a>, with no <code>Thread</code> anywhere in the code.</li>
+<li>All parallel streams, and <code>CompletableFuture</code> async methods called without an executor, share <code>ForkJoinPool.commonPool()</code>, which has one thread fewer than the machine has cores. Blocking I/O there starves everything else that uses it.</li>
+<li>Streams are the tidy way to collect results from futures, but laziness can quietly turn a parallel fan-out into a serial loop. And <code>Optional</code> belongs in your own concurrent APIs, such as a <code>tryTake()</code> that may find nothing.</li>
+</ul>
+</div>
+
+<h2 id="a-stream-pipeline">A stream pipeline</h2>
+<p>A stream is not a collection; it holds no data. It describes a computation over a source, in three parts:</p>
+<ul>
+<li><strong>A source:</strong> <code>list.stream()</code>, <code>Arrays.stream(array)</code>, <code>IntStream.range(0, n)</code>, <code>map.entrySet().stream()</code>.</li>
+<li><strong>Intermediate operations</strong>, which are lazy and each return a new stream: <code>filter</code>, <code>map</code>, <code>flatMap</code>, <code>distinct</code>, <code>sorted</code>, <code>limit</code>, <code>peek</code>.</li>
+<li><strong>One terminal operation</strong>, which actually runs the pipeline: <code>collect</code>, <code>toList()</code>, <code>reduce</code>, <code>count</code>, <code>sum</code>, <code>forEach</code>, <code>findFirst</code>, <code>anyMatch</code>, <code>min</code>, <code>max</code>.</li>
+</ul>
+
+<figure class="code single" data-sample="java-streams-optional.1" data-expect="ok"><figcaption><span class="ctitle">A pipeline, start to finish</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">TreeMap</span>;
+<span class="k">import</span> java.util.stream.<span class="t">Collectors</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Order</span>(<span class="t">String</span> customer, <span class="t">String</span> status, <span class="t">long</span> cents) { }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">List</span>&lt;<span class="t">Order</span>&gt; orders = <span class="t">List</span>.<span class="f">of</span>(
+            <span class="k">new</span> <span class="t">Order</span>(<span class="s">"asha"</span>, <span class="s">"PAID"</span>, <span class="n">12_000</span>), <span class="k">new</span> <span class="t">Order</span>(<span class="s">"ravi"</span>, <span class="s">"PAID"</span>, <span class="n">4_500</span>),
+            <span class="k">new</span> <span class="t">Order</span>(<span class="s">"asha"</span>, <span class="s">"REFUNDED"</span>, <span class="n">9_000</span>), <span class="k">new</span> <span class="t">Order</span>(<span class="s">"meera"</span>, <span class="s">"PAID"</span>, <span class="n">15_000</span>),
+            <span class="k">new</span> <span class="t">Order</span>(<span class="s">"ravi"</span>, <span class="s">"PAID"</span>, <span class="n">7_000</span>));
+
+        <span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Long</span>&gt; spend = orders.<span class="f">stream</span>()
+            .<span class="f">filter</span>(o -&gt; o.<span class="f">status</span>().<span class="f">equals</span>(<span class="s">"PAID"</span>))                                <span class="c">// keep paid orders</span>
+            .<span class="f">collect</span>(<span class="t">Collectors</span>.<span class="f">groupingBy</span>(<span class="t">Order</span>::customer, <span class="t">TreeMap</span>::<span class="k">new</span>,
+                                           <span class="t">Collectors</span>.<span class="f">summingLong</span>(<span class="t">Order</span>::cents)));  <span class="c">// total per customer</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"paid spend in cents: "</span> + spend);
+
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; big = spend.<span class="f">entrySet</span>().<span class="f">stream</span>()
+            .<span class="f">filter</span>(e -&gt; e.<span class="f">getValue</span>() &gt;= <span class="n">12_000</span>)
+            .<span class="f">map</span>(<span class="t">Map</span>.<span class="t">Entry</span>::getKey)
+            .<span class="f">toList</span>();                                                               <span class="c">// Java 16 and later</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"customers at 120.00 or more: "</span> + big);
+
+        <span class="t">long</span> paidCount = orders.<span class="f">stream</span>().<span class="f">filter</span>(o -&gt; o.<span class="f">status</span>().<span class="f">equals</span>(<span class="s">"PAID"</span>)).<span class="f">count</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"paid orders: "</span> + paidCount);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Four facts about pipelines matter later in this lesson:</p>
+<ul>
+<li><strong>Lazy, and one element at a time.</strong> Nothing runs until the terminal operation, and then each element travels through the whole chain before the next one starts, rather than stage by stage. The exception is a stateful operation such as <code>sorted</code>, which must see every element before it passes any on. Hold on to this; it explains the lazy join trap below.</li>
+<li><strong>One shot.</strong> A stream can be consumed once. A second terminal operation throws <code>IllegalStateException: stream has already been operated upon or closed</code>.</li>
+<li><strong><code>toList()</code> is unmodifiable.</strong> Adding to its result throws <code>UnsupportedOperationException</code>. <code>Collectors.toMap</code> throws <code>IllegalStateException</code> on a duplicate key unless you pass a merge function.</li>
+<li><strong><code>reduce(identity, op)</code> has two rules.</strong> The identity must really be neutral for the operation (0 for a sum, 1 for a product), and the operation must be associative. A sequential stream forgives a wrong identity; a parallel one does not.</li>
+</ul>
+
+<h2 id="side-effects-the-rule-that-parallel-streams-enforce">Side effects: the rule that parallel streams enforce</h2>
+<p>The stream documentation asks for lambdas that do not modify the source and are stateless, and it strongly discourages side effects. In a sequential stream, breaking that is merely ugly. <strong>In a parallel stream, a side effect on shared state is a race.</strong> Here are two ways to break a parallel stream, and the fixes:</p>
+
+<figure class="code single" data-sample="java-streams-optional.2" data-expect="ok"><figcaption><span class="ctitle">Two ways to break a parallel stream</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.stream.<span class="t">IntStream</span>;
+<span class="k">import</span> java.util.stream.<span class="t">Stream</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="c">// 1. A side effect into a shared ArrayList.</span>
+        <span class="k">for</span> (<span class="t">int</span> run = <span class="n">1</span>; run &lt;= <span class="n">3</span>; run += <span class="n">1</span>) {
+            <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; out = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+            <span class="t">String</span> problem = <span class="s">"no exception"</span>;
+            <span class="k">try</span> {
+                <span class="t">IntStream</span>.<span class="f">range</span>(<span class="n">0</span>, <span class="n">100_000</span>).<span class="f">parallel</span>().<span class="f">forEach</span>(out::add);   <span class="c">// many threads call add at once</span>
+            } <span class="k">catch</span> (<span class="t">RuntimeException</span> e) {
+                problem = e.<span class="f">getClass</span>().<span class="f">getSimpleName</span>();
+            }
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"run "</span> + run + <span class="s">": forEach(out::add) kept "</span> + out.<span class="f">size</span>() + <span class="s">" of 100000, "</span> + problem);
+        }
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; right = <span class="t">IntStream</span>.<span class="f">range</span>(<span class="n">0</span>, <span class="n">100_000</span>).<span class="f">parallel</span>().<span class="f">boxed</span>().<span class="f">toList</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"toList() kept "</span> + right.<span class="f">size</span>() + <span class="s">" of 100000, in order: "</span> + right.<span class="f">get</span>(<span class="n">99_999</span>));
+
+        <span class="c">// 2. A reduce whose "identity" is not an identity.</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"sequential reduce(10, sum) of 1..4: "</span> + <span class="t">Stream</span>.<span class="f">of</span>(<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>).<span class="f">reduce</span>(<span class="n">10</span>, <span class="t">Integer</span>::sum));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"parallel   reduce(10, sum) of 1..4: "</span> + <span class="t">Stream</span>.<span class="f">of</span>(<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>).<span class="f">parallel</span>().<span class="f">reduce</span>(<span class="n">10</span>, <span class="t">Integer</span>::sum));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"parallel   10 + reduce(0, sum):     "</span> + (<span class="n">10</span> + <span class="t">Stream</span>.<span class="f">of</span>(<span class="n">1</span>, <span class="n">2</span>, <span class="n">3</span>, <span class="n">4</span>).<span class="f">parallel</span>().<span class="f">reduce</span>(<span class="n">0</span>, <span class="t">Integer</span>::sum)));
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The <code>ArrayList</code> version loses elements on most runs, sometimes throws <code>ArrayIndexOutOfBoundsException</code>, and can even leave <code>null</code> entries where two threads raced during a resize. <code>toList()</code> is correct in parallel because the stream builds a separate piece per chunk and joins the pieces in order; nothing is shared. The bad <code>reduce</code> adds the seed once per chunk, so its parallel answer depends on how the stream was split: 50 here when it splits into four pieces. Put the 10 outside the reduction.</p>
+<p>Java's <a class="term" data-term="effectively-final" href="glossary.html#effectively-final">effectively final</a> rule stops you from writing <code>count += 1</code> on a local inside a lambda. People work around it with <code>int[] count = {0}</code> (a race in parallel) or an <code>AtomicInteger</code> (correct, but every thread fights over one variable, and the order is still undefined). Both miss the point: <strong>express the result as the output of the pipeline</strong>, with <code>count()</code>, <code>sum()</code>, <code>reduce</code> or <code>collect</code>.</p>
+<p>Two smaller surprises. On a parallel stream <code>forEach</code> runs in no particular order; <code>forEachOrdered</code> keeps the source order, at a cost. And side effects may not run at all: since Java 9, <code>count()</code> may skip the pipeline entirely when the size is known from the source, so <code>List.of(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;).stream().peek(System.out::println).count()</code> returns 3 and prints nothing.</p>
+
+<h2 id="parallel-streams-and-the-common-pool">Parallel streams and the common pool</h2>
+<p>A <a class="term" data-term="parallel-stream" href="glossary.html#parallel-stream">parallel stream</a>, from <code>parallelStream()</code> or <code>.parallel()</code> on any stream, splits the source into chunks and runs them as fork/join tasks on the <a class="term" data-term="common-pool" href="glossary.html#common-pool">common pool</a>, <code>ForkJoinPool.commonPool()</code>. The calling thread joins in and does part of the work itself. The common pool's parallelism is the number of available processors minus one (at least one), and you can change it with the system property <code>java.util.concurrent.ForkJoinPool.common.parallelism</code>.</p>
+
+<figure class="code single" data-sample="java-streams-optional.3" data-expect="ok"><figcaption><span class="ctitle">Who runs a parallel stream?</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="k">import</span> java.util.<span class="t">Set</span>;
+<span class="k">import</span> java.util.<span class="t">TreeSet</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ConcurrentHashMap</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ForkJoinPool</span>;
+<span class="k">import</span> java.util.stream.<span class="t">IntStream</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"cores: "</span> + <span class="t">Runtime</span>.<span class="f">getRuntime</span>().<span class="f">availableProcessors</span>()
+            + <span class="s">", common pool parallelism: "</span> + <span class="t">ForkJoinPool</span>.<span class="f">getCommonPoolParallelism</span>());
+
+        <span class="t">Set</span>&lt;<span class="t">String</span>&gt; threads = <span class="t">ConcurrentHashMap</span>.<span class="f">newKeySet</span>();   <span class="c">// a thread-safe set, for this demo only</span>
+        <span class="t">long</span> sum = <span class="t">IntStream</span>.<span class="f">range</span>(<span class="n">0</span>, <span class="n">2_000_000</span>).<span class="f">parallel</span>()
+            .<span class="f">peek</span>(i -&gt; threads.<span class="f">add</span>(<span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">getName</span>().<span class="f">replaceAll</span>(<span class="s">"\\d+$"</span>, <span class="s">"N"</span>)))
+            .<span class="f">asLongStream</span>()
+            .<span class="f">sum</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"sum = "</span> + sum + <span class="s">", computed by: "</span> + <span class="k">new</span> <span class="t">TreeSet</span>&lt;&gt;(threads));
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The output names <code>main</code> and <code>ForkJoinPool.commonPool-worker-N</code>: the caller plus the shared pool. That pool is shared by <strong>every</strong> parallel stream in the JVM, and by <code>CompletableFuture.supplyAsync</code>, <code>thenApplyAsync</code> and the other async methods whenever you do not pass an executor (on a machine where the common pool's parallelism is below 2, those methods start a new thread per task instead).</p>
+<table>
+<thead><tr><th>Parallel streams tend to help when</th><th>They tend to hurt when</th></tr></thead>
+<tbody>
+<tr><td>Each element needs real CPU work</td><td>The work is I/O or any blocking call</td></tr>
+<tr><td>There are many elements (thousands and up, as an order of magnitude)</td><td>The input is small, so splitting costs more than it saves</td></tr>
+<tr><td>The source splits cheaply: arrays, <code>ArrayList</code>, <code>IntStream.range</code></td><td>The source splits badly: <code>LinkedList</code>, <code>Stream.iterate</code>, I/O sources</td></tr>
+<tr><td>Lambdas are stateless and the reduction is associative</td><td>Lambdas touch shared mutable state</td></tr>
+<tr><td>Order does not matter</td><td>The pipeline uses <code>limit</code>, <code>findFirst</code> or <code>forEachOrdered</code> on an ordered source</td></tr>
+<tr><td>The code runs in a batch job that owns the machine</td><td>The code runs inside request threads, which then all compete for the same few pool threads</td></tr>
+</tbody>
+</table>
+<p>The worst case is blocking I/O inside a parallel stream. Each call holds a common pool thread hostage while it waits, so every other parallel stream and every default <code>CompletableFuture</code> in the process queues up behind your network calls. For I/O fan-out, use an executor sized for I/O, or Java 21 virtual threads, with an explicit concurrency limit. You will sometimes see the trick of running a parallel stream inside your own <code>ForkJoinPool</code> with <code>pool.submit(() -&gt; list.parallelStream()...).get()</code>. It works because tasks forked from a pool's worker stay in that pool, but that is an implementation behavior, not a documented promise.</p>
+
+<h2 id="the-lazy-join-trap">The lazy join trap</h2>
+<p>Because elements travel through the whole pipeline one at a time, a single pipeline that starts async work and then joins it finishes each element before starting the next. The fan-out silently becomes a loop. Each task below sleeps 100 ms to stand in for a remote call:</p>
+
+<figure class="code single" data-sample="java-streams-optional.4" data-expect="ok"><figcaption><span class="ctitle">One pipeline versus two</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40</span><code><span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="t">String</span> <span class="f">fetch</span>(<span class="t">String</span> id) {
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">100</span>);   <span class="c">// stands in for a 100 ms remote call</span>
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        }
+        <span class="k">return</span> id.<span class="f">toUpperCase</span>();
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">List</span>&lt;<span class="t">String</span>&gt; ids = <span class="t">List</span>.<span class="f">of</span>(<span class="s">"a"</span>, <span class="s">"b"</span>, <span class="s">"c"</span>, <span class="s">"d"</span>);
+        <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(<span class="n">4</span>)) {
+            <span class="c">// One pipeline: each element is submitted AND joined before the next is submitted.</span>
+            <span class="t">long</span> t0 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="t">List</span>&lt;<span class="t">String</span>&gt; slow = ids.<span class="f">stream</span>()
+                .<span class="f">map</span>(id -&gt; <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; <span class="f">fetch</span>(id), pool))
+                .<span class="f">map</span>(<span class="t">CompletableFuture</span>::join)
+                .<span class="f">toList</span>();
+            <span class="t">long</span> slowMs = <span class="t">TimeUnit</span>.NANOSECONDS.<span class="f">toMillis</span>(<span class="t">System</span>.<span class="f">nanoTime</span>() - t0);
+
+            <span class="c">// Two pipelines: submit everything first, then join.</span>
+            t0 = <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="t">List</span>&lt;<span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt;&gt; futures = ids.<span class="f">stream</span>()
+                .<span class="f">map</span>(id -&gt; <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; <span class="f">fetch</span>(id), pool))
+                .<span class="f">toList</span>();
+            <span class="t">List</span>&lt;<span class="t">String</span>&gt; fast = futures.<span class="f">stream</span>().<span class="f">map</span>(<span class="t">CompletableFuture</span>::join).<span class="f">toList</span>();
+            <span class="t">long</span> fastMs = <span class="t">TimeUnit</span>.NANOSECONDS.<span class="f">toMillis</span>(<span class="t">System</span>.<span class="f">nanoTime</span>() - t0);
+
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"one pipeline:  "</span> + slow + <span class="s">" in "</span> + slowMs + <span class="s">" ms"</span>);
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"two pipelines: "</span> + fast + <span class="s">" in "</span> + fastMs + <span class="s">" ms"</span>);
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Expect roughly 400 ms against roughly 100 ms. <strong>Start everything in one pipeline that ends in <code>toList()</code>, then join in a second pipeline.</strong> The results still come out in input order, because you join the futures in order. The executor is passed explicitly so the remote calls never touch the common pool.</p>
+
+<h2 id="optional">Optional</h2>
+<p><code>Optional&lt;T&gt;</code> holds either a value or nothing. It was designed as a return type for "there may be no result", which is why <code>findFirst()</code>, <code>max()</code> and <code>reduce(op)</code> without an identity return one. The useful methods:</p>
+<ul>
+<li>Transform: <code>map</code>, <code>flatMap</code>, <code>filter</code>.</li>
+<li>Get out: <code>orElse(value)</code>, <code>orElseGet(() -&gt; compute())</code>, <code>orElseThrow()</code> (Java 10), <code>or(() -&gt; otherOptional)</code> (Java 9).</li>
+<li>Act: <code>ifPresent(action)</code>, <code>ifPresentOrElse(action, emptyAction)</code> (Java 9). Test: <code>isPresent()</code>, <code>isEmpty()</code> (Java 11).</li>
+<li>Create: <code>Optional.of(value)</code> (throws on null), <code>Optional.ofNullable(maybeNull)</code>, <code>Optional.empty()</code>.</li>
+</ul>
+<p>The common trap: <strong><code>orElse(expensive())</code> always runs <code>expensive()</code></strong>, even when the value is present, because Java evaluates arguments before the call. Use <code>orElseGet(() -&gt; expensive())</code>. Also, <code>get()</code> on an empty <code>Optional</code> throws <code>NoSuchElementException</code>; <code>orElseThrow()</code> does the same but says so in the code. Do not use <code>Optional</code> for fields, parameters or collection elements, and never return <code>null</code> from a method declared to return <code>Optional</code>.</p>
+<p>Two connections to concurrent code make <code>Optional</code> worth knowing well:</p>
+<ul>
+<li><strong>Read shared state once.</strong> <code>if (cache.get(k) != null) return cache.get(k);</code> reads a shared map twice, and another thread can remove the key in between, so the method returns <code>null</code> after checking that it would not. <code>return Optional.ofNullable(cache.get(k));</code> reads once and makes "read, then decide" the natural shape.</li>
+<li><strong>Absent must mean absent.</strong> <code>ConcurrentHashMap</code> forbids <code>null</code> keys and values. Doug Lea, its designer, explained why: in a plain map you can tell "no entry" from "entry whose value is null" by calling <code>containsKey</code>, but in a concurrent map the map can change between the two calls, so <code>get</code> returning <code>null</code> must mean "absent" with no ambiguity. The same reasoning makes <code>Optional</code> a good return type for your own <code>tryTake()</code> or <code>poll()</code>: empty means "nothing there right now".</li>
+</ul>
+
+<figure class="code single" data-sample="java-streams-optional.5" data-expect="ok"><figcaption><span class="ctitle">Optional in practice</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="k">import</span> java.util.<span class="t">Map</span>;
+<span class="k">import</span> java.util.<span class="t">NoSuchElementException</span>;
+<span class="k">import</span> java.util.<span class="t">Optional</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ConcurrentHashMap</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">ConcurrentHashMap</span>&lt;<span class="t">String</span>, <span class="t">String</span>&gt; sessions = <span class="k">new</span> <span class="t">ConcurrentHashMap</span>&lt;&gt;(<span class="t">Map</span>.<span class="f">of</span>(<span class="s">"u1"</span>, <span class="s">"token-abc"</span>));
+
+    <span class="c">// Read the shared map once, then decide. Never call get() twice.</span>
+    <span class="k">static</span> <span class="t">Optional</span>&lt;<span class="t">String</span>&gt; <span class="f">findToken</span>(<span class="t">String</span> user) {
+        <span class="k">return</span> <span class="t">Optional</span>.<span class="f">ofNullable</span>(sessions.<span class="f">get</span>(user));
+    }
+
+    <span class="k">static</span> <span class="t">String</span> <span class="f">expensiveDefault</span>() {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"  (expensiveDefault ran)"</span>);
+        <span class="k">return</span> <span class="s">"guest"</span>;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) {
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"u1 -&gt; "</span> + <span class="f">findToken</span>(<span class="s">"u1"</span>).<span class="f">map</span>(<span class="t">String</span>::toUpperCase).<span class="f">orElse</span>(<span class="s">"none"</span>));
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"u2 -&gt; "</span> + <span class="f">findToken</span>(<span class="s">"u2"</span>).<span class="f">map</span>(<span class="t">String</span>::toUpperCase).<span class="f">orElse</span>(<span class="s">"none"</span>));
+
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"orElse with a value present:"</span>);
+        <span class="t">String</span> a = <span class="f">findToken</span>(<span class="s">"u1"</span>).<span class="f">orElse</span>(<span class="f">expensiveDefault</span>());          <span class="c">// runs expensiveDefault anyway</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"orElseGet with a value present:"</span>);
+        <span class="t">String</span> b = <span class="f">findToken</span>(<span class="s">"u1"</span>).<span class="f">orElseGet</span>(<span class="t">Main</span>::expensiveDefault);    <span class="c">// does not run it</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"both returned "</span> + a + <span class="s">" and "</span> + b);
+
+        <span class="k">try</span> {
+            <span class="f">findToken</span>(<span class="s">"u2"</span>).<span class="f">orElseThrow</span>();
+        } <span class="k">catch</span> (<span class="t">NoSuchElementException</span> e) {
+            <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"orElseThrow on empty: "</span> + e.<span class="f">getMessage</span>());
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<div class="box example">
+<h3>Worked example: a word count, three ways</h3>
+<p>You have a large list of lines and want a count per word, using every core. The first attempt shares a map:</p>
+<figure class="code single" data-sample="java-streams-optional.6"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Long</span>&gt; counts = <span class="k">new</span> <span class="t">HashMap</span>&lt;&gt;();
+lines.<span class="f">parallelStream</span>()
+     .<span class="f">flatMap</span>(line -&gt; <span class="t">Arrays</span>.<span class="f">stream</span>(line.<span class="f">split</span>(<span class="s">"\\s+"</span>)))
+     .<span class="f">forEach</span>(word -&gt; counts.<span class="f">merge</span>(word, <span class="n">1L</span>, <span class="t">Long</span>::sum));   <span class="c">// a data race on a HashMap</span></code></div></pre></div><div class="runout" hidden></div></figure>
+<p><strong>Broken.</strong> Several threads call <code>merge</code> on one <code>HashMap</code> at once: lost counts, a corrupted table, or exceptions. Switching to a <code>ConcurrentHashMap</code> makes it correct, because <code>merge</code> is atomic per key there, but it is still the side-effect style, and every thread contends on the hot words.</p>
+<p><strong>Idiomatic.</strong> Let the pipeline produce the map:</p>
+<figure class="code single" data-sample="java-streams-optional.7"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><code><span class="t">Map</span>&lt;<span class="t">String</span>, <span class="t">Long</span>&gt; counts = lines.<span class="f">parallelStream</span>()
+    .<span class="f">flatMap</span>(line -&gt; <span class="t">Arrays</span>.<span class="f">stream</span>(line.<span class="f">split</span>(<span class="s">"\\s+"</span>)))
+    .<span class="f">collect</span>(<span class="t">Collectors</span>.<span class="f">groupingByConcurrent</span>(w -&gt; w, <span class="t">Collectors</span>.<span class="f">counting</span>()));</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>groupingByConcurrent</code> inserts into one <code>ConcurrentHashMap</code>, which is fast when you do not care about encounter order. Plain <code>groupingBy</code> would also be correct in parallel: it builds a separate map per chunk and merges them at the end, with no shared state at all. Either way, the result comes out of the pipeline instead of leaking out through a lambda.</p>
+<p><strong>The senior question to ask first:</strong> is the input big enough, and the work CPU-heavy enough, to beat the cost of splitting and merging? For a few thousand short lines, the sequential stream is probably faster. Measure, and say that you would measure.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Collecting through a side effect.</strong> <code>forEach(list::add)</code> into a shared list or map. Use <code>toList()</code>, <code>collect</code>, or <code>reduce</code>.</li>
+<li><strong>"Fixing" a lambda counter with an <code>int[]</code> or an <code>AtomicInteger</code>.</strong> The first is a race, the second a contention point. Use <code>count()</code> or <code>sum()</code>.</li>
+<li><strong>A <code>reduce</code> seed that is not an identity.</strong> It is added once per chunk in parallel. Add constants outside the reduction.</li>
+<li><strong>Blocking calls in a parallel stream.</strong> They hold common pool threads that the whole JVM shares. Use an executor or virtual threads for I/O.</li>
+<li><strong>Parallelizing small inputs.</strong> Splitting and merging cost more than they save.</li>
+<li><strong>Expecting <code>forEach</code> to keep order in parallel.</strong> Use <code>forEachOrdered</code>, or better, collect.</li>
+<li><strong>Joining futures in the same pipeline that creates them.</strong> The fan-out becomes a loop. Two pipelines.</li>
+<li><strong><code>orElse(expensive())</code>, and <code>get()</code> without a check.</strong> Use <code>orElseGet</code> and <code>orElseThrow</code>.</li>
+<li><strong>Reading a shared map twice.</strong> <code>if (m.get(k) != null) return m.get(k);</code> can return <code>null</code>. Read once into a local or an <code>Optional</code>.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Streams are rarely the question in a concurrency round, but they show up in the code you write, and two follow ups are common: "can you parallelize this?" and "what is wrong with this lambda?"</p>
+<blockquote>I would only use a parallel stream for CPU-bound work on a large source that splits easily, with no shared mutable state. It runs on the common fork/join pool, which has cores minus one threads for the whole JVM, so for I/O I would use my own executor, or virtual threads with an explicit limit, instead.</blockquote>
+<blockquote>Inside a stream, the result comes out of the pipeline through <code>collect</code> or <code>reduce</code>, never through a side effect into a shared collection. Then the parallel version is exactly as correct as the sequential one.</blockquote>
+<p>Follow ups to expect. "Which pool do parallel streams use, and how big is it?" (<code>ForkJoinPool.commonPool()</code>, available processors minus one by default, plus the calling thread, shared by the whole JVM). "How would you call 100 services in parallel and keep the results in order?" (submit all to an executor as <code>CompletableFuture</code>s, then join them in order). "Why does <code>ConcurrentHashMap</code> reject <code>null</code>?" (so one <code>get</code> returning <code>null</code> always means absent; a follow-up <code>containsKey</code> would race with writers). "What does <code>Optional</code> give you over returning <code>null</code>?" (the signature tells the caller the result may be missing and forces them to handle it, and it composes with <code>map</code> and <code>orElseGet</code>; it costs an allocation, so keep it to return values, not fields or hot inner loops).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<ul>
+<li><strong>How parallel <code>collect</code> stays safe.</strong> A collector has a supplier, an accumulator and a combiner. In parallel, each chunk gets its own container from the supplier, fills it alone, and the combiner merges containers pairwise. That is <a class="term" data-term="thread-confinement" href="glossary.html#thread-confinement">thread confinement</a>, not locking, which is why <code>collect(Collectors.toList())</code> needs no synchronization. The concurrent collectors (<code>groupingByConcurrent</code>, <code>toConcurrentMap</code>) instead share one concurrent map and give up encounter order.</li>
+<li><strong>Splitting quality decides speed-up.</strong> A source reports characteristics such as <code>SIZED</code> and <code>SUBSIZED</code> through its <code>Spliterator</code>. An array or <code>ArrayList</code> splits into equal halves cheaply; a <code>LinkedList</code> has to walk to split, and <code>Stream.iterate</code> hardly splits at all. Calling <code>unordered()</code> can make <code>distinct()</code> and <code>limit()</code> much cheaper in parallel.</li>
+<li><strong>Parallel streams are a CPU tool; virtual threads are a waiting tool.</strong> In Java 21, a blocking fan-out of a thousand calls is a virtual thread per call plus a <code>Semaphore</code> for the limit, not a parallel stream.</li>
+</ul>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A pipeline is a source, lazy intermediate operations and one terminal operation; elements flow through it one at a time.</li>
+<li>Lambdas must not mutate shared state. In a parallel stream a side effect is a race; produce results with <code>collect</code>, <code>reduce</code> or <code>toList()</code>.</li>
+<li>Parallel streams run on the common <code>ForkJoinPool</code> (cores minus one threads, shared by the whole JVM): use them for big CPU-bound work, never for blocking I/O.</li>
+<li>Start all futures in one pipeline and join them in another, or the fan-out becomes a loop.</li>
+<li><code>Optional</code> is a return type for "maybe no result"; prefer <code>orElseGet</code> and <code>orElseThrow</code>, and read shared state once.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="java-streams-optional"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="java-streams-optional.q1" data-a="0,1,2" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt"><code>List&lt;Integer&gt; out = new ArrayList&lt;&gt;(); IntStream.range(0, 100_000).parallel().forEach(out::add);</code> Which outcomes are possible? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>out.size()</code> is less than 100,000</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">An <code>ArrayIndexOutOfBoundsException</code> is thrown</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>out</code> contains some <code>null</code> entries</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Always exactly 100,000 elements, just in a scrambled order</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> <code>ArrayList.add</code> is a read-modify-write of the size and the backing array. Concurrent calls overwrite each other's slots (lost elements), race during a resize (an exception, or slots that end up <code>null</code>), and nothing guarantees the count. Use <code>toList()</code> or <code>collect</code>, which give each chunk its own container.</div></div><div class="mcq" data-id="java-streams-optional.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">What does <code>Stream.of(1, 2, 3, 4).parallel().reduce(10, Integer::sum)</code> return?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">20, the same as the sequential version</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It depends on how the stream is split: the 10 is added once per chunk, so four chunks give 50</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws, because 10 is not an identity</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">10, because a parallel reduce ignores the elements</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each chunk starts its own reduction from the identity, and the partial results are combined. With a true identity (0) that changes nothing; with 10 it adds 10 per chunk. The sequential result is 20, the parallel one varies with the split. Keep the seed neutral and add constants outside.</div></div><div class="mcq" data-id="java-streams-optional.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">On Java 21, what does <code>List.of(&quot;A&quot;, &quot;B&quot;, &quot;C&quot;).stream().peek(System.out::println).count()</code> print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A, B and C on three lines</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing; <code>count()</code> returns 3 without running the pipeline</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A, B and C in some unpredictable order</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It throws, because <code>peek</code> cannot be used with <code>count</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Since Java 9, <code>count()</code> may compute the answer directly from a sized source and skip the intermediate operations, so <code>peek</code> never runs. It is a reminder that side effects in a pipeline are not even guaranteed to happen. Add a <code>filter</code>, and the size is no longer known, so <code>peek</code> runs again.</div></div><div class="mcq" data-id="java-streams-optional.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">On a machine with 8 available processors, what is the default parallelism of <code>ForkJoinPool.commonPool()</code>, which parallel streams use?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">8</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">7</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">16</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Unbounded: it adds threads as tasks block</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The default is the number of available processors minus one (at least one), because the thread that starts a parallel stream also does part of the work. The pool is shared by the whole JVM, which is why one blocking stream can starve the others; the size can be changed with a system property.</div></div><div class="mcq" data-id="java-streams-optional.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>String user = cache.lookup(id).orElse(loadFromDatabase(id));</code> What happens when <code>lookup</code> finds the user?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>loadFromDatabase</code> is skipped because the Optional has a value</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>loadFromDatabase</code> still runs; its result is thrown away</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws, because <code>orElse</code> needs an empty Optional</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>loadFromDatabase</code> runs only on a parallel stream</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Java evaluates method arguments before the call, so the database query runs every time. <code>orElseGet(() -&gt; loadFromDatabase(id))</code> takes a supplier and only calls it when the Optional is empty.</div></div><div class="mcq" data-id="java-streams-optional.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why does <code>ConcurrentHashMap</code> refuse <code>null</code> keys and values?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Hashing <code>null</code> is impossible</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">So that <code>get</code> returning <code>null</code> always means "absent": in a concurrent map, checking <code>containsKey</code> afterwards would be a race</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">To save memory in each node</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because <code>null</code> values would break the lock striping</span></button></li></ol><div class="why" hidden><strong>Why.</strong> In a plain map you can tell a missing key from a key mapped to <code>null</code> with a second call, <code>containsKey</code>. In a concurrent map another thread can change the map between the two calls, so the answer would be meaningless. Banning <code>null</code> makes a single <code>get</code> unambiguous, the same idea behind returning <code>Optional</code> from your own concurrent methods.</div></div><div class="mcq" data-id="java-streams-optional.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Four ids are processed with <code>ids.stream().map(id -&gt; CompletableFuture.supplyAsync(() -&gt; fetch(id), pool)).map(CompletableFuture::join).toList()</code>. Each <code>fetch</code> takes 100 ms and <code>pool</code> has 4 threads. About how long does it take?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">About 100 ms, because the four calls run in parallel</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">About 400 ms, because each element is joined before the next one is submitted</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">About 25 ms</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks, because <code>join</code> blocks a pool thread</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Streams are lazy and push one element through the whole pipeline at a time, so the second <code>supplyAsync</code> is called only after the first <code>join</code> returns. Collect the futures with <code>toList()</code> first, then join them in a second pipeline, and the four calls overlap. There is no deadlock here, because <code>join</code> runs on the calling thread, not on a pool thread.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="java-streams-optional.c1" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">A teammate wants to call 1,000 URLs with <code>urls.parallelStream().map(this::fetch).toList()</code>. Would you approve it? If not, what would you write instead, keeping the results in input order and at most 50 calls in flight?</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>No. <code>fetch</code> is blocking I/O, and a parallel stream runs on the common fork/join pool: cores minus one threads, shared by every parallel stream and default <code>CompletableFuture</code> in the JVM. The calls would hold those threads while waiting on the network, so we would get only a handful of calls in flight, and everything else in the process that uses the common pool would stall behind them.</p>
+<p>Instead, an executor meant for waiting, and an explicit limit. In Java 21:</p>
+<figure class="code single" data-sample="java-streams-optional.8"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="t">List</span>&lt;<span class="t">String</span>&gt; <span class="f">fetchAll</span>(<span class="t">List</span>&lt;<span class="t">String</span>&gt; urls) {
+    <span class="t">Semaphore</span> inFlight = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">50</span>);
+    <span class="k">try</span> (<span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newVirtualThreadPerTaskExecutor</span>()) {
+        <span class="t">List</span>&lt;<span class="t">CompletableFuture</span>&lt;<span class="t">String</span>&gt;&gt; futures = urls.<span class="f">stream</span>()
+            .<span class="f">map</span>(url -&gt; <span class="t">CompletableFuture</span>.<span class="f">supplyAsync</span>(() -&gt; {
+                inFlight.<span class="f">acquireUninterruptibly</span>();     <span class="c">// at most 50 calls at once</span>
+                <span class="k">try</span> {
+                    <span class="k">return</span> <span class="f">fetch</span>(url);
+                } <span class="k">finally</span> {
+                    inFlight.<span class="f">release</span>();
+                }
+            }, pool))
+            .<span class="f">toList</span>();                                 <span class="c">// start everything first</span>
+        <span class="k">return</span> futures.<span class="f">stream</span>().<span class="f">map</span>(<span class="t">CompletableFuture</span>::join).<span class="f">toList</span>();   <span class="c">// then join, in input order</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The futures are created in one pipeline and joined in a second, so the calls overlap; joining in list order keeps the results in input order. Virtual threads make waiting cheap and the semaphore protects the remote side. On Java 17 I would use a fixed pool of 50 platform threads instead, which gives the limit by itself. I would also add a timeout per call and decide whether one failure should fail the whole batch.</p></div></div><div class="cq" data-q="java-streams-optional.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Make this correct when the stream is parallel, without any lock: <code>List&lt;String&gt; longWords = new ArrayList&lt;&gt;(); words.parallelStream().filter(w -&gt; w.length() &gt; 3).forEach(longWords::add);</code> Then, in the same style, count the words by their first letter.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code single" data-sample="java-streams-optional.9"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7</span><code><span class="t">List</span>&lt;<span class="t">String</span>&gt; longWords = words.<span class="f">parallelStream</span>()
+    .<span class="f">filter</span>(w -&gt; w.<span class="f">length</span>() &gt; <span class="n">3</span>)
+    .<span class="f">toList</span>();                                  <span class="c">// each chunk builds its own piece; kept in source order</span>
+
+<span class="t">Map</span>&lt;<span class="t">Character</span>, <span class="t">Long</span>&gt; byFirstLetter = words.<span class="f">parallelStream</span>()
+    .<span class="f">filter</span>(w -&gt; !w.<span class="f">isEmpty</span>())
+    .<span class="f">collect</span>(<span class="t">Collectors</span>.<span class="f">groupingBy</span>(w -&gt; w.<span class="f">charAt</span>(<span class="n">0</span>), <span class="t">Collectors</span>.<span class="f">counting</span>()));</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The original shares one <code>ArrayList</code> between the threads of the common pool, so elements are lost or the list is corrupted. In the fix the result is the output of the pipeline: each chunk fills its own container and the stream merges them, so there is no shared mutable state and no lock. For the counts, <code>groupingBy</code> merges per-chunk maps; <code>groupingByConcurrent</code> would insert into one <code>ConcurrentHashMap</code> instead, which is often faster when the order of entries does not matter.</p></div></div><div class="cq" data-q="java-streams-optional.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A cache method reads <code>if (cache.get(key) != null) { return cache.get(key); } return load(key);</code> on a <code>ConcurrentHashMap</code> that another thread evicts from. Callers occasionally get <code>null</code>. Explain, and fix it two ways.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>It reads the shared map twice. Between the check and the second <code>get</code>, the evictor can remove the key, so the method checks that the value is there and then returns <code>null</code> anyway: a check-then-act across two calls that are each thread-safe on their own.</p>
+<p>Fix one: read once into a local. <code>String v = cache.get(key); return v != null ? v : load(key);</code> or, with <code>Optional</code>, <code>return Optional.ofNullable(cache.get(key)).orElseGet(() -&gt; load(key));</code>. Fix two, if a missing value should also be stored: <code>return cache.computeIfAbsent(key, this::load);</code>, which makes the check and the insert one atomic step per key, so concurrent misses on the same key run the loader once. (The loader then runs while that key's bin is locked, so it must be short and must not touch the map itself.)</p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-ordered-parallel-map.html" data-problem="ordered-parallel-map"><span class="pk">Executors and async · medium</span><b>Ordered parallel map</b><span class="pst"></span></a><a class="pcard" href="p-parallel-merge-sort.html" data-problem="parallel-merge-sort"><span class="pk">Executors and async · medium</span><b>Parallel merge sort</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="java-time-units.html"><span>Previous</span><b>Time: nanoTime, Duration and TimeUnit</b></a><a class="next" href="java-collections-for-coding-rounds.html"><span>Next</span><b>Collections for coding rounds: comparators, heaps, trees and traps</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#a-stream-pipeline">A stream pipeline</a><a href="#side-effects-the-rule-that-parallel-streams-enforce">Side effects: the rule that parallel streams enforce</a><a href="#parallel-streams-and-the-common-pool">Parallel streams and the common pool</a><a href="#the-lazy-join-trap">The lazy join trap</a><a href="#optional">Optional</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

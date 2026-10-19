@@ -1,0 +1,1024 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Producer and consumer with a bounded buffer · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="producer-consumer" data-title="Producer and consumer with a bounded buffer" data-track="core" data-module="core-5" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details open><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer" class=here><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m5">Module 05: Waiting and signaling</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 05.5</span><span>26 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Producer and consumer with a bounded buffer</h1><p class="lsum">Hand work between threads through a bounded buffer: blocking, many producers and consumers, shutdown, back-pressure and timeouts.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Databricks</span><span class="co">LinkedIn</span><span class="co">Microsoft</span><span class="co">Bloomberg</span><span class="co">Uber</span></div><div class="prereq"><span>Before this:</span><a href="condition-variables.html">Condition variables and monitors</a><a href="wait-in-a-loop.html">Spurious and stolen wakeups: always wait in a loop</a><a href="lost-wakeups-and-notify-all.html">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</a></div></header><article class="prose" id="article">
+<p class="lead">One group of threads makes work, another group does it, and a buffer with a fixed size sits between them. This is the most common concurrency structure in real systems, the backbone of every thread pool and log writer, and one of the most asked concurrency coding questions.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>Picture the pass in a restaurant kitchen: the counter under the heat lamp where chefs put finished plates and waiters pick them up. It has room for six plates. If the pass is full, a chef with a plate in hand has to wait; if it is empty, a waiter has to wait. Nobody shouts across the room to coordinate. The counter itself does it.</p>
+<p>Two things make it work. The counter is <strong>bounded</strong>: when waiters fall behind, the chefs are forced to slow down instead of stacking plates on the floor. And at closing time the manager says "kitchen closed": chefs stop cooking, waiters carry out whatever is still on the pass, and then everyone goes home. That is the whole lesson: a bounded buffer, two kinds of waiting, and a clean shutdown.</p>
+</div>
+
+<h2 id="why-a-buffer-and-why-a-bounded-one">Why a buffer, and why a bounded one</h2>
+<p>The <a class="term" data-term="producer-consumer" href="glossary.html#producer-consumer">producer-consumer</a> pattern separates making work from doing it. Producers (request handlers, a file reader, a crawler finding links) put items into a shared buffer; consumers (worker threads, a disk writer) take them out. The two sides can run at different speeds, and short bursts are absorbed by the buffer.</p>
+<p>The buffer must have a limit. An unbounded queue hides a slow consumer until memory runs out: latency grows a little every second, then the process dies of an out of memory error hours later. A <a class="term" data-term="bounded-buffer" href="glossary.html#bounded-buffer">bounded buffer</a> turns the same situation into <a class="term" data-term="backpressure" href="glossary.html#backpressure">back-pressure</a>: when consumers cannot keep up, the buffer fills and producers are made to wait or are told no. <strong>The capacity is a decision about what happens under overload, not a tuning detail.</strong></p>
+<p>The state is tiny: the items and the capacity. The invariant is <strong>0 &lt;= size &lt;= capacity, and items leave in the order they arrived</strong>. Every method locks, waits until it can act without breaking the invariant, acts, and wakes the threads that might now be able to act. That is the <a class="term" data-term="monitor" href="glossary.html#monitor">monitor</a> pattern from the condition variables lessons, applied to the most useful structure there is.</p>
+
+<h2 id="version-1-one-monitor-wait-and-notifyall">Version 1: one monitor, wait and notifyAll</h2>
+<p>The shortest correct version uses one lock and one <a class="term" data-term="condition-variable" href="glossary.html#condition-variable">condition variable</a> for both kinds of waiting. Producers wait while the buffer is full, consumers wait while it is empty, and since both kinds sleep on the same condition, every change must wake everybody.</p>
+
+<figure class="code pair" data-sample="producer-consumer.1"><figcaption><span class="ctitle">A bounded buffer with one condition</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> T&gt;
+<span class="k">class</span> BoundedBuffer {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BoundedBuffer</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        changed_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_; });
+        items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        changed_.<span class="f">notify_all</span>();           <span class="c">// some waiter may be a consumer: wake them all</span>
+    }
+
+    T <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        changed_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !items_.<span class="f">empty</span>(); });
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        changed_.<span class="f">notify_all</span>();           <span class="c">// some waiter may be a producer</span>
+        <span class="k">return</span> item;
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> changed_;    <span class="c">// one condition for both kinds of waiter</span>
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+
+<span class="k">class</span> <span class="t">BoundedBuffer</span>&lt;T&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;T&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+
+    <span class="t">BoundedBuffer</span>(<span class="t">int</span> capacity) {
+        <span class="k">this</span>.capacity = capacity;
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">put</span>(T item) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">while</span> (items.<span class="f">size</span>() == capacity) {
+            <span class="f">wait</span>();                      <span class="c">// releases the monitor while asleep</span>
+        }
+        items.<span class="f">addLast</span>(item);
+        <span class="f">notifyAll</span>();                     <span class="c">// some waiter may be a consumer: wake them all</span>
+    }
+
+    <span class="k">synchronized</span> T <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">while</span> (items.<span class="f">isEmpty</span>()) {
+            <span class="f">wait</span>();
+        }
+        T item = items.<span class="f">removeFirst</span>();
+        <span class="f">notifyAll</span>();                     <span class="c">// some waiter may be a producer</span>
+        <span class="k">return</span> item;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>This is correct with any number of producers and consumers. Three details carry the weight. The wait is in a <code>while</code> loop (in C++, the predicate overload is that loop), because a woken thread must re-check: another thread may have taken the item first, and wakeups can be spurious. The state change and the notify happen under the lock. And it is <code>notifyAll</code>, not <code>notify</code>, because of the next section.</p>
+
+<h3>Why notify is not enough with one condition</h3>
+<p>With a single condition, the threads asleep on it are a mix of producers and consumers. <code>notify()</code> (or <code>notify_one()</code>) wakes one of them, chosen by the runtime, and it may be the wrong kind. Here is a buffer of capacity 1 that stalls forever with two producers and two consumers, even though every wait is in a loop:</p>
+
+<figure class="timeline"><figcaption>notify wakes the wrong thread (capacity 1, one condition)</figcaption><div class="tl c5"><div class="tl-head"><span class="t">step</span><span>Producer 1</span><span>Producer 2</span><span>Consumer 1</span><span>Consumer 2</span><span>Buffer</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">take: buffer empty, waits</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">take: buffer empty, waits</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell">put(a), then notify wakes C1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">[a]</span></div><div class="tl-row"><span class="t">5</span><span class="cell">put(b): buffer full, waits</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell">put(c): buffer full, waits</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">takes a, then notify wakes C2 (a consumer)</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">8</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">[ ] empty</span></div><div class="tl-row"><span class="t">9</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">take again: empty, waits</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">10</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">re-checks: empty, waits again</span><span class="cell empty"></span></div><div class="tl-note">! All four threads wait, two items are in hand, and nobody is left to notify anyone</div></div></figure>
+
+<p>The notify in step 7 was spent on a thread that could not use it. That is a <a class="term" data-term="lost-wakeup" href="glossary.html#lost-wakeup">lost wakeup</a> in its multi-thread form, and it is exactly the bug in the <a href="p-fix-the-lost-wakeup.html">fix the lost wakeup</a> problem. Two fixes: <code>notifyAll</code> (wake everybody and let the loop sort them out), or two conditions, so that every signal reaches a thread that can use it.</p>
+
+<h2 id="version-2-two-conditions-many-producers-many-consumers">Version 2: two conditions, many producers, many consumers</h2>
+<p>A <code>ReentrantLock</code> can have several conditions, and in C++ you simply declare two <code>std::condition_variable</code> objects next to one mutex. Producers wait on "not full", consumers wait on "not empty". Now each condition only ever has one kind of waiter, so waking one thread is safe: after a <code>put</code>, any waiting consumer can make progress, and after a <code>take</code>, any waiting producer can.</p>
+<p>The program below is the full version you should be able to write in an interview: two conditions, a <code>close()</code> method for shutdown, three producers and two consumers, and a check that every item arrived exactly once.</p>
+
+<figure class="code pair" data-sample="producer-consumer.2" data-expect="ok"><figcaption><span class="ctitle">Two conditions and close: three producers, two consumers</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> T&gt;
+<span class="k">class</span> BoundedBuffer {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BoundedBuffer</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        not_full_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_ || closed_; });
+        <span class="k">if</span> (closed_) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"buffer is closed"</span>);
+        items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        not_empty_.<span class="f">notify_one</span>();             <span class="c">// exactly one consumer can proceed</span>
+    }
+
+    <span class="c">// Returns nullopt only when the buffer is closed and drained.</span>
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        not_empty_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !items_.<span class="f">empty</span>() || closed_; });
+        <span class="k">if</span> (items_.<span class="f">empty</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        not_full_.<span class="f">notify_one</span>();              <span class="c">// exactly one producer can proceed</span>
+        <span class="k">return</span> item;
+    }
+
+    <span class="t">void</span> <span class="f">close</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+            closed_ = <span class="k">true</span>;
+        }
+        not_full_.<span class="f">notify_all</span>();              <span class="c">// the rules changed for every waiter</span>
+        not_empty_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> not_full_;       <span class="c">// producers wait here</span>
+    <span class="t">std</span>::<span class="t">condition_variable</span> not_empty_;      <span class="c">// consumers wait here</span>
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;
+    <span class="t">bool</span> closed_ = <span class="k">false</span>;
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    BoundedBuffer&lt;<span class="t">int</span>&gt; <span class="f">buffer</span>(<span class="n">8</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; producers, consumers;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">long</span>&gt; <span class="f">sums</span>(<span class="n">2</span>, <span class="n">0</span>), <span class="f">counts</span>(<span class="n">2</span>, <span class="n">0</span>);   <span class="c">// one slot per consumer, read after join</span>
+    <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; <span class="n">3</span>; p += <span class="n">1</span>) {
+        producers.<span class="f">emplace_back</span>([&amp;buffer] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">1000</span>; i += <span class="n">1</span>) buffer.<span class="f">put</span>(i);
+        });
+    }
+    <span class="k">for</span> (<span class="t">int</span> c = <span class="n">0</span>; c &lt; <span class="n">2</span>; c += <span class="n">1</span>) {
+        consumers.<span class="f">emplace_back</span>([&amp;buffer, &amp;sums, &amp;counts, c] {
+            <span class="k">while</span> (<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; item = buffer.<span class="f">take</span>()) {
+                sums[c] += *item;
+                counts[c] += <span class="n">1</span>;
+            }
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : producers) t.<span class="f">join</span>();
+    buffer.<span class="f">close</span>();                          <span class="c">// only after every producer has finished</span>
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : consumers) t.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"taken "</span> &lt;&lt; counts[<span class="n">0</span>] + counts[<span class="n">1</span>] &lt;&lt; <span class="s">" items, sum "</span> &lt;&lt; sums[<span class="n">0</span>] + sums[<span class="n">1</span>]
+              &lt;&lt; <span class="s">" (expected 3000 and "</span> &lt;&lt; <span class="n">3</span> * <span class="n">500500</span> &lt;&lt; <span class="s">")\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">BoundedBuffer</span>&lt;T&gt; {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;T&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>();    <span class="c">// producers wait here</span>
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notEmpty = lock.<span class="f">newCondition</span>();   <span class="c">// consumers wait here</span>
+        <span class="k">private</span> <span class="t">boolean</span> closed;
+
+        <span class="t">BoundedBuffer</span>(<span class="t">int</span> capacity) { <span class="k">this</span>.capacity = capacity; }
+
+        <span class="k">void</span> <span class="f">put</span>(T item) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (items.<span class="f">size</span>() == capacity &amp;&amp; !closed) notFull.<span class="f">await</span>();
+                <span class="k">if</span> (closed) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"buffer is closed"</span>);
+                items.<span class="f">addLast</span>(item);
+                notEmpty.<span class="f">signal</span>();               <span class="c">// exactly one consumer can proceed</span>
+            } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+        }
+
+        <span class="c">// Like poll(), returns null when there is nothing left: closed and drained.</span>
+        T <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (items.<span class="f">isEmpty</span>() &amp;&amp; !closed) notEmpty.<span class="f">await</span>();
+                <span class="k">if</span> (items.<span class="f">isEmpty</span>()) <span class="k">return</span> <span class="k">null</span>;
+                T item = items.<span class="f">removeFirst</span>();
+                notFull.<span class="f">signal</span>();                <span class="c">// exactly one producer can proceed</span>
+                <span class="k">return</span> item;
+            } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+        }
+
+        <span class="k">void</span> <span class="f">close</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                closed = <span class="k">true</span>;
+                notFull.<span class="f">signalAll</span>();             <span class="c">// the rules changed for every waiter</span>
+                notEmpty.<span class="f">signalAll</span>();
+            } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">BoundedBuffer</span>&lt;<span class="t">Integer</span>&gt; buffer = <span class="k">new</span> <span class="t">BoundedBuffer</span>&lt;&gt;(<span class="n">8</span>);
+        <span class="t">AtomicLong</span> sum = <span class="k">new</span> <span class="t">AtomicLong</span>(), taken = <span class="k">new</span> <span class="t">AtomicLong</span>();
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; producers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(), consumers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> p = <span class="n">0</span>; p &lt; <span class="n">3</span>; p += <span class="n">1</span>) {
+            producers.<span class="f">add</span>(<span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"producer-"</span> + p).<span class="f">start</span>(() -&gt; {
+                <span class="k">try</span> { <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">1000</span>; i += <span class="n">1</span>) buffer.<span class="f">put</span>(i); }
+                <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }));
+        }
+        <span class="k">for</span> (<span class="t">int</span> c = <span class="n">0</span>; c &lt; <span class="n">2</span>; c += <span class="n">1</span>) {
+            consumers.<span class="f">add</span>(<span class="t">Thread</span>.<span class="f">ofPlatform</span>().<span class="f">name</span>(<span class="s">"consumer-"</span> + c).<span class="f">start</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">for</span> (<span class="t">Integer</span> item = buffer.<span class="f">take</span>(); item != <span class="k">null</span>; item = buffer.<span class="f">take</span>()) {
+                        sum.<span class="f">addAndGet</span>(item);
+                        taken.<span class="f">incrementAndGet</span>();
+                    }
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) { <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); }
+            }));
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> t : producers) t.<span class="f">join</span>();
+        buffer.<span class="f">close</span>();                          <span class="c">// only after every producer has finished</span>
+        <span class="k">for</span> (<span class="t">Thread</span> t : consumers) t.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"taken "</span> + taken + <span class="s">" items, sum "</span> + sum + <span class="s">" (expected 3000 and 1501500)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>taken 3000 items, sum 1501500 (expected 3000 and 1501500)</pre></div><div class="runout" hidden></div></figure>
+
+<p>Read the two <code>wait</code> conditions carefully, because they are the whole shutdown design. A producer waits while the buffer is full <em>and</em> open. A consumer waits while it is empty <em>and</em> open, and it returns "nothing left" only when it is empty <em>and</em> closed. So a consumer that wakes after <code>close()</code> still takes the items that are left. Closing means "no more puts", not "throw away what is queued".</p>
+<p>In C++, notice where the notify sits in <code>close()</code>: after the lock is released. Notifying while holding the lock is also correct; notifying after unlocking can save the woken thread from waking up only to block on the mutex. It is safe here because the buffer outlives every thread that waits on it: <code>main</code> joins the consumers before the buffer is destroyed. If a waiter could destroy the buffer as soon as it saw <code>closed</code>, you would notify under the lock instead, for the reason shown in <a href="lost-wakeups-and-notify-all.html">the previous lesson</a>. In <code>put</code> and <code>take</code> the notify is inside the lock for simplicity, which is always safe.</p>
+
+<div class="box note">
+<h3>Why each consumer sums into its own slot</h3>
+<p>In the C++ demo, each consumer writes only <code>sums[c]</code> and <code>counts[c]</code>, and <code>main</code> reads them after <code>join()</code>. No two threads write the same element, and the join gives <code>main</code> a happens-before edge to everything the consumer wrote, so no lock and no atomic is needed. That is the "do not share" fix from the lost update lesson, used on purpose.</p>
+</div>
+
+<h2 id="shutting-down">Shutting down</h2>
+<p>Interviewers almost always ask "how does it stop?" because a producer and consumer system that cannot shut down cleanly either hangs on exit or drops work. There are three standard answers.</p>
+
+<table>
+<thead><tr><th>Approach</th><th>How it works</th><th>Good for</th><th>Watch out for</th></tr></thead>
+<tbody>
+<tr><td>A closed flag</td><td><code>close()</code> sets a flag under the lock and wakes everyone. <code>put</code> refuses; <code>take</code> drains, then reports "closed".</td><td>Buffers you write yourself; any number of consumers</td><td>Close only after all producers have finished, or their late puts fail</td></tr>
+<tr><td><a class="term" data-term="poison-pill" href="glossary.html#poison-pill">Poison pills</a></td><td>After the last real item, put one special "stop" item per consumer. A consumer that takes one exits.</td><td>Library queues you cannot change, like <code>ArrayBlockingQueue</code></td><td>Exactly one pill per consumer, after every producer is done; FIFO is what guarantees real work comes first</td></tr>
+<tr><td>Interruption</td><td>Interrupt the consumer threads; <code>take()</code> throws <code>InterruptedException</code> and the loop exits.</td><td>Stopping now, abandoning queued work (Java's <code>shutdownNow</code> style)</td><td>Queued items are not processed; C++ has no thread interruption, so use a flag or a <code>std::stop_token</code> (C++20 <code>std::condition_variable_any</code> has <code>wait</code> overloads that take one)</td></tr>
+</tbody>
+</table>
+
+<figure class="code pair" data-sample="producer-consumer.3"><figcaption><span class="ctitle">Poison pills on a plain blocking queue</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21</span><code><span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+
+<span class="c">// Queue is any blocking queue with put(T) and take() (no close), holding</span>
+<span class="c">// std::optional&lt;Job&gt;. An empty optional is the pill.</span>
+<span class="k">using</span> Job = <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;;
+
+<span class="k">template</span> &lt;<span class="k">class</span> Queue&gt;
+<span class="t">void</span> <span class="f">consume</span>(Queue&amp; <span class="t">queue</span>) {
+    <span class="k">while</span> (<span class="t">std</span>::<span class="t">optional</span>&lt;Job&gt; job = <span class="t">queue</span>.<span class="f">take</span>()) {
+        (*job)();                        <span class="c">// an empty optional ends the loop</span>
+    }
+}
+
+<span class="c">// Called once every producer has finished (joined).</span>
+<span class="k">template</span> &lt;<span class="k">class</span> Queue&gt;
+<span class="t">void</span> <span class="f">stop_all</span>(Queue&amp; <span class="t">queue</span>, <span class="t">int</span> consumers) {
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; consumers; i += <span class="n">1</span>) {
+        <span class="t">queue</span>.<span class="f">put</span>(<span class="t">std</span>::nullopt);         <span class="c">// one pill per consumer</span>
+    }
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">import</span> java.util.concurrent.<span class="t">BlockingQueue</span>;
+
+<span class="k">class</span> <span class="t">Pills</span> {
+    <span class="c">// A unique object: compared with ==, so no real task can ever equal it.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Runnable</span> POISON = () -&gt; { };
+
+    <span class="k">static</span> <span class="k">void</span> <span class="f">consume</span>(<span class="t">BlockingQueue</span>&lt;<span class="t">Runnable</span>&gt; queue) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">Runnable</span> task = queue.<span class="f">take</span>();
+            <span class="k">if</span> (task == POISON) {
+                <span class="k">return</span>;                  <span class="c">// this consumer's stop signal</span>
+            }
+            task.<span class="f">run</span>();
+        }
+    }
+
+    <span class="c">// Called once every producer has finished.</span>
+    <span class="k">static</span> <span class="k">void</span> <span class="f">stopAll</span>(<span class="t">BlockingQueue</span>&lt;<span class="t">Runnable</span>&gt; queue, <span class="t">int</span> consumers) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; consumers; i += <span class="n">1</span>) {
+            queue.<span class="f">put</span>(POISON);           <span class="c">// one pill per consumer</span>
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>With several producers, nobody can put the pills until <em>all</em> producers have finished. Usually the main thread joins the producers (or counts them down with a latch) and then puts the pills. A producer that puts a pill when it alone finishes is a classic bug: a consumer exits early while other producers are still adding work, and the last items are never processed.</p>
+
+<h2 id="back-pressure-block-wait-a-while-or-say-no">Back-pressure: block, wait a while, or say no</h2>
+<p>A full buffer is the system telling producers "slow down". What a producer does next is a design decision, and the right answer depends on who the producer is:</p>
+<ul>
+<li><strong>Block</strong> (<code>put</code>): right for background producers, like a file reader feeding a parser. The reader simply goes at the parser's speed. Wrong for request threads, because a blocked request thread is a user waiting with no answer.</li>
+<li><strong>Wait with a timeout</strong> (<code>offer(item, timeout)</code>): try for a bounded time, then give up and let the caller decide: return an error, retry later, or count a drop. This is how services shed load instead of piling up.</li>
+<li><strong>Fail immediately</strong> (<code>offer(item)</code> or a <code>try_put</code> you write): when the item is optional and waiting is pointless, such as a sampled trace or a best-effort debug event.</li>
+<li><strong>Drop something</strong>: the newest item, or the oldest one (keep the freshest data). Always count the drops; silent loss is the worst outcome.</li>
+</ul>
+
+<figure class="code pair" data-sample="producer-consumer.4"><figcaption><span class="ctitle">offer with a timeout: give up instead of blocking forever</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="c">// Inside BoundedBuffer from the demo above (add: #include &lt;chrono&gt;).</span>
+<span class="k">template</span> &lt;<span class="k">class</span> Rep, <span class="k">class</span> Period&gt;
+<span class="t">bool</span> <span class="f">offer</span>(T item, <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">duration</span>&lt;Rep, Period&gt; timeout) {
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+    <span class="c">// wait_for with a predicate returns false if the predicate is still false at the deadline</span>
+    <span class="t">bool</span> ready = not_full_.<span class="f">wait_for</span>(lock, timeout, [<span class="k">this</span>] {
+        <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_ || closed_;
+    });
+    <span class="k">if</span> (!ready) {
+        <span class="k">return</span> <span class="k">false</span>;                               <span class="c">// still full: the caller decides</span>
+    }
+    <span class="k">if</span> (closed_) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"buffer is closed"</span>);
+    items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+    not_empty_.<span class="f">notify_one</span>();
+    <span class="k">return</span> <span class="k">true</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="c">// Inside BoundedBuffer from the demo above (add: import java.util.concurrent.TimeUnit).</span>
+<span class="t">boolean</span> <span class="f">offer</span>(T item, <span class="t">long</span> timeout, <span class="t">TimeUnit</span> unit) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+    <span class="t">long</span> nanos = unit.<span class="f">toNanos</span>(timeout);
+    lock.<span class="f">lockInterruptibly</span>();
+    <span class="k">try</span> {
+        <span class="k">while</span> (items.<span class="f">size</span>() == capacity &amp;&amp; !closed) {
+            <span class="k">if</span> (nanos &lt;= <span class="n">0L</span>) {
+                <span class="k">return</span> <span class="k">false</span>;                       <span class="c">// still full: the caller decides</span>
+            }
+            nanos = notFull.<span class="f">awaitNanos</span>(nanos);      <span class="c">// returns the time left</span>
+        }
+        <span class="k">if</span> (closed) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"buffer is closed"</span>);
+        items.<span class="f">addLast</span>(item);
+        notEmpty.<span class="f">signal</span>();
+        <span class="k">return</span> <span class="k">true</span>;
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>Two details matter here. In Java, <code>awaitNanos</code> returns the time still left, so a spurious or stolen wakeup does not restart the full timeout. In C++, <code>wait_for</code> with a predicate computes one deadline up front and handles the loop for you; without the predicate you would need <code>wait_until</code> with a fixed deadline in your own loop. <code>poll(timeout)</code> on the consumer side is the mirror image.</p>
+
+<h2 id="the-library-versions">The library versions</h2>
+<p>In production Java you would not write this class. <code>java.util.concurrent</code> has it, in several flavors, and the method names tell you the overload policy:</p>
+<table>
+<thead><tr><th></th><th>Throws</th><th>Returns a special value</th><th>Blocks</th><th>Times out</th></tr></thead>
+<tbody>
+<tr><td>Insert</td><td><code>add(e)</code></td><td><code>offer(e)</code> (false)</td><td><code>put(e)</code></td><td><code>offer(e, time, unit)</code></td></tr>
+<tr><td>Remove</td><td><code>remove()</code></td><td><code>poll()</code> (null)</td><td><code>take()</code></td><td><code>poll(time, unit)</code></td></tr>
+</tbody>
+</table>
+<p><code>ArrayBlockingQueue</code> is Version 2 without <code>close()</code>: one lock and two conditions over a circular array. <code>LinkedBlockingQueue</code> uses <strong>two locks</strong>, one for the head and one for the tail, so a producer and a consumer can work at the same moment; its default capacity is <code>Integer.MAX_VALUE</code>, which means "unbounded" unless you pass one. The C++ standard library (through C++23) has no blocking queue at all, which is precisely why C++ candidates are asked to write one.</p>
+
+<h2 id="with-semaphores-instead-of-conditions">With semaphores instead of conditions</h2>
+<p>A common follow up is "can you build it with semaphores?" The textbook answer counts both kinds of room with two <a class="term" data-term="semaphore" href="glossary.html#semaphore">semaphores</a>: <code>freeSlots</code> starts at the capacity, <code>filledSlots</code> starts at zero, and a lock still guards the deque itself, because two producers can get past <code>freeSlots</code> at the same moment. A semaphore remembers its releases, so there is no lost wakeup to reason about and no wait loop to write.</p>
+
+<figure class="code pair" data-sample="producer-consumer.5"><figcaption><span class="ctitle">The semaphore version: semaphore first, then the lock</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34</span><code><span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;semaphore&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> T&gt;
+<span class="k">class</span> SemaphoreBuffer {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">SemaphoreBuffer</span>(<span class="t">std</span>::<span class="t">ptrdiff_t</span> capacity) : <span class="f">free_slots_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        free_slots_.<span class="f">acquire</span>();               <span class="c">// wait for room while holding no lock</span>
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+            items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        }
+        filled_slots_.<span class="f">release</span>();             <span class="c">// one more item for some consumer</span>
+    }
+
+    T <span class="f">take</span>() {
+        filled_slots_.<span class="f">acquire</span>();             <span class="c">// wait for an item while holding no lock</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());  <span class="c">// never empty: we hold a permit for one item</span>
+        items_.<span class="f">pop_front</span>();
+        free_slots_.<span class="f">release</span>();               <span class="c">// release never blocks, so doing it under the lock is fine</span>
+        <span class="k">return</span> item;
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;                    <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;&gt; free_slots_;   <span class="c">// permits = empty slots</span>
+    <span class="t">std</span>::<span class="t">counting_semaphore</span>&lt;&gt; filled_slots_{<span class="n">0</span>};   <span class="c">// permits = items ready to take</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Semaphore</span>;
+
+<span class="k">class</span> <span class="t">SemaphoreBuffer</span>&lt;T&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;T&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();   <span class="c">// guarded by lock</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> freeSlots;                         <span class="c">// permits = empty slots</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Semaphore</span> filledSlots = <span class="k">new</span> <span class="t">Semaphore</span>(<span class="n">0</span>);    <span class="c">// permits = items ready to take</span>
+
+    <span class="t">SemaphoreBuffer</span>(<span class="t">int</span> capacity) { freeSlots = <span class="k">new</span> <span class="t">Semaphore</span>(capacity); }
+
+    <span class="k">void</span> <span class="f">put</span>(T item) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        freeSlots.<span class="f">acquire</span>();                 <span class="c">// wait for room while holding no lock</span>
+        <span class="k">synchronized</span> (lock) {
+            items.<span class="f">addLast</span>(item);
+        }
+        filledSlots.<span class="f">release</span>();               <span class="c">// one more item for some consumer</span>
+    }
+
+    T <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        filledSlots.<span class="f">acquire</span>();               <span class="c">// wait for an item while holding no lock</span>
+        T item;
+        <span class="k">synchronized</span> (lock) {
+            item = items.<span class="f">removeFirst</span>();      <span class="c">// never empty: we hold a permit for one item</span>
+        }
+        freeSlots.<span class="f">release</span>();                 <span class="c">// one more slot for some producer</span>
+        <span class="k">return</span> item;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>The trap is the order: <strong>acquire the semaphore first, then the lock</strong>. A consumer that locks first and then waits on <code>filledSlots</code> sleeps while holding the lock, so no producer can ever add the item it is waiting for, and the program deadlocks. The semaphore version is short, but it has no natural <code>close()</code>: a thread blocked in <code>acquire</code> can only be freed by extra permits (poison pills again) or, in Java, by interruption. That is why the condition version is the one to write when shutdown is part of the question, and the only one allowed when the interviewer bans semaphores, as one LinkedIn round did.</p>
+
+<div class="box example">
+<h3>Worked example: sizing the buffer of a log writer</h3>
+<p>A service has 64 request threads that each call <code>log(event)</code>. One background thread drains the buffer and writes to disk in batches, at about 50,000 events a second; the service produces about 20,000 a second at peak. How big should the buffer be, and what should <code>log</code> do when it is full?</p>
+<ol>
+<li><strong>Normal operation.</strong> The writer is faster than the producers, so the buffer is nearly empty. Capacity barely matters here.</li>
+<li><strong>A disk stall.</strong> Suppose the disk pauses for 200 ms. At 20,000 events a second, 4,000 events pile up. A capacity of 10,000 rides out a 0.5 s stall without anyone waiting.</li>
+<li><strong>The latency it adds.</strong> By Little's law, time in queue = items in queue / drain rate. A full buffer of 10,000 drained at 50,000 a second adds up to 0.2 s before an event reaches the disk. A buffer of a million would "never fill", and would hide 20 s of lag and a lot of memory.</li>
+<li><strong>When it does fill.</strong> Request threads should not block indefinitely on logging. Use <code>offer</code> with a short timeout (say 5 ms), and on failure drop the event and increment a <code>droppedEvents</code> counter that alerts. If the log is an audit log that must not lose events, block instead, and accept that a dead disk stops the service, which is the honest outcome.</li>
+</ol>
+<p>This is the shape of the Databricks log writer question: producers, one writer, batching, and "what happens when the queue is full?" The buffer you just built is its core.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong><code>if</code> instead of <code>while</code> around the wait.</strong> A woken consumer finds the item already taken and removes from an empty queue. Always loop; in C++ always pass the predicate.</li>
+<li><strong><code>notify</code> with one shared condition.</strong> The single notify can wake a thread of the wrong kind and the system stalls (the timeline above). Use <code>notifyAll</code>, or two conditions with <code>signal</code>.</li>
+<li><strong>Doing the work while holding the lock.</strong> <code>take()</code> should remove the item and return; processing it inside the lock serializes all consumers and blocks every producer.</li>
+<li><strong>Checking <code>closed</code> before checking for items.</strong> A consumer that returns as soon as it sees <code>closed</code> drops whatever is still queued. Drain first: return "nothing left" only when closed <em>and</em> empty.</li>
+<li><strong>Closing or sending pills too early.</strong> Close after every producer has finished, and send exactly one pill per consumer.</li>
+<li><strong>An unbounded queue "for safety".</strong> It moves the failure from a visible full buffer to an invisible memory leak. Note that <code>new LinkedBlockingQueue&lt;&gt;()</code> is unbounded.</li>
+<li><strong>Swallowing <code>InterruptedException</code>.</strong> Catching it and continuing the loop makes the consumer impossible to cancel. Exit the loop, or restore the flag with <code>Thread.currentThread().interrupt()</code>.</li>
+<li><strong>Reading <code>size()</code> without the lock.</strong> It is a read of shared state like any other; in C++ it is a data race.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>This shows up in three forms. As a direct task: "design a bounded blocking queue" (LinkedIn has asked for it with plain <code>wait</code> and <code>notify</code> only, Bloomberg as a bounded concurrent queue, and Rubrik as the first step before building a thread pool on top, usually with library queues banned). As a debugging task: Rubrik's debugging round has handed candidates a C++ producer and consumer program with a critical section bug. And inside a bigger design: Databricks' log and event writer is producers, a queue and one writer thread, followed by "what happens when the queue is full?"</p>
+<blockquote>I will use one mutex for the queue and two condition variables, not full and not empty. Put waits in a loop while the queue is full, adds, and signals not empty; take is the mirror image. Each condition has only one kind of waiter, so signaling one thread is safe; with a single condition I would need notifyAll. For shutdown I will add a closed flag: put refuses after close, take drains what is left and then reports closed.</blockquote>
+<p>Follow ups to expect, roughly in order of frequency:</p>
+<ul>
+<li>"Why <code>while</code> and not <code>if</code>?" Spurious wakeups, and another consumer may have taken the item first.</li>
+<li>"Can you do it with one condition?" Yes, with <code>notifyAll</code>; explain the stall that <code>notify</code> causes.</li>
+<li>"Add a timeout." <code>awaitNanos</code> or <code>wait_for</code> with a predicate; return false on timeout.</li>
+<li>"How do you shut it down?" Closed flag or poison pills, and the ordering rules for each.</li>
+<li>"What should a producer do when it is full?" Block, time out, or shed load, depending on who the producer is.</li>
+<li>"Walk me through each step." LinkedIn interviewers have asked about the context switches at each step of a producer and consumer run. Practice saying it: "the consumer releases the lock inside await and sleeps; the producer acquires it, adds, signals; the consumer wakes, reacquires the lock, re-checks the condition."</li>
+<li>"Can you do it with semaphores?" Yes: free-slot and filled-slot semaphores plus a lock for the deque, and the semaphore is always acquired before the lock.</li>
+<li>"Is the order preserved?" Items leave in FIFO order, and each producer's items stay in that producer's order, but items from different producers interleave, and with several consumers the processing order is not the take order. If order matters per key, send each key to one consumer, as in <a href="ordering-by-ownership.html">ordering by ownership</a>.</li>
+<li>"How would you test it?" Several producers and consumers, every item tagged, check each arrives exactly once, capacity never exceeded, no hang (join with a timeout), and ThreadSanitizer in C++.</li>
+</ul>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>One lock or two.</strong> With one lock, producers and consumers serialize against each other. <code>LinkedBlockingQueue</code> splits it: <code>putLock</code> guards the tail, <code>takeLock</code> guards the head, and an <code>AtomicInteger</code> count connects them. A producer that sees the queue was empty must briefly take the take lock to signal a consumer, and signals cascade (a woken producer signals the next producer if there is still room). It is faster under heavy two-sided load and harder to get right; mentioning the design is a strong signal.</p>
+<p><strong>Batching.</strong> A consumer that takes one item per lock round trip pays the lock cost per item. <code>drainTo(list, max)</code> in Java, or a <code>take_all</code> that swaps the whole deque out under the lock in C++, lets a disk writer grab hundreds of items at once and write them in one system call. This is the heart of group commit in the log writer question.</p>
+<p><strong>Single producer, single consumer.</strong> With exactly one of each you can drop the lock entirely: a ring buffer where only the producer writes the tail index and only the consumer writes the head index, published with release stores and read with acquire loads. You will build the reasoning for that in <a href="memory-orders.html">memory orders</a>.</p>
+<p><strong>Fairness.</strong> <code>new ArrayBlockingQueue&lt;&gt;(n, true)</code> makes waiting threads proceed in FIFO order at a throughput cost. Without it, a thread that just arrived can barge ahead of one that has waited a long time.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A bounded buffer is one lock, the items, and two kinds of waiting: producers while full, consumers while empty.</li>
+<li>Always wait in a loop. With one condition use <code>notifyAll</code>; with two conditions, <code>signal</code> (or <code>notify_one</code>) is safe.</li>
+<li>The capacity is your overload policy: when full, block, time out, or shed load, and count what you drop.</li>
+<li>Shut down with a closed flag that still drains, or one poison pill per consumer after all producers finish.</li>
+<li>Never do the work inside the lock: take the item, release, then process.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="producer-consumer"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="producer-consumer.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A bounded buffer uses one condition (one Java monitor, or one <code>std::condition_variable</code>) for producers and consumers, waits in a <code>while</code> loop, but wakes waiters with <code>notify()</code> (or <code>notify_one()</code>). With 2 producers and 2 consumers, what can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing goes wrong, because the <code>while</code> loop handles every wakeup</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Every thread can end up waiting forever, because a notify can wake a thread of the wrong kind</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Items can be delivered twice</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A consumer can remove from an empty buffer</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The loop makes the woken thread re-check safely, so nothing is corrupted, but it cannot recover a wakeup that went to a thread that cannot use it. A consumer that wakes a consumer, while producers sleep, leaves everyone waiting. The fix is <code>notifyAll</code> or two conditions.</div></div><div class="mcq" data-id="producer-consumer.q2" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A consumer's <code>take()</code> is written as <code>if (items.isEmpty()) wait(); return items.removeFirst();</code> with <code>notifyAll()</code> after every put. There are two consumers. What can go wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: notifyAll wakes both consumers, so both get an item</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">It deadlocks immediately</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Both consumers wake for one item; the second one removes from an empty queue and throws</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The producer blocks forever</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>notifyAll</code> wakes both. The first to reacquire the lock takes the only item; the second returns from <code>wait</code> and, with <code>if</code>, does not re-check, so <code>removeFirst</code> throws <code>NoSuchElementException</code> (in C++, popping an empty deque is undefined behavior). A <code>while</code> loop sends it back to sleep.</div></div><div class="mcq" data-id="producer-consumer.q3" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Three producers and four consumers share a library blocking queue, and you shut down with poison pills. Which plan is correct?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Each producer puts one pill when it finishes</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Put one pill as soon as the first producer finishes</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Wait until all three producers have finished, then put four pills</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Put three pills, one per producer, after all have finished</span></button></li></ol><div class="why" hidden><strong>Why.</strong> One pill stops one consumer, so you need one per consumer. They must go in after every real item, which means after every producer is done; FIFO then guarantees the real work is taken first. A producer putting its own pill can stop a consumer while other producers are still adding work.</div></div><div class="mcq" data-id="producer-consumer.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the demo's buffer, every producer has finished and <code>close()</code> is called while 5 items are still queued. One consumer then calls <code>take()</code> in a loop. What does it get?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">"Nothing left" at once, and the 5 items are discarded</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The 5 remaining items, one per call, and then "nothing left"</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">An exception, because the buffer is closed</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It keeps waiting until a producer puts more</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A consumer waits only while the buffer is empty and open, and reports "nothing left" only when it is empty and closed. Closing stops new puts; it does not throw away queued work. Checking <code>closed</code> before checking for items would lose the 5 items.</div></div><div class="mcq" data-id="producer-consumer.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A web service's request threads put metrics events into a bounded buffer (losing a few is acceptable). The consumer is down and the buffer is full. Which behavior is best for the request threads?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Block in <code>put</code> until there is room</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Try to insert with a short timeout, and on failure drop the event and increment a dropped-events counter</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Switch to an unbounded queue so nothing is ever dropped</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Spin in a loop calling <code>offer</code> until it succeeds</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Request threads must not hang on a non-essential side task, so blocking forever is wrong. An unbounded queue just converts the outage into memory growth, and spinning burns CPU. A bounded wait plus a counted drop keeps the service responsive and makes the loss visible.</div></div><div class="mcq" data-id="producer-consumer.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why should a consumer process an item after <code>take()</code> returns, rather than inside the locked region of <code>take()</code>?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Processing inside the lock can cause a data race on the item</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Holding the lock while processing blocks every producer and every other consumer for the whole processing time</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Condition variables do not allow work inside the lock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It makes no difference to throughput</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The lock protects only the buffer's state. Work done while holding it serializes all consumers and stops producers too, so the pattern loses its parallelism. Remove the item, release the lock, then process it.</div></div><div class="mcq" data-id="producer-consumer.q7" data-a="2" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>Which <code>BlockingQueue</code> call waits up to 50 ms for space and then reports failure without throwing?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>put(e)</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>add(e)</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>offer(e, 50, TimeUnit.MILLISECONDS)</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>offer(e)</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>put</code> blocks without limit, <code>add</code> throws <code>IllegalStateException</code> when full, and <code>offer(e)</code> fails immediately. The timed <code>offer</code> waits up to the timeout and returns false if there is still no room.</div></div><div class="mcq" data-id="producer-consumer.q8" data-a="1" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>In C++, what does <code>cv.wait_for(lock, 50ms, [&amp;] { return !q.empty(); })</code> return, and when?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always true once it returns; it throws on timeout</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The predicate's value at the end: true as soon as the queue is non-empty, false if the 50 ms pass with it still empty</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>std::cv_status::timeout</code> or <code>std::cv_status::no_timeout</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Nothing; you must check the queue yourself afterwards</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The predicate overload loops over spurious wakeups for you and returns a bool: the predicate's final value. The <code>std::cv_status</code> return belongs to the overload without a predicate, which also cannot tell a spurious wakeup from a real one.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="producer-consumer.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a bounded buffer with <code>put</code>, <code>take</code> and <code>close</code> in your language. After <code>close()</code>, <code>put</code> must fail, and <code>take</code> must return the remaining items and then signal that the buffer is finished. Use two conditions.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="producer-consumer.6"><figcaption><span class="ctitle">BoundedBuffer with close</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">class</span> T&gt;
+<span class="k">class</span> BoundedBuffer {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BoundedBuffer</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        not_full_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_ || closed_; });
+        <span class="k">if</span> (closed_) <span class="k">throw</span> <span class="t">std</span>::<span class="t">runtime_error</span>(<span class="s">"closed"</span>);
+        items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        not_empty_.<span class="f">notify_one</span>();
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">take</span>() {                   <span class="c">// nullopt means closed and drained</span>
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        not_empty_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !items_.<span class="f">empty</span>() || closed_; });
+        <span class="k">if</span> (items_.<span class="f">empty</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        not_full_.<span class="f">notify_one</span>();
+        <span class="k">return</span> item;
+    }
+
+    <span class="t">void</span> <span class="f">close</span>() {
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+            closed_ = <span class="k">true</span>;
+        }
+        not_full_.<span class="f">notify_all</span>();
+        not_empty_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> not_full_, not_empty_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;
+    <span class="t">bool</span> closed_ = <span class="k">false</span>;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">BoundedBuffer</span>&lt;T&gt; {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;T&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notFull = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> notEmpty = lock.<span class="f">newCondition</span>();
+    <span class="k">private</span> <span class="t">boolean</span> closed;
+
+    <span class="t">BoundedBuffer</span>(<span class="t">int</span> capacity) { <span class="k">this</span>.capacity = capacity; }
+
+    <span class="k">void</span> <span class="f">put</span>(T item) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (items.<span class="f">size</span>() == capacity &amp;&amp; !closed) notFull.<span class="f">await</span>();
+            <span class="k">if</span> (closed) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalStateException</span>(<span class="s">"closed"</span>);
+            items.<span class="f">addLast</span>(item);
+            notEmpty.<span class="f">signal</span>();
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+
+    T <span class="f">take</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {      <span class="c">// null means closed and drained</span>
+        lock.<span class="f">lockInterruptibly</span>();
+        <span class="k">try</span> {
+            <span class="k">while</span> (items.<span class="f">isEmpty</span>() &amp;&amp; !closed) notEmpty.<span class="f">await</span>();
+            <span class="k">if</span> (items.<span class="f">isEmpty</span>()) <span class="k">return</span> <span class="k">null</span>;
+            T item = items.<span class="f">removeFirst</span>();
+            notFull.<span class="f">signal</span>();
+            <span class="k">return</span> item;
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+
+    <span class="k">void</span> <span class="f">close</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            closed = <span class="k">true</span>;
+            notFull.<span class="f">signalAll</span>();
+            notEmpty.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>The key lines are the two wait conditions. Producers wait while full and open; consumers wait while empty and open, and report "finished" only when empty and closed, so queued items are drained. <code>close()</code> uses <code>signalAll</code> (<code>notify_all</code>) because every waiter, of both kinds, must re-check under the new rules.</p></div></div><div class="cq" data-q="producer-consumer.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">You own the logging library of a service: 64 request threads call <code>log(event)</code>, and one background thread writes batches to disk. The interviewer asks: "What happens when the disk is slow and the queue fills up?" Give your answer, with the policy and the numbers you would use.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>First I would make sure the queue is bounded, because an unbounded one turns a slow disk into memory growth and, eventually, a crash that takes the service down with it. I would size it to ride out a normal disk hiccup: if we log 20,000 events a second and a stall can last half a second, a capacity of about 10,000 to 20,000 absorbs it. By Little's law a full queue of 10,000 drained at 50,000 a second adds about 0.2 seconds of logging lag, which is fine.</p>
+<p>When the queue is still full, request threads must not block indefinitely on a side task. For ordinary application logs I would use <code>offer</code> with a short timeout, a few milliseconds, then drop the event and increment a dropped-events counter that we alert on, so the loss is visible. For audit logs that must never lose an event, I would block instead and make that explicit: if the disk is dead, the service should stop accepting work rather than silently break its audit guarantee. The writer drains in batches with <code>drainTo</code> so each disk write and fsync covers many events, and <code>close()</code> stops new events, drains the queue, flushes and then returns.</p></div></div><div class="cq" data-q="producer-consumer.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer says: "You used <code>signal()</code> in <code>put</code> and <code>take</code>. A colleague says that is a lost wakeup waiting to happen and you must use <code>signalAll()</code>. Who is right?" Answer as you would out loud.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>It depends on how many conditions there are, and with my design <code>signal()</code> is safe. I have two conditions: only producers ever wait on not-full, and only consumers ever wait on not-empty. After a put, exactly one more item exists, so waking exactly one consumer is enough, and any consumer can use it. After a take, one slot is free, so waking one producer is enough. Every signal reaches a thread that can make progress.</p>
+<p>My colleague would be right for a single-condition design, like <code>synchronized</code> with <code>wait()</code>. There, producers and consumers sleep in the same wait set, so <code>notify()</code> might wake a producer when only a consumer can proceed, and with the wrong interleaving every thread ends up waiting. In that design you must use <code>notifyAll()</code>. The one place I do use <code>signalAll()</code> is <code>close()</code>, because closing changes the condition for every waiter at once.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="producer-consumer.s1" data-seconds="120"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 120 s</span></div><div class="qtext">"You have two minutes: design a bounded blocking queue for many producers and many consumers. Then tell me what a producer should do when it is full."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>The state: one mutex, a deque or circular array, a capacity; size stays between zero and capacity, items leave in FIFO order</li><li>Two conditions, not full and not empty, and every wait is a loop on its own predicate</li><li>Put signals not empty and take signals not full; a single signal is safe because each condition has one kind of waiter</li><li>Items are processed after <code>take</code> returns, never while holding the lock</li><li>When full, it depends on the producer: block for a background stage, a timed offer and then an error or a drop for request threads</li><li>Count every drop and alert on it; an unbounded queue is not an answer</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would build it as a monitor. The state is a deque, a capacity, one mutex and two condition variables: not full, where producers wait, and not empty, where consumers wait. The invariant is that the size stays between zero and the capacity, and items leave in arrival order. <code>put</code> takes the lock, waits in a loop while the queue is full, adds the item and signals not empty. <code>take</code> is the mirror image. The loops matter because wakeups can be spurious, and another consumer may get the item first. A single signal is safe because each condition only ever has one kind of waiter, and each put or take frees exactly one of them. With one shared condition I would need <code>notifyAll</code>. Consumers process an item after <code>take</code> returns, never under the lock, or the queue stops being parallel. Now, when it is full. The capacity is really an overload policy, and the answer depends on who the producer is. A background stage, like a file reader feeding a parser, should just block, because running at the consumer's speed is exactly what we want. A request thread should not hang on a side task, so I would use an offer with a short timeout, and on failure return an error or drop the item and bump a counter we alert on. What I would not do is make the queue unbounded. That only turns a slow consumer into memory growth and latency that nobody sees until the process dies.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you add <code>close()</code> so that consumers finish the queued items and then exit?</span></p></div></div><div class="sq" data-sq="producer-consumer.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Here is a symptom: after we added graceful shutdown, the last few hundred items in the queue are sometimes never processed, and nothing crashes. What do you look for?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Lost items with no crash mean consumers left while work was still queued, so check the shutdown ordering</li><li>The consumer's exit test: returning as soon as <code>closed</code> is set drops the queue; finish only when closed and empty</li><li>When close happens: only after every producer has finished, never when one producer alone is done</li><li>With poison pills: exactly one per consumer, put after the last real item</li><li>Interrupting consumers is a stop now tool that abandons queued work, wrong for a graceful stop</li><li>Prove the fix with a test that tags every item and checks each is processed exactly once</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">Lost items with no crash usually mean consumers left while work was still queued, so I would check the shutdown ordering. First, the consumer's exit test. If <code>take</code> reports closed as soon as the flag is set, every item still in the buffer is dropped. The rule is drain first: a consumer reports finished only when the queue is closed and empty. Second, when close happens. It must come after every producer has finished, which in practice means after joining them. A common bug is a producer that closes the queue, or puts a poison pill, when it alone is done. A consumer then exits while other producers are still adding, and their last items are stranded or rejected. With pills, it is exactly one per consumer, after the last real item. Third, I would check whether the stop path interrupts the consumers. Interruption abandons whatever is queued. That is right for a stop now, and wrong for a graceful stop. To prove the fix, I would write a test that tags every item, runs several producers and consumers, and checks that each item is processed exactly once.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">And if the consumers never exit at all after shutdown, what do you check?</span></p></div></div><div class="sq" data-sq="producer-consumer.s3" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Walk me through exactly what each thread does, and where the context switches are, when a consumer calls <code>take</code> on an empty queue and a producer then calls <code>put</code>."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>The consumer takes the lock, sees the queue empty, and calls <code>await</code>, which releases the lock and sleeps as one step</li><li>The producer takes the free lock, adds the item and signals not empty; the signal makes the consumer eligible but does not hand it the lock</li><li>The consumer must reacquire the lock inside <code>await</code> before it returns, so it may wake only to block until the producer unlocks</li><li>Back in its loop, the consumer re-checks the condition, because another consumer may have taken the item or the wakeup may be spurious</li><li>It removes the item, signals not full, releases the lock, and processes the item outside the lock</li><li>Context switches: one when the consumer blocks, one when it is woken, and possibly one more if it wakes into a held lock</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The consumer goes first. It acquires the lock, sees the queue is empty and calls <code>await</code> on not empty. That call releases the lock and puts the consumer to sleep as one step. That is the first context switch, off the CPU. Now the producer calls <code>put</code>. The lock is free, so it gets it at once, sees there is room, adds the item and signals not empty. The signal does not hand over the lock. It only makes the consumer eligible to run, and the producer carries on until it unlocks. The consumer is scheduled again, the second switch, and it must reacquire the lock inside <code>await</code> before it returns. If the producer still holds it, the consumer may wake only to block again, depending on the implementation. Once it has the lock, the consumer re-checks the condition in its loop, because another consumer could have taken the item first, or the wakeup could be spurious. The queue is not empty, so it removes the item, signals not full in case a producer is waiting, releases the lock, and only then processes the item.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What changes if both kinds of thread share one condition and you use <code>notify</code>?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-producer-consumer-shutdown.html" data-problem="producer-consumer-shutdown"><span class="pk">Thread-safe structures · medium</span><b>Producer consumer with shutdown</b><span class="pst"></span></a><a class="pcard" href="p-ring-buffer-queue.html" data-problem="ring-buffer-queue"><span class="pk">Thread-safe structures · medium</span><b>Ring buffer blocking queue</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-lost-wakeup.html" data-problem="fix-the-lost-wakeup"><span class="pk">Bug hunts · medium</span><b>Fix the job queue that stalls</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="lost-wakeups-and-notify-all.html"><span>Previous</span><b>Lost wakeups, notify versus notifyAll, Mesa versus Hoare</b></a><a class="next" href="visibility.html"><span>Next</span><b>Visibility: why a thread may never see your write</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#why-a-buffer-and-why-a-bounded-one">Why a buffer, and why a bounded one</a><a href="#version-1-one-monitor-wait-and-notifyall">Version 1: one monitor, wait and notifyAll</a><a href="#version-2-two-conditions-many-producers-many-consumers">Version 2: two conditions, many producers, many consumers</a><a href="#shutting-down">Shutting down</a><a href="#back-pressure-block-wait-a-while-or-say-no">Back-pressure: block, wait a while, or say no</a><a href="#the-library-versions">The library versions</a><a href="#with-semaphores-instead-of-conditions">With semaphores instead of conditions</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

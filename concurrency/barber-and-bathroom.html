@@ -1,0 +1,1481 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The sleeping barber and the unisex bathroom · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="barber-and-bathroom" data-title="The sleeping barber and the unisex bathroom" data-track="core" data-module="core-12" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details open><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom" class=here><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m12">Module 12: Classic problems</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 12.5</span><span>32 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>The sleeping barber and the unisex bathroom</h1><p class="lsum">Bounded admission, lost wakeups, graceful shutdown and fairness policies for a sleeping barber and a bathroom shared by incompatible groups.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span></div><div class="prereq"><span>Before this:</span><a href="condition-variables.html">Condition variables and monitors</a><a href="producer-consumer.html">Producer and consumer with a bounded buffer</a><a href="readers-writers.html">Readers and writers, three ways</a><a href="livelock-and-starvation.html">Livelock, starvation and fairness</a></div></header><article class="prose" id="article">
+<p class="lead">Rubrik interview reports describe a bathroom that two groups may not share, with a capacity of three and a fairness follow up, and it has handed candidates a broken barber shop to debug. Together the two puzzles cover resource admission: a server that sleeps when idle, and a room with rules about who may share it.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A neighborhood barber shop has one barber, one barber's chair and three chairs for waiting. When nobody is waiting, the barber naps in his own chair. A customer who finds him asleep wakes him; a customer who finds all three waiting chairs taken walks away. The famous bug: the barber glances at the empty waiting room and decides to nap, and in the second before he sits down a customer walks in, sees the barber awake, and sits quietly to wait. Now the barber sleeps and the customer waits, forever.</p>
+<p>The office bathroom has three stalls and is shared by two teams who must never be inside together. Rules are easy until people keep coming: if red team members keep arriving while red is inside, blue may wait all day. <strong>Both puzzles are about one decision made atomically, "may I go in now, or do I wait", and about never letting a waiter be forgotten.</strong></p>
+</div>
+
+<h2 id="the-sleeping-barber">The sleeping barber</h2>
+<p>The <a class="term" data-term="sleeping-barber" href="glossary.html#sleeping-barber">sleeping barber</a> problem has these rules: one barber, N waiting chairs; when no customer is waiting, the barber sleeps; an arriving customer who finds every waiting chair taken leaves; otherwise the customer sits down, wakes the barber if he is asleep, and waits for a haircut. Haircuts happen one at a time, and a customer leaves only after their own haircut.</p>
+
+<h3>The naive version and its lost wakeup</h3>
+<p>The bug in the story is a <a class="term" data-term="check-then-act" href="glossary.html#check-then-act">check then act</a> on "is anyone waiting?" followed by "go to sleep", done as two separate steps:</p>
+
+<figure class="code pair" data-sample="barber-and-bathroom.1"><figcaption><span class="ctitle">The barber checks, then sleeps, in two steps</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> BarberShop {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BarberShop</span>(<span class="t">int</span> chairs) : <span class="f">chairs_</span>(chairs) {}
+
+    <span class="t">bool</span> <span class="f">arrive</span>() {                              <span class="c">// a customer</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (waiting_ == chairs_) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// no chair: leave</span>
+        waiting_ += <span class="n">1</span>;
+        cv_.<span class="f">notify_one</span>();                        <span class="c">// wake the barber if he sleeps</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">void</span> <span class="f">serveOne</span>() {                            <span class="c">// the barber</span>
+        <span class="t">bool</span> empty;
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            empty = (waiting_ == <span class="n">0</span>);
+        }
+        <span class="k">if</span> (empty) {                             <span class="c">// the check and the sleep are two steps</span>
+            <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            cv_.<span class="f">wait</span>(lock);                      <span class="c">// no predicate, and a notify sent in between is lost</span>
+        }
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        waiting_ -= <span class="n">1</span>;
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">int</span> chairs_;
+    <span class="t">int</span> waiting_ = <span class="n">0</span>;                            <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> cv_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">class</span> <span class="t">BarberShop</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> chairs;
+    <span class="k">private</span> <span class="t">int</span> waiting = <span class="n">0</span>;                     <span class="c">// guarded by this</span>
+
+    <span class="t">BarberShop</span>(<span class="t">int</span> chairs) { <span class="k">this</span>.chairs = chairs; }
+
+    <span class="t">boolean</span> <span class="f">arrive</span>() {                           <span class="c">// a customer</span>
+        <span class="k">synchronized</span> (<span class="k">this</span>) {
+            <span class="k">if</span> (waiting == chairs) <span class="k">return</span> <span class="k">false</span>; <span class="c">// no chair: leave</span>
+            waiting += <span class="n">1</span>;
+            <span class="f">notify</span>();                            <span class="c">// wake the barber if he sleeps</span>
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+    }
+
+    <span class="k">void</span> <span class="f">serveOne</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {   <span class="c">// the barber</span>
+        <span class="t">boolean</span> empty;
+        <span class="k">synchronized</span> (<span class="k">this</span>) { empty = (waiting == <span class="n">0</span>); }
+        <span class="k">if</span> (empty) {                             <span class="c">// the check and the sleep are two steps</span>
+            <span class="k">synchronized</span> (<span class="k">this</span>) { <span class="f">wait</span>(); }      <span class="c">// a notify sent in between is lost</span>
+        }
+        <span class="k">synchronized</span> (<span class="k">this</span>) { waiting -= <span class="n">1</span>; }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>The barber sleeps, the customer waits, forever</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>barber</span><span>customer</span><span>waiting count</span></div><div class="tl-row"><span class="t">1</span><span class="cell">locks, sees waiting = 0, unlocks: decides to sleep</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell">arrives, locks, waiting becomes 1</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">1</span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">notifies, but nobody is waiting on the condition yet</span><span class="cell empty"></span></div><div class="tl-row bad"><span class="t">5</span><span class="cell bad">locks again and waits, without checking the count again</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">The wakeup happened before the sleep, so it was lost. The barber sleeps with a customer in the chair.</div></div></figure>
+
+<p>The fix is the rule from the <a href="lost-wakeups-and-notify-all.html">lost wakeup lesson</a>: check the condition and go to sleep under one lock, in a loop, so a customer cannot change the predicate between the check and the atomic release-and-wait operation. In C++ that is the predicate form of <code>wait</code>. The deliberately broken fragment also mishandles spurious wakeups: it could subtract from an empty waiting count.</p>
+
+<h3>The barber as a monitor, with closing time</h3>
+<p>A complete answer adds two things interviewers ask for next. Each customer must leave only after their own haircut, so the customer waits for a "done" signal tied to them; here every seated customer holds a ticket, haircuts finish in ticket order, and a customer waits until the finished ticket reaches theirs. And the shop must close cleanly: nobody new sits down, seated customers are still served, and a sleeping barber is woken so he can go home.</p>
+
+<p>For these samples, chair counts and room capacities are positive, visits finish, and ticket counters do not wrap. Admission is measured when a caller acquires the monitor lock. The barber sample queues every accepted customer before service; supporting zero waiting chairs would require a separate direct handoff to an idle barber. One barber serves tickets in order, and accepted customers wait uninterruptibly for completion; Java interruption may cancel lock acquisition before admission.</p>
+
+<figure class="code pair" data-sample="barber-and-bathroom.2" data-expect="ok"><figcaption><span class="ctitle">The sleeping barber as a monitor, with closing time</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> BarberShop {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BarberShop</span>(<span class="t">int</span> chairs) : <span class="f">chairs_</span>(chairs) {}
+
+    <span class="c">// A customer. Returns false if there was no free chair, or the shop has closed.</span>
+    <span class="t">bool</span> <span class="f">getHaircut</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (closed_ || <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(waitingRoom_.<span class="f">size</span>()) == chairs_) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// leave at once</span>
+        <span class="k">const</span> <span class="t">std</span>::<span class="t">uint64_t</span> my = nextTicket_;
+        nextTicket_ += <span class="n">1</span>;
+        waitingRoom_.<span class="f">push_back</span>(my);
+        mostWaiting_ = <span class="t">std</span>::<span class="f">max</span>(mostWaiting_, <span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(waitingRoom_.<span class="f">size</span>()));
+        customerWaiting_.<span class="f">notify_one</span>();                           <span class="c">// wake the barber if he sleeps</span>
+        haircutDone_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> lastFinished_ &gt;= my; });   <span class="c">// stay until my haircut is done</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="c">// The barber. Returns the next ticket, or nothing once the shop is closed and empty.</span>
+    <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">std</span>::<span class="t">uint64_t</span>&gt; <span class="f">nextCustomer</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        customerWaiting_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> !waitingRoom_.<span class="f">empty</span>() || closed_; });   <span class="c">// sleep while idle</span>
+        <span class="k">if</span> (waitingRoom_.<span class="f">empty</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+        <span class="t">std</span>::<span class="t">uint64_t</span> ticket = waitingRoom_.<span class="f">front</span>();
+        waitingRoom_.<span class="f">pop_front</span>();
+        <span class="k">return</span> ticket;
+    }
+
+    <span class="t">void</span> <span class="f">finished</span>(<span class="t">std</span>::<span class="t">uint64_t</span> ticket) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        lastFinished_ = ticket;
+        haircutDone_.<span class="f">notify_all</span>();       <span class="c">// the customer holding this ticket may leave</span>
+    }
+
+    <span class="t">void</span> <span class="f">close</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        closed_ = <span class="k">true</span>;                  <span class="c">// nobody new sits down; seated customers are still served</span>
+        customerWaiting_.<span class="f">notify_one</span>();   <span class="c">// a sleeping barber must wake up to go home</span>
+    }
+
+    <span class="t">int</span> <span class="f">mostWaiting</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> mostWaiting_;
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">int</span> chairs_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">uint64_t</span>&gt; waitingRoom_;   <span class="c">// tickets of seated customers; all guarded by m_</span>
+    <span class="t">std</span>::<span class="t">uint64_t</span> nextTicket_ = <span class="n">1</span>;
+    <span class="t">std</span>::<span class="t">uint64_t</span> lastFinished_ = <span class="n">0</span>;          <span class="c">// haircuts finish in ticket order</span>
+    <span class="t">bool</span> closed_ = <span class="k">false</span>;
+    <span class="t">int</span> mostWaiting_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> customerWaiting_;  <span class="c">// the barber sleeps here</span>
+    <span class="t">std</span>::<span class="t">condition_variable</span> haircutDone_;      <span class="c">// seated customers wait here</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    BarberShop <span class="f">shop</span>(<span class="n">3</span>);
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; served{<span class="n">0</span>}, turnedAway{<span class="n">0</span>};
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">barber</span>([&amp;] {
+        <span class="k">while</span> (<span class="k">auto</span> ticket = shop.<span class="f">nextCustomer</span>()) {
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(3ms);  <span class="c">// cutting hair; the sleep only makes the timing visible</span>
+            shop.<span class="f">finished</span>(*ticket);
+        }
+    });
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; customers;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">15</span>; i += <span class="n">1</span>) {
+        customers.<span class="f">emplace_back</span>([&amp;] {
+            <span class="k">if</span> (shop.<span class="f">getHaircut</span>()) served += <span class="n">1</span>; <span class="k">else</span> turnedAway += <span class="n">1</span>;
+        });
+        <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(1ms);     <span class="c">// a customer about every millisecond, again only for visible timing</span>
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; c : customers) c.<span class="f">join</span>();
+    shop.<span class="f">close</span>();
+    barber.<span class="f">join</span>();
+    <span class="f">assert</span>(served + turnedAway == <span class="n">15</span> &amp;&amp; shop.<span class="f">mostWaiting</span>() &lt;= <span class="n">3</span>);
+    <span class="f">assert</span>(!shop.<span class="f">getHaircut</span>());
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"served "</span> &lt;&lt; served &lt;&lt; <span class="s">", turned away "</span> &lt;&lt; turnedAway
+              &lt;&lt; <span class="s">", most waiting at once "</span> &lt;&lt; shop.<span class="f">mostWaiting</span>() &lt;&lt; <span class="s">" (3 chairs)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">BarberShop</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> chairs;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayDeque</span>&lt;<span class="t">Long</span>&gt; waitingRoom = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();   <span class="c">// tickets of seated customers</span>
+        <span class="k">private</span> <span class="t">long</span> nextTicket = <span class="n">1</span>;                                       <span class="c">// all guarded by lock</span>
+        <span class="k">private</span> <span class="t">long</span> lastFinished = <span class="n">0</span>;                                     <span class="c">// haircuts finish in ticket order</span>
+        <span class="k">private</span> <span class="t">boolean</span> closed = <span class="k">false</span>;
+        <span class="k">private</span> <span class="t">int</span> mostWaiting = <span class="n">0</span>;
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> customerWaiting = lock.<span class="f">newCondition</span>();    <span class="c">// the barber sleeps here</span>
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> haircutDone = lock.<span class="f">newCondition</span>();        <span class="c">// seated customers wait here</span>
+
+        <span class="t">BarberShop</span>(<span class="t">int</span> chairs) { <span class="k">this</span>.chairs = chairs; }
+
+        <span class="c">// A customer. Returns false if there was no free chair, or the shop has closed.</span>
+        <span class="t">boolean</span> <span class="f">getHaircut</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {
+            lock.<span class="f">lockInterruptibly</span>();
+            <span class="k">try</span> {
+                <span class="k">if</span> (closed || waitingRoom.<span class="f">size</span>() == chairs) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// leave at once</span>
+                <span class="t">long</span> my = nextTicket;
+                nextTicket += <span class="n">1</span>;
+                waitingRoom.<span class="f">addLast</span>(my);
+                mostWaiting = <span class="t">Math</span>.<span class="f">max</span>(mostWaiting, waitingRoom.<span class="f">size</span>());
+                customerWaiting.<span class="f">signal</span>();                                <span class="c">// wake the barber if he sleeps</span>
+                <span class="k">while</span> (lastFinished &lt; my) haircutDone.<span class="f">awaitUninterruptibly</span>();          <span class="c">// stay until my haircut is done</span>
+                <span class="k">return</span> <span class="k">true</span>;
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="c">// The barber. Returns the next ticket, or -1 once the shop is closed and empty.</span>
+        <span class="t">long</span> <span class="f">nextCustomer</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="k">while</span> (waitingRoom.<span class="f">isEmpty</span>() &amp;&amp; !closed) customerWaiting.<span class="f">awaitUninterruptibly</span>();   <span class="c">// sleep while idle</span>
+                <span class="k">return</span> waitingRoom.<span class="f">isEmpty</span>() ? -<span class="n">1</span> : waitingRoom.<span class="f">removeFirst</span>();
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="k">void</span> <span class="f">finished</span>(<span class="t">long</span> ticket) {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                lastFinished = ticket;
+                haircutDone.<span class="f">signalAll</span>();      <span class="c">// the customer holding this ticket may leave</span>
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="k">void</span> <span class="f">close</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                closed = <span class="k">true</span>;                <span class="c">// nobody new sits down; seated customers are still served</span>
+                customerWaiting.<span class="f">signal</span>();     <span class="c">// a sleeping barber must wake up to go home</span>
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="t">int</span> <span class="f">mostWaiting</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> { <span class="k">return</span> mostWaiting; } <span class="k">finally</span> { lock.<span class="f">unlock</span>(); }
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">BarberShop</span> shop = <span class="k">new</span> <span class="t">BarberShop</span>(<span class="n">3</span>);
+        <span class="t">AtomicInteger</span> served = <span class="k">new</span> <span class="t">AtomicInteger</span>(), turnedAway = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+        <span class="t">Thread</span> barber = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+            <span class="t">long</span> ticket;
+            <span class="k">while</span> ((ticket = shop.<span class="f">nextCustomer</span>()) != -<span class="n">1</span>) {
+                <span class="k">try</span> {
+                    <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">3</span>);              <span class="c">// simulated haircut; timing only</span>
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>(); <span class="c">// still complete this accepted haircut</span>
+                }
+                shop.<span class="f">finished</span>(ticket);
+            }
+        }, <span class="s">"barber"</span>);
+        barber.<span class="f">start</span>();
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; customers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">15</span>; i += <span class="n">1</span>) {
+            <span class="t">Thread</span> c = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">if</span> (shop.<span class="f">getHaircut</span>()) served.<span class="f">incrementAndGet</span>(); <span class="k">else</span> turnedAway.<span class="f">incrementAndGet</span>();
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"customer-"</span> + i);
+            customers.<span class="f">add</span>(c);
+            c.<span class="f">start</span>();
+            <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">1</span>);                      <span class="c">// a customer about every millisecond, again only for visible timing</span>
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> c : customers) c.<span class="f">join</span>();
+        shop.<span class="f">close</span>();
+        barber.<span class="f">join</span>();
+        <span class="k">if</span> (served.<span class="f">get</span>() + turnedAway.<span class="f">get</span>() != <span class="n">15</span> || shop.<span class="f">mostWaiting</span>() &gt; <span class="n">3</span>)
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"lost customer or exceeded waiting capacity"</span>);
+        <span class="k">if</span> (shop.<span class="f">getHaircut</span>()) <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"accepted after close"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"served "</span> + served + <span class="s">", turned away "</span> + turnedAway
+                + <span class="s">", most waiting at once "</span> + shop.<span class="f">mostWaiting</span>() + <span class="s">" (3 chairs)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>served 9, turned away 6, most waiting at once 3 (3 chairs)</pre></div><div class="runout" hidden></div></figure>
+
+<p>The barber cuts hair outside the lock, so customers can sit down meanwhile. Two conditions keep the signals targeted: the barber sleeps on <code>customerWaiting</code>, customers wait on <code>haircutDone</code>, and since several customers wait there for different tickets, finishing a haircut uses <code>signalAll</code> (<code>notify_all</code> in C++). Printed counts depend on scheduling; sleeps make overlap visible and are not correctness requirements. This demo uses <code>close()</code> to stop the barber, not interruption. </p>
+<p>A real haircut failure needs a terminal failure result for the affected customer, rather than leaving their wait unsatisfied.</p>
+
+<h3>The insight: it is producer and consumer with a "leave if full"</h3>
+<p>Step back and the shop is a bounded queue. Customers are producers who try to add themselves without blocking and walk away if it is full; the barber is a consumer who sleeps on an empty queue. That suggests the second technique: <strong>give each customer their own "done" signal and put it in a bounded queue</strong>. The barber takes the next signal, cuts, and completes it. It also explains why the classic three semaphore solution (a count of seated customers that the barber sleeps on, a semaphore with which the barber calls the next customer, and a mutex for the count) needs care: a semaphore permit is not addressed to anyone, so "your haircut is done" can be picked up by the wrong customer unless you add a per customer rendezvous.</p>
+
+<figure class="code pair" data-sample="barber-and-bathroom.3"><figcaption><span class="ctitle">The barber with one done signal per customer</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">class</span> QueueBarberShop {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">QueueBarberShop</span>(<span class="t">int</span> chairs) : <span class="f">chairs_</span>(chairs) {}
+
+    <span class="t">bool</span> <span class="f">getHaircut</span>() {
+        <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; done;
+        <span class="t">std</span>::<span class="t">future</span>&lt;<span class="t">void</span>&gt; myHaircut = done.<span class="f">get_future</span>();
+        {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            <span class="k">if</span> (<span class="k">static_cast</span>&lt;<span class="t">int</span>&gt;(waitingRoom_.<span class="f">size</span>()) == chairs_) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// no free chair: leave</span>
+            waitingRoom_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(done));
+        }
+        customerWaiting_.<span class="f">notify_one</span>();
+        myHaircut.<span class="f">get</span>();                          <span class="c">// wait for my own haircut, nobody else's</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">void</span> <span class="f">serveOne</span>() {                              <span class="c">// the barber calls this in a loop</span>
+        <span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt; customer;
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            customerWaiting_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !waitingRoom_.<span class="f">empty</span>(); });   <span class="c">// sleep while idle</span>
+            customer = <span class="t">std</span>::<span class="f">move</span>(waitingRoom_.<span class="f">front</span>());
+            waitingRoom_.<span class="f">pop_front</span>();
+        }
+        <span class="f">cutHair</span>();                                 <span class="c">// outside the lock: customers can still sit down</span>
+        customer.<span class="f">set_value</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">void</span> <span class="f">cutHair</span>() {}
+
+    <span class="k">const</span> <span class="t">int</span> chairs_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">promise</span>&lt;<span class="t">void</span>&gt;&gt; waitingRoom_;   <span class="c">// guarded by m_</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> customerWaiting_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="k">import</span> java.util.concurrent.<span class="t">ArrayBlockingQueue</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">CompletableFuture</span>;
+
+<span class="k">class</span> <span class="t">QueueBarberShop</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ArrayBlockingQueue</span>&lt;<span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt;&gt; waitingRoom;   <span class="c">// each customer brings their own done signal</span>
+
+    <span class="t">QueueBarberShop</span>(<span class="t">int</span> chairs) { waitingRoom = <span class="k">new</span> <span class="t">ArrayBlockingQueue</span>&lt;&gt;(chairs); }
+
+    <span class="t">boolean</span> <span class="f">getHaircut</span>() {
+        <span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt; done = <span class="k">new</span> <span class="t">CompletableFuture</span>&lt;&gt;();
+        <span class="k">if</span> (!waitingRoom.<span class="f">offer</span>(done)) <span class="k">return</span> <span class="k">false</span>;   <span class="c">// does not wait for capacity</span>
+        done.<span class="f">join</span>();                                  <span class="c">// wait for my own haircut, nobody else's</span>
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="k">void</span> <span class="f">barberLoop</span>() <span class="k">throws</span> <span class="t">InterruptedException</span> {   <span class="c">// interrupt only after accepted work is drained</span>
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">CompletableFuture</span>&lt;<span class="t">Void</span>&gt; customer = waitingRoom.<span class="f">take</span>();   <span class="c">// sleeps while the waiting room is empty</span>
+            <span class="f">cutHair</span>();
+            customer.<span class="f">complete</span>(<span class="k">null</span>);
+        }
+    }
+
+    <span class="k">private</span> <span class="k">void</span> <span class="f">cutHair</span>() { }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>This fragment isolates per-customer completion and omits admission shutdown. Stop new arrivals and drain accepted work before stopping its worker. <code>offer</code> does not wait for a free queue slot, but it can wait briefly for the queue's internal lock; it is not a lock-free operation. C++ uses <code>get()</code> so a broken promise or an explicitly stored failure is reported. With multiple barbers, a single highest-finished ticket is unsafe because haircuts can finish out of order; per-customer completion still works.</p>
+
+<p>Seen this way, a shop with several barbers is a thread pool: barbers are workers, the waiting chairs are the task queue's capacity, and a customer walking away is the pool's rejection policy. The same failure modes apply, which is why <a href="rejection-and-pool-failures.html">bounded queues and rejection</a> is the natural next read.</p>
+
+<h3>The barber shop Rubrik hands you to debug</h3>
+<p>A reported 2026 Rubrik debugging round gave a candidate about 180 lines of a multithreaded barber shop with shared chairs, brushes, scissors and combs, and asked them to fix deadlocks and an incorrect shutdown. Expect two families of bug. A barber who needs two tools is a philosopher who needs two forks: if one barber takes scissors then comb and another takes comb then scissors, they can deadlock, and the fix is one global order for the tools (see <a href="dining-philosophers.html">the dining philosophers</a>). And shutdown bugs: a closed flag that sleeping threads never see because nobody signals them, a wait predicate without <code>|| closed</code>, or customers left waiting forever because the barber went home without serving or dismissing them. The closing rule above handles those shutdown cases with one barber and successful service. With several idle barbers, wake all of them on close, and track completion separately for each customer.</p>
+
+<h2 id="the-unisex-bathroom">The unisex bathroom</h2>
+<p>The rules of the <a class="term" data-term="unisex-bathroom" href="glossary.html#unisex-bathroom">unisex bathroom</a>: one bathroom with C stalls (Rubrik uses 3), two groups of people (men and women in the textbook, Democrats and Republicans in Rubrik's version), and never both groups inside at once. That is <a class="term" data-term="group-mutual-exclusion" href="glossary.html#group-mutual-exclusion">group mutual exclusion</a>: like a lock, except that members of the same group may share. It generalizes ideas you already know: if every person were their own group it would be a plain mutex, and readers-writers is the case where all readers form one group and every writer is a group of one.</p>
+
+<h3>The obvious monitor, and who it starves</h3>
+<p>The first correct-looking answer is a monitor whose enter condition is: there is space, and the room is empty or holds my group. In code, wait while <code>!(inside &lt; capacity &amp;&amp; (inside == 0 || groupInside == g))</code>. It never mixes groups and never overfills. But it is reader preference with two kinds of reader:</p>
+
+<figure class="timeline"><figcaption>Red keeps the bathroom, blue waits</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>red team</span><span>blue team</span><span>inside</span></div><div class="tl-row"><span class="t">1</span><span class="cell">R1 and R2 enter (room was empty)</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">2 red</span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">B1 arrives and waits: red is inside</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">R3 enters: space, and red is inside</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell">R1 leaves; R4 arrives and takes the free stall</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">6</span><span class="cell">R2 leaves; R5 arrives and takes the free stall</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row risk"><span class="t">7</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell risk">never empty, always red</span></div><div class="tl-row bad"><span class="t">8</span><span class="cell empty"></span><span class="cell bad">B1 is still waiting, as long as red members keep arriving</span><span class="cell empty"></span></div><div class="tl-note">Mutual exclusion and capacity hold, yet one group can starve the other forever.</div></div></figure>
+
+<p>Rubrik's follow ups are about exactly this. The fix is a fairness policy, and there are several, each with a cost. Choosing one and naming its cost is the senior part of the answer.</p>
+
+<h3>Fairness policy 1: first come, first served</h3>
+<p>Hand out tickets under the lock and let people in strictly in ticket order. The person at the head of the line enters as soon as there is space and the room holds their group or is empty; when they enter, the next ticket is served, so a run of same group people at the head enters together. After ticket assignment nobody can be overtaken. Starvation freedom assumes every visit ends and every eligible thread eventually runs and acquires the lock; the mutex itself does not promise scheduler fairness or a wall-clock waiting bound. The cost is <a class="term" data-term="head-of-line-blocking" href="glossary.html#head-of-line-blocking">head of line blocking</a>: if the head of the line is blue and red is inside, the reds behind that blue person wait too, even though there is space.</p>
+
+<figure class="code pair" data-sample="barber-and-bathroom.4" data-expect="ok"><figcaption><span class="ctitle">A fair bathroom: capacity 3, one group at a time, first come first served</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cassert&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;random&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">class</span> Bathroom {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Bathroom</span>(<span class="t">int</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">enter</span>(<span class="t">int</span> group) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">const</span> <span class="t">std</span>::<span class="t">uint64_t</span> my = nextTicket_;
+        nextTicket_ += <span class="n">1</span>;
+        changed_.<span class="f">wait</span>(lock, [&amp;] {
+            <span class="k">return</span> my == nowServing_ &amp;&amp; inside_ &lt; capacity_ &amp;&amp; (inside_ == <span class="n">0</span> || groupInside_ == group);
+        });
+        inside_ += <span class="n">1</span>;
+        groupInside_ = group;
+        nowServing_ += <span class="n">1</span>;                       <span class="c">// the next person in line may come in too</span>
+        changed_.<span class="f">notify_all</span>();
+    }
+
+    <span class="t">void</span> <span class="f">leave</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        inside_ -= <span class="n">1</span>;
+        <span class="k">if</span> (inside_ == <span class="n">0</span>) groupInside_ = -<span class="n">1</span>;
+        changed_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">int</span> capacity_;
+    <span class="t">int</span> inside_ = <span class="n">0</span>;                            <span class="c">// all guarded by m_</span>
+    <span class="t">int</span> groupInside_ = -<span class="n">1</span>;                      <span class="c">// the group using it now, or -1 when empty</span>
+    <span class="t">std</span>::<span class="t">uint64_t</span> nextTicket_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">uint64_t</span> nowServing_ = <span class="n">0</span>;              <span class="c">// the ticket at the head of the line</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> changed_;
+};
+
+<span class="c">// An independent check, outside the bathroom's own lock.</span>
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; insideOf[<span class="n">2</span>];
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; mostInside{<span class="n">0</span>}, mixed{<span class="n">0</span>}, visits{<span class="n">0</span>};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> <span class="k">namespace</span> <span class="t">std</span>::chrono_literals;
+    Bathroom <span class="f">bathroom</span>(<span class="n">3</span>);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">void</span>()&gt;&gt; people;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">24</span>; i += <span class="n">1</span>) {
+        <span class="t">int</span> group = i % <span class="n">2</span>;
+        people.<span class="f">push_back</span>([&amp;bathroom, group] {
+            bathroom.<span class="f">enter</span>(group);
+            <span class="t">int</span> now = insideOf[group].<span class="f">fetch_add</span>(<span class="n">1</span>) + <span class="n">1</span>;
+            <span class="t">int</span> seen = mostInside.<span class="f">load</span>();
+            <span class="k">while</span> (now &gt; seen &amp;&amp; !mostInside.<span class="f">compare_exchange_weak</span>(seen, now)) {}
+            <span class="k">if</span> (insideOf[<span class="n">1</span> - group].<span class="f">load</span>() != <span class="n">0</span>) mixed += <span class="n">1</span>;
+            <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(1ms);   <span class="c">// using the bathroom; the sleep only makes overlap visible</span>
+            insideOf[group].<span class="f">fetch_sub</span>(<span class="n">1</span>);
+            visits += <span class="n">1</span>;
+            bathroom.<span class="f">leave</span>();
+        });
+    }
+    <span class="t">std</span>::<span class="f">shuffle</span>(people.<span class="f">begin</span>(), people.<span class="f">end</span>(), <span class="t">std</span>::<span class="f">mt19937</span>(<span class="n">3</span>));
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; ts;
+    <span class="k">for</span> (<span class="k">auto</span>&amp; p : people) ts.<span class="f">emplace_back</span>(p);
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : ts) t.<span class="f">join</span>();
+    <span class="f">assert</span>(visits == <span class="n">24</span> &amp;&amp; mostInside &lt;= <span class="n">3</span> &amp;&amp; mixed == <span class="n">0</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"visits "</span> &lt;&lt; visits &lt;&lt; <span class="s">" of 24, most inside at once "</span> &lt;&lt; mostInside &lt;&lt; <span class="s">", mixed visits "</span> &lt;&lt; mixed &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">Collections</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.<span class="t">Random</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">Bathroom</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+        <span class="k">private</span> <span class="t">int</span> inside = <span class="n">0</span>;                 <span class="c">// all guarded by lock</span>
+        <span class="k">private</span> <span class="t">int</span> groupInside = -<span class="n">1</span>;           <span class="c">// the group using it now, or -1 when empty</span>
+        <span class="k">private</span> <span class="t">long</span> nextTicket = <span class="n">0</span>;
+        <span class="k">private</span> <span class="t">long</span> nowServing = <span class="n">0</span>;            <span class="c">// the ticket at the head of the line</span>
+        <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> changed = lock.<span class="f">newCondition</span>();
+
+        <span class="t">Bathroom</span>(<span class="t">int</span> capacity) { <span class="k">this</span>.capacity = capacity; }
+
+        <span class="k">void</span> <span class="f">enter</span>(<span class="t">int</span> group) {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                <span class="t">long</span> my = nextTicket;
+                nextTicket += <span class="n">1</span>;
+                <span class="k">while</span> (my != nowServing || inside == capacity || (inside &gt; <span class="n">0</span> &amp;&amp; groupInside != group)) {
+                    changed.<span class="f">awaitUninterruptibly</span>();     <span class="c">// a ticket must never be abandoned</span>
+                }
+                inside += <span class="n">1</span>;
+                groupInside = group;
+                nowServing += <span class="n">1</span>;                        <span class="c">// the next person in line may come in too</span>
+                changed.<span class="f">signalAll</span>();
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+
+        <span class="k">void</span> <span class="f">leave</span>() {
+            lock.<span class="f">lock</span>();
+            <span class="k">try</span> {
+                inside -= <span class="n">1</span>;
+                <span class="k">if</span> (inside == <span class="n">0</span>) groupInside = -<span class="n">1</span>;
+                changed.<span class="f">signalAll</span>();
+            } <span class="k">finally</span> {
+                lock.<span class="f">unlock</span>();
+            }
+        }
+    }
+
+    <span class="c">// An independent check, outside the bathroom's own lock.</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicInteger</span>[] insideOf = { <span class="k">new</span> <span class="t">AtomicInteger</span>(), <span class="k">new</span> <span class="t">AtomicInteger</span>() };
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicInteger</span> mostInside = <span class="k">new</span> <span class="t">AtomicInteger</span>(), mixed = <span class="k">new</span> <span class="t">AtomicInteger</span>(), visits = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Bathroom</span> bathroom = <span class="k">new</span> <span class="t">Bathroom</span>(<span class="n">3</span>);
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; people = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">24</span>; i += <span class="n">1</span>) {
+            <span class="t">int</span> group = i % <span class="n">2</span>;
+            people.<span class="f">add</span>(<span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                bathroom.<span class="f">enter</span>(group);
+                mostInside.<span class="f">accumulateAndGet</span>(insideOf[group].<span class="f">incrementAndGet</span>(), <span class="t">Math</span>::max);
+                <span class="k">if</span> (insideOf[<span class="n">1</span> - group].<span class="f">get</span>() != <span class="n">0</span>) mixed.<span class="f">incrementAndGet</span>();
+                <span class="k">try</span> {
+                    <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">1</span>);                    <span class="c">// using the bathroom; the sleep only makes overlap visible</span>
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+                insideOf[group].<span class="f">addAndGet</span>(-<span class="n">1</span>);
+                visits.<span class="f">incrementAndGet</span>();
+                bathroom.<span class="f">leave</span>();
+            }, (group == <span class="n">0</span> ? <span class="s">"red-"</span> : <span class="s">"blue-"</span>) + i));
+        }
+        <span class="t">Collections</span>.<span class="f">shuffle</span>(people, <span class="k">new</span> <span class="t">Random</span>(<span class="n">3</span>));
+        <span class="k">for</span> (<span class="t">Thread</span> p : people) p.<span class="f">start</span>();
+        <span class="k">for</span> (<span class="t">Thread</span> p : people) p.<span class="f">join</span>();
+        <span class="k">if</span> (visits.<span class="f">get</span>() != <span class="n">24</span> || mostInside.<span class="f">get</span>() &gt; <span class="n">3</span> || mixed.<span class="f">get</span>() != <span class="n">0</span>)
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">AssertionError</span>(<span class="s">"bathroom invariant failed"</span>);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"visits "</span> + visits + <span class="s">" of 24, most inside at once "</span> + mostInside + <span class="s">", mixed visits "</span> + mixed);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>visits 24 of 24, most inside at once 3, mixed visits 0</pre></div><div class="runout" hidden></div></figure>
+
+<p>The checker sits outside the bathroom's lock on purpose. Each person counts themselves in after <code>enter</code> returns and out before calling <code>leave</code>, and looks at the other group's count while inside. A nonzero other-group count proves a violation, but a bad admission can be missed if a thread pauses before updating its external counter. These are stress checks, not proof; deterministic tests should also gate arrivals, record admission order under the monitor lock, and check the invariant at each admission. The Java version waits uninterruptibly and preserves interrupt status because a ticket that leaves the line would block everyone behind it. Supporting cancellation means removing or recording abandoned tickets under the same lock, skipping them whenever they reach the head, and waking waiters. Pair every successful <code>enter</code> with <code>leave</code> in <code>finally</code> in Java or an RAII guard in C++, including when the visit throws.</p>
+
+<h3>Fairness policy 2: batches that switch</h3>
+<p>To keep more stalls busy, let groups take turns in batches: <strong>once the other group is waiting, stop admitting new members of the group inside; when the room empties, reserve as many admissions for the other group as it has waiters at that moment</strong>. That finite quota forms the next batch and may be used even though the first group is waiting again. This version counts slots rather than identifying people, so newcomers from the chosen group can take a slot before older waiters.</p>
+<p>The first instinct, "never enter while the other group is waiting", hides a deadlock. With an empty room and both groups waiting, each side politely yields to the other, and nobody ever goes in. Every turn taking design needs a tie breaker for the empty room; here it is the group whose batch it currently is.</p>
+
+<p>Groups are numbered 0 and 1 in this implementation. Cancellation is excluded: abandoning a promised slot without updating the waiting count and batch quota could prevent a switch.</p>
+
+<figure class="code pair" data-sample="barber-and-bathroom.5"><figcaption><span class="ctitle">A bathroom that switches between batches</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> BatchBathroom {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BatchBathroom</span>(<span class="t">int</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">enter</span>(<span class="t">int</span> g) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        waiting_[g] += <span class="n">1</span>;
+        changed_.<span class="f">wait</span>(lock, [&amp;] { <span class="k">return</span> <span class="f">canEnter</span>(g); });
+        waiting_[g] -= <span class="n">1</span>;
+        <span class="k">if</span> (g == batchGroup_ &amp;&amp; batchLeft_ &gt; <span class="n">0</span>) batchLeft_ -= <span class="n">1</span>;
+        inside_ += <span class="n">1</span>;
+        groupInside_ = g;
+        changed_.<span class="f">notify_all</span>();
+    }
+
+    <span class="t">void</span> <span class="f">leave</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        inside_ -= <span class="n">1</span>;
+        <span class="k">if</span> (inside_ == <span class="n">0</span>) {
+            <span class="t">int</span> other = <span class="n">1</span> - groupInside_;
+            groupInside_ = -<span class="n">1</span>;
+            <span class="k">if</span> (batchLeft_ == <span class="n">0</span> &amp;&amp; waiting_[other] &gt; <span class="n">0</span>) {   <span class="c">// switch: everyone the other side has waiting now</span>
+                batchGroup_ = other;
+                batchLeft_ = waiting_[other];
+            }
+        }
+        changed_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="t">bool</span> <span class="f">canEnter</span>(<span class="t">int</span> g) <span class="k">const</span> {                            <span class="c">// caller holds m_</span>
+        <span class="k">if</span> (inside_ == capacity_) <span class="k">return</span> <span class="k">false</span>;
+        <span class="k">if</span> (inside_ &gt; <span class="n">0</span> &amp;&amp; groupInside_ != g) <span class="k">return</span> <span class="k">false</span>;          <span class="c">// never mixed</span>
+        <span class="k">if</span> (waiting_[<span class="n">1</span> - g] == <span class="n">0</span>) <span class="k">return</span> <span class="k">true</span>;                        <span class="c">// nobody on the other side waits</span>
+        <span class="k">if</span> (g == batchGroup_ &amp;&amp; batchLeft_ &gt; <span class="n">0</span>) <span class="k">return</span> <span class="k">true</span>;          <span class="c">// part of the batch that was promised the room</span>
+        <span class="k">return</span> inside_ == <span class="n">0</span> &amp;&amp; batchLeft_ == <span class="n">0</span> &amp;&amp; g == batchGroup_;   <span class="c">// empty room, both waiting: the tie break</span>
+    }
+
+    <span class="k">const</span> <span class="t">int</span> capacity_;
+    <span class="t">int</span> inside_ = <span class="n">0</span>;                <span class="c">// all guarded by m_</span>
+    <span class="t">int</span> groupInside_ = -<span class="n">1</span>;          <span class="c">// -1 when empty</span>
+    <span class="t">int</span> waiting_[<span class="n">2</span>] = {<span class="n">0</span>, <span class="n">0</span>};
+    <span class="t">int</span> batchGroup_ = <span class="n">0</span>;            <span class="c">// the group whose batch is being let in</span>
+    <span class="t">int</span> batchLeft_ = <span class="n">0</span>;             <span class="c">// members of that batch not yet in</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> changed_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56</span><code><span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">BatchBathroom</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+    <span class="k">private</span> <span class="t">int</span> inside = <span class="n">0</span>;                    <span class="c">// all guarded by lock</span>
+    <span class="k">private</span> <span class="t">int</span> groupInside = -<span class="n">1</span>;              <span class="c">// -1 when empty</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span>[] waiting = <span class="k">new</span> <span class="t">int</span>[<span class="n">2</span>];
+    <span class="k">private</span> <span class="t">int</span> batchGroup = <span class="n">0</span>;                <span class="c">// the group whose batch is being let in</span>
+    <span class="k">private</span> <span class="t">int</span> batchLeft = <span class="n">0</span>;                 <span class="c">// members of that batch not yet in</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> changed = lock.<span class="f">newCondition</span>();
+
+    <span class="t">BatchBathroom</span>(<span class="t">int</span> capacity) { <span class="k">this</span>.capacity = capacity; }
+
+    <span class="k">private</span> <span class="t">boolean</span> <span class="f">canEnter</span>(<span class="t">int</span> g) {          <span class="c">// caller holds lock</span>
+        <span class="k">if</span> (inside == capacity) <span class="k">return</span> <span class="k">false</span>;
+        <span class="k">if</span> (inside &gt; <span class="n">0</span> &amp;&amp; groupInside != g) <span class="k">return</span> <span class="k">false</span>;          <span class="c">// never mixed</span>
+        <span class="k">if</span> (waiting[<span class="n">1</span> - g] == <span class="n">0</span>) <span class="k">return</span> <span class="k">true</span>;                       <span class="c">// nobody on the other side waits</span>
+        <span class="k">if</span> (g == batchGroup &amp;&amp; batchLeft &gt; <span class="n">0</span>) <span class="k">return</span> <span class="k">true</span>;          <span class="c">// part of the batch that was promised the room</span>
+        <span class="k">return</span> inside == <span class="n">0</span> &amp;&amp; batchLeft == <span class="n">0</span> &amp;&amp; g == batchGroup;    <span class="c">// empty room, both waiting: the tie break</span>
+    }
+
+    <span class="k">void</span> <span class="f">enter</span>(<span class="t">int</span> g) {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            waiting[g] += <span class="n">1</span>;
+            <span class="k">while</span> (!<span class="f">canEnter</span>(g)) changed.<span class="f">awaitUninterruptibly</span>();   <span class="c">// a promised batch place must be used</span>
+            waiting[g] -= <span class="n">1</span>;
+            <span class="k">if</span> (g == batchGroup &amp;&amp; batchLeft &gt; <span class="n">0</span>) batchLeft -= <span class="n">1</span>;
+            inside += <span class="n">1</span>;
+            groupInside = g;
+            changed.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">void</span> <span class="f">leave</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            inside -= <span class="n">1</span>;
+            <span class="k">if</span> (inside == <span class="n">0</span>) {
+                <span class="t">int</span> other = <span class="n">1</span> - groupInside;
+                groupInside = -<span class="n">1</span>;
+                <span class="k">if</span> (batchLeft == <span class="n">0</span> &amp;&amp; waiting[other] &gt; <span class="n">0</span>) {   <span class="c">// switch: everyone the other side has waiting now</span>
+                    batchGroup = other;
+                    batchLeft = waiting[other];
+                }
+            }
+            changed.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>This is fair between the groups: once both sides are waiting, neither group can admit an unbounded number of people before the other gets a turn, assuming finite visits and eventual scheduling. It does not guarantee fairness between individuals: a red who arrives during red's batch may take a batch place ahead of a red who waited longer, who might lose again in every later red batch. If the interviewer wants both, combine it with tickets: a batch is "every ticket of that group issued before the switch".</p>
+
+<h3>Fairness policy 3, and the policies in one table</h3>
+<p>A third family limits how long a group may hold the room while the other waits: at most K more admissions, or stop admitting after a T millisecond deadline, then switch when empty. Existing occupants are not evicted, so T does not bound total occupancy time. A timer is needed if the deadline itself must trigger a state transition while nobody calls the monitor. It is simple to bolt onto the obvious monitor and gives a tunable trade-off.</p>
+<table>
+<thead><tr><th>Policy</th><th>Group starvation</th><th>Individual starvation</th><th>Throughput</th></tr></thead>
+<tbody>
+<tr><td>Obvious monitor (no policy)</td><td>Possible</td><td>Possible</td><td>Avoids policy-induced idle stalls while the current group has eligible arrivals</td></tr>
+<tr><td>First come, first served</td><td>Impossible</td><td>Impossible</td><td>May lose throughput when head of line blocking leaves stalls empty</td></tr>
+<tr><td>Batches that switch</td><td>Impossible</td><td>Possible in theory, unless batches are defined by tickets</td><td>Can improve utilisation by grouping compatible visits up to capacity</td></tr>
+<tr><td>Batch limit K or time limit T</td><td>Impossible</td><td>Possible in theory</td><td>Tunable: larger K permits longer batches and can increase opposite-group waits</td></tr>
+</tbody>
+</table>
+
+<div class="box example">
+<h3>Worked example: one morning, three policies</h3>
+<p>Capacity 3. During a short arrival burst, six people acquire the monitor lock in this order: red 1, red 2, blue 1, red 3, red 4, blue 2. No visit completes until all six have requested entry. Treat admission and departure overhead as negligible, and every visit as one time unit. Who is inside in each unit?</p>
+<table>
+<thead><tr><th>Unit</th><th>Obvious monitor (one possible timing)</th><th>First come, first served</th><th>Batches that switch</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>red 1, red 2, red 3</td><td>red 1, red 2</td><td>red 1, red 2</td></tr>
+<tr><td>2</td><td>red 4</td><td>blue 1</td><td>blue 1, blue 2</td></tr>
+<tr><td>3</td><td>blue 1, blue 2</td><td>red 3, red 4</td><td>red 3, red 4</td></tr>
+<tr><td>4</td><td></td><td>blue 2</td><td></td></tr>
+</tbody>
+</table>
+<p>The obvious monitor keeps every stall it can busy, but blue 1, who arrived third, goes in last, and with a suitable steady stream of overlapping reds could wait forever. First come, first served is perfectly fair and needs four units, because each blue at the head of the line blocks the reds behind it. Batches that switch finish in three units: when blue 1 arrived, red 3 and red 4 were held back, and when the room emptied, both waiting blues went in together.</p>
+</div>
+
+<h3>Rubrik's variants: "the most eligible person" and the team playground</h3>
+<p>One Rubrik version asks you to admit "the most eligible waiting person" whenever there is room, with each person's visit taking a time that depends on their name. Clarify what "eligible" means: oldest request globally, or oldest request compatible with current occupants. These are different policies. Choosing only the oldest currently compatible request is the obvious monitor with a queue, so it can starve the other group; add the batch switch (stop admitting your group once the other has waited) and you have a defensible answer. </p>
+<p>Because visit times are known, you may be asked about shortest job first: shortest job first minimises average waiting time for a single server with a fixed set of available jobs and known durations. That theorem does not directly apply to three stalls with group constraints; favouring short eligible visits is a heuristic here and can starve long visits. Aging raises priority with time, but still needs a policy that eventually makes the group eligible.</p>
+<p>The team playground (reported at Rubrik in 2025) has many teams, at most 10 players inside, one team at a time, and asks for several ways to prevent starvation. Everything above generalizes: tickets work unchanged with a team number instead of a group; batch switching hands the playground to the team of the longest waiting player; a batch or admission deadline limits new entries before a handoff, but does not bound how long existing players stay. Have three ready, with their costs.</p>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>The barber checks, then sleeps.</strong> Any gap between "nobody is waiting" and "wait" loses a wakeup. Check and wait under one lock, in a loop.</li>
+<li><strong>A customer who leaves before the haircut.</strong> "Seated" is not "served". Each customer must wait for a signal that is about their own haircut.</li>
+<li><strong>Shutdown that nobody hears.</strong> Setting <code>closed = true</code> without signalling leaves a sleeping barber asleep; a wait predicate without <code>|| closed</code> ignores it even when signalled.</li>
+<li><strong>Capacity and group checked in two steps.</strong> "If the room is empty or mine, then take a stall from the capacity semaphore" lets a red and a blue both see an empty room and both enter. The group check and the admission must be one atomic decision under one lock.</li>
+<li><strong>Yielding with no tie breaker.</strong> "Never enter while the other group waits", applied by both groups to an empty room, deadlocks. Someone must have the turn.</li>
+<li><strong>Signalling one waiter with mixed groups waiting.</strong> <code>notify</code> can wake a person from the wrong group, who waits again while the right one sleeps. Use <code>notifyAll</code>, or targeted conditions with enough wakeups for eligible waiters; strict ticket order needs the head ticket specifically.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>This is Rubrik's territory. The political bathroom (capacity 3, never both parties, others queue, admit the most eligible waiting person) was reported in a 2024 G5 multithreading round, where the candidate was first asked to explain operating system resource allocation policies with pros and cons and then implement one (they chose first come, first served), and again in a May 2025 concurrency round. A 2025 L4 round asked the team playground (one team at a time, at most 10 players) with a follow up on several ways to prevent starvation. A 2026 Rubrik debugging round handed over a barber shop simulation with deadlocks and an incorrect shutdown.</p>
+<p>What the interviewer listens for: exclusion and capacity decided atomically, a named fairness policy with its cost, and no lost wakeups.</p>
+<blockquote>I will write it as a monitor: one lock, the count inside, the group inside, and the waiters. A person enters when there is space and the room is empty or holds their group. That alone lets one group starve the other, so I will add a policy: once the other group is waiting, stop admitting my group, and when the room empties hand it to everyone the other group has waiting, with a tie breaker so two waiting groups cannot deadlock. If strict fairness per person matters more than throughput, I would switch to tickets, at the cost of head of line blocking.</blockquote>
+<p>Follow ups to expect: "Who can starve now?" "What if there are 10 teams instead of 2?" "Each person's visit time is known; does that change your policy?" "How does the barber go home at closing time?" "How would you test that groups never mix?" (an independent counter per group checked from inside, many threads, random arrival order, and ThreadSanitizer for C++).</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Name the scheduling policy you are choosing.</strong> Rubrik's prompt about operating system resource allocation is a hint that this is a scheduling problem. First come, first served is fair with head of line blocking; batching trades fairness per person for throughput; rotating bounded admission batches resembles round robin, but occupants are not preempted; shortest job first has an average-wait optimum in the fixed, single-server model; with ongoing arrivals it can starve long jobs, and group constraints require additional admission rules. Saying which one you picked, and what it costs, is the senior signal.</p>
+<p><strong>The same shape appears in real systems.</strong> Database lock managers decide admission with a compatibility table (shared locks share, exclusive locks do not) and must avoid starving exclusive requests behind a stream of shared ones. A device or connection that can serve only one tenant's workload at a time, with batches per tenant, is the bathroom with tenants as groups. And the barber is every bounded worker pool that rejects when full.</p>
+<p><strong>Waking everyone has a cost.</strong> These monitors use one condition and <code>notifyAll</code> because waiters have different predicates. With hundreds of waiters, each change wakes all of them, and most go back to sleep. Per-group conditions reduce unrelated wakeups, but waiters must still check capacity. Strict ticket order needs a targeted signal to the head ticket or a broadcast: signalling an arbitrary same-group waiter can still strand the eligible ticket.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>The sleeping barber's famous bug is a lost wakeup: checking "anyone waiting?" and sleeping must be one step under one lock.</li>
+<li>The barber is producer and consumer with "leave if full"; each customer needs their own done signal, and closing means refuse new, serve seated, wake the sleeper.</li>
+<li>The bathroom is group mutual exclusion: decide "space, and empty or my group" atomically.</li>
+<li>Without a policy one group can starve the other. Tickets are fairest, batches that switch keep stalls busy, limits are tunable; every turn taking rule needs a tie breaker for the empty room.</li>
+<li>With many teams the same three policies apply; name the one you pick and its cost.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="barber-and-bathroom"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="barber-and-bathroom.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">The barber locks, sees <code>waiting == 0</code>, unlocks, and then locks again to call <code>wait()</code>. A customer arrives between the two locks, increments <code>waiting</code> and calls <code>notify()</code>. Assume no later arrival or interruption. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The barber wakes immediately, because the notify is stored</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The barber can remain asleep with a customer waiting because the notify was sent before he waited</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The customer leaves because the barber is asleep</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The program must throw <code>IllegalMonitorStateException</code></span></button></li></ol><div class="why" hidden><strong>Why.</strong> Condition variables do not remember notifications. Because the check and the wait were two separate critical sections, the customer's signal fell in the gap. Checking and waiting in one loop under one lock closes the gap. A spurious wakeup may happen but cannot be relied on. The customer has already been accepted, and the barber owns the monitor when calling <code>wait</code>, so neither departure nor a monitor-ownership exception follows.</div></div><div class="mcq" data-id="barber-and-bathroom.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">You model the barber shop with Java's <code>ArrayBlockingQueue</code> (or your own bounded queue). Which enqueue operation reports a full room with <code>false</code>, without waiting for capacity?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot"><code>put</code>, so the customer waits for a chair</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>offer</code>, which reports full with <code>false</code> instead of waiting for a slot</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>add</code>, because it is the fastest</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot"><code>take</code>, because the customer takes a chair</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A customer who finds no free chair must leave, not wait, so the enqueue must not wait for capacity. <code>put</code> would turn the waiting room into an unbounded line on the pavement. <code>add</code> throws when full rather than returning <code>false</code>; <code>take</code> removes an item and is not an enqueue. None of this promises lock-free access to the queue.</div></div><div class="mcq" data-id="barber-and-bathroom.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A bathroom monitor admits a person when <code>inside &lt; 3 &amp;&amp; (inside == 0 || groupInside == g)</code>, with no other rule. Red members arrive continuously and overlap. A blue member is waiting. What happens to them?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">They get in within one visit time</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">They can wait forever, because the room never becomes empty of red</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">They get in as soon as one red member leaves</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The monitor lets them in alongside the reds</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The rule is reader preference with two groups: same group arrivals keep joining while the room is theirs. It is safe (never mixed, never over 3) but not live for the other group. A fairness rule must eventually stop new red admissions while blue waits. One departure need not empty the room, and capacity never permits mixed groups.</div></div><div class="mcq" data-id="barber-and-bathroom.q4" data-a="2" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Both groups adopt the rule "never enter while someone from the other group is waiting". The room is empty, and one red and one blue are waiting. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The red enters first because red was there first</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">They both enter together</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nobody enters: each defers to the other, so they wait forever</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The rule alternates them automatically</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Symmetric politeness with no tie breaker is a deadlock. A turn taking design needs a deciding value for the empty room, such as whose batch it is. Arrival order is not consulted by this rule, both predicates are false, and no automatic alternation exists.</div></div><div class="mcq" data-id="barber-and-bathroom.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A first come, first served bathroom with capacity 3 is empty. The line is red 1, red 2, blue 1, red 3, with tickets assigned in that order. Assume nobody leaves and eligible entrants run. Who enters before the first departure?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">red 1, red 2 and red 3</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">red 1 and red 2; blue 1 waits for the room to empty, and red 3 waits behind blue 1</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">red 1, red 2 and blue 1</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only red 1</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Ticket order lets red 1 and red 2 in together. Blue 1 is next and must wait for an empty room, and red 3 may not overtake blue 1 even though a stall is free. That is head of line blocking, the price of ticket-order fairness. Red 3 cannot bypass blue 1, blue 1 cannot mix with red, and red 2 need not wait for red 1 to leave.</div></div><div class="mcq" data-id="barber-and-bathroom.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Spot the bug: <code>if (groupInside == -1 || groupInside == g) { capacity.acquire(); synchronized (this) { inside += 1; groupInside = g; } }</code>, where <code>capacity</code> is a semaphore with 3 permits.</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The semaphore should have 2 permits</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The group check happens outside any lock and separately from admission, so a red and a blue can both see an empty room and both go in</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Replacing only <code>inside</code> with an atomic counter is sufficient</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">There is no bug</span></button></li></ol><div class="why" hidden><strong>Why.</strong> It is a check-then-act across two steps. Both people read groupInside as empty before either writes it. Deciding "space, and empty or my group" must be one atomic step under one lock, together with updating the state. Changing the permit count does not repair that decision; <code>inside += 1</code> is already protected by the monitor, and making only the counter atomic would not repair the group check.</div></div><div class="mcq" data-id="barber-and-bathroom.q7" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Rubrik's team playground has many teams, a limit of 10 players inside, and one team at a time. Assume finite visits, eventual lock acquisition and no cancellation. Which policy guarantees no overtaking after admission tickets are assigned?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The obvious monitor with notifyAll</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Tickets: admit strictly in arrival order, letting consecutive players of the team inside join it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Let the largest waiting team go next</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">A random team each time the playground empties</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Tickets bound the number of admissions ahead of each ticket, and therefore prevent starvation under the stated progress assumptions; they do not give a wall-clock bound. Largest team first can starve small teams; random choice provides no worst-case progress bound; the obvious monitor starves anyone not inside. The cost of tickets is lower throughput from head of line blocking.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="barber-and-bathroom.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Implement Rubrik's team playground: players of many teams call <code>enter(team)</code> and <code>leave()</code>; at most <code>capacity</code> players are inside; only one team is inside at a time; no team and no player may starve.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="barber-and-bathroom.6"><figcaption><span class="ctitle">A fair playground with tickets</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> Playground {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Playground</span>(<span class="t">int</span> capacity) : <span class="f">capacity_</span>(capacity) {}
+
+    <span class="t">void</span> <span class="f">enter</span>(<span class="t">int</span> team) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">const</span> <span class="t">std</span>::<span class="t">uint64_t</span> my = nextTicket_;
+        nextTicket_ += <span class="n">1</span>;
+        changed_.<span class="f">wait</span>(lock, [&amp;] {
+            <span class="k">return</span> my == nowServing_ &amp;&amp; inside_ &lt; capacity_ &amp;&amp; (inside_ == <span class="n">0</span> || teamInside_ == team);
+        });
+        inside_ += <span class="n">1</span>;
+        teamInside_ = team;
+        nowServing_ += <span class="n">1</span>;                        <span class="c">// teammates right behind may join</span>
+        changed_.<span class="f">notify_all</span>();
+    }
+
+    <span class="t">void</span> <span class="f">leave</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        inside_ -= <span class="n">1</span>;
+        <span class="k">if</span> (inside_ == <span class="n">0</span>) teamInside_ = -<span class="n">1</span>;
+        changed_.<span class="f">notify_all</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">int</span> capacity_;
+    <span class="t">int</span> inside_ = <span class="n">0</span>;                             <span class="c">// all guarded by m_</span>
+    <span class="t">int</span> teamInside_ = -<span class="n">1</span>;                        <span class="c">// -1 when empty</span>
+    <span class="t">std</span>::<span class="t">uint64_t</span> nextTicket_ = <span class="n">0</span>;
+    <span class="t">std</span>::<span class="t">uint64_t</span> nowServing_ = <span class="n">0</span>;               <span class="c">// the ticket at the head of the line</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> changed_;
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42</span><code><span class="k">import</span> java.util.concurrent.locks.<span class="t">Condition</span>;
+<span class="k">import</span> java.util.concurrent.locks.<span class="t">ReentrantLock</span>;
+
+<span class="k">class</span> <span class="t">Playground</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">int</span> capacity;
+    <span class="k">private</span> <span class="t">int</span> inside = <span class="n">0</span>;                    <span class="c">// all guarded by lock</span>
+    <span class="k">private</span> <span class="t">int</span> teamInside = -<span class="n">1</span>;               <span class="c">// -1 when empty</span>
+    <span class="k">private</span> <span class="t">long</span> nextTicket = <span class="n">0</span>;
+    <span class="k">private</span> <span class="t">long</span> nowServing = <span class="n">0</span>;               <span class="c">// the ticket at the head of the line</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Condition</span> changed = lock.<span class="f">newCondition</span>();
+
+    <span class="t">Playground</span>(<span class="t">int</span> capacity) { <span class="k">this</span>.capacity = capacity; }
+
+    <span class="k">void</span> <span class="f">enter</span>(<span class="t">int</span> team) {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            <span class="t">long</span> my = nextTicket;
+            nextTicket += <span class="n">1</span>;
+            <span class="k">while</span> (my != nowServing || inside == capacity || (inside &gt; <span class="n">0</span> &amp;&amp; teamInside != team)) {
+                changed.<span class="f">awaitUninterruptibly</span>();   <span class="c">// a ticket must never be abandoned</span>
+            }
+            inside += <span class="n">1</span>;
+            teamInside = team;
+            nowServing += <span class="n">1</span>;                      <span class="c">// teammates right behind may join</span>
+            changed.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+
+    <span class="k">void</span> <span class="f">leave</span>() {
+        lock.<span class="f">lock</span>();
+        <span class="k">try</span> {
+            inside -= <span class="n">1</span>;
+            <span class="k">if</span> (inside == <span class="n">0</span>) teamInside = -<span class="n">1</span>;
+            changed.<span class="f">signalAll</span>();
+        } <span class="k">finally</span> {
+            lock.<span class="f">unlock</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Admission is strictly in ticket order. With positive capacity, finite visits, no abandoned tickets or counter wrap, and eventual lock acquisition, every issued ticket progresses after finitely many earlier tickets. This is an admission-order guarantee, not a maximum duration for waiting. Consecutive players of the team inside enter together up to the capacity. The trade-off to state: a player of another team at the head of the line blocks everyone behind them until the playground empties. If throughput matters more, switch to batches: when the playground empties, give it to the team of the oldest waiting player and admit that team's waiting players as one batch.</p></div></div><div class="cq" data-q="barber-and-bathroom.c2" data-kind="design"><div class="cqh"><span class="kind k-design">Design</span></div><div class="qtext">Before you code the political bathroom, the interviewer asks: "Explain some resource allocation policies, with pros and cons, and pick one." Answer as you would out loud.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>First come, first served: hand out tickets and admit in order. Pro: nobody starves and it is easy to reason about. Con: head of line blocking, because a person of the other party at the front leaves stalls empty while others wait.</p>
+<p>Batching or turn taking: let one party in until the other party is waiting, then switch when the room empties and admit the other party's waiting people as a batch. Pro: can improve use of the three stalls by grouping compatible visits. Con: fair between parties but not strictly per person, and it needs a tie breaker for the empty room or it can deadlock.</p>
+<p>Admission windows or a batch limit: stop new admissions after K entries or a T second deadline while the other party waits, then switch once the occupants leave. Pro: one tunable knob. Con: K trades batching against waiting; a T second admission deadline does not evict existing occupants, so it is not a wall-clock waiting guarantee.</p>
+<p>Shortest visit first: since each visit time is known from the name, admit short visits first. Pro: can reduce average wait, though the single-server optimality proof does not cover group constraints and multiple stalls. Con: long visits can starve; aging and a fair group-selection rule are needed.</p>
+<p>I would pick batching with a tie breaker if group fairness and utilisation are the goals. I would clarify whether fairness must apply to each individual; a slot-count batch alone does not guarantee that. If the interviewer says strict fairness per person matters most, I would switch to first come, first served.</p></div></div><div class="cq" data-q="barber-and-bathroom.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">A barber shop's <code>close()</code> sets <code>closed = true</code> under the lock and returns. After it is called, the program never exits: the barber thread is stuck. Find two possible causes and fix them.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>First cause: nobody wakes the barber. He is asleep on the "customer waiting" condition, and setting a flag does not wake anyone. Fix: <code>close()</code> must signal that condition (<code>signal</code>, or <code>notify_one</code> in C++) after setting the flag, under the lock.</p>
+<p>Second cause: the barber's wait predicate ignores the flag. If he waits <code>while (waitingRoom.isEmpty())</code>, he goes back to sleep even when woken. Fix: wait while the room is empty and the shop is not closed, and after waking return "go home" when the room is empty and closed. That keeps the promise to customers already seated (they are still served), refuses new ones (the customer side checks <code>closed</code>), and lets the barber thread end so <code>join</code> returns.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="barber-and-bathroom.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"The barber is asleep even though a customer is waiting. Walk me through how that happens, and how you would fix it and close the shop."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A notification is not stored: checking empty, unlocking and then waiting loses the customer's signal</li><li>Check the queue and wait in a loop under one lock; waiting atomically releases the lock</li><li>Remove a customer under the lock, perform the haircut outside it, then publish that customer's completion</li><li>Closing rejects new arrivals, wakes the barber and drains accepted customers before exit</li><li>Completion by highest ticket assumes one barber; multiple barbers need per-customer completion</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The barber has lost a wakeup. He checks an empty queue, releases the lock, and decides to sleep. In that gap a customer queues and signals. Nobody is waiting yet, so the signal disappears. The barber then sleeps without checking again. I would put the queue predicate and the wait in one loop under one lock. Waiting atomically releases that lock, so a customer cannot slip between the check and registration of the wait. A wakeup only means check again; it does not reserve a customer. The barber removes one customer under the lock, cuts hair outside it, then records completion under the lock. Each customer waits for their own completion, because being accepted is not the same as being served. To close, I set a closed flag under the same lock, reject new arrivals and wake the barber. He drains accepted customers and exits only when closed and empty. The owner joins him before destroying the shop. With one barber, tickets finish in order. With several barbers, I need a separate completion result for each customer because later tickets may finish first. That keeps admission, service and shutdown promises separate and testable.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What if the haircut throws, or an accepted customer wants to cancel?</span></p></div></div><div class="sq" data-sq="barber-and-bathroom.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Design a bathroom with three stalls, two groups that cannot mix, and no starvation. Why does your fairness policy work?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>One monitor protects occupancy, the current group and ticket state</li><li>Admit only the next ticket when there is capacity and the room is empty or contains that group</li><li>Advance the ticket on entry and wake waiters; consecutive compatible tickets may share</li><li>Progress assumes finite visits, eventual lock acquisition and no abandoned tickets</li><li>Explain head of line blocking and distinguish group batching from individual fairness</li><li>Cancellation removes or skips abandoned tickets; successful admission always requires leave</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use one monitor and admission tickets. The monitor protects the number inside, the current group and the next ticket to serve. A caller takes a ticket under the lock and waits until it is their turn, a stall is available, and the room is empty or contains their group. On entry I advance the ticket and wake waiters, so consecutive people from the same group can share the room. On departure I reduce occupancy, clear the group when empty and wake waiters again. Nobody can overtake an issued ticket. If visits finish and eligible threads eventually acquire the lock, each ticket has only finitely many people ahead and eventually enters. That is not a wall-clock bound or a promise about operating system scheduling. The cost is head of line blocking. A blue person waiting behind two reds prevents later reds from using the third stall. Batching can improve utilisation, but counting batch slots alone does not guarantee fairness to each individual. I would also define cancellation explicitly: an abandoned head ticket must be removed or skipped under the lock. Every successful entry must have a matching departure, even when the caller's work throws.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you support cancellation without leaving a hole in the ticket sequence?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-sleeping-barber.html" data-problem="sleeping-barber"><span class="pk">Ordering puzzles · medium</span><b>The sleeping barber</b><span class="pst"></span></a><a class="pcard" href="p-fair-bathroom.html" data-problem="fair-bathroom"><span class="pk">Ordering puzzles · hard</span><b>The fair bathroom (and the team playground)</b><span class="pst"></span></a><a class="pcard" href="p-debug-the-barber-shop.html" data-problem="debug-the-barber-shop"><span class="pk">Bug hunts · senior</span><b>Debug the barber shop</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="h2o-and-group-formation.html"><span>Previous</span><b>H2O and group formation problems</b></a><a class="next" href="web-crawler.html"><span>Next</span><b>The multithreaded web crawler</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#the-sleeping-barber">The sleeping barber</a><a href="#the-unisex-bathroom">The unisex bathroom</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

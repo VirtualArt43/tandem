@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>volatile in Java, std::atomic in C++ · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="volatile-and-atomic" data-title="volatile in Java, std::atomic in C++" data-track="core" data-module="core-6" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details open><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic" class=here><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m6">Module 06: The memory model</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 06.4</span><span>24 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>volatile in Java, std::atomic in C++</h1><p class="lsum">What Java volatile and C++ std::atomic guarantee, what they do not, the atomic operations you will use, and why C++ volatile is not for threads.</p><div class="asked"><span>Asked at</span><span class="co">Microsoft</span><span class="co">Nvidia</span><span class="co">Databricks</span><span class="co">Rubrik</span></div><div class="prereq"><span>Before this:</span><a href="happens-before.html">Happens-before and synchronizes-with</a><a href="lost-update.html">The lost update: read, modify, write</a></div></header><article class="prose" id="article">
+<p class="lead">Java and C++ both have a keyword called <code>volatile</code>, and they mean completely different things. In Java it is a real threading tool. In C++ it is not a threading tool at all; the C++ tool is <code>std::atomic</code>. Mixing the two up is one of the fastest ways to lose an interviewer's trust, and knowing exactly what each one buys is one of the fastest ways to win it.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A Java <code>volatile</code> variable is like a whiteboard in the corridor that everyone must read directly, never from a photo on their phone. You always see the latest number. But if two people each read "41", walk back to their desks, and write "42", one of the updates is lost. <strong>Seeing the latest value is not the same as updating it safely.</strong></p>
+<p>An atomic variable is like the token machine at a bank counter. You press the button and get the next number, and no two customers can ever get the same one, because reading the counter and advancing it happen in one indivisible step. Atomics give you the whiteboard's visibility and the token machine's indivisibility, for one variable at a time.</p>
+</div>
+
+<h2 id="java-volatile-what-it-guarantees">Java volatile: what it guarantees</h2>
+<p>A field declared <a class="term" data-term="volatile" href="glossary.html#volatile">volatile</a> in Java gets four guarantees:</p>
+<ol>
+<li><strong>Visibility.</strong> A write to a volatile field happens-before every later read of it, so readers always see the latest value. No hoisting, no stale register copy.</li>
+<li><strong>Ordering.</strong> Reads and writes made before a volatile write cannot be moved after it, and reads and writes made after a volatile read cannot be moved before it. That is what makes the "write data, then set a volatile flag" hand-off safe.</li>
+<li><strong>One global order.</strong> All volatile accesses in the program fall into a single order that every thread agrees on, which is why volatile fixes the store buffering test from <a href="reordering.html">reordering</a>. In C++ terms, volatile behaves like <code>memory_order_seq_cst</code>.</li>
+<li><strong>No tearing for <code>long</code> and <code>double</code>.</strong> The Java specification (JLS 17.7) allows a plain 64 bit write to be split into two 32 bit halves, so a reader could see half of each value, a <a class="term" data-term="torn-read" href="glossary.html#torn-read">torn read</a>. Volatile <code>long</code> and <code>double</code> reads and writes are always atomic. (References are always atomic, volatile or not.)</li>
+</ol>
+<p>And one thing it does not give: <strong>atomic compound actions</strong>. <code>count++</code>, <code>count += 1</code>, "check then set", "read, compute, write back" are several steps, and volatile makes each step visible without making the group indivisible. Volatile is also not mutual exclusion: two threads can be inside the same volatile-using code at once.</p>
+
+<h2 id="volatile-does-not-make-count-1-atomic">volatile does not make count += 1 atomic</h2>
+<p>This is the single most asked volatile question, so see it fail in both languages. In Java the field is volatile; in C++ the variable is <code>volatile int</code>, which is what people who confuse the two languages write.</p>
+
+<figure class="code pair" data-sample="volatile-and-atomic.1" data-expect="race"><figcaption><span class="ctitle">A volatile counter still loses updates</span><span class="cnote bad">has a deliberate race</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">volatile</span> <span class="t">int</span> count = <span class="n">0</span>;               <span class="c">// volatile: no atomicity, no ordering, no visibility promise</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">auto</span> work = [] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">100000</span>; i += <span class="n">1</span>) {
+            count = count + <span class="n">1</span>;        <span class="c">// a volatile read, then a volatile write: a data race</span>
+        }
+    };
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">a</span>(work), <span class="f">b</span>(work);
+    a.<span class="f">join</span>();
+    b.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"count = "</span> &lt;&lt; count &lt;&lt; <span class="s">" (expected 200000)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">volatile</span> <span class="t">int</span> count = <span class="n">0</span>;    <span class="c">// volatile: every read and write is visible...</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Runnable</span> work = () -&gt; {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">100_000</span>; i += <span class="n">1</span>) {
+                count += <span class="n">1</span>;           <span class="c">// ...but this is still read, add, write: three steps</span>
+            }
+        };
+        <span class="t">Thread</span> a = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"a"</span>), b = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"b"</span>);
+        a.<span class="f">start</span>(); b.<span class="f">start</span>();
+        a.<span class="f">join</span>(); b.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"count = "</span> + count + <span class="s">" (expected 200000)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>count = 180777 (expected 200000)</pre></div><div class="runout" hidden></div></figure>
+
+<p>Both lose updates, for the reason you know from <a href="lost-update.html">the lost update</a>: two threads read the same value and both write back one more. The C++ version is worse: ThreadSanitizer reports a <a class="term" data-term="data-race" href="glossary.html#data-race">data race</a>, because C++ <code>volatile</code> is not synchronization, so the program's behavior is undefined. (C++20 even deprecates <code>+=</code> and <code>++</code> on volatile variables, which is why the code spells out the read and the write.)</p>
+
+<h2 id="when-volatile-is-the-right-tool-in-java">When volatile is the right tool in Java</h2>
+<p>Volatile is exactly right when every write is independent of the current value, or when only one thread ever writes:</p>
+<ul>
+<li><strong>Flags:</strong> <code>volatile boolean stopRequested</code>, as in <a href="visibility.html">visibility</a>.</li>
+<li><strong>One writer, many readers:</strong> a sensor thread publishes <code>volatile double latestTemperature</code>; readers just need the latest value.</li>
+<li><strong>Publishing an immutable object:</strong> build a new <code>Config</code> and assign it to <code>volatile Config current</code>. Readers get a fully built object; see <a href="safe-publication.html">safe publication</a>.</li>
+<li><strong>Cheap reads with locked writes:</strong> readers read a volatile field with no lock; writers update it inside <code>synchronized</code>, so their read-modify-write is atomic. Reads never block.</li>
+</ul>
+
+<figure class="code pair" data-sample="volatile-and-atomic.2"><figcaption><span class="ctitle">Lock-free reads, locked writes</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+
+<span class="k">class</span> Gauge {
+<span class="k">public</span>:
+    <span class="t">long</span> <span class="f">get</span>() <span class="k">const</span> {
+        <span class="k">return</span> value_.<span class="f">load</span>();                 <span class="c">// no lock: an atomic read</span>
+    }
+
+    <span class="t">void</span> <span class="f">add_capped</span>(<span class="t">long</span> delta, <span class="t">long</span> cap) {   <span class="c">// a compound update, kept simple under a lock</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="t">long</span> next = value_.<span class="f">load</span>() + delta;
+        value_.<span class="f">store</span>(next &gt; cap ? cap : next);
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; value_{<span class="n">0</span>};              <span class="c">// atomic, because get() reads without the mutex</span>
+    <span class="t">std</span>::<span class="t">mutex</span> m_;                            <span class="c">// serializes writers only</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12</span><code><span class="k">class</span> <span class="t">Gauge</span> {
+    <span class="k">private</span> <span class="k">volatile</span> <span class="t">long</span> value;              <span class="c">// readers need only visibility</span>
+
+    <span class="t">long</span> <span class="f">get</span>() {
+        <span class="k">return</span> value;                         <span class="c">// no lock: a volatile read</span>
+    }
+
+    <span class="k">synchronized</span> <span class="k">void</span> <span class="f">addCapped</span>(<span class="t">long</span> delta, <span class="t">long</span> cap) {   <span class="c">// writers need atomicity: one at a time</span>
+        <span class="t">long</span> next = value + delta;
+        value = next &gt; cap ? cap : next;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>In C++ the shared variable must still be <code>std::atomic</code>, because <code>get()</code> reads it while a writer may be storing it, and a non-atomic access there would be a data race. For a plain add you would just use <code>fetch_add</code>; the lock earns its place when the update is more complicated than one atomic operation can express.</p>
+
+<h2 id="the-atomic-toolkit">The atomic toolkit</h2>
+<p>An <a class="term" data-term="atomic-variable" href="glossary.html#atomic-variable">atomic variable</a> makes single operations indivisible: the hardware performs the read, the change and the write as one step that no other core can split. Java has <code>AtomicInteger</code>, <code>AtomicLong</code>, <code>AtomicBoolean</code>, <code>AtomicReference</code> and array versions; C++ has the class template <code>std::atomic&lt;T&gt;</code>. The operations line up almost one to one:</p>
+<table>
+<thead><tr><th>What</th><th>Java</th><th>C++</th></tr></thead>
+<tbody>
+<tr><td>Read</td><td><code>get()</code></td><td><code>load()</code></td></tr>
+<tr><td>Write</td><td><code>set(v)</code></td><td><code>store(v)</code></td></tr>
+<tr><td>Write, return the old value</td><td><code>getAndSet(v)</code></td><td><code>exchange(v)</code></td></tr>
+<tr><td>Add, return the old or new value</td><td><code>getAndAdd(d)</code>, <code>addAndGet(d)</code>, <code>incrementAndGet()</code></td><td><code>fetch_add(d)</code> (old value), <code>++a</code>, <code>a += d</code> (new value)</td></tr>
+<tr><td>Bitwise</td><td><code>getAndUpdate(f)</code> with a lambda (a <code>VarHandle</code> also has <code>getAndBitwiseOr</code> and friends)</td><td><code>fetch_and</code>, <code>fetch_or</code>, <code>fetch_xor</code></td></tr>
+<tr><td>Compare and set</td><td><code>compareAndSet(expected, next)</code> returns a boolean</td><td><code>compare_exchange_weak(expected, next)</code>, <code>compare_exchange_strong(...)</code></td></tr>
+<tr><td>Any function, retried for you</td><td><code>updateAndGet(f)</code>, <code>accumulateAndGet(x, f)</code></td><td>no built-in: write the compare-exchange loop</td></tr>
+</tbody>
+</table>
+<p>Every one of these defaults to the strongest ordering: Java atomics have volatile semantics, and every <code>std::atomic</code> operation defaults to <code>std::memory_order_seq_cst</code>. C++ lets you pass a weaker order as an extra argument; that is the next lesson, <a href="memory-orders.html">memory orders</a>.</p>
+
+<p><a class="term" data-term="compare-and-swap" href="glossary.html#compare-and-swap">compare-and-swap</a> is the operation everything else can be built from: "set it to <code>next</code>, but only if it still holds <code>expected</code>". If another thread changed the value in between, it fails, and you re-read and retry. Here is the classic use, keeping a running maximum, next to the simpler counter and an exchange that reads and resets in one step:</p>
+
+<figure class="code pair" data-sample="volatile-and-atomic.3" data-expect="ok"><figcaption><span class="ctitle">Counter, running maximum with compare-and-set, and exchange</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; requests{<span class="n">0</span>};
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; slowest{<span class="n">0</span>};                                     <span class="c">// largest latency seen, in ms</span>
+
+<span class="t">void</span> <span class="f">record</span>(<span class="t">int</span> latency_ms) {
+    requests.<span class="f">fetch_add</span>(<span class="n">1</span>);                                       <span class="c">// one atomic read-modify-write</span>
+    <span class="t">int</span> current = slowest.<span class="f">load</span>();
+    <span class="k">while</span> (latency_ms &gt; current &amp;&amp; !slowest.<span class="f">compare_exchange_weak</span>(current, latency_ms)) {
+        <span class="c">// on failure, current now holds the latest value: the loop re-checks and retries</span>
+    }
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; workers;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+        workers.<span class="f">emplace_back</span>([t] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">10000</span>; i += <span class="n">1</span>) <span class="f">record</span>((i * <span class="n">37</span> + t * <span class="n">11</span>) % <span class="n">1000</span>);
+        });
+    }
+    <span class="k">for</span> (<span class="k">auto</span>&amp; w : workers) w.<span class="f">join</span>();
+    <span class="t">long</span> drained = requests.<span class="f">exchange</span>(<span class="n">0</span>);                         <span class="c">// read and reset in one step</span>
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"requests "</span> &lt;&lt; drained &lt;&lt; <span class="s">", slowest "</span> &lt;&lt; slowest.<span class="f">load</span>()
+              &lt;&lt; <span class="s">" ms, after reset "</span> &lt;&lt; requests.<span class="f">load</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicLong</span> requests = <span class="k">new</span> <span class="t">AtomicLong</span>();
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicInteger</span> slowest = <span class="k">new</span> <span class="t">AtomicInteger</span>();    <span class="c">// largest latency seen, in ms</span>
+
+    <span class="k">static</span> <span class="k">void</span> <span class="k">record</span>(<span class="t">int</span> latencyMs) {
+        requests.<span class="f">incrementAndGet</span>();                              <span class="c">// one atomic read-modify-write</span>
+        <span class="t">int</span> current = slowest.<span class="f">get</span>();
+        <span class="k">while</span> (latencyMs &gt; current &amp;&amp; !slowest.<span class="f">compareAndSet</span>(current, latencyMs)) {
+            current = slowest.<span class="f">get</span>();                             <span class="c">// lost a race: re-read, retry</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Thread</span>[] workers = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">4</span>];
+        <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; workers.length; t += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> id = t;
+            workers[t] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">10_000</span>; i += <span class="n">1</span>) <span class="k">record</span>((i * <span class="n">37</span> + id * <span class="n">11</span>) % <span class="n">1000</span>);
+            }, <span class="s">"worker-"</span> + t);
+            workers[t].<span class="f">start</span>();
+        }
+        <span class="k">for</span> (<span class="t">Thread</span> w : workers) w.<span class="f">join</span>();
+        <span class="t">long</span> drained = requests.<span class="f">getAndSet</span>(<span class="n">0</span>);                    <span class="c">// read and reset in one step</span>
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"requests "</span> + drained + <span class="s">", slowest "</span> + slowest.<span class="f">get</span>() + <span class="s">" ms, after reset "</span> + requests.<span class="f">get</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>requests 40000, slowest 999 ms, after reset 0</pre></div><div class="runout" hidden></div></figure>
+
+<figure class="timeline"><figcaption>A compare-and-set loop under contention</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Thread A (records 50)</span><span>Thread B (records 90)</span><span>slowest in memory</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">slowest is 40</span></div><div class="tl-row"><span class="t">2</span><span class="cell">reads 40; 50 is larger, so it will try to swap</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">reads 40; 90 is larger</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell">compareAndSet(40, 90) succeeds</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">slowest is 90</span></div><div class="tl-row"><span class="t">6</span><span class="cell">compareAndSet(40, 50) fails: the value is no longer 40</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">7</span><span class="cell">re-reads 90; 50 is not larger, so it stops</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">8</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell good">slowest is 90: nothing was lost</span></div><div class="tl-note">With a plain check, then set, thread A would have written 50 over 90</div></div></figure>
+
+<p>Three details in the compare-and-set loop are worth saying out loud in an interview:</p>
+<ul>
+<li><strong>Why a loop.</strong> <code>if (x &gt; max.get()) max.set(x);</code> is a check-then-act: between the check and the set, another thread can store a larger value, and you overwrite it with a smaller one. The CAS only succeeds if nothing changed since you read.</li>
+<li><strong>Who updates <code>expected</code>.</strong> C++'s <code>compare_exchange_weak</code> writes the current value into <code>current</code> when it fails, so the loop body can be empty. Java's <code>compareAndSet</code> only returns false, so you re-read yourself (or use <code>accumulateAndGet(x, Math::max)</code>, which loops for you).</li>
+<li><strong>Weak versus strong.</strong> <code>compare_exchange_weak</code> may fail even when the value matched (a spurious failure, allowed so that CPUs built on load-linked and store-conditional, such as older ARM cores with their load-exclusive and store-exclusive pair, can implement it cheaply). Inside a retry loop that costs nothing, so prefer weak in loops and strong for a single attempt. Java's <code>compareAndSet</code> is strong; <code>weakCompareAndSetVolatile</code> and friends are the weak versions.</li>
+</ul>
+
+<div class="box warning">
+<h3>Two atomic steps are not one atomic step</h3>
+<p>In C++, <code>a = a + 1</code> on a <code>std::atomic&lt;int&gt;</code> compiles: it is an atomic load followed by an atomic store. Two threads can both load 5 and both store 6, exactly the lost update. <code>a += 1</code>, <code>++a</code> and <code>a.fetch_add(1)</code> are single atomic operations. The Java version of the same mistake is <code>a.set(a.get() + 1)</code>. Atomics protect one operation, never a sequence of them.</p>
+</div>
+
+<div class="only only-java"><span class="otag">Java</span>
+<h3>VarHandle, in one paragraph</h3>
+<p>Java 9 added <a class="term" data-term="varhandle" href="glossary.html#varhandle">VarHandle</a>: a handle on an ordinary field or array element that offers every atomic operation and lets you choose the ordering per access: plain, opaque, acquire and release (<code>getAcquire</code>, <code>setRelease</code>), or full volatile (<code>getVolatile</code>, <code>setVolatile</code>), plus <code>compareAndSet</code>, <code>getAndAdd</code> and the rest. It is the supported replacement for <code>sun.misc.Unsafe</code>, and many <code>java.util.concurrent</code> classes use it internally (a few core ones, such as <code>AtomicInteger</code> and <code>ConcurrentHashMap</code>, still use the JDK's internal <code>Unsafe</code>). The <code>AtomicXxx</code> classes expose the same modes since Java 9 (<code>setRelease</code>, <code>getAcquire</code>, <code>getPlain</code>). Application code rarely needs it; reach for it when you want atomic operations on a field of an existing class without an extra <code>AtomicLong</code> object per instance.</p>
+<figure class="code single" data-sample="volatile-and-atomic.8"><figcaption><span class="ctitle">A field with atomic operations through a VarHandle</span><span class="ctabs"><span class="clang">Java</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">import</span> java.lang.invoke.<span class="t">MethodHandles</span>;
+<span class="k">import</span> java.lang.invoke.<span class="t">VarHandle</span>;
+
+<span class="k">class</span> <span class="t">Counter</span> {
+    <span class="k">private</span> <span class="k">volatile</span> <span class="t">long</span> value;
+    <span class="k">private</span> <span class="k">static</span> <span class="k">final</span> <span class="t">VarHandle</span> VALUE;
+
+    <span class="k">static</span> {
+        <span class="k">try</span> {
+            VALUE = <span class="t">MethodHandles</span>.<span class="f">lookup</span>().<span class="f">findVarHandle</span>(<span class="t">Counter</span>.<span class="k">class</span>, <span class="s">"value"</span>, <span class="t">long</span>.<span class="k">class</span>);
+        } <span class="k">catch</span> (<span class="t">ReflectiveOperationException</span> e) {
+            <span class="k">throw</span> <span class="k">new</span> <span class="t">ExceptionInInitializerError</span>(e);
+        }
+    }
+
+    <span class="k">void</span> <span class="f">increment</span>() { VALUE.<span class="f">getAndAdd</span>(<span class="k">this</span>, <span class="n">1L</span>); }                 <span class="c">// atomic, volatile semantics</span>
+    <span class="t">long</span> <span class="f">peek</span>() { <span class="k">return</span> (<span class="t">long</span>) VALUE.<span class="f">getAcquire</span>(<span class="k">this</span>); }           <span class="c">// an acquire read</span>
+    <span class="k">void</span> <span class="f">reset</span>() { VALUE.<span class="f">setRelease</span>(<span class="k">this</span>, <span class="n">0L</span>); }                    <span class="c">// a release write</span>
+    <span class="t">boolean</span> <span class="f">replace</span>(<span class="t">long</span> expected, <span class="t">long</span> next) {
+        <span class="k">return</span> VALUE.<span class="f">compareAndSet</span>(<span class="k">this</span>, expected, next);
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+</div>
+
+<h2 id="what-can-be-atomic">What can be atomic</h2>
+<p>In C++, <code>std::atomic&lt;T&gt;</code> accepts any trivially copyable <code>T</code>: integers, pointers, enums, plain structs of any size. Whether the hardware can update a given <code>T</code> in one instruction depends on its size and the CPU. If it cannot, the library silently uses a hidden lock, and the "atomic" is no longer <a class="term" data-term="lock-free" href="glossary.html#lock-free">lock-free</a>. You can ask: <code>is_always_lock_free</code> is a compile-time constant, and <code>is_lock_free()</code> answers at run time.</p>
+
+<div class="only only-cpp"><span class="otag">C++</span>
+<figure class="code single" data-sample="volatile-and-atomic.9" data-expect="ok"><figcaption><span class="ctitle">Which atomics are lock-free on this machine</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;cstdint&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+
+<span class="k">struct</span> Pair { <span class="t">std</span>::<span class="t">int64_t</span> a, b; };                 <span class="c">// 16 bytes</span>
+<span class="k">struct</span> Big { <span class="t">std</span>::<span class="t">int64_t</span> a, b, c, d; };            <span class="c">// 32 bytes</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="t">std</span>::boolalpha
+              &lt;&lt; <span class="s">"atomic&lt;int&gt;       always lock-free: "</span> &lt;&lt; <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt;::is_always_lock_free &lt;&lt; <span class="s">"\n"</span>
+              &lt;&lt; <span class="s">"atomic&lt;long long&gt; always lock-free: "</span> &lt;&lt; <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt;::is_always_lock_free &lt;&lt; <span class="s">"\n"</span>
+              &lt;&lt; <span class="s">"atomic&lt;Pair&gt;      lock-free here:   "</span> &lt;&lt; <span class="t">std</span>::<span class="t">atomic</span>&lt;Pair&gt;{}.<span class="f">is_lock_free</span>() &lt;&lt; <span class="s">"\n"</span>
+              &lt;&lt; <span class="s">"atomic&lt;Big&gt;       lock-free here:   "</span> &lt;&lt; <span class="t">std</span>::<span class="t">atomic</span>&lt;Big&gt;{}.<span class="f">is_lock_free</span>() &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>On this site's Apple M chips the 16 byte pair is lock-free and the 32 byte struct is not. On x86-64 the 16 byte answer depends on the compiler and its flags, so never assume; check it, or <code>static_assert(std::atomic&lt;T&gt;::is_always_lock_free)</code> when it matters (it does inside signal handlers and in latency-critical code).</p>
+</div>
+<p>Java's answer to "make a whole struct atomic" is different and often cleaner: make the struct an immutable object and swap references with an <code>AtomicReference</code>. A reference fits in one machine word, so <code>compareAndSet</code> on it is lock-free on every mainstream JVM, and readers get a consistent snapshot of every field at once.</p>
+
+<h3>std::atomic_flag and the simplest spinlock</h3>
+<p><a class="term" data-term="atomic-flag" href="glossary.html#atomic-flag">std::atomic_flag</a> is the one atomic type the C++ standard guarantees to be lock-free on every platform. It is a boolean with two operations: <code>test_and_set()</code> (set it and return the old value) and <code>clear()</code>. C++20 adds <code>test()</code>, <code>wait()</code>, <code>notify_one()</code> and <code>notify_all()</code>. Its classic use is a <a class="term" data-term="spinlock" href="glossary.html#spinlock">spinlock</a>; the Java equivalent uses <code>AtomicBoolean.compareAndSet</code>.</p>
+
+<figure class="code pair" data-sample="volatile-and-atomic.4" data-expect="ok"><figcaption><span class="ctitle">A spinlock on one atomic boolean</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+
+<span class="k">class</span> SpinLock {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">lock</span>() {
+        <span class="k">while</span> (held_.<span class="f">test_and_set</span>()) {    <span class="c">// returns the old value: true means someone holds it</span>
+            <span class="c">// spin; C++20 also offers held_.wait(true) to sleep until it changes</span>
+        }
+    }
+
+    <span class="t">void</span> <span class="f">unlock</span>() {
+        held_.<span class="f">clear</span>();                    <span class="c">// publishes everything written inside the lock</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">atomic_flag</span> held_;               <span class="c">// C++20: starts clear (before C++20: = ATOMIC_FLAG_INIT)</span>
+};
+
+SpinLock lock;
+<span class="t">long</span> count = <span class="n">0</span>;                           <span class="c">// guarded by lock</span>
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">auto</span> work = [] {
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">20000</span>; i += <span class="n">1</span>) {
+            <span class="t">std</span>::<span class="t">lock_guard</span>&lt;SpinLock&gt; <span class="f">guard</span>(lock);   <span class="c">// any type with lock() and unlock() works</span>
+            count += <span class="n">1</span>;
+        }
+    };
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">a</span>(work), <span class="f">b</span>(work);
+    a.<span class="f">join</span>();
+    b.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"count = "</span> &lt;&lt; count &lt;&lt; <span class="s">" (expected 40000)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicBoolean</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">final</span> <span class="k">class</span> <span class="t">SpinLock</span> {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicBoolean</span> held = <span class="k">new</span> <span class="t">AtomicBoolean</span>(<span class="k">false</span>);
+
+        <span class="k">void</span> <span class="f">lock</span>() {
+            <span class="k">while</span> (!held.<span class="f">compareAndSet</span>(<span class="k">false</span>, <span class="k">true</span>)) {   <span class="c">// flip false to true, or retry</span>
+                <span class="t">Thread</span>.<span class="f">onSpinWait</span>();                      <span class="c">// tells the CPU we are spinning</span>
+            }
+        }
+
+        <span class="k">void</span> <span class="f">unlock</span>() {
+            held.<span class="f">set</span>(<span class="k">false</span>);                              <span class="c">// a volatile write: publishes our work</span>
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="t">SpinLock</span> lock = <span class="k">new</span> <span class="t">SpinLock</span>();
+    <span class="k">static</span> <span class="t">long</span> count = <span class="n">0</span>;                                <span class="c">// guarded by lock</span>
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">Runnable</span> work = () -&gt; {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">0</span>; i &lt; <span class="n">20_000</span>; i += <span class="n">1</span>) {
+                lock.<span class="f">lock</span>();
+                <span class="k">try</span> {
+                    count += <span class="n">1</span>;
+                } <span class="k">finally</span> {
+                    lock.<span class="f">unlock</span>();
+                }
+            }
+        };
+        <span class="t">Thread</span> a = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"a"</span>), b = <span class="k">new</span> <span class="t">Thread</span>(work, <span class="s">"b"</span>);
+        a.<span class="f">start</span>(); b.<span class="f">start</span>();
+        a.<span class="f">join</span>(); b.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"count = "</span> + count + <span class="s">" (expected 40000)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>count = 40000 (expected 40000)</pre></div><div class="runout" hidden></div></figure>
+<p>The counter itself is a plain variable, and it is safe: the successful <code>test_and_set</code> (or <code>compareAndSet</code>) that takes the lock and the <code>clear</code> (or <code>set(false)</code>) that releases it form happens-before edges, just like a mutex. Spinlocks burn CPU while they wait, so they suit only very short critical sections; <a href="spinlocks.html">spinlocks</a> covers when they beat a mutex.</p>
+
+<h2 id="c-volatile-is-for-hardware-not-threads">C++ volatile is for hardware, not threads</h2>
+<p>In C++ (and C), <code>volatile</code> tells the compiler one thing: <strong>every access to this object is an observable side effect</strong>. It must not remove a volatile read or write, merge two of them, or reorder volatile accesses relative to each other. That is exactly what you need for a memory-mapped device register, where reading has a meaning to the hardware and each read may return something new:</p>
+<figure class="code single" data-sample="volatile-and-atomic.10"><figcaption><span class="ctitle">What volatile is for: a memory-mapped device register</span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="p">#include &lt;cstdint&gt;</span>
+
+<span class="c">// The device's status register lives at a fixed physical address (on a microcontroller).</span>
+<span class="k">volatile</span> <span class="t">std</span>::<span class="t">uint32_t</span>* <span class="k">const</span> kStatus = <span class="k">reinterpret_cast</span>&lt;<span class="k">volatile</span> <span class="t">std</span>::<span class="t">uint32_t</span>*&gt;(<span class="n">0x40001000</span>);
+
+<span class="t">void</span> <span class="f">wait_until_ready</span>() {
+    <span class="k">while</span> ((*kStatus &amp; 0x1u) == <span class="n">0</span>) {
+        <span class="c">// every iteration really reads the register; the compiler may not hoist it</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>What C++ <code>volatile</code> does <em>not</em> do: it does not make any operation atomic, it emits no CPU fences, it does not order volatile accesses against ordinary ones, and it creates no happens-before edge between threads. Two threads accessing a volatile variable without synchronization is still a data race and still undefined behavior. The legitimate uses are memory-mapped I/O, variables shared with a signal handler (<code>volatile std::sig_atomic_t</code>), local variables that must survive a <code>longjmp</code>, and stopping the optimizer from deleting a benchmark loop.</p>
+<p>The confusion has history. Microsoft's compiler, by default on x86 targets, gives volatile acquire and release semantics as an extension (the <code>/volatile:ms</code> option), so code that used volatile flags "worked" on Windows for years, and can break when compiled for ARM, where the default is the standard behavior (<code>/volatile:iso</code>). Systems interviews still ask "what does volatile mean in C?"; an Nvidia system software round in our research lists <code>volatile</code> among its C topics. The answer is hardware registers, not threads.</p>
+
+<h2 id="choosing-the-tool">Choosing the tool</h2>
+<table>
+<thead><tr><th>Situation</th><th>Java</th><th>C++</th></tr></thead>
+<tbody>
+<tr><td>A flag or a value written independently of its old value</td><td><code>volatile</code></td><td><code>std::atomic</code> with <code>load</code> and <code>store</code></td></tr>
+<tr><td>A counter or a single variable updated from its old value</td><td><code>AtomicLong</code>, or <code>LongAdder</code> under heavy contention</td><td><code>std::atomic</code> with <code>fetch_add</code>, or a compare-exchange loop</td></tr>
+<tr><td>Several variables that must change together</td><td>A lock, or one immutable object in an <code>AtomicReference</code></td><td>A <code>std::mutex</code>, or a small struct in <code>std::atomic</code> if it is lock-free</td></tr>
+<tr><td>A memory-mapped hardware register</td><td>not applicable</td><td><code>volatile</code></td></tr>
+</tbody>
+</table>
+
+<div class="box example">
+<h3>Worked example: metrics for a request handler</h3>
+<p>A handler running on 32 threads must track four things. Pick the right tool for each.</p>
+<ol>
+<li><strong>Total requests.</strong> One variable, updated from its old value by every thread: <code>LongAdder</code> in Java (it spreads contention across cells), <code>fetch_add</code> on a <code>std::atomic&lt;long&gt;</code> in C++, or per-thread counters summed on read when contention becomes visible in profiles.</li>
+<li><strong>Slowest request so far.</strong> One variable, but the update depends on a comparison: a compare-and-set loop, or <code>accumulateAndGet(latency, Math::max)</code> in Java.</li>
+<li><strong>The last error message.</strong> A reference written independently of its old value: a <code>volatile String lastError</code> in Java; in C++ a <code>std::string</code> cannot be atomic, so guard it with a mutex (or store an <code>std::atomic&lt;std::shared_ptr&lt;const std::string&gt;&gt;</code> where your library supports it).</li>
+<li><strong>Min and max latency, always consistent with each other.</strong> Two atomics would let a reader see a new min with an old max. Keep them in one immutable pair behind an <code>AtomicReference</code> with a CAS loop, or under one mutex.</li>
+</ol>
+<p>The pattern behind the answers: <strong>one variable and one operation, use an atomic; more than one variable or more than one step, use a lock or one atomic reference to an immutable object</strong>.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong><code>volatile</code> for a counter.</strong> Visibility is not atomicity. Use an atomic increment.</li>
+<li><strong><code>volatile</code> for threads in C++.</strong> It is not synchronization; a race on it is undefined behavior. Use <code>std::atomic</code>.</li>
+<li><strong><code>a = a + 1</code> on a <code>std::atomic</code>, or <code>a.set(a.get() + 1)</code> in Java.</strong> Two atomic operations, one lost update. Use <code>fetch_add</code> or <code>incrementAndGet</code>.</li>
+<li><strong>Check, then set with atomics.</strong> <code>if (max.get() &lt; x) max.set(x)</code> can overwrite a larger value. Use a CAS loop.</li>
+<li><strong>A volatile array in Java.</strong> <code>volatile int[] slots</code> makes the reference volatile, not the elements. Use <code>AtomicIntegerArray</code>, <code>AtomicLongArray</code> or <code>AtomicReferenceArray</code>.</li>
+<li><strong>A non-final atomic field.</strong> <code>AtomicLong hits = new AtomicLong()</code> that some code later reassigns makes threads update different counters. Declare atomic fields <code>final</code>.</li>
+<li><strong>Several atomics for one invariant.</strong> Each is consistent on its own; together they are not. One lock, or one atomic reference to an immutable value.</li>
+<li><strong><code>compare_exchange_weak</code> outside a loop.</strong> It may fail spuriously. Use <code>compare_exchange_strong</code> for a single attempt.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>Expect this at three depths. The basic one is "does volatile make this counter safe?" The middle one is "how does <code>AtomicInteger.incrementAndGet</code> work?" (a Databricks-tagged commenter on Blind says compare-and-swap questions are now common there, and a Rubrik onsite went from primitives to how CAS works to a CAS-based stack). The deep one is hardware: a 2025 Microsoft senior loop asked how Java <code>volatile</code> behaves on a single core versus multiple cores, down to caches and registers, and a 2026 Nvidia system software round listed <code>volatile</code> among its C questions.</p>
+<blockquote>Volatile in Java gives visibility and ordering: every read sees the latest write, and the write acts as a release and the read as an acquire, so I can use it for flags or to publish an immutable object. It does not make compound actions atomic, so for a counter I use an atomic, which does the read-modify-write as one hardware instruction or a compare-and-swap loop. In C++, volatile is only for memory-mapped hardware; for threads I use <code>std::atomic</code>, which defaults to sequentially consistent ordering.</blockquote>
+<p>Follow ups to expect:</p>
+<ul>
+<li>"<code>volatile</code> versus <code>synchronized</code>?" <code>synchronized</code> gives mutual exclusion and visibility (an unlock happens-before the next lock of the same monitor). <code>volatile</code> gives visibility and ordering for one field, never blocks, and makes no compound action atomic.</li>
+<li>"How is <code>incrementAndGet</code> implemented?" A single atomic add instruction where the CPU has one (x86 <code>lock xadd</code>, ARM <code>ldadd</code>), or a CAS retry loop.</li>
+<li>"What is the ABA problem?" CAS compares values, not history: if the value goes from A to B and back to A, a stale CAS still succeeds. It is harmless for a counter or a maximum and dangerous for pointers in a lock-free stack; see <a href="lock-free-stack-and-aba.html">the lock-free stack and ABA</a>.</li>
+<li>"What does volatile compile to?" On x86, a volatile read is a plain load and a volatile write is followed by a locked instruction that acts as a full fence. On ARM, load-acquire and store-release instructions.</li>
+<li>"Does volatile matter on a single core?" Yes: the compiler's hoisting and reordering do not depend on core count.</li>
+<li>"Is a non-volatile <code>long</code> safe to share?" Not by the specification: a 64 bit write may tear. Make it volatile or use <code>AtomicLong</code>.</li>
+<li>"What is <code>is_lock_free</code> for?" Knowing whether a <code>std::atomic&lt;T&gt;</code> hides a lock, which matters for signal handlers and latency.</li>
+</ul>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>What the instructions look like.</strong> On x86, every read-modify-write is a <code>lock</code>-prefixed instruction (<code>lock xadd</code>, <code>lock cmpxchg</code>), and <code>xchg</code> is implicitly locked. HotSpot implements a volatile store as an ordinary store followed by a locked add to the stack, which serves as a full fence; C++ compilers typically use <code>xchg</code> for a seq_cst store. Loads need nothing special on x86. On ARMv8.1 and later (including Apple M chips), clang compiles <code>fetch_add</code> to <code>ldaddal</code>, <code>compare_exchange</code> to <code>casal</code> and <code>exchange</code> to <code>swpal</code>; seq_cst loads and stores become <code>ldar</code> and <code>stlr</code>. Older ARM cores use load-exclusive and store-exclusive retry loops, which is where spurious CAS failure comes from.</p>
+<p><strong>Contention is the real cost.</strong> An uncontended atomic increment costs roughly a few nanoseconds; the same increment on a cache line that 32 cores are fighting over costs a cross-core transfer every time, an order of magnitude or two more. That is why <code>LongAdder</code> exists and why <a href="counters-at-scale.html">counters at scale</a> stripes counters across cells.</p>
+<p><strong>C++20 additions.</strong> <code>std::atomic&lt;T&gt;::wait(old)</code> and <code>notify_one()</code> let a thread sleep until an atomic changes, without a mutex or condition variable (on Linux they are typically built on a futex). <code>std::atomic_ref&lt;T&gt;</code> performs atomic operations on an ordinary object you already have, such as an element of an existing array, for a phase of the program in which every access goes through <code>atomic_ref</code>.</p>
+<p><strong>Field updaters.</strong> Before VarHandle, Java code that wanted atomic operations on millions of small objects without an <code>AtomicLong</code> per object used <code>AtomicLongFieldUpdater</code> and its siblings on a <code>volatile</code> field. You will still see them in older libraries.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>Java volatile gives visibility, ordering, one global order of volatile accesses, and untorn <code>long</code> and <code>double</code>. It never makes <code>count += 1</code> atomic.</li>
+<li>Atomics make single operations indivisible: add, exchange, compare-and-set. Two atomic operations in a row are not atomic together.</li>
+<li>Compare-and-set loops implement any single-variable update; use weak CAS inside loops in C++.</li>
+<li>Several variables that must stay consistent need a lock, or one atomic reference to an immutable object.</li>
+<li>C++ volatile is for memory-mapped hardware and signal handlers, not threads. For threads, use <code>std::atomic</code>.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="volatile-and-atomic"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="volatile-and-atomic.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Two threads each run <code>count += 1</code> 100,000 times on a counter declared <code>volatile int</code> (Java or C++). What is true?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The result is always 200,000, because volatile forces every access to memory</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Updates can be lost, because each increment is still a separate read and write; in C++ it is also a data race</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The code does not compile in either language</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Volatile (in Java) makes each read and write visible but does not make the read-add-write sequence indivisible, so two threads can read the same value. In C++ volatile is not synchronization at all, so the unsynchronized accesses are a data race. It does compile in both: C++20 deprecates <code>+=</code> on a volatile, but deprecated is not removed. Use <code>incrementAndGet</code> or <code>fetch_add</code>.</div></div><div class="mcq" data-id="volatile-and-atomic.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A shared counter is an <code>AtomicInteger</code> (Java) or <code>std::atomic&lt;int&gt;</code> (C++), and two threads each run <code>a.set(a.get() + 1)</code> (Java) or <code>a.store(a.load() + 1)</code> (C++) many times. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The count is always exact, because every operation is atomic</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Updates can be lost: the load and the store are each atomic, but another thread can act between them</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It throws, because atomics cannot be read and written in one expression</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It is a data race and undefined behavior in C++</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Atomicity covers one operation at a time. Between the atomic read and the atomic write, another thread can do its own read, so one increment overwrites the other. There is no data race (all accesses are atomic), only a race condition. <code>incrementAndGet()</code> or <code>fetch_add(1)</code> is one operation.</div></div><div class="mcq" data-id="volatile-and-atomic.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A compare-and-set (<code>compareAndSet</code> or <code>compare_exchange_weak</code>) in an update loop returns false. What should the code do?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Throw an exception, because another thread corrupted the value</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Get the current value (Java: re-read it; C++: it is now in <code>expected</code>) and try again</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Fall back to a plain write of the new value</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Sleep for a millisecond so the other thread can finish, then write</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A failed CAS means the value changed since you read it (or, for a weak CAS, that it failed spuriously), which is normal under contention. Recompute from the fresh value and retry. A plain write would throw away the other thread's update, and a sleep adds latency without guaranteeing anything.</div></div><div class="mcq" data-id="volatile-and-atomic.q4" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">Which of these are correct uses of a Java volatile field or a C++ atomic with plain loads and stores, with no lock? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">A <code>stopRequested</code> flag set by one thread and polled by a worker</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Publishing a newly built immutable configuration object by assigning its reference</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">A hit counter that many threads update with <code>hits = hits + 1</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Lazy initialization with <code>if (!initialized) { init(); initialized = true; }</code> called by many threads</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Loads and stores are right when each write does not depend on the old value: a flag, or a reference to an object that never changes after publication. The counter and the lazy initialization are read-then-write sequences, so two threads can interleave inside them; they need an atomic read-modify-write, a CAS, or a lock.</div></div><div class="mcq" data-id="volatile-and-atomic.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A running maximum is updated with <code>if (x &gt; max.get()) max.set(x);</code> where <code>max</code> is atomic. What can go wrong?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing; both calls are atomic</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A larger value stored by another thread between the check and the set can be overwritten by a smaller one</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The maximum can only go down</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks under contention</span></button></li></ol><div class="why" hidden><strong>Why.</strong> It is a check-then-act on shared state. Thread A checks 50 &gt; 40 and pauses; thread B stores 90; thread A stores 50, and 90 is lost. A compare-and-set loop (or <code>accumulateAndGet(x, Math::max)</code>) only stores if the value is still the one you compared against.</div></div><div class="mcq" data-id="volatile-and-atomic.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>minLatency</code> and <code>maxLatency</code> are two separate atomic variables, each updated correctly with CAS loops. A reporting thread computes <code>maxLatency - minLatency</code>. What can it see?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Always a consistent range, because both variables are atomic</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">A min from one update and a max from another, so even a nonsensical range is possible</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Always zero</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">An exception, because two atomics cannot be read together</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each atomic is consistent on its own, but the reader's two loads are separate, and updates can land between them. An invariant that spans two variables needs a lock, or one immutable pair published through a single atomic reference.</div></div><div class="mcq" data-id="volatile-and-atomic.q7" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>A field is declared <code>volatile int[] slots = new int[8];</code>. One thread runs <code>slots[3] = 7;</code> and another thread later reads <code>slots[3]</code>. What does <code>volatile</code> guarantee here?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The element write is visible, because the array is volatile</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Only reads and writes of the array reference are volatile; the element accesses are plain, so the write may not be seen</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Nothing, because arrays cannot be volatile</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The element write is atomic and ordered, but not visible</span></button></li></ol><div class="why" hidden><strong>Why.</strong> <code>volatile</code> applies to the field, which holds a reference. <code>slots[3] = 7</code> reads the volatile reference and then does a plain element write. For per-element volatile semantics use <code>AtomicIntegerArray</code> (or a <code>VarHandle</code> for arrays).</div></div><div class="mcq" data-id="volatile-and-atomic.q8" data-a="2" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>What is C++ <code>volatile</code> actually for?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Sharing flags between threads, because it stops the compiler from caching the value</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Making reads and writes atomic on all platforms</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Memory-mapped hardware registers and similar cases where each access is a side effect the compiler must not remove or merge</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Making a variable visible across processes</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Volatile accesses must be performed as written, which is what device registers need. It gives no atomicity, no fences and no happens-before between threads, so a race on a volatile variable is still undefined behavior. Use <code>std::atomic</code> for threads.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="volatile-and-atomic.c1" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">An interviewer asks: "What exactly does volatile do in Java, what is the C++ equivalent, and what do they compile to? Does any of it matter on a single-core machine?" Answer as you would out loud.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>In Java, a volatile field gives three things. Visibility: a write happens-before every later read, so the compiler cannot keep the value in a register and readers always see the latest write. Ordering: writes before a volatile write cannot move after it, and reads after a volatile read cannot move before it, so a volatile flag can safely publish data written before it. And a single global order over all volatile accesses, which makes them behave like sequentially consistent atomics; it also makes volatile <code>long</code> and <code>double</code> reads and writes untorn. It does not make compound actions like <code>count++</code> atomic.</p>
+<p>The C++ equivalent is <code>std::atomic</code> with its default <code>memory_order_seq_cst</code>; C++ <code>volatile</code> is not equivalent at all, it only stops the compiler from removing or merging accesses, for hardware registers. On x86 a volatile or seq_cst load is an ordinary load, and the store is either an <code>xchg</code> or a store followed by a locked instruction that acts as a full fence, which waits for the store buffer to drain. On ARM they become load-acquire and store-release instructions, <code>ldar</code> and <code>stlr</code>. On a single core it still matters: the biggest effect is the compiler, which would otherwise hoist or reorder the accesses, and the compiler does not care how many cores there are. The hardware part, store buffers and fences, matters more on multiple cores, but you design against the language model either way.</p></div></div><div class="cq" data-q="volatile-and-atomic.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a lock-free <code>recordLatency(long ms)</code> that keeps the maximum latency ever seen, and a <code>reset()</code> that returns the current maximum and sets it back to 0 in one step. Say why <code>if (ms &gt; max) max = ms</code> is wrong.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="volatile-and-atomic.5"><figcaption><span class="ctitle">Running maximum with reset</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18</span><code><span class="p">#include &lt;atomic&gt;</span>
+
+<span class="k">class</span> MaxTracker {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">record_latency</span>(<span class="t">long</span> ms) {
+        <span class="t">long</span> current = max_.<span class="f">load</span>();
+        <span class="k">while</span> (ms &gt; current &amp;&amp; !max_.<span class="f">compare_exchange_weak</span>(current, ms)) {
+            <span class="c">// on failure current holds the fresh value; the condition is re-checked</span>
+        }
+    }
+
+    <span class="t">long</span> <span class="f">reset</span>() {
+        <span class="k">return</span> max_.<span class="f">exchange</span>(<span class="n">0</span>);          <span class="c">// read and clear in one atomic step</span>
+    }
+
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; max_{<span class="n">0</span>};
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="k">class</span> <span class="t">MaxTracker</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicLong</span> max = <span class="k">new</span> <span class="t">AtomicLong</span>();
+
+    <span class="k">void</span> <span class="f">recordLatency</span>(<span class="t">long</span> ms) {
+        <span class="t">long</span> current = max.<span class="f">get</span>();
+        <span class="k">while</span> (ms &gt; current &amp;&amp; !max.<span class="f">compareAndSet</span>(current, ms)) {
+            current = max.<span class="f">get</span>();          <span class="c">// someone changed it: re-read and re-check</span>
+        }
+        <span class="c">// equivalent one-liner: max.accumulateAndGet(ms, Math::max);</span>
+    }
+
+    <span class="t">long</span> <span class="f">reset</span>() {
+        <span class="k">return</span> max.<span class="f">getAndSet</span>(<span class="n">0</span>);          <span class="c">// read and clear in one atomic step</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>if (ms &gt; max) max = ms</code> is a check-then-act: between the comparison and the write, another thread can store a bigger value, which this thread then overwrites with a smaller one. With plain variables it is also a data race. The CAS loop only writes if the value is still the one it compared against; otherwise it re-reads and stops as soon as the stored maximum is already at least <code>ms</code>. <code>reset</code> must be one <code>getAndSet</code> or <code>exchange</code>: a separate read and write could lose a latency recorded in between.</p></div></div><div class="cq" data-q="volatile-and-atomic.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">This tracker keeps the smallest and largest latency, each in its own atomic, updated with correct CAS loops. A dashboard sometimes shows a negative range. Explain why and fix it so readers always see a consistent pair.
+<figure class="code pair" data-sample="volatile-and-atomic.6"><figcaption><span class="ctitle">Two atomics, one invariant</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;limits&gt;</span>
+
+<span class="k">struct</span> Range {
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; min{<span class="t">std</span>::numeric_limits&lt;<span class="t">long</span>&gt;::<span class="f">max</span>()};
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">long</span>&gt; max{<span class="t">std</span>::numeric_limits&lt;<span class="t">long</span>&gt;::<span class="f">min</span>()};
+
+    <span class="t">long</span> <span class="f">width</span>() <span class="k">const</span> {
+        <span class="k">return</span> max.<span class="f">load</span>() - min.<span class="f">load</span>();   <span class="c">// two separate reads</span>
+    }
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicLong</span>;
+
+<span class="k">class</span> <span class="t">Range</span> {
+    <span class="k">final</span> <span class="t">AtomicLong</span> min = <span class="k">new</span> <span class="t">AtomicLong</span>(<span class="t">Long</span>.MAX_VALUE);
+    <span class="k">final</span> <span class="t">AtomicLong</span> max = <span class="k">new</span> <span class="t">AtomicLong</span>(<span class="t">Long</span>.MIN_VALUE);
+
+    <span class="t">long</span> <span class="f">width</span>() {
+        <span class="k">return</span> max.<span class="f">get</span>() - min.<span class="f">get</span>();     <span class="c">// two separate reads</span>
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Each atomic is consistent on its own, but the invariant "min and max describe the same set of samples" spans two variables, and <code>width()</code> reads them at different moments. At startup both hold sentinels: if the first sample has already reached <code>max</code> but not yet <code>min</code>, the reader computes something like <code>50 - Long.MAX_VALUE</code>, a huge negative number (the other order overflows into a huge positive one). Later it can combine a min and a max that never described the same set of samples at any single moment. The fix is to make the pair one value: an immutable snapshot swapped with a single CAS, so a reader always sees a pair that existed at one moment.</p>
+<figure class="code pair" data-sample="volatile-and-atomic.7"><figcaption><span class="ctitle">One atomic snapshot of the pair</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25</span><code><span class="p">#include &lt;algorithm&gt;</span>
+<span class="p">#include &lt;atomic&gt;</span>
+
+<span class="k">class</span> Range {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">record</span>(<span class="t">long</span> ms) {
+        Snapshot cur = state_.<span class="f">load</span>();
+        <span class="k">while</span> (<span class="k">true</span>) {
+            Snapshot next = cur.count == <span class="n">0</span> ? Snapshot{ms, ms, <span class="n">1</span>}
+                : Snapshot{<span class="t">std</span>::<span class="f">min</span>(cur.min, ms), <span class="t">std</span>::<span class="f">max</span>(cur.max, ms), cur.count + <span class="n">1</span>};
+            <span class="k">if</span> (state_.<span class="f">compare_exchange_weak</span>(cur, next)) {
+                <span class="k">return</span>;                     <span class="c">// on failure cur is refreshed; recompute and retry</span>
+            }
+        }
+    }
+
+    <span class="t">long</span> <span class="f">width</span>() <span class="k">const</span> {
+        Snapshot s = state_.<span class="f">load</span>();         <span class="c">// one load: a consistent snapshot</span>
+        <span class="k">return</span> s.count == <span class="n">0</span> ? <span class="n">0</span> : s.max - s.min;
+    }
+
+<span class="k">private</span>:
+    <span class="k">struct</span> Snapshot { <span class="t">long</span> min; <span class="t">long</span> max; <span class="t">long</span> count; };   <span class="c">// 24 bytes: may use a hidden lock</span>
+    <span class="t">std</span>::<span class="t">atomic</span>&lt;Snapshot&gt; state_{Snapshot{<span class="n">0</span>, <span class="n">0</span>, <span class="n">0</span>}};
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23</span><code><span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicReference</span>;
+
+<span class="k">class</span> <span class="t">Range</span> {
+    <span class="k">record</span> <span class="t">Snapshot</span>(<span class="t">long</span> min, <span class="t">long</span> max) { }
+
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicReference</span>&lt;<span class="t">Snapshot</span>&gt; state = <span class="k">new</span> <span class="t">AtomicReference</span>&lt;&gt;(<span class="k">null</span>);
+
+    <span class="k">void</span> <span class="k">record</span>(<span class="t">long</span> ms) {
+        <span class="k">while</span> (<span class="k">true</span>) {
+            <span class="t">Snapshot</span> cur = state.<span class="f">get</span>();
+            <span class="t">Snapshot</span> next = (cur == <span class="k">null</span>) ? <span class="k">new</span> <span class="t">Snapshot</span>(ms, ms)
+                    : <span class="k">new</span> <span class="t">Snapshot</span>(<span class="t">Math</span>.<span class="f">min</span>(cur.<span class="f">min</span>(), ms), <span class="t">Math</span>.<span class="f">max</span>(cur.<span class="f">max</span>(), ms));
+            <span class="k">if</span> (next.<span class="f">equals</span>(cur) || state.<span class="f">compareAndSet</span>(cur, next)) {
+                <span class="k">return</span>;
+            }
+        }
+    }
+
+    <span class="t">long</span> <span class="f">width</span>() {
+        <span class="t">Snapshot</span> s = state.<span class="f">get</span>();           <span class="c">// one read: a consistent pair</span>
+        <span class="k">return</span> s == <span class="k">null</span> ? <span class="n">0</span> : s.<span class="f">max</span>() - s.<span class="f">min</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>In Java the record is immutable and the <code>AtomicReference</code> swap is always lock-free. In C++, <code>std::atomic&lt;Snapshot&gt;</code> works for any trivially copyable struct, but a 24 byte struct is usually not lock-free, so the library uses a hidden lock; that is still correct, and a plain <code>std::mutex</code> around two longs would be just as good and more obvious. What matters is that writers update, and readers read, the pair as one unit.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="volatile-and-atomic.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"How does <code>incrementAndGet</code> on an <code>AtomicInteger</code>, or <code>fetch_add</code> on a <code>std::atomic&lt;int&gt;</code>, actually work, down to the CPU? And what happens when 32 threads hit the same one?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>It is one atomic read-modify-write: no other core can act between the read and the write</li><li>On x86 it is a single <code>lock xadd</code>: the core owns the cache line for the whole instruction, which also acts as a full fence</li><li>On ARM it is <code>ldadd</code> on ARMv8.1 and later, or a load-exclusive and store-exclusive retry loop on older cores</li><li>The general form is a compare-and-set loop: read, compute, swap only if unchanged, retry if another thread won</li><li>Under contention the cache line bounces between cores, so each increment costs a cross-core transfer, an order of magnitude or two slower</li><li>For a hot counter: <code>LongAdder</code> in Java, sharded or per thread counters in C++, summed on read</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">It is a single atomic read-modify-write, which means no other core can get between the read and the write. On x86 the JIT or the C++ compiler emits one instruction, <code>lock xadd</code>. The lock prefix makes the core hold the cache line exclusively for the whole instruction, and it also acts as a full fence, which is why it gives volatile or sequentially consistent ordering for free. On ARMv8.1 and later, including Apple's chips, it is one <code>ldadd</code> instruction; older ARM cores use a load-exclusive and store-exclusive pair in a retry loop. Conceptually all of these are a compare-and-set loop: read the value, compute the new one, swap only if nobody changed it, otherwise retry. That loop is also how <code>updateAndGet</code> handles any function. Under contention it gets expensive. With 32 threads on one counter, the cache line ping-pongs between cores, and each increment waits for a cross-core transfer, an order of magnitude or two slower than the uncontended few nanoseconds. It stays correct, but throughput collapses. So for a hot counter I would use <code>LongAdder</code> in Java, or sharded per thread counters in C++, and sum them on read.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">What is the ABA problem, and when does a compare-and-set loop suffer from it?</span></p></div></div><div class="sq" data-sq="volatile-and-atomic.s2" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"Here is a symptom: a C++ service hands work between threads with a <code>volatile bool ready</code> flag. The producer fills a buffer, then sets <code>ready</code>. It ran fine on x86 for years. On new ARM servers, consumers occasionally read garbage from the buffer. What is going on, and how do you fix it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>C++ <code>volatile</code> is not synchronization: no atomicity, no fences, no happens-before, so the program has a data race and undefined behavior</li><li>It only stops the compiler removing or merging the flag accesses; the plain buffer writes may still move past the flag store</li><li>x86 hid the bug: it keeps stores in order and loads in order, and Microsoft's compiler even gives <code>volatile</code> acquire and release meaning there by default</li><li>ARM reorders more: the flag can become visible before the buffer, or the consumer can read the buffer early</li><li>Fix: <code>std::atomic&lt;bool&gt;</code>, a release store after filling and an acquire load before reading (or the seq_cst default)</li><li>Confirm with ThreadSanitizer, which flags the old code even on x86</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The flag was never correct; x86 was hiding the bug. In C++, <code>volatile</code> is not a threading tool. It stops the compiler from removing or merging accesses to the flag itself, but it emits no fences and creates no happens-before edge, so the program has a data race, which is undefined behavior. Worse, the buffer writes are ordinary writes, so even the compiler may move them after the flag store. On x86 it mostly worked because the hardware keeps stores in order and loads in order, and Microsoft's compiler even gives <code>volatile</code> acquire and release meaning on x86 by default. ARM has a weaker memory model. The flag can become visible to another core before the buffer writes, or the consumer can read the buffer before it reads the flag. That is the garbage. The fix is to make the flag a <code>std::atomic&lt;bool&gt;</code>, store it with release after filling the buffer, and load it with acquire before reading, or keep the default sequentially consistent ordering. The release and acquire pair is a happens-before edge, so the buffer is covered on every platform. I would also run the tests under ThreadSanitizer, which flags the old code even on x86.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">So what is <code>volatile</code> actually for in C++?</span></p></div></div><div class="sq" data-sq="volatile-and-atomic.s3" data-seconds="80"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 80 s</span></div><div class="qtext">"A junior engineer asks you for a rule of thumb: when is a <code>volatile</code> field enough, when do you need an atomic, and when do you need a lock? What do you tell them?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Ask what the write depends on: if each write is independent of the old value (a flag, a latest reading, a reference to a new immutable object), <code>volatile</code> in Java or an atomic load and store in C++ is enough</li><li>If the new value depends on the old one (a counter, a running maximum), use one atomic read-modify-write or a compare-and-set loop</li><li>If the rule spans several variables (a min and a max that must agree), use a lock, or one atomic reference to an immutable object</li><li>Never <code>volatile</code> for <code>count++</code>: visibility is not atomicity; and in C++ never <code>volatile</code> for threads at all</li><li>A useful hybrid: volatile reads with writes inside a lock, for read-heavy state with compound updates</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would tell them to ask what the write depends on. If every write is independent of the current value, like a stop flag, the latest temperature reading, or a reference to a freshly built immutable config, a <code>volatile</code> field in Java is enough, and in C++ a <code>std::atomic</code> with plain loads and stores. If the new value depends on the old one, like a counter or a running maximum, visibility is not enough, because two threads can read the same value. Then they need one atomic read-modify-write, <code>incrementAndGet</code> or <code>fetch_add</code>, or a compare-and-set loop. And if the rule spans two or more variables, like a min and a max that must agree, no single atomic helps, because a reader can combine values from different moments. Then use a lock, or put the fields in one immutable object and swap it through an <code>AtomicReference</code>. One hybrid is worth knowing: volatile reads with writes inside a lock, for read-heavy state. And in C++ the answer is never <code>volatile</code>; that is for hardware registers.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Under heavy writes, what does the <code>AtomicReference</code> approach cost compared with a lock?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-fix-the-lost-update.html" data-problem="fix-the-lost-update"><span class="pk">Bug hunts · warm-up</span><b>Fix the metrics that undercount</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-visibility-bug.html" data-problem="fix-the-visibility-bug"><span class="pk">Bug hunts · medium</span><b>Fix the visibility bug</b><span class="pst"></span></a><a class="pcard" href="p-lock-free-stack.html" data-problem="lock-free-stack"><span class="pk">Build a primitive · senior</span><b>A lock-free stack</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="happens-before.html"><span>Previous</span><b>Happens-before and synchronizes-with</b></a><a class="next" href="memory-orders.html"><span>Next</span><b>C++ memory orders: seq_cst, acquire, release and relaxed</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#java-volatile-what-it-guarantees">Java volatile: what it guarantees</a><a href="#volatile-does-not-make-count-1-atomic">volatile does not make count += 1 atomic</a><a href="#when-volatile-is-the-right-tool-in-java">When volatile is the right tool in Java</a><a href="#the-atomic-toolkit">The atomic toolkit</a><a href="#what-can-be-atomic">What can be atomic</a><a href="#c-volatile-is-for-hardware-not-threads">C++ volatile is for hardware, not threads</a><a href="#choosing-the-tool">Choosing the tool</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

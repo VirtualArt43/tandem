@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Mutexes and RAII guards · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="mutex-basics" data-title="Mutexes and RAII guards" data-track="core" data-module="core-4" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details open><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics" class=here><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out"><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m4">Module 04: Locks</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 04.1</span><span>19 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Mutexes and RAII guards</h1><p class="lsum">What a lock really guarantees, synchronized and ReentrantLock in Java, std::mutex with lock_guard, unique_lock and scoped_lock in C++.</p><div class="asked"><span>Asked at</span><span class="co">Rubrik</span><span class="co">Microsoft</span></div><div class="prereq"><span>Before this:</span><a href="invariants-and-critical-sections.html">Invariants, critical sections and finding shared state</a></div></header><article class="prose" id="article">
+<p class="lead">The mutex is the tool you will use more than any other. Learn exactly what it guarantees (mutual exclusion and visibility at its boundaries), exactly how to hold it so it is always released, and the handful of lock types you will write in every round.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A petrol station has one washroom and one key on a big wooden block. Whoever holds the key goes in; everyone else waits outside the door. That is mutual exclusion. The key must come back even if you trip on the way out, which is why it is chained to a block nobody can walk off with: in code, that block is RAII.</p>
+<p>There is a second, quieter guarantee. Whatever the last person left inside is exactly what the next person finds. <strong>Handing over the key hands over the state of the room.</strong> For threads, that is visibility: everything written before the unlock is seen after the next lock.</p>
+</div>
+
+<h2 id="what-a-lock-guarantees-and-what-it-does-not">What a lock guarantees, and what it does not</h2>
+<p>A <a class="term" data-term="mutex" href="glossary.html#mutex">mutex</a> gives you two guarantees:</p>
+<ol>
+<li><strong>Mutual exclusion.</strong> At most one thread at a time holds it, so at most one thread at a time runs any of the code guarded by it.</li>
+<li><strong>Visibility and ordering at the boundaries.</strong> An unlock happens-before every later lock of the same mutex. Everything a thread wrote before releasing the lock is visible to the next thread that acquires it, in order.</li>
+</ol>
+<p>And it promises nothing else. It does not decide <em>which</em> waiting thread goes next (most locks are not fair by default). It does not protect data that some code reads or writes without taking it. And it does not know which data it guards: that is purely a convention you keep, which is why <a href="invariants-and-critical-sections.html">writing down what guards what</a> matters.</p>
+
+<figure class="timeline"><figcaption>Exclusion and visibility at the lock boundaries</figcaption><div class="tl c3"><div class="tl-head"><span class="t">step</span><span>Thread A</span><span>Thread B</span><span>The lock</span></div><div class="tl-row"><span class="t">1</span><span class="cell">locks</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">held by A</span></div><div class="tl-row"><span class="t">3</span><span class="cell empty"></span><span class="cell">tries to lock: blocks</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell">writes x = 1, y = 2</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">5</span><span class="cell">unlocks</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-note">Everything A wrote before unlocking happens-before B&#x27;s lock returns</div><div class="tl-row"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">held by B</span></div><div class="tl-row good"><span class="t">7</span><span class="cell empty"></span><span class="cell good">reads x and y: sees 1 and 2, guaranteed</span><span class="cell empty"></span></div></div></figure>
+
+<p>Step through the difference a lock makes on the lost update from the previous module:</p>
+<div class="widget" data-widget="race-stepper" data-opts="{}"><div class="wload">Loading the race stepper simulator</div></div>
+
+<h2 id="java-synchronized-and-intrinsic-locks">Java: synchronized and intrinsic locks</h2>
+<p>Every Java object carries an <a class="term" data-term="intrinsic-lock" href="glossary.html#intrinsic-lock">intrinsic lock</a>, also called its monitor lock. <code>synchronized</code> takes it:</p>
+<ul>
+<li>A <code>synchronized</code> instance method locks <code>this</code>.</li>
+<li>A <code>static synchronized</code> method locks the <code>Class</code> object, a different lock from any instance's.</li>
+<li>A <code>synchronized (obj) { ... }</code> block locks whatever object you name: prefer a <a class="term" data-term="private-lock" href="glossary.html#private-lock">private lock object</a> that no outside code can reach.</li>
+</ul>
+<p>Intrinsic locks are reentrant (the holder can take them again, see <a href="reentrancy.html">reentrancy</a>) and are released however the block exits, return or exception. They also carry the <code>wait</code> and <code>notify</code> methods of the same object, which you will use in <a href="condition-variables.html">condition variables</a>.</p>
+
+<h2 id="c-std-mutex-and-a-guard">C++: std::mutex and a guard</h2>
+<p><code>std::mutex</code> has <code>lock()</code>, <code>unlock()</code> and <code>try_lock()</code>, but you almost never call them yourself. You create a guard object whose constructor locks and whose destructor unlocks, so the mutex is released on every path: that is <a class="term" data-term="raii" href="glossary.html#raii">RAII</a>. The everyday guard is <a class="term" data-term="lock-guard" href="glossary.html#lock-guard">std::lock_guard</a>. A <code>std::mutex</code> cannot be copied or moved, so a class containing one is not copyable by default, and it must be declared <code>mutable</code> if <code>const</code> member functions need to lock it.</p>
+
+<figure class="code pair" data-sample="mutex-basics.1"><figcaption><span class="ctitle">The everyday forms</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16</span><code><span class="k">class</span> Counter {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">increment</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);  <span class="c">// locked here...</span>
+        count_ += <span class="n">1</span>;
+    }                                           <span class="c">// ...unlocked here, on every path out</span>
+
+    <span class="t">long</span> <span class="f">get</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);  <span class="c">// reads take the lock too</span>
+        <span class="k">return</span> count_;
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;                      <span class="c">// mutable, so the const get() can lock it</span>
+    <span class="t">long</span> count_ = <span class="n">0</span>;                            <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24</span><code><span class="k">class</span> <span class="t">Counter</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();   <span class="c">// private: no outside code can lock it</span>
+    <span class="k">private</span> <span class="t">long</span> count;                         <span class="c">// guarded by lock</span>
+
+    <span class="k">void</span> <span class="f">increment</span>() {
+        <span class="k">synchronized</span> (lock) {
+            count += <span class="n">1</span>;
+        }
+    }
+
+    <span class="t">long</span> <span class="f">get</span>() {
+        <span class="k">synchronized</span> (lock) {                   <span class="c">// reads take the lock too</span>
+            <span class="k">return</span> count;
+        }
+    }
+}
+
+<span class="k">class</span> <span class="t">Registry</span> {
+    <span class="k">private</span> <span class="k">static</span> <span class="t">int</span> instances;               <span class="c">// guarded by Registry.class</span>
+
+    <span class="k">static</span> <span class="k">synchronized</span> <span class="k">void</span> <span class="f">created</span>() {        <span class="c">// locks the Class object, not an instance</span>
+        instances += <span class="n">1</span>;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="java-reentrantlock-the-explicit-lock">Java: ReentrantLock, the explicit lock</h2>
+<p><code>java.util.concurrent.locks.ReentrantLock</code> does what <code>synchronized</code> does, with the same memory guarantees, plus abilities <code>synchronized</code> lacks: <code>tryLock()</code> and <code>tryLock(timeout, unit)</code>, <code>lockInterruptibly()</code>, an optional fair ordering, and several <code>Condition</code> objects per lock. The price is that you must release it yourself, always in this exact shape:</p>
+<figure class="code pair" data-sample="mutex-basics.2"><figcaption><span class="ctitle">An explicit lock, released on every path</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15</span><code><span class="t">std</span>::<span class="t">mutex</span> m;
+
+<span class="t">void</span> <span class="f">update</span>() {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m);   <span class="c">// released on every path, including exceptions</span>
+    <span class="f">apply_change</span>();
+}
+
+<span class="t">bool</span> <span class="f">update_if_free</span>() {
+    <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m, <span class="t">std</span>::try_to_lock);   <span class="c">// do not wait</span>
+    <span class="k">if</span> (!lock.<span class="f">owns_lock</span>()) {
+        <span class="k">return</span> <span class="k">false</span>;            <span class="c">// report "busy" instead</span>
+    }
+    <span class="f">apply_change</span>();
+    <span class="k">return</span> <span class="k">true</span>;                 <span class="c">// the unique_lock unlocks here</span>
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22</span><code><span class="k">private</span> <span class="k">final</span> <span class="t">ReentrantLock</span> lock = <span class="k">new</span> <span class="t">ReentrantLock</span>();
+
+<span class="k">void</span> <span class="f">update</span>() {
+    lock.<span class="f">lock</span>();                 <span class="c">// before the try: if lock() failed, there is nothing to unlock</span>
+    <span class="k">try</span> {
+        <span class="f">applyChange</span>();           <span class="c">// may return early or throw</span>
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();           <span class="c">// the only way it is ever released</span>
+    }
+}
+
+<span class="t">boolean</span> <span class="f">updateIfFree</span>() {
+    <span class="k">if</span> (!lock.<span class="f">tryLock</span>()) {       <span class="c">// do not wait: report "busy" instead</span>
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+    <span class="k">try</span> {
+        <span class="f">applyChange</span>();
+        <span class="k">return</span> <span class="k">true</span>;
+    } <span class="k">finally</span> {
+        lock.<span class="f">unlock</span>();
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Use <code>synchronized</code> by default: it is shorter and cannot be left locked. Reach for <code>ReentrantLock</code> when you need a timeout, interruptible waiting, fairness, or more than one condition. Those features are covered in <a href="trylock-timeouts-fairness.html">tryLock, timeouts and fairness</a>. One Java 21 detail: a <a class="term" data-term="virtual-thread" href="glossary.html#virtual-thread">virtual thread</a> that blocks inside <code>synchronized</code> is pinned to its carrier thread; JDK 24 removed most of that limitation, but on Java 21 hot paths for virtual threads prefer <code>ReentrantLock</code>.</p>
+
+<h2 id="c-the-three-guards">C++: the three guards</h2>
+<table>
+<thead><tr><th>Guard</th><th>What it does</th><th>Use it when</th></tr></thead>
+<tbody>
+<tr><td><code>std::lock_guard</code></td><td>Locks in the constructor, unlocks in the destructor. Nothing else: not movable, cannot unlock early</td><td>The plain critical section: the default in C++11 and C++14 code</td></tr>
+<tr><td><code>std::unique_lock</code></td><td>Can start unlocked (<code>std::defer_lock</code>), try once (<code>std::try_to_lock</code>), adopt a lock you already hold (<code>std::adopt_lock</code>), unlock early and relock, be moved, and report <code>owns_lock()</code></td><td>You need any of those, and always with <code>std::condition_variable</code>, whose <code>wait</code> requires it</td></tr>
+<tr><td><code>std::scoped_lock</code> (C++17)</td><td>Locks one or several mutexes; with several, it uses a deadlock avoidance algorithm so listing order does not matter</td><td>A simple choice for one mutex, and the usual choice for taking several distinct mutexes together</td></tr>
+</tbody>
+</table>
+<p><a class="term" data-term="unique-lock" href="glossary.html#unique-lock">std::unique_lock</a> costs a little more (it stores an owns flag) and is the flexible one; <a class="term" data-term="scoped-lock" href="glossary.html#scoped-lock">std::scoped_lock</a> is the one to reach for when a single operation needs two mutexes, such as a transfer between two accounts. Taking several locks safely, in both languages, is the subject of <a href="multiple-locks.html">taking several locks</a>.</p>
+
+<figure class="code pair" data-sample="mutex-basics.3"><figcaption><span class="ctitle">Hold the lock only while touching shared state</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+<span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">string</span>&gt; snapshot = items_;   <span class="c">// copy what you need under the lock</span>
+lock.<span class="f">unlock</span>();                                <span class="c">// a unique_lock can release early</span>
+<span class="f">send</span>(snapshot);                               <span class="c">// slow I/O, no lock held</span></code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5</span><code><span class="t">String</span> snapshot;
+<span class="k">synchronized</span> (lock) {
+    snapshot = <span class="t">String</span>.<span class="f">join</span>(<span class="s">","</span>, items);   <span class="c">// copy what you need under the lock</span>
+}
+<span class="f">send</span>(snapshot);                           <span class="c">// slow I/O, no lock held</span></code></div></pre></div><div class="runout" hidden></div></figure>
+
+<h2 id="why-not-lock-and-unlock-by-hand">Why not lock and unlock by hand</h2>
+<p>Here is the code RAII exists to prevent. Every early <code>return</code> and every exception between the lock and the unlock leaves the mutex locked forever, and every thread that needs it hangs. With <code>ReentrantLock</code> you must write the <code>finally</code>; in C++, use a guard and you cannot forget.</p>
+<figure class="code pair" data-sample="mutex-basics.4"><figcaption><span class="ctitle">A lock leaked on the early return path</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="c">// BAD: the early return skips unlock(), and m stays locked forever</span>
+<span class="t">bool</span> <span class="f">reserve</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; seat) {
+    m.<span class="f">lock</span>();
+    <span class="k">if</span> (taken.<span class="f">count</span>(seat) &gt; <span class="n">0</span>) {
+        <span class="k">return</span> <span class="k">false</span>;            <span class="c">// still locked</span>
+    }
+    taken.<span class="f">insert</span>(seat);
+    m.<span class="f">unlock</span>();
+    <span class="k">return</span> <span class="k">true</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="c">// BAD: the early return skips unlock(), and the lock stays held forever</span>
+<span class="t">boolean</span> <span class="f">reserve</span>(<span class="t">String</span> seat) {
+    lock.<span class="f">lock</span>();
+    <span class="k">if</span> (taken.<span class="f">contains</span>(seat)) {
+        <span class="k">return</span> <span class="k">false</span>;            <span class="c">// still locked</span>
+    }
+    taken.<span class="f">add</span>(seat);
+    lock.<span class="f">unlock</span>();
+    <span class="k">return</span> <span class="k">true</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<div class="only only-cpp"><span class="otag">C++</span>
+<p>Two C++ guard typos compile and silently protect nothing. <code>std::lock_guard&lt;std::mutex&gt;{m_};</code> creates a temporary that unlocks at the end of that same statement. <code>std::unique_lock&lt;std::mutex&gt;(m_);</code> declares a <em>new</em> local variable named <code>m_</code> that locks nothing. Clang warns about the second (<code>-Wvexing-parse</code>), but compilers usually say nothing about the first; clang-tidy's <code>bugprone-unused-raii</code> check flags it. Always name the guard: <code>std::lock_guard&lt;std::mutex&gt; guard(m_);</code>.</p>
+<p>A <code>std::mutex</code> is not recursive: locking it again from the thread that already holds it is undefined behavior, in practice a <a class="term" data-term="self-deadlock" href="glossary.html#self-deadlock">self-deadlock</a>. Destroying a mutex that is still locked, or letting a thread end while it owns one, are undefined behavior too.</p>
+</div>
+
+<h2 id="reads-need-the-lock-too">Reads need the lock too</h2>
+<p>It is tempting to lock only writes: "a read cannot break anything". But a lock gives visibility only to threads that take it. An unlocked <code>size()</code> or getter can see a stale value, or the middle of an update that breaks an invariant, and in C++ it is a data race with the writers, which is undefined behavior. <strong>Every access to guarded state, reads included, takes the same lock.</strong> If a reader needs no lock, the field should be an atomic, or immutable.</p>
+
+<div class="box example">
+<h3>Worked example: a thread-safe stack</h3>
+<p>Rubrik has asked for a thread-safe stack both in a screen and in an onsite system coding round, with a lock-free version as the follow up (you will build that in <a href="lock-free-stack-and-aba.html">the lock-free stack</a>). The design choice that matters is the interface. <code>std::stack</code> and <code>java.util.Stack</code> style APIs separate "look" from "remove": <code>if (!s.empty()) { v = s.top(); s.pop(); }</code>. With a lock inside each method, two threads can both see one element, both read the same top, and then both pop, one of them from an empty stack. That is check-then-act again. So the stack offers one operation that checks and removes together, returning "nothing" when empty.</p>
+<figure class="code pair" data-sample="mutex-basics.5" data-expect="ok"><figcaption><span class="ctitle">A lock-based stack: four threads, nothing lost</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</span><code><span class="p">#include &lt;cstddef&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> ConcurrentStack {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">push</span>(T item) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+    }
+
+    <span class="t">std</span>::<span class="t">optional</span>&lt;T&gt; <span class="f">try_pop</span>() {                       <span class="c">// check and remove in one critical section</span>
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (items_.<span class="f">empty</span>()) <span class="k">return</span> <span class="t">std</span>::nullopt;
+        T top = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">back</span>());
+        items_.<span class="f">pop_back</span>();
+        <span class="k">return</span> top;
+    }
+
+    <span class="t">std</span>::<span class="t">size_t</span> <span class="f">size</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);          <span class="c">// reads take the lock too</span>
+        <span class="k">return</span> items_.<span class="f">size</span>();
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;                             <span class="c">// mutable, so the const size() can lock it</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;T&gt; items_;                             <span class="c">// guarded by m_</span>
+};
+
+<span class="t">int</span> <span class="f">main</span>() {
+    ConcurrentStack&lt;<span class="t">int</span>&gt; <span class="t">stack</span>;
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">long</span> <span class="t">long</span>&gt; <span class="f">popped</span>(<span class="n">4</span>, <span class="n">0</span>);               <span class="c">// what each thread popped, summed</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; threads;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+        threads.<span class="f">emplace_back</span>([&amp;<span class="t">stack</span>, &amp;popped, t] {
+            <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">10000</span>; i += <span class="n">1</span>) {
+                <span class="t">stack</span>.<span class="f">push</span>(i);
+                <span class="k">if</span> (i % <span class="n">2</span> == <span class="n">0</span>) popped[t] += <span class="t">stack</span>.<span class="f">try_pop</span>().<span class="f">value_or</span>(<span class="n">0</span>);
+            }
+        });
+    }
+    <span class="t">long</span> <span class="t">long</span> total = <span class="n">0</span>;
+    <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+        threads[t].<span class="f">join</span>();
+        total += popped[t];
+    }
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"left on the stack: "</span> &lt;&lt; <span class="t">stack</span>.<span class="f">size</span>() &lt;&lt; <span class="s">"\n"</span>;
+    <span class="k">while</span> (<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">int</span>&gt; x = <span class="t">stack</span>.<span class="f">try_pop</span>()) total += *x;
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"pushed values sum to "</span> &lt;&lt; <span class="n">4LL</span> * <span class="n">10000</span> * <span class="n">10001</span> / <span class="n">2</span> &lt;&lt; <span class="s">", popped plus left sum to "</span> &lt;&lt; total &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">Deque</span>;
+<span class="k">import</span> java.util.<span class="t">Optional</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">static</span> <span class="k">class</span> <span class="t">ConcurrentStack</span>&lt;T&gt; {
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+        <span class="k">private</span> <span class="k">final</span> <span class="t">Deque</span>&lt;T&gt; items = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();       <span class="c">// guarded by lock</span>
+
+        <span class="k">void</span> <span class="f">push</span>(T item) {
+            <span class="k">synchronized</span> (lock) { items.<span class="f">push</span>(item); }
+        }
+
+        <span class="t">Optional</span>&lt;T&gt; <span class="f">tryPop</span>() {                                    <span class="c">// check and remove in one critical section</span>
+            <span class="k">synchronized</span> (lock) { <span class="k">return</span> <span class="t">Optional</span>.<span class="f">ofNullable</span>(items.<span class="f">poll</span>()); }
+        }
+
+        <span class="t">int</span> <span class="f">size</span>() {
+            <span class="k">synchronized</span> (lock) { <span class="k">return</span> items.<span class="f">size</span>(); }          <span class="c">// reads take the lock too</span>
+        }
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">ConcurrentStack</span>&lt;<span class="t">Integer</span>&gt; stack = <span class="k">new</span> <span class="t">ConcurrentStack</span>&lt;&gt;();
+        <span class="t">long</span>[] popped = <span class="k">new</span> <span class="t">long</span>[<span class="n">4</span>];                              <span class="c">// what each thread popped, summed</span>
+        <span class="t">Thread</span>[] threads = <span class="k">new</span> <span class="t">Thread</span>[<span class="n">4</span>];
+        <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+            <span class="k">final</span> <span class="t">int</span> id = t;
+            threads[t] = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">10_000</span>; i += <span class="n">1</span>) {
+                    stack.<span class="f">push</span>(i);
+                    <span class="k">if</span> (i % <span class="n">2</span> == <span class="n">0</span>) popped[id] += stack.<span class="f">tryPop</span>().<span class="f">orElse</span>(<span class="n">0</span>);
+                }
+            }, <span class="s">"worker-"</span> + t);
+            threads[t].<span class="f">start</span>();
+        }
+        <span class="t">long</span> total = <span class="n">0</span>;
+        <span class="k">for</span> (<span class="t">int</span> t = <span class="n">0</span>; t &lt; <span class="n">4</span>; t += <span class="n">1</span>) {
+            threads[t].<span class="f">join</span>();
+            total += popped[t];
+        }
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"left on the stack: "</span> + stack.<span class="f">size</span>());
+        <span class="k">for</span> (<span class="t">Optional</span>&lt;<span class="t">Integer</span>&gt; x = stack.<span class="f">tryPop</span>(); x.<span class="f">isPresent</span>(); x = stack.<span class="f">tryPop</span>()) total += x.<span class="f">get</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"pushed values sum to "</span> + <span class="n">4L</span> * <span class="n">10_000</span> * <span class="n">10_001</span> / <span class="n">2</span> + <span class="s">", popped plus left sum to "</span> + total);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>left on the stack: 20000
+pushed values sum to 200020000, popped plus left sum to 200020000</pre></div><div class="runout" hidden></div></figure>
+<p>The test checks a real invariant: every value pushed is either popped exactly once or still on the stack, so the sums must match exactly, however the threads interleave. Notice the C++ <code>try_pop</code> moves the element out <em>before</em> removing it, all under the lock, and returns it by value: returning a reference to the top would let the caller use it after the lock is released. The blocking version, where <code>pop</code> waits for an element, needs a condition variable; that is the <a href="p-thread-safe-stack.html">thread-safe stack problem</a>.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Two different locks for the same data.</strong> One method locks <code>this</code>, another a private object, or a <code>static synchronized</code> method and an instance method share a static field: none of them exclude each other.</li>
+<li><strong>Locking writes but not reads.</strong> Stale or half-updated reads, and a data race in C++.</li>
+<li><strong><code>lock()</code> and <code>unlock()</code> without <code>finally</code> or a guard.</strong> The first early return or exception leaves the lock held forever.</li>
+<li><strong><code>lock()</code> inside the <code>try</code> with <code>unlock()</code> in <code>finally</code>.</strong> If <code>lock()</code> (or <code>lockInterruptibly()</code>) fails, <code>finally</code> unlocks a lock you do not hold and throws <code>IllegalMonitorStateException</code>, hiding the original problem.</li>
+<li><strong>An unnamed C++ guard.</strong> It is a temporary that unlocks immediately. Always give the guard a name.</li>
+<li><strong>Returning a reference or pointer to guarded data.</strong> The caller uses it after the lock is gone. Return copies.</li>
+<li><strong>Synchronizing on a field that gets reassigned, or on a shared constant</strong> such as a string literal or a boxed <code>Integer</code>. Threads end up locking different objects, or unrelated code locks yours. Lock a <code>private final</code> object.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The mutex is the default answer to "make this thread-safe", so the questions are about precision. Classic ones: "<code>synchronized</code> versus <code>ReentrantLock</code>?", "<code>lock_guard</code> versus <code>unique_lock</code> versus <code>scoped_lock</code>?", "what does <code>synchronized</code> guarantee besides mutual exclusion?" and "is this getter thread-safe?". Microsoft C++ candidates have been asked to build a producer and consumer with <code>std::mutex</code>, <code>std::unique_lock</code> and <code>std::condition_variable</code>; Rubrik has asked for a thread-safe stack as runnable code.</p>
+<blockquote>A lock gives two things: only one thread at a time in the critical section, and visibility: everything written before an unlock is seen by the next thread that locks. So every access to the guarded state, reads included, goes through the same lock. In Java I use <code>synchronized</code> on a private lock object by default and <code>ReentrantLock</code> with try and finally when I need tryLock, timeouts or several conditions. In C++ I never call lock and unlock myself: <code>std::scoped_lock</code> or <code>std::lock_guard</code> for a plain section, <code>std::unique_lock</code> when I need to unlock early or wait on a condition variable.</blockquote>
+<p>Follow ups to expect: "What happens if an exception is thrown inside <code>synchronized</code>?" (released). "Inside a <code>ReentrantLock</code> section?" (released only by your <code>finally</code>). "Why must <code>size()</code> lock?" (visibility, and a data race in C++). "How would you make this stack lock free?" (a CAS on the head pointer, then the ABA problem).</p>
+</div>
+
+<div class="box under">
+<h3>Under the hood</h3>
+<p>An uncontended lock can often be acquired and released entirely in user space. Acquisition commonly uses an atomic read-modify-write; release need not use compare-and-swap.</p>
+<p>Under contention, an implementation may spin briefly and then park the thread, using a <a class="term" data-term="futex" href="glossary.html#futex">futex</a> on Linux, for example. Instructions, latency and spinning policy depend on the runtime, platform and workload. HotSpot can inflate <code>synchronized</code> locking to a monitor with a wait queue when needed. The details are in <a href="how-locks-work.html">how locks are built</a>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>A lock gives mutual exclusion and visibility: an unlock happens-before the next lock of the same lock. Nothing more: no fairness, no protection for unlocked accesses.</li>
+<li>Java: <code>synchronized</code> on a private lock by default; <code>ReentrantLock</code> with <code>lock()</code> before <code>try</code> and <code>unlock()</code> in <code>finally</code> when you need its extra features.</li>
+<li>C++: never call <code>lock()</code> and <code>unlock()</code> yourself. <code>std::lock_guard</code> or <code>std::scoped_lock</code> for plain sections, <code>std::unique_lock</code> for flexibility and condition variables, <code>std::scoped_lock</code> for several mutexes.</li>
+<li>Every access to guarded state, reads included, takes the same lock; return copies, never references to guarded data.</li>
+<li>Design interfaces so that check and act happen in one call, such as a <code>tryPop</code> that returns an optional.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="mutex-basics"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="mutex-basics.q1" data-a="0,1" data-multi="1"><div class="mq"><span class="qn"></span><div class="qt">What does holding a lock (<code>synchronized</code>, <code>ReentrantLock</code>, or a <code>std::mutex</code> through a guard) guarantee? Select all that apply.<span class="qmulti">Select all that apply</span></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">At most one thread at a time runs code guarded by that lock</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Everything a thread wrote before releasing the lock is visible to the next thread that acquires it</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Waiting threads acquire the lock in the order in which they asked for it</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Code that reads the same data without taking the lock also sees up-to-date values</span></button></li></ol><button type="button" class="btn small qcheck">Check answer</button><div class="why" hidden><strong>Why.</strong> Mutual exclusion and visibility at the lock boundaries are the whole contract. Ordinary locks are not fair: a newly arriving thread may barge ahead of waiting ones. And the visibility edge exists only between an unlock and a later lock of the same lock, so a reader that skips the lock gets no guarantee (and in C++ it is a data race).</div></div><div class="mcq" data-id="mutex-basics.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>increment()</code> updates <code>count</code> inside <code>synchronized (lockA)</code>, and <code>reset()</code> sets <code>count = 0</code> inside <code>synchronized (lockB)</code> (in C++, under two different mutexes). What is the problem?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">None: both methods are locked</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The two methods do not exclude each other: one thread can be in each at the same time, so updates can be lost or overwritten (and in C++ it is a data race)</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It deadlocks the first time both methods run at once</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">None, as long as both locks are of the same type</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A lock only excludes code that takes the same lock. Two locks guarding one field protect nothing between the two methods. One field, one invariant, one lock.</div></div><div class="mcq" data-id="mutex-basics.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt"><code>x</code> and <code>y</code> start at 0. Thread A runs: lock; <code>x = 1</code>; <code>y = 2</code>; unlock. Thread B runs: lock; print <code>x</code> and <code>y</code>; unlock. Both use the same lock. What can B print?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Only <code>1 2</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot"><code>0 0</code> or <code>1 2</code></span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot"><code>0 0</code>, <code>1 0</code> or <code>1 2</code></span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Any combination of 0, 1 and 2</span></button></li></ol><div class="why" hidden><strong>Why.</strong> If B's critical section runs first, it sees <code>0 0</code>; if A's runs first, B is guaranteed to see both writes, because A's unlock happens-before B's lock. B can never see the middle (<code>1 0</code>), because A's two writes happen inside one critical section that B cannot interleave with.</div></div><div class="mcq" data-id="mutex-basics.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A stack class locks inside each of its methods. A caller writes <code>if (!s.empty()) { v = s.top(); s.pop(); }</code>. Two threads run this when the stack holds exactly one element. What can happen?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Exactly one thread gets the element, because each method is locked</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Both see the stack as non-empty and read the same top element; then one pop removes it and the other pops an empty stack</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It deadlocks, because three locked calls are made in a row</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Each thread gets a different element</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each call is atomic, but the lock is released between them, so the sequence is a check-then-act. That is why thread-safe stacks and queues offer a single <code>tryPop</code> or <code>poll</code> that checks and removes in one critical section and reports "empty" through its return value.</div></div><div class="mcq" data-id="mutex-basics.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">Why should a read-only method such as <code>size()</code> take the same lock as the methods that modify the data?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">It does not need to: reading cannot break anything</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Without the lock the read may see a stale value or the middle of an update, and in C++ it is a data race with the writers</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Only to make the lock fair to readers</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Because reading an <code>int</code> is not atomic on 64-bit machines</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Visibility comes from the lock: only a thread that acquires it is guaranteed to see what the last holder wrote. Unlocked reads can be stale or see a broken invariant halfway through an update. If a value must be readable without a lock, make it atomic or immutable.</div></div><div class="mcq" data-id="mutex-basics.q6" data-a="1" data-multi="0" data-lang="java"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">Java only</span>In one class, <code>static synchronized void a()</code> and an instance method <code>synchronized void b()</code> both modify the same <code>static int counter</code>. Do they exclude each other?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Yes: both are <code>synchronized</code></span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">No: <code>a</code> locks the <code>Class</code> object and <code>b</code> locks <code>this</code>, which are different locks</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Yes, because static fields always use the class lock</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Only if there is a single instance of the class</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A synchronized instance method locks <code>this</code>; a static one locks the <code>Class</code> object. Different locks never exclude each other, so <code>counter</code> is updated under two different locks. Guard it with one lock in both methods, for example a <code>private static final Object</code> lock, or <code>synchronized</code> on the class's own <code>Class</code> object (<code>MyClass.class</code>) inside <code>b</code>.</div></div><div class="mcq" data-id="mutex-basics.q7" data-a="0" data-multi="0" data-lang="cpp"><div class="mq"><span class="qn"></span><div class="qt"><span class="qlang">C++ only</span>What is wrong with this method?
+<figure class="code single" data-sample="mutex-basics.7"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4</span><code><span class="t">void</span> <span class="f">add</span>() {
+    <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt;{m_};
+    count_ += <span class="n">1</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The guard is an unnamed temporary destroyed at the end of its own statement, so the mutex is already unlocked when <code>count_ += 1</code> runs</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Nothing: the guard holds the mutex until the end of the function</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">It does not compile: <code>lock_guard</code> needs a name</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">It deadlocks, because the guard locks the mutex twice</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Only a named guard lives until the end of the scope. A temporary dies at the semicolon, so the increment runs unprotected. It compiles, usually without any compiler warning (clang-tidy's <code>bugprone-unused-raii</code> check catches it), which is what makes it dangerous. Write <code>std::lock_guard&lt;std::mutex&gt; guard(m_);</code>.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="mutex-basics.c1" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Write a thread-safe <code>BankAccount</code> with <code>deposit(amount)</code>, <code>withdraw(amount)</code> that returns false and changes nothing if the balance is too low, and <code>balance()</code>. Use a lock in your language and explain why <code>withdraw</code> is the method that needs the most care.</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="mutex-basics.6"><figcaption><span class="ctitle">A bank account guarded by one lock</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32</span><code><span class="p">#include &lt;limits&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+
+<span class="k">class</span> BankAccount {
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"amount must be positive"</span>);
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_);
+        <span class="k">if</span> (amount &gt; <span class="t">std</span>::numeric_limits&lt;<span class="t">long</span>&gt;::<span class="f">max</span>() - balance_) {
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">overflow_error</span>(<span class="s">"balance overflow"</span>);
+        }
+        balance_ += amount;
+    }
+
+    <span class="t">bool</span> <span class="f">withdraw</span>(<span class="t">long</span> amount) {
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"amount must be positive"</span>);
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_); <span class="c">// the check and the act in one critical section</span>
+        <span class="k">if</span> (balance_ &lt; amount) <span class="k">return</span> <span class="k">false</span>;
+        balance_ -= amount;
+        <span class="k">return</span> <span class="k">true</span>;
+    }
+
+    <span class="t">long</span> <span class="f">balance</span>() <span class="k">const</span> {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">guard</span>(m_); <span class="c">// reads take the lock too</span>
+        <span class="k">return</span> balance_;
+    }
+
+<span class="k">private</span>:
+    <span class="k">mutable</span> <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">long</span> balance_ = <span class="n">0</span>;                         <span class="c">// guarded by m_; invariant: balance_ &gt;= 0</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26</span><code><span class="k">class</span> <span class="t">BankAccount</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> lock = <span class="k">new</span> <span class="t">Object</span>();
+    <span class="k">private</span> <span class="t">long</span> balance;                      <span class="c">// guarded by lock; invariant: balance &gt;= 0</span>
+
+    <span class="k">void</span> <span class="f">deposit</span>(<span class="t">long</span> amount) {
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"amount must be positive"</span>);
+        <span class="k">synchronized</span> (lock) {
+            balance = <span class="t">Math</span>.<span class="f">addExact</span>(balance, amount); <span class="c">// overflow throws before balance changes</span>
+        }
+    }
+
+    <span class="t">boolean</span> <span class="f">withdraw</span>(<span class="t">long</span> amount) {
+        <span class="k">if</span> (amount &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"amount must be positive"</span>);
+        <span class="k">synchronized</span> (lock) {                  <span class="c">// the check and the act in one critical section</span>
+            <span class="k">if</span> (balance &lt; amount) <span class="k">return</span> <span class="k">false</span>;
+            balance -= amount;
+            <span class="k">return</span> <span class="k">true</span>;
+        }
+    }
+
+    <span class="t">long</span> <span class="f">balance</span>() {
+        <span class="k">synchronized</span> (lock) {                  <span class="c">// reads take the lock too</span>
+            <span class="k">return</span> balance;
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p><code>withdraw</code> is a check-then-act: "is there enough?" followed by "subtract". If the check and the subtraction were separately locked, two withdrawals could both pass the check and overdraw the account, so both happen inside one critical section. Positive-amount validation touches no shared state, so it runs before locking. The deposit's overflow check depends on the balance and stays under the lock; an overflowing deposit throws without changing it. <code>balance()</code> takes the lock so it sees the latest value, and in C++ so that it is not a data race. The lock is a private object (Java) or a private member (C++), so no outside code can take it.</p></div></div><div class="cq" data-q="mutex-basics.c2" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Your interviewer asks you to choose a lock type for a cache's <code>get</code> and <code>put</code>, and then for a method that moves money between two accounts that each have their own lock. Explain your choices in your language.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Java: for the cache I would use <code>synchronized</code> on a private final lock object, since <code>get</code> and <code>put</code> are short critical sections and <code>synchronized</code> cannot be left locked. If I needed to give up after a timeout, wait interruptibly, use fairness, or have several conditions, I would switch to a <code>ReentrantLock</code> with <code>lock()</code> before <code>try</code> and <code>unlock()</code> in <code>finally</code>. For the transfer, Java has no statement that takes two locks at once, so I would take both locks in a fixed global order, for example by account id with a tie breaker, so that two opposite transfers cannot deadlock.</p>
+<p>C++: for the cache, <code>std::scoped_lock</code> or <code>std::lock_guard</code> on a <code>mutable std::mutex</code> member, since the sections are plain; if I needed to unlock early, or to wait on a condition variable, <code>std::unique_lock</code>. For the transfer, handle a transfer to the same account first, then use <code>std::scoped_lock lock(from.m, to.m);</code> for two distinct mutexes. It locks both with a deadlock avoidance algorithm whatever order the arguments come in. In both languages, every read of the guarded data takes the same lock, and nothing slow happens while holding it.</p></div></div><div class="cq" data-q="mutex-basics.c3" data-kind="debug"><div class="cqh"><span class="kind k-debug">Debug</span></div><div class="qtext">Under load, some threads calling this hang forever. Find the bug and fix it.
+<figure class="code single" data-sample="mutex-basics.8"><figcaption><span class="ctitle"></span><span class="ctabs"><span class="clang">C++</span></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10</span><code><span class="t">bool</span> Inventory::<span class="f">reserve</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">string</span>&amp; sku, <span class="t">int</span> qty) {
+    m_.<span class="f">lock</span>();
+    <span class="k">auto</span> it = stock_.<span class="f">find</span>(sku);
+    <span class="k">if</span> (it == stock_.<span class="f">end</span>() || it-&gt;second &lt; qty) {
+        <span class="k">return</span> <span class="k">false</span>;
+    }
+    it-&gt;second -= qty;
+    m_.<span class="f">unlock</span>();
+    <span class="k">return</span> <span class="k">true</span>;
+}</code></div></pre></div><div class="runout" hidden></div></figure></div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>The early <code>return false</code> leaves the mutex locked: the first request for an unknown or short product leaves <code>m_</code> held, and every later call to anything that locks <code>m_</code> hangs. It shows up "under load" only because that is when such a request first arrives. Any exception between <code>lock()</code> and <code>unlock()</code> would do the same.</p>
+<p>The fix is to never lock and unlock by hand: replace the two calls with <code>std::lock_guard&lt;std::mutex&gt; guard(m_);</code> (or <code>std::scoped_lock guard(m_);</code>) at the top of the function. The guard's destructor unlocks on every path, the early return and exceptions included. The Java version of this bug is <code>lock.lock()</code> with <code>unlock()</code> not in a <code>finally</code>; the fix is <code>lock(); try { ... } finally { unlock(); }</code>, or simply a <code>synchronized</code> block.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="mutex-basics.s1" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"A teammate locks every write but leaves the getters unlocked. Walk me through what the lock guarantees and why that design is still wrong."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A mutex provides mutual exclusion and visibility only through a shared locking protocol</li><li>An unlock orders earlier writes before accesses after a later successful acquisition of the same lock</li><li>An unlocked reader can observe an inconsistent pair of fields; in C++ a conflicting ordinary access is a data race and undefined behavior</li><li>All accesses to guarded state use the same lock, including copying a snapshot</li><li>Locking does not promise fairness or make a sequence of separately locked calls atomic</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The getters need the same lock as the writers. A mutex gives mutual exclusion and a visibility guarantee, but only when threads follow the same locking protocol. One thread's unlock orders its earlier writes before another thread's accesses after acquiring that same mutex. Taking an unrelated lock does not create that connection. Suppose a writer changes a lower bound and an upper bound together. An unlocked getter can read one old field and one new field, even though the writer holds a lock throughout. In C++, those conflicting ordinary accesses are a data race, so the program has undefined behavior. I would lock the getters too, and copy both fields while holding the lock when callers need a consistent snapshot. An independently atomic field is a different design, and I would document it explicitly. I would also avoid promising more than the mutex provides. Ordinary locking does not guarantee which waiter goes next, and two separately locked calls still leave a gap. If a caller must check and update together, the class needs one operation covering both.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">If a getter takes the lock but returns a reference to the guarded collection, is the caller protected?</span></p></div></div><div class="sq" data-sq="mutex-basics.s2" data-seconds="75"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 75 s</span></div><div class="qtext">"How would you choose the locking API for a simple cache, a blocking queue, and a transfer between two accounts?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A simple cache uses a private lock with scope-based release in C++, or <code>synchronized</code> in Java</li><li>Condition waiting needs <code>unique_lock</code> with <code>std::condition_variable</code>; Java can use a monitor or <code>ReentrantLock</code> with conditions</li><li>Java <code>ReentrantLock</code> needs unlock in <code>finally</code> after successful acquisition</li><li>Transfers handle the same-account case first and acquire distinct locks in a global order or with C++17 <code>scoped_lock</code></li><li>Releasing locks automatically does not by itself prevent deadlock or roll back partial updates</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would choose the simplest API that supports the operation, with release guaranteed on ordinary returns and exceptions. For a cache with short critical sections, that means a private monitor with <code>synchronized</code> in Java, or a named guard around a mutex in C++. A blocking queue adds a wait for a state change. Java can wait on the same monitor, or use a <code>ReentrantLock</code> with separate conditions. In C++, a standard condition variable needs a unique lock because waiting releases the mutex and reacquires it before returning. With an explicit Java lock, I acquire before the try block and unlock in finally. For a transfer, I first handle the case where both accounts are the same. For distinct accounts, Java takes both locks in one global order, such as unique immutable account identifiers. In C++17 and later, scoped lock can acquire both mutexes with deadlock avoidance. These choices manage lock ownership, but they do not make the business operation exception safe automatically. I still validate before committing changes and preserve the invariant if something fails.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">Could recursive locks replace the global ordering rule for a transfer?</span></p></div></div><div class="sq" data-sq="mutex-basics.s3" data-seconds="60"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 60 s</span></div><div class="qtext">"An inventory service hangs after an out-of-stock request. The reservation method calls lock, checks stock, and unlocks at the bottom. What do you inspect?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Inspect the early return and exception paths for an acquired lock that is never released</li><li>An out-of-stock return before unlock leaves other threads blocked on that mutex</li><li>Use a named C++ guard or Java <code>synchronized</code>; explicit Java locking releases in finally</li><li>An unnamed C++ guard is destroyed at its statement and does not protect later accesses</li><li>Exercise the failing reservation path, then another reservation, with a bounded completion check</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would inspect the out-of-stock return first. If the method acquired the lock and returned before reaching unlock, it leaked ownership. Other threads then wait for a release that never happens. That matches a service that works until one particular request arrives. Exceptions between acquisition and release create the same failure. In C++, I would replace manual locking with a named guard whose scope covers the check and the update. The name matters: an unnamed temporary guard is destroyed at the end of its own statement. In Java, I would use <code>synchronized</code>, or put unlock in finally after successful explicit acquisition. Then I would test an out-of-stock reservation followed by a valid one from another thread, with a deadline on completion. I would also exercise an exception path. A successful reservation alone never reaches the branch that caused this hang.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">The lock now releases on exceptions, but an exception occurs halfway through a multi-field update. Is the state necessarily valid?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-thread-safe-stack.html" data-problem="thread-safe-stack"><span class="pk">Thread-safe structures · warm-up</span><b>Thread-safe stack</b><span class="pst"></span></a><a class="pcard" href="p-fix-the-lost-update.html" data-problem="fix-the-lost-update"><span class="pk">Bug hunts · warm-up</span><b>Fix the metrics that undercount</b><span class="pst"></span></a><a class="pcard" href="p-hit-counter.html" data-problem="hit-counter"><span class="pk">Thread-safe structures · medium</span><b>Thread-safe hit counter</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="invariants-and-critical-sections.html"><span>Previous</span><b>Invariants, critical sections and finding shared state</b></a><a class="next" href="lock-rules.html"><span>Next</span><b>The rules of locking</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#what-a-lock-guarantees-and-what-it-does-not">What a lock guarantees, and what it does not</a><a href="#java-synchronized-and-intrinsic-locks">Java: synchronized and intrinsic locks</a><a href="#c-std-mutex-and-a-guard">C++: std::mutex and a guard</a><a href="#java-reentrantlock-the-explicit-lock">Java: ReentrantLock, the explicit lock</a><a href="#c-the-three-guards">C++: the three guards</a><a href="#why-not-lock-and-unlock-by-hand">Why not lock and unlock by hand</a><a href="#reads-need-the-lock-too">Reads need the lock too</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>

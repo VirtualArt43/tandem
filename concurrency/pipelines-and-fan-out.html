@@ -1,0 +1,984 @@
+<!doctype html>
+<html lang="en" class="t-light l-piyush"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Pipelines, fan-out, fan-in and batching · Tandem</title><meta name="color-scheme" content="light dark"><link rel="icon" href="../assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="../assets/tandem.css"><script>(function(){try{var d=document.documentElement,g=function(k,v){var x=localStorage.getItem('tandem.'+k);return x===null?v:JSON.parse(x);},t=g('theme','auto'),l=g('learner','piyush');if(t==='auto'){t=matchMedia('(prefers-color-scheme: dark)').matches?'night':'light';}d.className='t-'+t+' l-'+l;}catch(e){}})();</script></head><body class="page-lesson track-core" data-slug="pipelines-and-fan-out" data-title="Pipelines, fan-out, fan-in and batching" data-track="core" data-module="core-13" data-root="../" data-section="concurrency" data-static="1"><a class="skip" href="#main">Skip to content</a><header class="top"><a class="brand" href="../index.html" title="Tandem home"><svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><path class="s1" d="M6 10c9 0 9 20 18 20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><path class="s2" d="M6 30c9 0 9-20 18-20h10" fill="none" stroke-width="3.4" stroke-linecap="round"/><circle class="s1f" cx="34" cy="30" r="2.6"/><circle class="s2f" cx="34" cy="10" r="2.6"/></svg><span>Tandem</span></a><a class="secname" href="../concurrency/index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6c5 0 5 12 10 12h6"/><path d="M4 18c5 0 5-12 10-12h6"/></svg><span>Concurrency</span></a><nav class="mainnav"><a href="../concurrency/index.html" data-nav="index.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5h9a3 3 0 0 1 3 3V20H8a3 3 0 0 1-3-3z"/><path d="M5 17a3 3 0 0 1 3-3h9"/></svg><span>Learn</span></a><a href="../concurrency/practice.html" data-nav="practice.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m8.5 8-4 4 4 4M15.5 8l4 4-4 4M13.5 5.5l-3 13"/></svg><span>Practice</span></a><a href="../concurrency/speak.html" data-nav="speak.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg><span>Speak</span></a><a href="../concurrency/interview.html" data-nav="interview.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Interview</span></a><a href="../concurrency/logbook.html" data-nav="logbook.html"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span></a></nav><div class="search"><input id="q" type="search" placeholder="Search  /" aria-label="Search lessons, problems and terms"><div class="results" id="results" hidden></div></div><div class="topright"><div class="who" role="group" aria-label="Who is learning"><button type="button" data-learner="piyush" title="Piyush learns in C++"><span class="dot"></span>Piyush<small>C++</small></button><button type="button" data-learner="shubhi" title="Shubhi learns in Java"><span class="dot"></span>Shubhi<small>Java</small></button></div><div class="themes"><button type="button" class="iconbtn" data-theme-menu title="Colour theme"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M5.3 5.3l1.8 1.8M16.9 16.9l1.8 1.8M5.3 18.7l1.8-1.8M16.9 7.1l1.8-1.8"/></svg></button><div class="themepop" id="themepop" hidden><div class="tphead">Theme</div><button type="button" data-theme-set="auto"><span class="sw sw-auto"></span>Match my Mac</button><button type="button" data-theme-set="light"><span class="sw sw-light"></span>Light</button><button type="button" data-theme-set="paper"><span class="sw sw-paper"></span>Paper</button><button type="button" data-theme-set="night"><span class="sw sw-night"></span>Night</button><button type="button" data-theme-set="black"><span class="sw sw-black"></span>Black</button></div></div><button type="button" class="askbtn" data-panel-open title="Open Navigator, Logbook and Bar Raiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Ask</span><kbd>&#8984;K</kbd></button></div></header><div class="page" id="main"><div class="lesson-layout"><aside class="map" id="map"><div class="maphead"><a href="track-core.html">Concurrency</a><button type="button" class="iconbtn" data-map-toggle title="Hide the course map"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div><details><summary><span class="mn">00</span>Start here<span class="mc" data-modfrac="core-0"></span></summary><ol><li><a href="welcome.html" data-slug="welcome"><span class="lnum">1</span><span class="lt">Welcome to Tandem</span></a></li><li><a href="how-companies-test.html" data-slug="how-companies-test"><span class="lnum">2</span><span class="lt">How top companies test concurrency</span></a></li><li><a href="study-plan.html" data-slug="study-plan"><span class="lnum">3</span><span class="lt">Your study plan</span></a></li><li><a href="speaking-like-a-senior.html" data-slug="speaking-like-a-senior"><span class="lnum">4</span><span class="lt">Speaking like a senior: how to say what you know</span></a></li></ol></details><details><summary><span class="mn">01</span>Foundations<span class="mc" data-modfrac="core-1"></span></summary><ol><li><a href="processes-and-threads.html" data-slug="processes-and-threads"><span class="lnum">1</span><span class="lt">Processes and threads: the memory picture</span></a></li><li><a href="concurrency-vs-parallelism.html" data-slug="concurrency-vs-parallelism"><span class="lnum">2</span><span class="lt">Concurrency versus parallelism</span></a></li><li><a href="cpu-vs-io-bound.html" data-slug="cpu-vs-io-bound"><span class="lnum">3</span><span class="lt">CPU bound versus I/O bound work</span></a></li><li><a href="scheduler-and-context-switch.html" data-slug="scheduler-and-context-switch"><span class="lnum">4</span><span class="lt">The scheduler, time slices and context switches</span></a></li><li><a href="thread-states.html" data-slug="thread-states"><span class="lnum">5</span><span class="lt">Thread states and what blocking really does</span></a></li><li><a href="cost-of-threads.html" data-slug="cost-of-threads"><span class="lnum">6</span><span class="lt">What a thread costs, and why more threads can be slower</span></a></li><li><a href="kernel-and-user-threads.html" data-slug="kernel-and-user-threads"><span class="lnum">7</span><span class="lt">Kernel threads, green threads and M:N scheduling</span></a></li><li><a href="virtual-memory-and-paging.html" data-slug="virtual-memory-and-paging"><span class="lnum">8</span><span class="lt">Virtual memory and paging</span></a></li></ol></details><details><summary><span class="mn">02</span>Working with threads<span class="mc" data-modfrac="core-2"></span></summary><ol><li><a href="creating-threads.html" data-slug="creating-threads"><span class="lnum">1</span><span class="lt">Creating, starting and joining threads</span></a></li><li><a href="passing-data-to-threads.html" data-slug="passing-data-to-threads"><span class="lnum">2</span><span class="lt">Passing data in and getting results out</span></a></li><li><a href="interruption-and-cancellation.html" data-slug="interruption-and-cancellation"><span class="lnum">3</span><span class="lt">Stopping a thread: interruption and cooperative cancellation</span></a></li><li><a href="exceptions-in-threads.html" data-slug="exceptions-in-threads"><span class="lnum">4</span><span class="lt">Exceptions and failures inside threads</span></a></li><li><a href="thread-local-daemon-sleep.html" data-slug="thread-local-daemon-sleep"><span class="lnum">5</span><span class="lt">Thread-local storage, daemon threads, sleep, yield and priority</span></a></li></ol></details><details><summary><span class="mn">03</span>Races and atomicity<span class="mc" data-modfrac="core-3"></span></summary><ol><li><a href="race-vs-data-race.html" data-slug="race-vs-data-race"><span class="lnum">1</span><span class="lt">Race conditions versus data races</span></a></li><li><a href="lost-update.html" data-slug="lost-update"><span class="lnum">2</span><span class="lt">The lost update: read, modify, write</span></a></li><li><a href="check-then-act.html" data-slug="check-then-act"><span class="lnum">3</span><span class="lt">Check then act: two safe calls, one unsafe sequence</span></a></li><li><a href="invariants-and-critical-sections.html" data-slug="invariants-and-critical-sections"><span class="lnum">4</span><span class="lt">Invariants, critical sections and finding shared state</span></a></li></ol></details><details><summary><span class="mn">04</span>Locks<span class="mc" data-modfrac="core-4"></span></summary><ol><li><a href="mutex-basics.html" data-slug="mutex-basics"><span class="lnum">1</span><span class="lt">Mutexes and RAII guards</span></a></li><li><a href="lock-rules.html" data-slug="lock-rules"><span class="lnum">2</span><span class="lt">The rules of locking</span></a></li><li><a href="trylock-timeouts-fairness.html" data-slug="trylock-timeouts-fairness"><span class="lnum">3</span><span class="lt">tryLock, timeouts, interruptible locking and fairness</span></a></li><li><a href="reentrancy.html" data-slug="reentrancy"><span class="lnum">4</span><span class="lt">Reentrant and recursive locks</span></a></li><li><a href="read-write-locks.html" data-slug="read-write-locks"><span class="lnum">5</span><span class="lt">Read-write locks and StampedLock</span></a></li><li><a href="lock-granularity-and-striping.html" data-slug="lock-granularity-and-striping"><span class="lnum">6</span><span class="lt">Lock granularity, contention and lock striping</span></a></li><li><a href="multiple-locks.html" data-slug="multiple-locks"><span class="lnum">7</span><span class="lt">Taking several locks safely</span></a></li><li><a href="how-locks-work.html" data-slug="how-locks-work"><span class="lnum">8</span><span class="lt">How locks are built: CAS, spinning, parking and futexes</span></a></li></ol></details><details><summary><span class="mn">05</span>Waiting and signaling<span class="mc" data-modfrac="core-5"></span></summary><ol><li><a href="busy-waiting.html" data-slug="busy-waiting"><span class="lnum">1</span><span class="lt">Busy waiting, and when spinning is right</span></a></li><li><a href="condition-variables.html" data-slug="condition-variables"><span class="lnum">2</span><span class="lt">Condition variables and monitors</span></a></li><li><a href="wait-in-a-loop.html" data-slug="wait-in-a-loop"><span class="lnum">3</span><span class="lt">Spurious and stolen wakeups: always wait in a loop</span></a></li><li><a href="lost-wakeups-and-notify-all.html" data-slug="lost-wakeups-and-notify-all"><span class="lnum">4</span><span class="lt">Lost wakeups, notify versus notifyAll, Mesa versus Hoare</span></a></li><li><a href="producer-consumer.html" data-slug="producer-consumer"><span class="lnum">5</span><span class="lt">Producer and consumer with a bounded buffer</span></a></li></ol></details><details><summary><span class="mn">06</span>The memory model<span class="mc" data-modfrac="core-6"></span></summary><ol><li><a href="visibility.html" data-slug="visibility"><span class="lnum">1</span><span class="lt">Visibility: why a thread may never see your write</span></a></li><li><a href="reordering.html" data-slug="reordering"><span class="lnum">2</span><span class="lt">Reordering by the compiler and the CPU</span></a></li><li><a href="happens-before.html" data-slug="happens-before"><span class="lnum">3</span><span class="lt">Happens-before and synchronizes-with</span></a></li><li><a href="volatile-and-atomic.html" data-slug="volatile-and-atomic"><span class="lnum">4</span><span class="lt">volatile in Java, std::atomic in C++</span></a></li><li><a href="memory-orders.html" data-slug="memory-orders"><span class="lnum">5</span><span class="lt">C++ memory orders: seq_cst, acquire, release and relaxed</span></a></li><li><a href="safe-publication.html" data-slug="safe-publication"><span class="lnum">6</span><span class="lt">Safe publication, immutability and final fields</span></a></li><li><a href="double-checked-locking.html" data-slug="double-checked-locking"><span class="lnum">7</span><span class="lt">Double-checked locking and lazy initialization</span></a></li><li><a href="caches-and-false-sharing.html" data-slug="caches-and-false-sharing"><span class="lnum">8</span><span class="lt">CPU caches, coherence and false sharing</span></a></li></ol></details><details><summary><span class="mn">07</span>Atomics and lock-free<span class="mc" data-modfrac="core-7"></span></summary><ol><li><a href="atomics-and-cas.html" data-slug="atomics-and-cas"><span class="lnum">1</span><span class="lt">Atomic variables and compare-and-swap</span></a></li><li><a href="cas-loops.html" data-slug="cas-loops"><span class="lnum">2</span><span class="lt">CAS loops and atomic state machines</span></a></li><li><a href="counters-at-scale.html" data-slug="counters-at-scale"><span class="lnum">3</span><span class="lt">Counters at scale: contention, LongAdder and striping</span></a></li><li><a href="spinlocks.html" data-slug="spinlocks"><span class="lnum">4</span><span class="lt">Spinlocks, backoff and when spinning beats blocking</span></a></li><li><a href="lock-free-stack-and-aba.html" data-slug="lock-free-stack-and-aba"><span class="lnum">5</span><span class="lt">A lock-free stack and the ABA problem</span></a></li><li><a href="progress-guarantees.html" data-slug="progress-guarantees"><span class="lnum">6</span><span class="lt">Blocking, lock-free and wait-free</span></a></li></ol></details><details><summary><span class="mn">08</span>Synchronizers<span class="mc" data-modfrac="core-8"></span></summary><ol><li><a href="semaphores.html" data-slug="semaphores"><span class="lnum">1</span><span class="lt">Semaphores: permits as a resource limit</span></a></li><li><a href="latches.html" data-slug="latches"><span class="lnum">2</span><span class="lt">Latches: wait until N things happen</span></a></li><li><a href="barriers-and-phasers.html" data-slug="barriers-and-phasers"><span class="lnum">3</span><span class="lt">Barriers and phasers</span></a></li><li><a href="build-semaphore-and-latch.html" data-slug="build-semaphore-and-latch"><span class="lnum">4</span><span class="lt">Build it yourself: semaphore and latch</span></a></li><li><a href="build-rw-lock-and-barrier.html" data-slug="build-rw-lock-and-barrier"><span class="lnum">5</span><span class="lt">Build it yourself: read-write lock and reusable barrier</span></a></li></ol></details><details><summary><span class="mn">09</span>Thread pools and async<span class="mc" data-modfrac="core-9"></span></summary><ol><li><a href="why-thread-pools.html" data-slug="why-thread-pools"><span class="lnum">1</span><span class="lt">Why thread pools exist</span></a></li><li><a href="executor-anatomy.html" data-slug="executor-anatomy"><span class="lnum">2</span><span class="lt">Inside an executor: the queue-before-max trap</span></a></li><li><a href="sizing-pools.html" data-slug="sizing-pools"><span class="lnum">3</span><span class="lt">Sizing a pool</span></a></li><li><a href="rejection-and-pool-failures.html" data-slug="rejection-and-pool-failures"><span class="lnum">4</span><span class="lt">Bounded queues, rejection and the ways pools fail</span></a></li><li><a href="futures-and-promises.html" data-slug="futures-and-promises"><span class="lnum">5</span><span class="lt">Futures and promises</span></a></li><li><a href="composing-async.html" data-slug="composing-async"><span class="lnum">6</span><span class="lt">Composing async work: CompletableFuture and continuations</span></a></li><li><a href="build-thread-pool.html" data-slug="build-thread-pool"><span class="lnum">7</span><span class="lt">Build it yourself: a thread pool with futures and shutdown</span></a></li><li><a href="scheduled-executors.html" data-slug="scheduled-executors"><span class="lnum">8</span><span class="lt">Scheduled executors and timers</span></a></li><li><a href="fork-join-and-parallel.html" data-slug="fork-join-and-parallel"><span class="lnum">9</span><span class="lt">Fork/join, work stealing and parallel algorithms</span></a></li><li><a href="virtual-threads-and-coroutines.html" data-slug="virtual-threads-and-coroutines"><span class="lnum">10</span><span class="lt">Virtual threads and coroutines</span></a></li><li><a href="build-a-future.html" data-slug="build-a-future"><span class="lnum">11</span><span class="lt">Build it yourself: a future you can complete and chain</span></a></li></ol></details><details><summary><span class="mn">10</span>Concurrent data structures<span class="mc" data-modfrac="core-10"></span></summary><ol><li><a href="blocking-queues.html" data-slug="blocking-queues"><span class="lnum">1</span><span class="lt">Blocking queues</span></a></li><li><a href="concurrent-hash-maps.html" data-slug="concurrent-hash-maps"><span class="lnum">2</span><span class="lt">Concurrent hash maps</span></a></li><li><a href="copy-on-write-and-snapshots.html" data-slug="copy-on-write-and-snapshots"><span class="lnum">3</span><span class="lt">Copy-on-write and immutable snapshots</span></a></li><li><a href="concurrent-caches.html" data-slug="concurrent-caches"><span class="lnum">4</span><span class="lt">Thread-safe caches: LRU, TTL and single-flight</span></a></li><li><a href="concurrent-iteration.html" data-slug="concurrent-iteration"><span class="lnum">5</span><span class="lt">Iterating while others write</span></a></li><li><a href="linearizability.html" data-slug="linearizability"><span class="lnum">6</span><span class="lt">Linearizability: what correct means</span></a></li></ol></details><details><summary><span class="mn">11</span>Liveness and failure<span class="mc" data-modfrac="core-11"></span></summary><ol><li><a href="deadlock.html" data-slug="deadlock"><span class="lnum">1</span><span class="lt">Deadlock: the four conditions and how to break each</span></a></li><li><a href="deadlock-avoidance-and-detection.html" data-slug="deadlock-avoidance-and-detection"><span class="lnum">2</span><span class="lt">Deadlock avoidance and detection</span></a></li><li><a href="livelock-and-starvation.html" data-slug="livelock-and-starvation"><span class="lnum">3</span><span class="lt">Livelock, starvation and fairness</span></a></li><li><a href="priority-inversion-and-convoys.html" data-slug="priority-inversion-and-convoys"><span class="lnum">4</span><span class="lt">Priority inversion and lock convoys</span></a></li><li><a href="thundering-herd.html" data-slug="thundering-herd"><span class="lnum">5</span><span class="lt">Thundering herd and cache stampede</span></a></li><li><a href="bug-symptom-map.html" data-slug="bug-symptom-map"><span class="lnum">6</span><span class="lt">From symptom to cause: the bug map</span></a></li></ol></details><details><summary><span class="mn">12</span>Classic problems<span class="mc" data-modfrac="core-12"></span></summary><ol><li><a href="ordering-threads.html" data-slug="ordering-threads"><span class="lnum">1</span><span class="lt">Making threads take turns</span></a></li><li><a href="dining-philosophers.html" data-slug="dining-philosophers"><span class="lnum">2</span><span class="lt">The dining philosophers</span></a></li><li><a href="readers-writers.html" data-slug="readers-writers"><span class="lnum">3</span><span class="lt">Readers and writers, three ways</span></a></li><li><a href="h2o-and-group-formation.html" data-slug="h2o-and-group-formation"><span class="lnum">4</span><span class="lt">H2O and group formation problems</span></a></li><li><a href="barber-and-bathroom.html" data-slug="barber-and-bathroom"><span class="lnum">5</span><span class="lt">The sleeping barber and the unisex bathroom</span></a></li><li><a href="web-crawler.html" data-slug="web-crawler"><span class="lnum">6</span><span class="lt">The multithreaded web crawler</span></a></li><li><a href="rate-limiters.html" data-slug="rate-limiters"><span class="lnum">7</span><span class="lt">Thread-safe rate limiters</span></a></li></ol></details><details open><summary><span class="mn">13</span>Patterns for thread safety<span class="mc" data-modfrac="core-13"></span></summary><ol><li><a href="safety-ladder.html" data-slug="safety-ladder"><span class="lnum">1</span><span class="lt">The safety ladder</span></a></li><li><a href="confinement-and-thread-local.html" data-slug="confinement-and-thread-local"><span class="lnum">2</span><span class="lt">Confinement and thread-local state</span></a></li><li><a href="single-writer-and-actors.html" data-slug="single-writer-and-actors"><span class="lnum">3</span><span class="lt">Single writer, actors and message passing</span></a></li><li><a href="pipelines-and-fan-out.html" data-slug="pipelines-and-fan-out" class=here><span class="lnum">4</span><span class="lt">Pipelines, fan-out, fan-in and batching</span></a></li><li><a href="monitor-object-pattern.html" data-slug="monitor-object-pattern"><span class="lnum">5</span><span class="lt">The monitor object pattern</span></a></li></ol></details><details><summary><span class="mn">14</span>Debugging and testing<span class="mc" data-modfrac="core-14"></span></summary><ol><li><a href="thread-dumps.html" data-slug="thread-dumps"><span class="lnum">1</span><span class="lt">Reading thread dumps and stacks</span></a></li><li><a href="thread-sanitizer.html" data-slug="thread-sanitizer"><span class="lnum">2</span><span class="lt">ThreadSanitizer and other race detectors</span></a></li><li><a href="testing-concurrent-code.html" data-slug="testing-concurrent-code"><span class="lnum">3</span><span class="lt">Testing concurrent code</span></a></li><li><a href="performance-and-contention.html" data-slug="performance-and-contention"><span class="lnum">4</span><span class="lt">Performance: contention, Amdahl and profiling</span></a></li></ol></details><details><summary><span class="mn">15</span>Concurrency in services<span class="mc" data-modfrac="core-15"></span></summary><ol><li><a href="server-threading-models.html" data-slug="server-threading-models"><span class="lnum">1</span><span class="lt">Server threading models</span></a></li><li><a href="io-models.html" data-slug="io-models"><span class="lnum">2</span><span class="lt">Blocking, non-blocking and multiplexed I/O</span></a></li><li><a href="queueing-math.html" data-slug="queueing-math"><span class="lnum">3</span><span class="lt">Queueing math for design rounds</span></a></li><li><a href="backpressure-and-load-shedding.html" data-slug="backpressure-and-load-shedding"><span class="lnum">4</span><span class="lt">Backpressure, bounded queues and load shedding</span></a></li><li><a href="bulkheads-timeouts-retries.html" data-slug="bulkheads-timeouts-retries"><span class="lnum">5</span><span class="lt">Bulkheads, timeouts, retries and circuit breakers</span></a></li><li><a href="rate-vs-concurrency-limits.html" data-slug="rate-vs-concurrency-limits"><span class="lnum">6</span><span class="lt">Rate limits versus concurrency limits</span></a></li></ol></details><details><summary><span class="mn">16</span>Concurrency across machines<span class="mc" data-modfrac="core-16"></span></summary><ol><li><a href="db-isolation-and-anomalies.html" data-slug="db-isolation-and-anomalies"><span class="lnum">1</span><span class="lt">Database isolation levels and anomalies</span></a></li><li><a href="optimistic-vs-pessimistic.html" data-slug="optimistic-vs-pessimistic"><span class="lnum">2</span><span class="lt">Optimistic versus pessimistic concurrency control</span></a></li><li><a href="idempotency-and-exactly-once.html" data-slug="idempotency-and-exactly-once"><span class="lnum">3</span><span class="lt">Idempotency, retries and exactly-once effects</span></a></li><li><a href="distributed-locks-and-fencing.html" data-slug="distributed-locks-and-fencing"><span class="lnum">4</span><span class="lt">Distributed locks, leases and fencing tokens</span></a></li><li><a href="ordering-by-ownership.html" data-slug="ordering-by-ownership"><span class="lnum">5</span><span class="lt">Ordering by ownership: partitions and single writers</span></a></li><li><a href="design-cases.html" data-slug="design-cases"><span class="lnum">6</span><span class="lt">Design cases: seats, flash sales, schedulers and counters</span></a></li></ol></details><details><summary><span class="mn">17</span>System coding rounds<span class="mc" data-modfrac="core-17"></span></summary><ol><li><a href="system-coding-rounds.html" data-slug="system-coding-rounds"><span class="lnum">1</span><span class="lt">System coding rounds: what they are and how they are graded</span></a></li><li><a href="executor-without-libraries.html" data-slug="executor-without-libraries"><span class="lnum">2</span><span class="lt">An executor without libraries: submit, wait for all, shutdown and shutdownNow</span></a></li><li><a href="dependency-job-runner.html" data-slug="dependency-job-runner"><span class="lnum">3</span><span class="lt">A parallel job runner that respects dependencies</span></a></li><li><a href="debugging-rounds.html" data-slug="debugging-rounds"><span class="lnum">4</span><span class="lt">Debugging rounds: the bug in someone else&#x27;s threaded code</span></a></li><li><a href="file-io-and-durability.html" data-slug="file-io-and-durability"><span class="lnum">5</span><span class="lt">Files, offsets, buffers, flush and fsync</span></a></li><li><a href="durable-log-writer.html" data-slug="durable-log-writer"><span class="lnum">6</span><span class="lt">A concurrent, ordered, durable log writer</span></a></li><li><a href="parallel-file-processing.html" data-slug="parallel-file-processing"><span class="lnum">7</span><span class="lt">Parallel copies, chunked reads and caches over slow storage</span></a></li><li><a href="fixed-buffer-queues.html" data-slug="fixed-buffer-queues"><span class="lnum">8</span><span class="lt">Queues inside a fixed buffer</span></a></li><li><a href="memory-allocators.html" data-slug="memory-allocators"><span class="lnum">9</span><span class="lt">Memory allocators: free lists, buddy allocation and thread safety</span></a></li><li><a href="machine-coding-with-concurrency.html" data-slug="machine-coding-with-concurrency"><span class="lnum">10</span><span class="lt">Machine coding rounds: thread-safe designs end to end</span></a></li></ol></details><details><summary><span class="mn">18</span>The interview room<span class="mc" data-modfrac="core-18"></span></summary><ol><li><a href="coding-round-playbook.html" data-slug="coding-round-playbook"><span class="lnum">1</span><span class="lt">How to run a concurrency coding round</span></a></li><li><a href="java-cheat-sheet.html" data-slug="java-cheat-sheet"><span class="lnum">2</span><span class="lt">Java concurrency cheat sheet</span></a></li><li><a href="cpp-cheat-sheet.html" data-slug="cpp-cheat-sheet"><span class="lnum">3</span><span class="lt">C++ concurrency cheat sheet, with pthreads</span></a></li><li><a href="phrasing-bank.html" data-slug="phrasing-bank"><span class="lnum">4</span><span class="lt">Saying it like a senior</span></a></li><li><a href="company-playbooks.html" data-slug="company-playbooks"><span class="lnum">5</span><span class="lt">Company playbooks</span></a></li><li><a href="final-checklist.html" data-slug="final-checklist"><span class="lnum">6</span><span class="lt">The final checklist</span></a></li></ol></details></aside><main class="lmain"><nav class="crumbs"><a href="index.html">Concurrency</a><span>/</span><a href="track-core.html">Course</a><span>/</span><a href="track-core.html#m13">Module 13: Patterns for thread safety</a></nav><header class="lhead"><div class="lkicker"><span>Lesson 13.4</span><span>31 min</span><span class="lvl lvl-core">Core</span><span class="donechip"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>Done</span></div><h1>Pipelines, fan-out, fan-in and batching</h1><p class="lsum">Stages joined by bounded queues, fan-out and fan-in, batching, ordered results with bounded parallelism, and back-pressure from the last stage to the first.</p><div class="asked"><span>Asked at</span><span class="co">Databricks</span></div><div class="prereq"><span>Before this:</span><a href="producer-consumer.html">Producer and consumer with a bounded buffer</a><a href="blocking-queues.html">Blocking queues</a><a href="futures-and-promises.html">Futures and promises</a><a href="single-writer-and-actors.html">Single writer, actors and message passing</a></div></header><article class="prose" id="article">
+<p class="lead">Most real concurrent programs are not one pool doing one thing. They are an assembly line: read, parse, transform, write. Each stage runs at its own speed, and the queues between the stages decide whether the line flows, floods or stalls.</p>
+
+<div class="box plain">
+<h3>In plain words</h3>
+<p>A wedding caterer's kitchen makes rotis for five hundred guests. One person rolls the dough, three people cook on three tawas (they share one pile of rolled dough, whoever is free takes the next), and one person stacks the cooked rotis into boxes. Between stations sit trays that hold only ten.</p>
+<p>When the packer falls behind, the tray in front of her fills, so the cooks stop; then their tray fills, so the roller stops. Nobody is told to slow down, yet the whole line slows to the packer's pace and the kitchen never drowns in rotis. <strong>Small trays between stations are what keep a fast station from burying a slow one.</strong> When the order is complete, the roller sends one "last one" card for each cook, and the packer waits for all three cards before closing.</p>
+</div>
+
+<h2 id="stages-joined-by-bounded-queues">Stages joined by bounded queues</h2>
+<p>A <a class="term" data-term="pipeline" href="glossary.html#pipeline">pipeline</a> is a chain of stages. Each stage is one thread or a small pool that takes an item from its input queue, does its part, and puts the result on its output queue. Three numbers describe it:</p>
+<ul>
+<li><strong>Throughput</strong> cannot exceed the slowest stage's capacity for a one-input, one-output pipeline. With sufficient input, independent resources and small handoff overhead, it approaches that capacity. A stage that handles 2,000 items a second caps the whole pipeline at 2,000, however fast the others are.</li>
+<li><strong>Latency</strong> for one item is the sum of the stage times plus the time it spends waiting in queues.</li>
+<li><strong>Queued items</strong> are bounded by the sum of the queue capacities. Total memory also includes active workers, batches, reorder buffers, retained inputs and outputs, and payload sizes. Bound those too; a capacity in items is not a capacity in bytes.</li>
+</ul>
+<p>Two parts of the design are easy to forget. Stopping: after all producers finish, send an end of stream marker (a <a class="term" data-term="poison-pill" href="glossary.html#poison-pill">poison pill</a>) for each worker that exits on taking one. Our single collector counts one marker per worker. If the next stage has several consumers too, use a coordinator to count upstream completions and send exactly one marker per downstream consumer; blindly forwarding markers across different worker counts is unsafe. Failing: if one stage dies silently, the stage before it blocks forever on a full queue and the stage after it waits forever on an empty one, so a failure must travel both ways.</p>
+
+<h2 id="fan-out-and-fan-in">Fan-out and fan-in</h2>
+<p><a class="term" data-term="fan-out" href="glossary.html#fan-out">Fan-out</a> means several workers take from one queue: whoever is free takes the next item, so load spreads by itself and other workers can process independent items while one item is slow. <a class="term" data-term="fan-in" href="glossary.html#fan-in">Fan-in</a> means several workers put into one queue that a single downstream thread drains. Together they parallelize the slow stage of a pipeline. This is work sharing, not broadcasting: each input goes to one worker. Fan-in can also feed several downstream consumers. The price is order: enqueue order after processing need not match input order, so attach sequence numbers if order matters.</p>
+
+<p>This first program demonstrates normal completion only: no cancellation, allocation failure or processing failure is injected. Start consumers before producing or joining workers, so bounded output queues can drain. The failure protocol below explains what must change for shutdown under faults.</p>
+
+<figure class="code pair" data-sample="pipelines-and-fan-out.1" data-expect="ok"><figcaption><span class="ctitle">Source, four workers, one collector, bounded queues between them</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> BoundedQueue {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BoundedQueue</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {
+        <span class="k">if</span> (capacity == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"zero capacity"</span>);
+    }
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        notFull_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_; });   <span class="c">// a full queue blocks the stage before it</span>
+        items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        notEmpty_.<span class="f">notify_one</span>();
+    }
+
+    T <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        notEmpty_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !items_.<span class="f">empty</span>(); });
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        notFull_.<span class="f">notify_one</span>();
+        <span class="k">return</span> item;
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notFull_, notEmpty_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;                       <span class="c">// guarded by m_</span>
+};
+
+<span class="k">constexpr</span> <span class="t">int</span> WORKERS = <span class="n">4</span>;
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="k">using</span> Item = <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">long</span>&gt;;           <span class="c">// std::nullopt is the end of stream marker</span>
+    BoundedQueue&lt;Item&gt; <span class="f">toWorkers</span>(<span class="n">8</span>), <span class="f">toCollector</span>(<span class="n">8</span>);
+
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">std</span>::<span class="t">thread</span>&gt; workers;
+    <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; WORKERS; w += <span class="n">1</span>) {      <span class="c">// fan-out: four workers share one input queue</span>
+        workers.<span class="f">emplace_back</span>([&amp;] {
+            <span class="k">while</span> (<span class="k">true</span>) {
+                Item item = toWorkers.<span class="f">take</span>();
+                <span class="k">if</span> (!item) {                    <span class="c">// pass the end on, then stop</span>
+                    toCollector.<span class="f">put</span>(<span class="t">std</span>::nullopt);
+                    <span class="k">return</span>;
+                }
+                <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(<span class="n">1</span>));   <span class="c">// the slow part of the work; the sleep stands in for it</span>
+                toCollector.<span class="f">put</span>(*item * *item);
+            }
+        });
+    }
+
+    <span class="t">long</span> sum = <span class="n">0</span>, count = <span class="n">0</span>;                    <span class="c">// written only by the collector thread</span>
+    <span class="t">std</span>::<span class="t">thread</span> <span class="f">collector</span>([&amp;] {                 <span class="c">// fan-in: one thread drains all workers' output</span>
+        <span class="t">int</span> endsSeen = <span class="n">0</span>;
+        <span class="k">while</span> (endsSeen &lt; WORKERS) {            <span class="c">// one end marker per worker</span>
+            Item item = toCollector.<span class="f">take</span>();
+            <span class="k">if</span> (!item) endsSeen += <span class="n">1</span>;
+            <span class="k">else</span> { sum += *item; count += <span class="n">1</span>; }
+        }
+    });
+
+    <span class="k">for</span> (<span class="t">long</span> i = <span class="n">1</span>; i &lt;= <span class="n">200</span>; i += <span class="n">1</span>) toWorkers.<span class="f">put</span>(i);              <span class="c">// the source blocks whenever workers fall behind</span>
+    <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; WORKERS; w += <span class="n">1</span>) toWorkers.<span class="f">put</span>(<span class="t">std</span>::nullopt); <span class="c">// one end marker per worker</span>
+    <span class="k">for</span> (<span class="k">auto</span>&amp; t : workers) t.<span class="f">join</span>();
+    collector.<span class="f">join</span>();
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"processed "</span> &lt;&lt; count &lt;&lt; <span class="s">" items, sum of squares "</span> &lt;&lt; sum &lt;&lt; <span class="s">" (want 2686700)\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ArrayBlockingQueue</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">BlockingQueue</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="k">record</span> <span class="t">Item</span>(<span class="t">int</span> value) { }
+    <span class="k">static</span> <span class="k">final</span> <span class="t">Item</span> END = <span class="k">new</span> <span class="t">Item</span>(-<span class="n">1</span>);                   <span class="c">// end of stream marker, compared by identity</span>
+    <span class="k">static</span> <span class="k">final</span> <span class="t">int</span> WORKERS = <span class="n">4</span>;
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="t">BlockingQueue</span>&lt;<span class="t">Item</span>&gt; toWorkers = <span class="k">new</span> <span class="t">ArrayBlockingQueue</span>&lt;&gt;(<span class="n">8</span>);     <span class="c">// bounded: a full queue blocks the stage before it</span>
+        <span class="t">BlockingQueue</span>&lt;<span class="t">Item</span>&gt; toCollector = <span class="k">new</span> <span class="t">ArrayBlockingQueue</span>&lt;&gt;(<span class="n">8</span>);
+
+        <span class="t">List</span>&lt;<span class="t">Thread</span>&gt; workers = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; WORKERS; w += <span class="n">1</span>) {               <span class="c">// fan-out: four workers share one input queue</span>
+            <span class="t">Thread</span> t = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {
+                <span class="k">try</span> {
+                    <span class="k">while</span> (<span class="k">true</span>) {
+                        <span class="t">Item</span> item = toWorkers.<span class="f">take</span>();
+                        <span class="k">if</span> (item == END) {                   <span class="c">// pass the end on, then stop</span>
+                            toCollector.<span class="f">put</span>(END);
+                            <span class="k">return</span>;
+                        }
+                        <span class="t">Thread</span>.<span class="f">sleep</span>(<span class="n">1</span>);                     <span class="c">// the slow part of the work; the sleep stands in for it</span>
+                        toCollector.<span class="f">put</span>(<span class="k">new</span> <span class="t">Item</span>(item.<span class="f">value</span>() * item.<span class="f">value</span>()));
+                    }
+                } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                    <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                }
+            }, <span class="s">"worker-"</span> + w);
+            workers.<span class="f">add</span>(t);
+            t.<span class="f">start</span>();
+        }
+
+        <span class="t">long</span>[] result = <span class="k">new</span> <span class="t">long</span>[<span class="n">2</span>];                         <span class="c">// sum and count, written only by the collector</span>
+        <span class="t">Thread</span> collector = <span class="k">new</span> <span class="t">Thread</span>(() -&gt; {                <span class="c">// fan-in: one thread drains all workers' output</span>
+            <span class="k">try</span> {
+                <span class="t">int</span> endsSeen = <span class="n">0</span>;
+                <span class="k">while</span> (endsSeen &lt; WORKERS) {                 <span class="c">// one end marker per worker</span>
+                    <span class="t">Item</span> item = toCollector.<span class="f">take</span>();
+                    <span class="k">if</span> (item == END) endsSeen += <span class="n">1</span>;
+                    <span class="k">else</span> { result[<span class="n">0</span>] += item.<span class="f">value</span>(); result[<span class="n">1</span>] += <span class="n">1</span>; }
+                }
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            }
+        }, <span class="s">"collector"</span>);
+        collector.<span class="f">start</span>();
+
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">200</span>; i += <span class="n">1</span>) toWorkers.<span class="f">put</span>(<span class="k">new</span> <span class="t">Item</span>(i));    <span class="c">// the source blocks whenever workers fall behind</span>
+        <span class="k">for</span> (<span class="t">int</span> w = <span class="n">0</span>; w &lt; WORKERS; w += <span class="n">1</span>) toWorkers.<span class="f">put</span>(END);         <span class="c">// one end marker per worker</span>
+        <span class="k">for</span> (<span class="t">Thread</span> t : workers) t.<span class="f">join</span>();
+        collector.<span class="f">join</span>();
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="s">"processed "</span> + result[<span class="n">1</span>] + <span class="s">" items, sum of squares "</span> + result[<span class="n">0</span>] + <span class="s">" (want 2686700)"</span>);
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>processed 200 items, sum of squares 2686700 (want 2686700)</pre></div><div class="runout" hidden></div></figure>
+
+<p>Count the end markers. The source sends four, one per worker, because each worker stops after taking one. Each worker forwards its marker, so the collector stops after seeing four. Send only one marker and three workers wait forever on an empty queue; stop the collector after the first marker and it can miss later results or leave workers blocked on a full output queue. FIFO insertion ensures that each worker's results precede its own marker, so seeing all four proves all their results were drained. Queue transfer publishes preceding writes, but it does not make subsequent mutation of a shared payload safe: transfer ownership or use immutable messages.</p>
+
+<h2 id="back-pressure-from-the-last-stage-to-the-first">Back-pressure, from the last stage to the first</h2>
+<p>Blocking bounded queues propagate <a class="term" data-term="backpressure" href="glossary.html#backpressure">back-pressure</a> between these stages. When the last stage slows down, its input queue fills, the stage before it blocks on <code>put</code>, then that stage's own input fills, and so on until the source blocks. The pipeline settles at the speed of its slowest stage, and queued item counts stay within capacity; worker state, batches and other retained data need separate bounds.</p>
+
+<figure class="timeline"><figcaption>A slow disk slows the whole line, safely</figcaption><div class="tl c4"><div class="tl-head"><span class="t">step</span><span>source</span><span>parsers</span><span>writer</span><span>queues</span></div><div class="tl-row"><span class="t">1</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">the disk slows down; each batch now takes 10 times longer</span><span class="cell empty"></span></div><div class="tl-row"><span class="t">2</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">the parsers-to-writer queue fills to its capacity</span></div><div class="tl-row risk"><span class="t">3</span><span class="cell empty"></span><span class="cell risk">parsers block on put: they stop taking new lines</span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row"><span class="t">4</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span><span class="cell">the source-to-parsers queue fills to its capacity</span></div><div class="tl-row risk"><span class="t">5</span><span class="cell risk">the source blocks on put: it stops reading input</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell empty"></span></div><div class="tl-row good"><span class="t">6</span><span class="cell empty"></span><span class="cell empty"></span><span class="cell good">the writer keeps draining at its new, slower pace</span><span class="cell empty"></span></div><div class="tl-note">Throughput drops to the writer&#x27;s speed; queued work remains bounded. Sustained excess input to unbounded queues would keep growing the backlog.</div></div></figure>
+
+<p>At the very front, where requests come from outside, blocking is only one choice. You can block (push the back-pressure to your callers), reject and shed load (fail fast with an error the caller can retry later), drop or sample (fine for metrics and logs that tolerate loss), or spill to disk (absorb a burst at the cost of complexity). <a href="backpressure-and-load-shedding.html">Back-pressure and load shedding</a> covers how services choose.</p>
+
+<h2 id="batching">Batching</h2>
+<p>Some steps have a large fixed cost per call and a small cost per item: an <code>fsync</code>, a network round trip, a system call, taking a contended lock. <a class="term" data-term="batching" href="glossary.html#batching">Batching</a> pays the fixed cost once for many items. The usual policy is <strong>up to B items or up to T milliseconds, whichever comes first</strong>: the size limit bounds the batch, and the time limit caps intentional batch assembly delay after the first item is taken. Earlier queueing, scheduling delays and the write itself still add latency.</p>
+<p>Use an illustrative cost model, not a disk benchmark: assume a flush costs 1 ms and ignore transfer cost. One flush per event then caps a serial writer at 1,000 events a second; batches of 100 raise that ideal ceiling to 100,000. Real latency depends on the storage stack and load, and has no universal 10 ms upper bound. A durable acknowledgement comes only after the batch write and required durability operation succeed, not when the batch fills; see <a href="file-io-and-durability.html">file I/O and durability</a>.</p>
+
+<figure class="code pair" data-sample="pipelines-and-fan-out.2"><figcaption><span class="ctitle">Taking a batch: up to B items or T time, whichever comes first</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48</span><code><span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> BatchingQueue {
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">BatchingQueue</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {
+        <span class="k">if</span> (capacity == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"zero capacity"</span>);
+    }
+
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        {
+            <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+            notFull_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_; });
+            items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        }
+        ready_.<span class="f">notify_one</span>();
+    }
+
+    <span class="c">// Blocks for the first item, then collects more until maxItems or until maxWait has passed.</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;T&gt; <span class="f">takeBatch</span>(<span class="t">std</span>::<span class="t">size_t</span> maxItems, <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">nanoseconds</span> maxWait) {
+        <span class="k">if</span> (maxItems == <span class="n">0</span> || maxItems &gt; capacity_ || maxWait.<span class="f">count</span>() &lt; <span class="n">0</span>)
+            <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"invalid batch limits"</span>);
+        <span class="t">std</span>::<span class="t">vector</span>&lt;T&gt; batch;
+        batch.<span class="f">reserve</span>(maxItems);
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        ready_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !items_.<span class="f">empty</span>(); });                          <span class="c">// sleep until there is any work</span>
+        <span class="k">const</span> <span class="k">auto</span> deadline = <span class="t">std</span>::<span class="t">chrono</span>::<span class="t">steady_clock</span>::<span class="f">now</span>() + maxWait;
+        ready_.<span class="f">wait_until</span>(lock, deadline, [&amp;] { <span class="k">return</span> items_.<span class="f">size</span>() &gt;= maxItems; });  <span class="c">// wait a little for more</span>
+        <span class="k">while</span> (!items_.<span class="f">empty</span>() &amp;&amp; batch.<span class="f">size</span>() &lt; maxItems) {
+            batch.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>()));
+            items_.<span class="f">pop_front</span>();
+        }
+        notFull_.<span class="f">notify_all</span>();                 <span class="c">// removing a batch frees several slots</span>
+        <span class="k">return</span> batch;
+    }
+
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> ready_, notFull_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;              <span class="c">// guarded by m_</span>
+};</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29</span><code><span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">BlockingQueue</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">TimeUnit</span>;
+
+<span class="k">class</span> <span class="t">Batcher</span> {
+    <span class="c">// Blocks for the first item, then collects more until maxItems or until maxWaitNanos have passed.</span>
+    <span class="k">static</span> &lt;T&gt; <span class="t">List</span>&lt;T&gt; <span class="f">takeBatch</span>(<span class="t">BlockingQueue</span>&lt;T&gt; queue, <span class="t">int</span> maxItems, <span class="t">long</span> maxWaitNanos) <span class="k">throws</span> <span class="t">InterruptedException</span> {
+        <span class="k">if</span> (maxItems &lt;= <span class="n">0</span> || maxWaitNanos &lt; <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"invalid batch limits"</span>);
+        <span class="t">List</span>&lt;T&gt; batch = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;(maxItems);
+        batch.<span class="f">add</span>(queue.<span class="f">take</span>());                                   <span class="c">// sleep until there is any work</span>
+        <span class="t">long</span> deadline = <span class="t">System</span>.<span class="f">nanoTime</span>() + maxWaitNanos;
+        <span class="k">while</span> (batch.<span class="f">size</span>() &lt; maxItems) {
+            queue.<span class="f">drainTo</span>(batch, maxItems - batch.<span class="f">size</span>());        <span class="c">// grab whatever is already waiting</span>
+            <span class="k">if</span> (batch.<span class="f">size</span>() == maxItems) <span class="k">break</span>;
+            <span class="t">long</span> left = deadline - <span class="t">System</span>.<span class="f">nanoTime</span>();
+            <span class="k">if</span> (left &lt;= <span class="n">0</span>) <span class="k">break</span>;
+            <span class="k">try</span> {
+                T next = queue.<span class="f">poll</span>(left, <span class="t">TimeUnit</span>.NANOSECONDS);
+                <span class="k">if</span> (next == <span class="k">null</span>) <span class="k">break</span>;
+                batch.<span class="f">add</span>(next);
+            } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+                <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+                <span class="k">break</span>;                       <span class="c">// return items already removed instead of losing them</span>
+            }
+        }
+        <span class="k">return</span> batch;
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+
+<p>These fragments assume one batching consumer, ordinary nonthrowing value moves in C++, and a timeout whose computed deadline is representable. In Java, interruption before the first item propagates; interruption after taking ownership of items returns the partial batch with the interrupt flag restored. The caller must then flush or explicitly discard that batch according to its cancellation contract. They do not yet handle end markers: the owner must flush a partial batch on close and must not pass a control marker to the data-writing function. Java's deadline arithmetic uses <code>nanoTime</code> differences; C++ uses <code>steady_clock</code>, so wall-clock adjustments do not restart the window.</p>
+<p>Under sustained heavy load batches tend to fill before the deadline; under light load the time limit flushes small batches so batch assembly does not wait forever. This amortizes fixed cost until the writer saturates; beyond saturation, more traffic increases queueing and rejection, not throughput.</p>
+
+<h2 id="ordered-results-with-bounded-parallelism">Ordered results with bounded parallelism</h2>
+<p>A common requirement: apply a slow function to a list, with at most K calls running at once, and return the results in input order. Fan-out and fan-in lose the order, so you need one of three techniques:</p>
+<ul>
+<li><strong>A window of futures in input order.</strong> Start up to K calls; before starting another, wait for the oldest and emit it. Order is automatic and at most K tasks and un-emitted results occupy the window. A returned list still retains all N emitted results; stream them to a sink for bounded total result storage. A slow call at the head holds up emitting later ones that already finished: <a class="term" data-term="head-of-line-blocking" href="glossary.html#head-of-line-blocking">head of line blocking</a>.</li>
+<li><strong>Sequence numbers and a <a class="term" data-term="reorder-buffer" href="glossary.html#reorder-buffer">reorder buffer</a>.</strong> Tag each item with its position; workers finish in any order; the collector keeps early arrivals in a map and emits whenever the next expected position arrives.</li>
+<li><strong>Write into slots.</strong> Each worker writes its result into slot i of a preallocated array, and the caller reads the array after all workers finish. Simple when you only need the whole result at the end. Allocate before launching, give each slot one writer, and join before reading. Do not resize a shared C++ vector during writes, and avoid <code>std::vector&lt;bool&gt;</code> because distinct bits can share storage.</li>
+</ul>
+
+<figure class="code pair" data-sample="pipelines-and-fan-out.3" data-expect="ok"><figcaption><span class="ctitle">An ordered parallel map with at most K calls in flight</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-edit title="Edit this code, then run it">Edit</button><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button><button type="button" class="cbtn run" data-run title="Compile and run on this Mac"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Run</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="p">#include &lt;atomic&gt;</span>
+<span class="p">#include &lt;chrono&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;future&gt;</span>
+<span class="p">#include &lt;iostream&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;thread&gt;</span>
+<span class="p">#include &lt;type_traits&gt;</span>
+<span class="p">#include &lt;vector&gt;</span>
+
+<span class="c">// Applies f to every input with at most k calls running, and returns the results in input order.</span>
+<span class="k">template</span> &lt;<span class="k">typename</span> T, <span class="k">typename</span> F&gt;
+<span class="k">auto</span> <span class="f">orderedMap</span>(<span class="k">const</span> <span class="t">std</span>::<span class="t">vector</span>&lt;T&gt;&amp; inputs, F f, <span class="t">std</span>::<span class="t">size_t</span> k) {
+    <span class="k">if</span> (k == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"k must be positive"</span>);
+    <span class="k">using</span> R = <span class="t">std</span>::invoke_result_t&lt;F, T&gt;;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;<span class="t">std</span>::<span class="t">future</span>&lt;R&gt;&gt; window;                   <span class="c">// futures in input order, never more than k</span>
+    <span class="t">std</span>::<span class="t">vector</span>&lt;R&gt; results;
+    <span class="k">for</span> (<span class="k">const</span> T&amp; input : inputs) {
+        <span class="k">if</span> (window.<span class="f">size</span>() == k) {                        <span class="c">// emit the oldest before starting another</span>
+            results.<span class="f">push_back</span>(window.<span class="f">front</span>().<span class="f">get</span>());     <span class="c">// get() rethrows a failure from the call</span>
+            window.<span class="f">pop_front</span>();
+        }
+        window.<span class="f">push_back</span>(<span class="t">std</span>::<span class="t">async</span>(<span class="t">std</span>::<span class="t">launch</span>::<span class="t">async</span>, f, input));
+    }
+    <span class="k">while</span> (!window.<span class="f">empty</span>()) {
+        results.<span class="f">push_back</span>(window.<span class="f">front</span>().<span class="f">get</span>());
+        window.<span class="f">pop_front</span>();
+    }
+    <span class="k">return</span> results;
+}
+
+<span class="t">std</span>::<span class="t">atomic</span>&lt;<span class="t">int</span>&gt; inFlight{<span class="n">0</span>}, mostInFlight{<span class="n">0</span>};
+
+<span class="t">int</span> <span class="f">slowSquare</span>(<span class="t">int</span> x) {
+    <span class="t">int</span> now = inFlight.<span class="f">fetch_add</span>(<span class="n">1</span>) + <span class="n">1</span>;
+    <span class="t">int</span> seen = mostInFlight.<span class="f">load</span>();
+    <span class="k">while</span> (now &gt; seen &amp;&amp; !mostInFlight.<span class="f">compare_exchange_weak</span>(seen, now)) {}
+    <span class="t">std</span>::<span class="t">this_thread</span>::<span class="f">sleep_for</span>(<span class="t">std</span>::<span class="t">chrono</span>::<span class="t">milliseconds</span>(x % <span class="n">3</span> == <span class="n">0</span> ? <span class="n">6</span> : <span class="n">1</span>));   <span class="c">// uneven latency, simulated</span>
+    inFlight.<span class="f">fetch_sub</span>(<span class="n">1</span>);
+    <span class="k">return</span> x * x;
+}
+
+<span class="t">int</span> <span class="f">main</span>() {
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; inputs;
+    <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">12</span>; i += <span class="n">1</span>) inputs.<span class="f">push_back</span>(i);
+    <span class="t">std</span>::<span class="t">vector</span>&lt;<span class="t">int</span>&gt; out = <span class="f">orderedMap</span>(inputs, slowSquare, <span class="n">4</span>);
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"["</span>;
+    <span class="k">for</span> (<span class="t">std</span>::<span class="t">size_t</span> i = <span class="n">0</span>; i &lt; out.<span class="f">size</span>(); i += <span class="n">1</span>) <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; (i ? <span class="s">", "</span> : <span class="s">""</span>) &lt;&lt; out[i];
+    <span class="t">std</span>::<span class="t">cout</span> &lt;&lt; <span class="s">"], most calls in flight: "</span> &lt;&lt; mostInFlight &lt;&lt; <span class="s">"\n"</span>;
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50</span><code><span class="k">import</span> java.util.<span class="t">ArrayDeque</span>;
+<span class="k">import</span> java.util.<span class="t">ArrayList</span>;
+<span class="k">import</span> java.util.<span class="t">List</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">ExecutorService</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Executors</span>;
+<span class="k">import</span> java.util.concurrent.<span class="t">Future</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicInteger</span>;
+<span class="k">import</span> java.util.function.<span class="t">Function</span>;
+
+<span class="k">public</span> <span class="k">class</span> <span class="t">Main</span> {
+    <span class="c">// Applies f to every input with at most k calls running, and returns the results in input order.</span>
+    <span class="k">static</span> &lt;T, R&gt; <span class="t">List</span>&lt;R&gt; <span class="f">orderedMap</span>(<span class="t">List</span>&lt;T&gt; inputs, <span class="t">Function</span>&lt;T, R&gt; f, <span class="t">int</span> k) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="k">if</span> (k &lt;= <span class="n">0</span>) <span class="k">throw</span> <span class="k">new</span> <span class="t">IllegalArgumentException</span>(<span class="s">"k must be positive"</span>);
+        <span class="t">ExecutorService</span> pool = <span class="t">Executors</span>.<span class="f">newFixedThreadPool</span>(k);
+        <span class="k">try</span> {
+            <span class="t">ArrayDeque</span>&lt;<span class="t">Future</span>&lt;R&gt;&gt; window = <span class="k">new</span> <span class="t">ArrayDeque</span>&lt;&gt;();   <span class="c">// futures in input order, never more than k</span>
+            <span class="t">List</span>&lt;R&gt; results = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+            <span class="k">for</span> (T input : inputs) {
+                <span class="k">if</span> (window.<span class="f">size</span>() == k) results.<span class="f">add</span>(window.<span class="f">removeFirst</span>().<span class="f">get</span>());   <span class="c">// emit the oldest before starting another</span>
+                window.<span class="f">addLast</span>(pool.<span class="f">submit</span>(() -&gt; f.<span class="f">apply</span>(input)));
+            }
+            <span class="k">while</span> (!window.<span class="f">isEmpty</span>()) results.<span class="f">add</span>(window.<span class="f">removeFirst</span>().<span class="f">get</span>());
+            <span class="k">return</span> results;                                      <span class="c">// get() rethrows a failure, wrapped in ExecutionException</span>
+        } <span class="k">finally</span> {
+            pool.<span class="f">shutdownNow</span>();
+            pool.<span class="f">close</span>();                   <span class="c">// Java 21: wait for termination, including on failure</span>
+        }
+    }
+
+    <span class="k">static</span> <span class="k">final</span> <span class="t">AtomicInteger</span> inFlight = <span class="k">new</span> <span class="t">AtomicInteger</span>(), mostInFlight = <span class="k">new</span> <span class="t">AtomicInteger</span>();
+
+    <span class="k">static</span> <span class="t">int</span> <span class="f">slowSquare</span>(<span class="t">int</span> x) {
+        mostInFlight.<span class="f">accumulateAndGet</span>(inFlight.<span class="f">incrementAndGet</span>(), <span class="t">Math</span>::max);
+        <span class="k">try</span> {
+            <span class="t">Thread</span>.<span class="f">sleep</span>(x % <span class="n">3</span> == <span class="n">0</span> ? <span class="n">6</span> : <span class="n">1</span>);                    <span class="c">// uneven latency, simulated</span>
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            <span class="k">throw</span> <span class="k">new</span> java.util.concurrent.<span class="t">CancellationException</span>(<span class="s">"interrupted"</span>);
+        } <span class="k">finally</span> {
+            inFlight.<span class="f">addAndGet</span>(-<span class="n">1</span>);
+        }
+        <span class="k">return</span> x * x;
+    }
+
+    <span class="k">public</span> <span class="k">static</span> <span class="k">void</span> <span class="f">main</span>(<span class="t">String</span>[] args) <span class="k">throws</span> <span class="t">Exception</span> {
+        <span class="t">List</span>&lt;<span class="t">Integer</span>&gt; inputs = <span class="k">new</span> <span class="t">ArrayList</span>&lt;&gt;();
+        <span class="k">for</span> (<span class="t">int</span> i = <span class="n">1</span>; i &lt;= <span class="n">12</span>; i += <span class="n">1</span>) inputs.<span class="f">add</span>(i);
+        <span class="t">System</span>.out.<span class="f">println</span>(<span class="f">orderedMap</span>(inputs, <span class="t">Main</span>::slowSquare, <span class="n">4</span>) + <span class="s">", most calls in flight: "</span> + mostInFlight.<span class="f">get</span>());
+    }
+}</code></div></pre></div><div class="csample"><span>Typical output</span><pre>[1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 121, 144], most calls in flight: 4</pre></div><div class="runout" hidden></div></figure>
+
+<p>The samples require a callable safe to invoke concurrently, copyable C++ inputs and callable, and a non-void value result. Peak observed concurrency may be below K because scheduling is nondeterministic; the guarantee is the upper bound. The C++ samples use C++17 facilities and also compile as C++20.</p>
+
+<p>The reorder buffer version has one trap worth knowing before an interviewer springs it. If you limit parallelism with a semaphore and release the permit when a call <em>finishes</em>, a slow item at the head lets every other item finish and pile up in the buffer: K calls in flight, but the buffer can grow without bound. <strong>Release the permit when a result is emitted, not when it is computed</strong>, and at most K admitted items remain un-emitted. Acquire that permit before admission, and keep it through processing and ordering.</p>
+<p><strong>Do not deadlock the reorder buffer.</strong> A collector that stops draining a full completion queue while waiting for item 1 can prevent item 1 from entering that queue. Bound admission instead, and keep draining every admitted result into storage sized for the whole window. Release permits on cancellation too, or explicitly tear down the entire admission mechanism. A slow first item still causes head of line blocking; bounded memory does not remove that latency.</p>
+
+<div class="only only-cpp"><span class="otag">C++</span><p><code>std::async</code> with <code>std::launch::async</code> runs each call as if in a new thread, so thread creation costs remain even though at most K calls run at once. Releasing the last reference to an unfinished async shared state can wait for completion. These futures therefore wait during unwinding if <code>get()</code> throws; the remaining work is not cancelled. A reusable pool avoids per-item thread creation, and cooperative cancellation must be designed separately.</p></div>
+<div class="only only-java"><span class="otag">Java</span><p><code>ExecutionException</code> wraps whatever the function threw; unwrap it with <code>getCause()</code> if callers should see the original. <code>shutdownNow()</code> attempts interruption; it does not wait and cannot force an uncooperative task to stop. The subsequent Java 21 <code>close()</code> waits for termination. Thus this map owns its workers until they finish, but an uncooperative function can prevent it from returning. Also, retrieving futures in input order can delay discovery of a later failure behind an earlier slow call.</p></div>
+
+<h2 id="failure-and-cancellation-need-their-own-path">Failure and cancellation need their own path</h2>
+<p><strong>Graceful close drains; abort wakes and rejects.</strong> Normal completion sends markers after the last accepted item and flushes the final partial batch before reporting success. For abort, record the first failure and stop accepting work, then wake both blocked puts and blocked takes. Merely checking an error flag before a blocking call leaves a race where failure occurs immediately after the check.</p>
+<p>A custom abortable channel keeps <code>aborted</code> under the queue mutex. A put waits for space <em>or abort</em>, a take waits for data <em>or abort</em>, and both reject once aborted. Its abort operation sets the flag and broadcasts on both conditions; call it on every channel without holding another channel's lock. Java <code>BlockingQueue</code> has no built-in close: a supervisor can instead interrupt all stage threads, provided every stage treats interruption as terminal and performs no blocking marker insertion afterwards. Ordinary C++ condition-variable waits do not respond to a stop token automatically.</p>
+<p>After requesting abort, join all stage threads, release resources and report the first failure. External I/O and transforms must be bounded or cooperate with cancellation; no queue protocol can force an arbitrary stuck function to return. Do not run all blocking stages on a fixed pool that can fill entirely with upstream tasks waiting for downstream tasks that have not started. Use independent stage capacity or nonblocking composition. Across a process crash, retries require idempotency or durable tracking; an in-memory pipeline does not provide exactly-once side effects.</p>
+
+<h2 id="sizing-the-stages">Sizing the stages</h2>
+<p><a class="term" data-term="littles-law" href="glossary.html#littles-law">Little's law</a> ties the numbers together: the items in a stage on average equal its throughput times the time each item spends there. If parsing takes 4 ms per item and you need 1,000 items a second, an average of about 4 items must be actively parsing, so you need at least 4 parser threads (and 4 free cores, since parsing is CPU work). These are ideal lower bounds, with no CPU headroom. Size queues from a latency budget and a burst allowance: a 1,000-item backlog before a 1,000-item-per-second server takes roughly one second to drain with no new input. Also budget bytes and downstream limits such as connection capacity. A long queue does not add throughput; it only adds latency and hides the moment you fall behind.</p>
+
+<div class="box example">
+<h3>Worked example: a log indexing pipeline</h3>
+<p>The task: read log lines from files, parse each line into fields, and write the parsed records to an index, in order. The machine has 8 cores. Assumed costs for this illustrative capacity calculation: reading takes 0.01 ms per line, parsing 0.4 ms per line of CPU, and each write to the index costs about 5 ms whether it carries 1 record or 100.</p>
+<table>
+<thead><tr><th>Stage</th><th>Design</th><th>Capacity</th></tr></thead>
+<tbody>
+<tr><td>Read</td><td>1 thread</td><td>1 / 0.01 ms = 100,000 lines a second</td></tr>
+<tr><td>Parse</td><td>7 threads (fan-out), leaving roughly one core for other work</td><td>7 times 1 / 0.4 ms = 17,500 lines a second</td></tr>
+<tr><td>Write</td><td>1 owner thread, batches of up to 100 or 20 ms</td><td>100 per 5 ms = 20,000 lines a second</td></tr>
+</tbody>
+</table>
+<p>Ignoring handoff overhead, contention and incomplete batches, the capacity ceiling is about 17,500 lines a second: parsing is the bottleneck, and the writer keeps up only because it batches. Without batching the writer would manage 1 line per 5 ms, 200 a second, and everything else would sit blocked behind it. The index must be in order, but parsing fans out and finishes out of order, so the writer's input needs sequence numbers and a small reorder buffer, with the permit rule from above so the buffer stays bounded. If the disk slows to 50 ms a write, the writer drops to 2,000 lines a second, its queue fills, parsers and then the reader block, and the whole pipeline runs at 2,000 a second with bounded retained work if payloads, active work, queues and reorder storage all have bounds.</p>
+</div>
+
+<div class="box mistakes">
+<h3>Common mistakes</h3>
+<ul>
+<li><strong>Unbounded queues between stages.</strong> A fast stage in front of a slow one fills memory until the process dies. Every queue gets a capacity.</li>
+<li><strong>One end marker for N workers.</strong> One worker stops; the others wait forever. Send one per worker, and have the next stage count them.</li>
+<li><strong>A stage that dies quietly.</strong> If a worker throws and exits without passing its end marker, the collector waits forever, and if the workers stop taking, the source blocks forever on a full queue. Record the first error and choose a shutdown protocol: drain with all consumers still alive, or abort by waking every blocked producer and consumer. A marker put in <code>finally</code> can itself block forever if the downstream stage has exited.</li>
+<li><strong>Batching without a time limit.</strong> At low traffic a batch never fills, so the first item waits indefinitely.</li>
+<li><strong>Releasing the ordering permit on completion.</strong> The reorder buffer grows without bound behind a slow head. Release on emit.</li>
+<li><strong>Too many tiny stages.</strong> Every hand off is a queue operation and often a thread wakeup. Merge cheap adjacent stages; split only where a stage needs different parallelism or is the bottleneck.</li>
+</ul>
+</div>
+
+<div class="box interview">
+<h3>In the interview</h3>
+<p>The collected Databricks reports repeatedly describe concurrent log or event writers. Across those reports, topics include batching to reduce flushes, ordered writes, durability acknowledgements, close and back-pressure. Another Databricks round, a cached file reader over slow storage, was answered with fixed-size chunks fetched in parallel by a thread pool, each chunk fetched once. An older Google phone screen (2020) asked for a multithreaded C++ queue that notified consumers in batches of N records or after T seconds, which is the batching policy above.</p>
+<blockquote>I will build it as stages connected by bounded queues: the source, a fan-out stage of parser threads sized to the cores, and a single writer that owns the output and batches up to 100 records or 20 milliseconds. Bounded queues give back-pressure: if the writer slows down, the parsers block and then the source blocks, so queued work stays bounded and throughput drops to the writer's pace. I also bound payload bytes, active work and batch storage. Shutdown is an end marker per parser, counted by the writer, which flushes the last batch before it exits. Because parsing finishes out of order, the writer reorders by sequence number, and I release the parallelism permit when a record is emitted, so the reorder buffer stays bounded.</blockquote>
+<p>Follow ups to expect: "What happens when the queue is full?" (block, reject, or drop, and why). "How big should each queue be?" "What if a parser throws?" "Which stage is the bottleneck, and how would you find it?" (measure each stage's throughput and queue depth; a persistently full queue identifies a downstream constraint, but also check downstream queue depths, service time and worker utilisation). "How do you make the output ordered?"</p>
+</div>
+
+<div class="box senior">
+<h3>Senior depth</h3>
+<p><strong>Back-pressure across asynchronous boundaries needs a protocol.</strong> Blocking <code>put</code> works between threads in one process. When stages are asynchronous (callbacks, non-blocking I/O), nothing blocks, so demand must be signalled explicitly. Java's <code>java.util.concurrent.Flow</code> interfaces define that protocol: a subscriber requests a positive number of additional items with <code>Flow.Subscription.request(n)</code>, and a publisher must not deliver more data items than the outstanding demand permits. Terminal completion or error signals do not require demand. Reactive libraries build on the same idea.</p>
+<p><strong>Pipelines and divide and conquer are different shapes.</strong> A pipeline suits a stream of independent items flowing through fixed steps; fork and join with work stealing suits one big task that splits recursively. They can be combined: a pipeline stage may use fork/join internally. Choose based on dependencies and blocking behaviour, not the pattern name.</p>
+<p><strong>Across machines, the queue becomes a log.</strong> When stages are separate services connected by a durable log, consumer lag can grow independently of producer progress until retention, quota or storage limits intervene. Back-pressure then becomes a monitoring and scaling decision (add consumers, slow the producer, or shed load) instead of a blocking <code>put</code>.</p>
+</div>
+
+<div class="box takeaways">
+<h3>Key takeaways</h3>
+<ul>
+<li>The slowest stage caps pipeline throughput. Bound queues, active work, batches, reorder buffers and payload bytes to bound retained memory.</li>
+<li>Blocking bounded queues propagate back-pressure: a slow last stage slows the first stage instead of filling memory.</li>
+<li>Fan-out spreads a slow stage over several workers and gives up order; one end marker per worker shuts it down cleanly.</li>
+<li>Batch expensive steps by size or time, whichever comes first.</li>
+<li>For ordered results with K in flight, keep a window of futures, or a reorder buffer whose permit is released on emit.</li>
+</ul>
+</div>
+
+<section class="quiz" id="quick-check" data-lesson="pipelines-and-fan-out"><h2>Quick check</h2><p class="qmeta">Answer each question, then read why. Your score is saved for your module test.</p><div class="mcq" data-id="pipelines-and-fan-out.q1" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">With sustained input above 8,000 items per second, bounded blocking queues and negligible overhead, a three stage pipeline can do 50,000, 8,000 and 20,000 items per second in its three stages. What is the pipeline's throughput, and which queue fills up?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">78,000 per second; no queue fills</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">About 8,000 per second; the queue in front of the second stage fills</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">About 20,000 per second; the last queue fills</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">About 26,000 per second, the average</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The slowest stage sets the pace. Work arrives at the second stage faster than it can handle, so the queue in front of it is the full one, and with bounded queues the first stage then blocks. The full queue points at the bottleneck.</div></div><div class="mcq" data-id="pipelines-and-fan-out.q2" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A stage has 4 workers sharing one input queue. Each worker exits after consuming one marker and never puts it back. When the input ends, the source puts one end marker on the queue. What happens?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">All four workers see it and stop</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">One worker takes it and stops; the other three wait forever on an empty queue, so the program never finishes</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The marker is ignored</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">All four stop, but the collector misses some results</span></button></li></ol><div class="why" hidden><strong>Why.</strong> A queue hands each item to exactly one taker. Send one marker per worker, and have the downstream stage count one marker per upstream worker before it stops.</div></div><div class="mcq" data-id="pipelines-and-fan-out.q3" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A producer makes 5,000 items a second, a consumer handles 3,000, and the queue between them is unbounded. Assume constant rates and enough memory for ten minutes. How much backlog accumulates?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The consumer catches up eventually</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The queue grows by 2,000 items a second, adding 1,200,000 items in ten minutes</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The producer slows down automatically</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Items are dropped when the queue gets large</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The excess is 5,000 minus 3,000 = 2,000 per second; 600 seconds adds 1,200,000 items. There is no automatic dropping or throttling in this model, and the slower consumer cannot catch up while rates stay constant. A bounded queue would make the producer block at the capacity, settling the item flow at 3,000 a second with a bounded queue backlog.</div></div><div class="mcq" data-id="pipelines-and-fan-out.q4" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">An ordered parallel map uses a semaphore of K permits. Each worker releases its permit as soon as its call finishes, and a collector emits results in input order from a reorder buffer. A fixed pool of K workers pulls from a source that keeps supplying items, with no separate admission bound. Item 1 is very slow. Which structure can grow without a bound tied to K?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Nothing: at most K calls run at once</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The reorder buffer: items 2, 3, 4 and onward keep finishing and waiting behind item 1, with no limit</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The number of threads</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The input queue</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Permits released on completion let new calls start while the head is stuck, so finished results pile up. Release the permit when a result is emitted, and the buffer holds at most K results.</div></div><div class="mcq" data-id="pipelines-and-fan-out.q5" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">A batching writer flushes when it has 100 events or when 5 ms have passed since the first event of the batch. Traffic is one event every second. Ignoring queueing, scheduling and flush duration, how much intentional batch assembly delay does each event incur?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">None</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Up to about 5 ms: each event waits for the time limit and is flushed alone</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">About 100 seconds, until 100 events arrive</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">About 1 second</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The size limit never triggers at this rate, so the time limit decides. Without a time limit the event would wait for 99 more, which is why a continuously running stream with a latency target needs a time trigger as well as a size trigger. A finite job could instead flush on end of input.</div></div><div class="mcq" data-id="pipelines-and-fan-out.q6" data-a="1" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In a Java fan-out stage, one worker throws an exception on a bad item, and its thread ends without forwarding anything. Assume the remaining stages continue running. The collector waits for one end marker per worker. What happens at the end of the input?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">The collector finishes normally with one result missing</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">The collector waits forever for the dead worker's end marker</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">The other workers restart the dead one</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">The exception is rethrown in the collector</span></button></li></ol><div class="why" hidden><strong>Why.</strong> The dead worker never takes its end marker, so it never forwards one. Recording an error is not enough: use the drain or abort protocol below to unblock every stage. An uncaught exception escaping a C++ thread entry instead calls <code>std::terminate</code>, so this silent thread-exit scenario is specifically Java.</div></div><div class="mcq" data-id="pipelines-and-fan-out.q7" data-a="0" data-multi="0"><div class="mq"><span class="qn"></span><div class="qt">In the first program, main joins every worker and the collector before printing. The collector alone updates sum and count. Which pair can it print after normal completion?</div></div><ol class="opts"><li><button type="button" class="opt" data-i="0"><span class="ok">A</span><span class="ot">Only count 200 and sum 2,686,700</span></button></li><li><button type="button" class="opt" data-i="1"><span class="ok">B</span><span class="ot">Any count up to 200, because fan-out loses input order</span></button></li><li><button type="button" class="opt" data-i="2"><span class="ok">C</span><span class="ot">Count 200, but a stale sum because sum is not atomic</span></button></li><li><button type="button" class="opt" data-i="3"><span class="ok">D</span><span class="ot">Count 204, because four end markers are counted as data</span></button></li></ol><div class="why" hidden><strong>Why.</strong> Each input is consumed once, each square is added once, and each worker's marker follows its results. The collector waits for all four markers, and joining it publishes its writes to main. The sum is 200 times 201 times 401 divided by 6 = 2,686,700. Order does not change this sum; markers increment a separate counter.</div></div><div class="qscore" hidden></div></section>
+
+<section class="checkpoint" id="checkpoint"><h2>Checkpoint</h2><p class="qmeta">Write your own answer first. Then compare with the model answer, or ask Bar Raiser to mark it like an interviewer would.</p><div class="cq" data-q="pipelines-and-fan-out.c1" data-kind="numbers"><div class="cqh"><span class="kind k-numbers">Numbers</span></div><div class="qtext">A thumbnail service downloads an image (about 200 ms of waiting on the network), resizes it (about 20 ms of CPU), and uploads the result (about 100 ms of waiting). The machine has 8 cores, and the target is 400 images a second. How many threads does each stage need, and what limits the target? Use Little's law and treat the numbers as rough.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Little's law: items in a stage = throughput times time per item. Download: 400 a second times 0.2 s means about 80 downloads in flight, so about 80 threads (or async I/O), and almost no CPU. Resize: 400 times 0.02 s means about 8 resizes in flight, and since each is pure CPU, that needs all 8 cores busy all the time. Upload: 400 times 0.1 s means about 40 in flight.</p>
+<p>The limit is the resize stage: 8 cores times 50 resizes per core per second is exactly 400 a second, with no headroom for anything else on the machine, including the download and upload threads' own CPU. A provisional target of 300 to 350 a second leaves some headroom, but load tests must choose the real target. More I/O threads help only while bandwidth, connection limits and remote quotas permit. Queue capacities come from burst size, payload bytes and latency budgets, not a fixed multiplier of worker count.</p></div></div><div class="cq" data-q="pipelines-and-fan-out.c2" data-kind="code"><div class="cqh"><span class="kind k-code">Write code</span></div><div class="qtext">Implement graceful draining after a processing failure: a Java transform throws <code>RuntimeException</code>, or a C++ transform throws. Assume finite, terminating transforms, live source and collector, no external interruption, and successful queue operations. Stop starting new transforms once failure is observed, drain pending input, join all stages, and report the first error. How would you extend this to cancellation or failure of the collector?</div><textarea class="myans mono" rows="5" placeholder="Write your answer here. Code is welcome."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><figure class="code pair" data-sample="pipelines-and-fan-out.4"><figcaption><span class="ctitle">Graceful draining while the source and collector remain alive</span><span class="ctabs"><button type="button" class="ctab" data-lang="cpp">C++</button><button type="button" class="ctab" data-lang="java">Java</button></span><span class="cacts"><button type="button" class="cbtn" data-copy title="Copy the code">Copy</button></span></figcaption><div class="panes"><pre class="pane pane-cpp" data-lang="cpp"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70</span><code><span class="p">#include &lt;condition_variable&gt;</span>
+<span class="p">#include &lt;deque&gt;</span>
+<span class="p">#include &lt;exception&gt;</span>
+<span class="p">#include &lt;functional&gt;</span>
+<span class="p">#include &lt;mutex&gt;</span>
+<span class="p">#include &lt;optional&gt;</span>
+<span class="p">#include &lt;stdexcept&gt;</span>
+<span class="p">#include &lt;utility&gt;</span>
+
+<span class="k">template</span> &lt;<span class="k">typename</span> T&gt;
+<span class="k">class</span> Channel {                                              <span class="c">// a bounded queue, as in the pipeline above</span>
+<span class="k">public</span>:
+    <span class="k">explicit</span> <span class="f">Channel</span>(<span class="t">std</span>::<span class="t">size_t</span> capacity) : <span class="f">capacity_</span>(capacity) {
+        <span class="k">if</span> (capacity == <span class="n">0</span>) <span class="k">throw</span> <span class="t">std</span>::<span class="f">invalid_argument</span>(<span class="s">"zero capacity"</span>);
+    }
+    <span class="t">void</span> <span class="f">put</span>(T item) {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        notFull_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> items_.<span class="f">size</span>() &lt; capacity_; });
+        items_.<span class="f">push_back</span>(<span class="t">std</span>::<span class="f">move</span>(item));
+        notEmpty_.<span class="f">notify_one</span>();
+    }
+    T <span class="f">take</span>() {
+        <span class="t">std</span>::<span class="t">unique_lock</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        notEmpty_.<span class="f">wait</span>(lock, [<span class="k">this</span>] { <span class="k">return</span> !items_.<span class="f">empty</span>(); });
+        T item = <span class="t">std</span>::<span class="f">move</span>(items_.<span class="f">front</span>());
+        items_.<span class="f">pop_front</span>();
+        notFull_.<span class="f">notify_one</span>();
+        <span class="k">return</span> item;
+    }
+<span class="k">private</span>:
+    <span class="k">const</span> <span class="t">std</span>::<span class="t">size_t</span> capacity_;
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">condition_variable</span> notFull_, notEmpty_;
+    <span class="t">std</span>::<span class="t">deque</span>&lt;T&gt; items_;
+};
+
+<span class="k">class</span> FirstError {                                           <span class="c">// shared by every stage</span>
+<span class="k">public</span>:
+    <span class="t">void</span> <span class="f">record</span>(<span class="t">std</span>::<span class="t">exception_ptr</span> e) {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">if</span> (!error_) error_ = e;                             <span class="c">// keep only the first failure</span>
+    }
+    <span class="t">bool</span> <span class="f">failed</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> error_ != <span class="k">nullptr</span>;
+    }
+    <span class="t">std</span>::<span class="t">exception_ptr</span> <span class="f">get</span>() {
+        <span class="t">std</span>::<span class="t">lock_guard</span>&lt;<span class="t">std</span>::<span class="t">mutex</span>&gt; <span class="f">lock</span>(m_);
+        <span class="k">return</span> error_;
+    }
+<span class="k">private</span>:
+    <span class="t">std</span>::<span class="t">mutex</span> m_;
+    <span class="t">std</span>::<span class="t">exception_ptr</span> error_;
+};
+
+<span class="c">// std::nullopt is the end of stream marker on both channels.</span>
+<span class="k">inline</span> <span class="t">void</span> <span class="f">safeWorker</span>(Channel&lt;<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">long</span>&gt;&gt;&amp; in, Channel&lt;<span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">long</span>&gt;&gt;&amp; out,
+                       <span class="k">const</span> <span class="t">std</span>::<span class="t">function</span>&lt;<span class="t">long</span>(<span class="t">long</span>)&gt;&amp; work, FirstError&amp; firstError) {
+    <span class="k">while</span> (<span class="k">true</span>) {
+        <span class="t">std</span>::<span class="t">optional</span>&lt;<span class="t">long</span>&gt; item = in.<span class="f">take</span>();
+        <span class="k">if</span> (!item) <span class="k">break</span>;
+        <span class="k">if</span> (firstError.<span class="f">failed</span>()) <span class="k">continue</span>;                   <span class="c">// after a failure, drain input without working</span>
+        <span class="k">try</span> {
+            out.<span class="f">put</span>(<span class="f">work</span>(*item));
+        } <span class="k">catch</span> (...) {
+            firstError.<span class="f">record</span>(<span class="t">std</span>::<span class="f">current_exception</span>());
+        }
+    }
+    out.<span class="f">put</span>(<span class="t">std</span>::nullopt);                                   <span class="c">// always, so the collector can finish under the stated assumptions</span>
+}</code></div></pre><pre class="pane pane-java" data-lang="java"><div class="cwrap"><span class="ln" aria-hidden="true">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46</span><code><span class="k">import</span> java.util.concurrent.<span class="t">BlockingQueue</span>;
+<span class="k">import</span> java.util.concurrent.atomic.<span class="t">AtomicReference</span>;
+<span class="k">import</span> java.util.function.<span class="t">Function</span>;
+
+<span class="k">class</span> <span class="t">SafeWorker</span>&lt;I, O&gt; <span class="k">implements</span> <span class="t">Runnable</span> {
+    <span class="k">private</span> <span class="k">final</span> <span class="t">BlockingQueue</span>&lt;<span class="t">Object</span>&gt; in;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">BlockingQueue</span>&lt;<span class="t">Object</span>&gt; out;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Object</span> end;                               <span class="c">// the end of stream marker</span>
+    <span class="k">private</span> <span class="k">final</span> <span class="t">Function</span>&lt;I, O&gt; work;
+    <span class="k">private</span> <span class="k">final</span> <span class="t">AtomicReference</span>&lt;<span class="t">Throwable</span>&gt; firstError;    <span class="c">// shared by every stage</span>
+
+    <span class="t">SafeWorker</span>(<span class="t">BlockingQueue</span>&lt;<span class="t">Object</span>&gt; in, <span class="t">BlockingQueue</span>&lt;<span class="t">Object</span>&gt; out, <span class="t">Object</span> end,
+               <span class="t">Function</span>&lt;I, O&gt; work, <span class="t">AtomicReference</span>&lt;<span class="t">Throwable</span>&gt; firstError) {
+        <span class="k">this</span>.in = in;
+        <span class="k">this</span>.out = out;
+        <span class="k">this</span>.end = end;
+        <span class="k">this</span>.work = work;
+        <span class="k">this</span>.firstError = firstError;
+    }
+
+    <span class="a">@SuppressWarnings</span>(<span class="s">"unchecked"</span>)
+    <span class="k">public</span> <span class="k">void</span> <span class="f">run</span>() {
+        <span class="k">try</span> {
+            <span class="k">while</span> (<span class="k">true</span>) {
+                <span class="t">Object</span> item = in.<span class="f">take</span>();
+                <span class="k">if</span> (item == end) <span class="k">break</span>;                      <span class="c">// forward only after input is drained</span>
+                <span class="k">if</span> (firstError.<span class="f">get</span>() != <span class="k">null</span>) <span class="k">continue</span>;      <span class="c">// after a failure, drain input without working</span>
+                <span class="k">try</span> {
+                    out.<span class="f">put</span>(work.<span class="f">apply</span>((I) item));
+                } <span class="k">catch</span> (<span class="t">RuntimeException</span> e) {
+                    firstError.<span class="f">compareAndSet</span>(<span class="k">null</span>, e);       <span class="c">// keep only the first failure</span>
+                }
+            }
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            firstError.<span class="f">compareAndSet</span>(<span class="k">null</span>, e);
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+            <span class="k">return</span>; <span class="c">// cancellation needs the supervisor abort protocol described earlier</span>
+        }
+        <span class="k">try</span> {
+            out.<span class="f">put</span>(end);
+        } <span class="k">catch</span> (<span class="t">InterruptedException</span> e) {
+            firstError.<span class="f">compareAndSet</span>(<span class="k">null</span>, e);
+            <span class="t">Thread</span>.<span class="f">currentThread</span>().<span class="f">interrupt</span>();
+        }
+    }
+}</code></div></pre></div><div class="runout" hidden></div></figure>
+<p>Under the stated assumptions, a processing failure is recorded and workers keep draining without starting further work after they observe it. Work already started may finish. The collector must continue consuming output, even if it discards results after a failure, so marker insertion can complete. The source checks the shared error before each put and, once it is set, stops producing and sends the end markers early. The collector counts end markers as usual, and when it is done the caller checks the shared error and rethrows it (in C++ with <code>std::rethrow_exception</code>). This is graceful draining, not immediate cancellation. The Java interruption paths record the error and restore the flag, but require the supervisor abort protocol below; an end marker cannot repair a dead downstream consumer.</p></div></div><div class="cq" data-q="pipelines-and-fan-out.c3" data-kind="theory"><div class="cqh"><span class="kind k-theory">Explain</span></div><div class="qtext">Explain back-pressure in a pipeline to an interviewer: how it works with bounded queues, and what the front of the system should do when it cannot keep up.</div><textarea class="myans" rows="5" placeholder="Write your answer here, the way you would say it in the interview."></textarea><div class="cqa"><button type="button" class="btn ghost small" data-model>Show the model answer</button><button type="button" class="btn small" data-mark><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Ask Bar Raiser to mark it</button><button type="button" class="btn ghost small" data-speak><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>Answer out loud</button></div><div class="spk" hidden></div><div class="model" hidden><div class="mlabel">Model answer</div><p>Every queue between stages has a capacity, and a stage that finds its output queue full blocks on put. So when the slowest stage falls behind, its input queue fills, the stage in front of it blocks, then that stage's input fills, and the blocking travels back stage by stage to the source. Nothing has to be coordinated: the whole pipeline settles at the speed of its slowest stage, and queued item counts stay within the sum of capacities. Active tasks, batches, payload bytes and retained outputs still need independent bounds.</p>
+<p>At the front, where requests arrive from outside, I have to choose what blocking means. If callers can wait, I let them block or time out, which pushes the back-pressure to them. If they cannot, I shed load: reject quickly with an error they can retry later, which keeps latency low for the requests I do accept. For telemetry that tolerates loss, dropping or sampling is fine. Spilling to disk absorbs bursts but only delays the problem if the overload lasts. Whatever I choose, I watch queue depth per stage, because the full queue tells me where the bottleneck is.</p></div></div></section>
+
+<section class="sayit" id="say-it"><h2>Say it out loud</h2><p class="qmeta">Interviews are spoken. Answer each question out loud as if the interviewer just asked it. Tandem transcribes you on this Mac, word for word, measures your pace, fillers and pauses, and Bar Raiser scores what you said and how you said it.</p><div class="sq" data-sq="pipelines-and-fan-out.s1" data-seconds="90"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 90 s</span></div><div class="qtext">"You have a stream of records to parse in parallel and write in order. Walk me through the pipeline, including what happens when the writer fails."</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>Use bounded queues, a limited parser pool and one writer</li><li>Sequence records and bound admission until ordered emission</li><li>Count payloads, active work, batches and reorder storage in the memory budget</li><li>Batch by size or time and flush the partial batch on graceful close</li><li>On failure stop admission and wake blocked operations in both directions</li><li>Join all stages and report the first error; cancellation requires cooperative work</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">I would use bounded queues, a limited pool of parsers, and one writer that owns the output. I would number records at admission so the writer can restore input order. The admission limit would cover everything accepted but not yet emitted, including completed records waiting behind a slow earlier record. Otherwise a fixed worker count can hide an unbounded reorder buffer.
+
+The memory budget includes queue contents, active work, batches, reorder storage, and payload bytes. When the writer slows, its queue fills, parsers block, and eventually the source stops accepting more work. At the service boundary I would choose a deadline or rejection policy instead of letting callers wait indefinitely.
+
+The writer batches by size or elapsed time. On graceful close, I stop admission, let accepted work drain, count every parser's completion, and flush the final partial batch. If durability is required, acknowledgements follow the successful durability operation.
+
+If the writer fails, I record the first error and abort every channel so blocked producers and consumers wake. I do not rely on inserting a final marker into a full queue. I then join all stages and report the error. That requires transforms and I/O to terminate or cooperate with cancellation; a stop flag cannot force arbitrary code to return.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you choose queue capacities from a latency budget and variable record sizes?</span></p></div></div><div class="sq" data-sq="pipelines-and-fan-out.s2" data-seconds="80"><div class="cqh"><span class="kind k-speak">Out loud</span><span class="sqt"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>about 80 s</span></div><div class="qtext">"Only four calls can run at once, but memory keeps growing behind a slow first result. What is wrong, and how would you fix it?"</div><div class="spk"></div><div class="sqpts" hidden><div class="mlabel">What a strong answer covers</div><ul><li>A running-call limit does not bound completed but un-emitted results</li><li>Releasing permits on completion keeps admitting later work</li><li>Hold admission permits until ordered emission or explicit cancellation</li><li>Drain all admitted completions so the missing head can reach the collector</li><li>State the head of line and retained-output trade-offs</li></ul></div><div class="model" hidden><div class="mlabel">How a senior would say it</div><div class="mtext">The limit is on running calls, but the growing memory is in completed results waiting for their turn. Suppose the first call is stuck. The other three finish, release their permits, and let three more calls start. That can repeat across the whole input, even though four calls are never exceeded.
+
+I would acquire a permit before admitting each item and keep it until its result is emitted in order. That bounds admitted but un-emitted work, including the reorder buffer. Cancellation must release those permits or tear down admission explicitly.
+
+The collector must still drain completions for every admitted item. If it stops reading a full completion queue while waiting for the missing first result, that first worker may be unable to enqueue its result. I would reserve reorder storage for the entire admission window.
+
+A simpler alternative is a window of futures retrieved in input order. Both approaches preserve the memory bound but still suffer head of line blocking. Also, if I collect every emitted result in a returned list, that list still takes space proportional to the input. Streaming emission is needed for bounded total result storage.</div><p class="follow"><strong>Likely follow up:</strong> <span class="ftext">How would you discover a later task's failure promptly while the oldest future is still running?</span></p></div></div></section>
+
+<section class="practice-links" id="practice-this"><h2>Practice this</h2><div class="pcards"><a class="pcard" href="p-ordered-parallel-map.html" data-problem="ordered-parallel-map"><span class="pk">Executors and async · medium</span><b>Ordered parallel map</b><span class="pst"></span></a><a class="pcard" href="p-durable-log-writer.html" data-problem="durable-log-writer"><span class="pk">Concurrent systems · senior</span><b>Durable log writer with group commit</b><span class="pst"></span></a><a class="pcard" href="p-bounded-blocking-queue.html" data-problem="bounded-blocking-queue"><span class="pk">Thread-safe structures · medium</span><b>Bounded blocking queue</b><span class="pst"></span></a></div></section>
+</article><footer class="lfoot"><div class="lfbtns"><button type="button" class="btn" data-done><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span>Mark lesson as done</span></button><button type="button" class="btn ghost" data-test-me><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg>Test me on this lesson</button><button type="button" class="btn ghost" data-note-here><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg>Note something</button></div><nav class="lnav"><a class="prev" href="single-writer-and-actors.html"><span>Previous</span><b>Single writer, actors and message passing</b></a><a class="next" href="monitor-object-pattern.html"><span>Next</span><b>The monitor object pattern</b></a></nav></footer></main><aside class="toc"><div class="tochead">On this page</div><a href="#stages-joined-by-bounded-queues">Stages joined by bounded queues</a><a href="#fan-out-and-fan-in">Fan-out and fan-in</a><a href="#back-pressure-from-the-last-stage-to-the-first">Back-pressure, from the last stage to the first</a><a href="#batching">Batching</a><a href="#ordered-results-with-bounded-parallelism">Ordered results with bounded parallelism</a><a href="#failure-and-cancellation-need-their-own-path">Failure and cancellation need their own path</a><a href="#sizing-the-stages">Sizing the stages</a><a href="#quick-check">Quick check</a><a href="#checkpoint">Checkpoint</a><a href="#say-it">Say it out loud</a><a href="#practice-this">Practice this</a></aside></div></div><aside id="panel" class="panel" hidden aria-label="Navigator, Logbook and Bar Raiser"><div class="pgrip" id="pgrip" title="Drag to resize. Double click to reset."></div><div class="phead"><div class="ptabs" role="tablist"><button type="button" role="tab" data-ptab="navigator"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 5.5h14a1.5 1.5 0 0 1 1.5 1.5v8.5a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17H5a1.5 1.5 0 0 1-1.5-1.5V7A1.5 1.5 0 0 1 5 5.5z"/></svg><span>Navigator</span></button><button type="button" role="tab" data-ptab="logbook"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5h9l3.5 3.5v13.5H6z"/><path d="M14.5 3.5V7.5h4M9 12h6M9 15.5h6"/></svg><span>Logbook</span><b class="badge" data-due-badge hidden></b></button><button type="button" role="tab" data-ptab="barraiser"><svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span>Bar Raiser</span></button></div><button type="button" class="iconbtn" data-panel-close title="Close (Esc)"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div><div class="pctx"><span id="pthread"></span><span id="pwhere"></span></div><div class="plog" id="log-navigator" role="tabpanel"></div><div class="plog" id="log-logbook" role="tabpanel" hidden></div><div class="plog" id="log-barraiser" role="tabpanel" hidden></div><div class="brquick" id="brquick" hidden><button type="button" data-br="mcq">5 quick MCQs</button><button type="button" data-br="theory">A theory question</button><button type="button" data-br="code">A coding question</button><button type="button" data-br="output">What can this print?</button><button type="button" data-br="bug">Spot the bug</button><button type="button" data-br="rapid">Rapid fire round</button><button type="button" data-br="weak">Drill my weak spots</button></div><form class="pform" id="pform" autocomplete="off"><div class="recbar" id="recbar"><span class="recdot"></span><span id="recmsg">Listening</span><span class="meter" id="meter"></span><span id="rectime">0:00</span></div><textarea id="pinput" rows="2"></textarea><div class="prow"><button type="button" class="mic" id="mic" title="Speak: click to start and stop, or press and hold"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg></button><select id="voicelang" title="Language you speak in"><option value="hinglish">Hinglish</option><option value="en">English</option><option value="hi">Hindi</option></select><label class="tick" title="Send as soon as your speech becomes text"><input type="checkbox" id="autosend">Auto send</label><label class="tick" title="Read every new answer aloud"><input type="checkbox" id="autoread">Read aloud</label><button class="btn send" id="psend" type="submit">Ask</button></div></form></aside><div class="toast" id="toast" hidden></div><script src="../concurrency/data.js"></script><script src="../assets/tandem.js"></script></body></html>
